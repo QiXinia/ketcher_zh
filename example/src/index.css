@@ -1,54 +1,173 @@
 @import 'normalize.css';
 
+:root {
+  color-scheme: light;
+  --ketcher-page-bg: #ffffff;
+  --ketcher-page-text: #1f2933;
+  --ketcher-editor-bg: #eef3f7;
+  --ketcher-canvas-bg: #fcfcfc;
+  --ketcher-surface: #ffffff;
+  --ketcher-surface-raised: #ffffff;
+  --ketcher-surface-muted: #f5f7fa;
+  --ketcher-text-primary: #27313b;
+  --ketcher-text-secondary: #5f6f7e;
+  --ketcher-border: #d6dde8;
+  --ketcher-border-soft: #edf1f5;
+  --ketcher-accent: #167782;
+  --ketcher-accent-hover: #0d6370;
+  --ketcher-shadow: 0 10px 28px rgba(33, 44, 71, 0.12);
+}
+
+html[data-theme='dark'] {
+  color-scheme: dark;
+  --ketcher-page-bg: #0c1117;
+  --ketcher-page-text: #edf4fb;
+  --ketcher-editor-bg: #0c1117;
+  --ketcher-canvas-bg: #f7fafc;
+  --ketcher-surface: #111820;
+  --ketcher-surface-raised: #17212c;
+  --ketcher-surface-muted: #1d2a36;
+  --ketcher-text-primary: #edf4fb;
+  --ketcher-text-secondary: #a8b8c7;
+  --ketcher-border: #2c3a49;
+  --ketcher-border-soft: #202c38;
+  --ketcher-accent: #57c7d4;
+  --ketcher-accent-hover: #7ddde8;
+  --ketcher-shadow: 0 16px 42px rgba(0, 0, 0, 0.38);
+}
+
 body {
-    margin: 0;
-    padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: var(--ketcher-page-bg);
+  color: var(--ketcher-page-text);
 }
 
 code {
-    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
 
 #root {
-    height: 100%;
-    width: 100%;
+  height: 100%;
+  width: 100%;
 }
 
 html,
 body {
-    height: 100%;
-    width: 100%;
+  height: 100%;
+  width: 100%;
+}
+
+html[data-theme='dark'] .Ketcher-root {
+  background: var(--ketcher-editor-bg);
+  color: var(--ketcher-text-primary);
+}
+
+html[data-theme='dark'] [data-testid='ketcher-canvas'],
+html[data-theme='dark'] [data-testid='canvas'] {
+  background-color: var(--ketcher-canvas-bg) !important;
+}
+
+html[data-theme='dark'] .Ketcher-root button:not([disabled]),
+html[data-theme='dark']
+  .Ketcher-root
+  [role='button']:not([aria-disabled='true']) {
+  color: var(--ketcher-text-primary);
+}
+
+html[data-theme='dark'] .Ketcher-root button:hover,
+html[data-theme='dark'] .Ketcher-root [role='button']:hover {
+  color: var(--ketcher-accent-hover);
+}
+
+html[data-theme='dark'] .Ketcher-root button[disabled],
+html[data-theme='dark'] .Ketcher-root [aria-disabled='true'] {
+  color: rgba(168, 184, 199, 0.55);
+}
+
+html[data-theme='dark'] .Ketcher-root input,
+html[data-theme='dark'] .Ketcher-root select,
+html[data-theme='dark'] .Ketcher-root textarea {
+  background: var(--ketcher-surface-raised) !important;
+  border-color: var(--ketcher-border) !important;
+  color: var(--ketcher-text-primary) !important;
+}
+
+html[data-theme='dark'] .Ketcher-root input::placeholder,
+html[data-theme='dark'] .Ketcher-root textarea::placeholder {
+  color: var(--ketcher-text-secondary);
+}
+
+html[data-theme='dark'] .Ketcher-root .contexify,
+html[data-theme='dark'] .Ketcher-root .MuiPaper-root,
+html[data-theme='dark'] .MuiPaper-root.ketcher-dialog {
+  background: var(--ketcher-surface-raised) !important;
+  border-color: var(--ketcher-border) !important;
+  color: var(--ketcher-text-primary) !important;
+  box-shadow: var(--ketcher-shadow) !important;
+}
+
+html[data-theme='dark'] .Ketcher-root .contexify {
+  --contexify-menu-bgColor: var(--ketcher-surface-raised);
+  --contexify-item-color: var(--ketcher-text-primary);
+  --contexify-activeItem-bgColor: var(--ketcher-surface-muted);
+  --contexify-activeItem-color: var(--ketcher-accent-hover);
+  --contexify-separator-color: var(--ketcher-border);
+  --contexify-rightSlot-color: var(--ketcher-text-secondary);
+  --contexify-activeRightSlot-color: var(--ketcher-accent-hover);
+  --contexify-arrow-color: var(--ketcher-text-primary);
+  --contexify-activeArrow-color: var(--ketcher-accent-hover);
+}
+
+html[data-theme='dark'] .Ketcher-polymer-editor-root {
+  background: var(--ketcher-editor-bg);
+  color: var(--ketcher-text-primary);
+}
+
+html[data-theme='dark'] .Ketcher-polymer-editor-root,
+html[data-theme='dark'] .Ketcher-polymer-editor-root * {
+  scrollbar-color: #425366 #17212c;
+}
+
+html[data-theme='dark'] .Ketcher-polymer-editor-root svg {
+  background: var(--ketcher-editor-bg);
+}
+
+html[data-theme='dark'] [data-testid='notification-banner'] {
+  background: var(--ketcher-surface-raised) !important;
+  border: 1px solid var(--ketcher-border);
+  color: var(--ketcher-text-primary);
 }
 
 .MuiPaper-root.ketcher-dialog {
-    align-self: center;
-    width: 800px;
-    height: 650px;
-    z-index: 1002;
-    max-height: calc(100vh - 4.28571rem);
-    max-width: calc(100vw - 4.28571rem);
-    min-height: 19rem;
-    min-width: 19rem;
+  align-self: center;
+  width: 800px;
+  height: 650px;
+  z-index: 1002;
+  max-height: calc(100vh - 4.28571rem);
+  max-width: calc(100vw - 4.28571rem);
+  min-height: 19rem;
+  min-width: 19rem;
 }
 
 .container {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }
 
 .box {
-    min-width: 450px;
-    min-height: 350px;
-    flex-grow: 1;
-    margin: 20px;
-    box-shadow: 1px 4px 12px rgba(103, 104, 132, 0.18);
+  min-width: 450px;
+  min-height: 350px;
+  flex-grow: 1;
+  margin: 20px;
+  box-shadow: 1px 4px 12px rgba(103, 104, 132, 0.18);
 }

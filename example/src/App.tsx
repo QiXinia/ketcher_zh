@@ -6,6 +6,10 @@ import 'ketcher-react/dist/index.css';
 
 import { getStructServiceProvider } from './utils';
 import { safePostMessage } from './utils/safePostMessage';
+import {
+  getCurrentKetcherTheme,
+  subscribeToKetcherThemeMessages,
+} from './theme';
 
 const getHiddenButtonsConfig = (): ButtonsConfig => {
   const searchParams = new URLSearchParams(window.location.search);
@@ -31,6 +35,8 @@ const App = () => {
     getStructServiceProvider().then(setStructServiceProvider);
   }, []);
 
+  useEffect(() => subscribeToKetcherThemeMessages(), []);
+
   if (!structServiceProvider) {
     return <div>Loading...</div>;
   }
@@ -49,6 +55,9 @@ const App = () => {
           window.ketcher = ketcher;
           safePostMessage({
             eventType: 'init',
+            data: {
+              theme: getCurrentKetcherTheme(),
+            },
           });
           window.scrollTo(0, 0);
         }}

@@ -6,6 +6,55 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
     <style>
+      :root {
+        color-scheme: light;
+        --host-bg: #f6f8fb;
+        --host-surface: #ffffff;
+        --host-surface-elevated: #ffffff;
+        --host-text: #1f2933;
+        --host-muted: #667085;
+        --host-border: #d6dde8;
+        --host-accent: #167782;
+        --host-accent-hover: #0d6370;
+        --host-control-bg: #ffffff;
+        --host-shadow: 0 18px 48px rgba(33, 44, 71, 0.18);
+        --host-backdrop: rgba(10, 20, 30, 0.42);
+      }
+
+      [data-theme='dark'] {
+        color-scheme: dark;
+        --host-bg: #0c1117;
+        --host-surface: #111820;
+        --host-surface-elevated: #151f2a;
+        --host-text: #edf4fb;
+        --host-muted: #9fb0bf;
+        --host-border: #293746;
+        --host-accent: #57c7d4;
+        --host-accent-hover: #7ddde8;
+        --host-control-bg: #0d141c;
+        --host-shadow: 0 22px 64px rgba(0, 0, 0, 0.46);
+        --host-backdrop: rgba(2, 7, 12, 0.72);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        min-height: 100vh;
+        margin: 0;
+        padding: 24px;
+        background: radial-gradient(
+            circle at top left,
+            rgba(87, 199, 212, 0.12),
+            transparent 34rem
+          ),
+          var(--host-bg);
+        color: var(--host-text);
+        font-family: FreeSans, Arimo, 'Droid Sans', Helvetica, 'Helvetica Neue',
+          Arial, sans-serif;
+      }
+
       .modal {
         display: block;
         position: fixed;
@@ -15,28 +64,30 @@
         width: 100%;
         height: 100%;
         overflow: auto;
-        background-color: rgb(0, 0, 0);
-        background-color: rgba(0, 0, 0, 0.4);
+        background-color: var(--host-backdrop);
       }
 
       .modal-content {
-        background-color: #fefefe;
-        margin: 0% auto;
+        background-color: var(--host-surface-elevated);
+        margin: 0 auto;
         padding: 20px;
-        border: 1px solid #888;
+        border: 1px solid var(--host-border);
+        border-radius: 14px;
+        box-shadow: var(--host-shadow);
         width: 80%;
       }
 
       .close {
-        color: #aaa;
+        color: var(--host-muted);
         float: right;
         font-size: 28px;
         font-weight: bold;
+        line-height: 1;
       }
 
       .close:hover,
       .close:focus {
-        color: black;
+        color: var(--host-text);
         text-decoration: none;
         cursor: pointer;
       }
@@ -52,6 +103,15 @@
         gap: 40px;
       }
 
+      .controls {
+        min-width: 180px;
+        padding: 18px;
+        background: var(--host-surface);
+        border: 1px solid var(--host-border);
+        border-radius: 14px;
+        box-shadow: 0 10px 28px rgba(33, 44, 71, 0.08);
+      }
+
       .columns > div:nth-child(2) {
         width: 80%;
       }
@@ -59,21 +119,86 @@
       textarea {
         width: 100%;
         height: 500px;
+        resize: vertical;
       }
 
-      input {
+      input,
+      textarea {
         margin: 5px 0;
+        background: var(--host-control-bg);
+        border: 1px solid var(--host-border);
+        border-radius: 8px;
+        color: var(--host-text);
+        padding: 8px 10px;
       }
 
       label {
         margin-right: 20px;
+        color: var(--host-muted);
+      }
+
+      button {
+        min-height: 36px;
+        margin-bottom: 14px;
+        padding: 8px 14px;
+        border: 1px solid var(--host-accent);
+        border-radius: 9px;
+        background: var(--host-accent);
+        color: #ffffff;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background-color 0.2s ease, border-color 0.2s ease,
+          transform 0.2s ease;
+      }
+
+      button:hover {
+        background: var(--host-accent-hover);
+        border-color: var(--host-accent-hover);
+      }
+
+      button:active {
+        transform: translateY(1px);
+      }
+
+      iframe {
+        display: block;
+        border: 1px solid var(--host-border);
+        border-radius: 8px;
+        background: var(--host-surface);
+      }
+
+      .theme-toggle {
+        width: 100%;
+        background: transparent;
+        color: var(--host-accent);
+      }
+
+      .theme-toggle:hover {
+        background: rgba(87, 199, 212, 0.12);
+        color: var(--host-accent-hover);
+      }
+
+      @media (max-width: 760px) {
+        body {
+          padding: 16px;
+        }
+
+        .columns {
+          flex-direction: column;
+          gap: 18px;
+        }
+
+        .columns > div:nth-child(2) {
+          width: 100%;
+        }
       }
     </style>
   </head>
   <body>
     <div class="columns">
-      <div>
-        <button>Open Modal</button>
+      <div class="controls">
+        <button class="open-modal">Open Modal</button>
+        <button class="theme-toggle" type="button">Use dark theme</button>
         <div class="inputs">
           <div>
             <label for="height">Height</label>
@@ -93,7 +218,10 @@
       </div>
     </div>
     <script defer>
-      const button = document.querySelector('button');
+      const THEME_STORAGE_KEY = 'ketcher-theme';
+      const THEME_MESSAGE_EVENT = 'theme:change';
+      const openModalButton = document.querySelector('.open-modal');
+      const themeToggleButton = document.querySelector('.theme-toggle');
       const textarea = document.querySelector('.molecule');
       const width = document.querySelector('.width');
       const height = document.querySelector('.height');
@@ -104,7 +232,7 @@
             width="784"
             height="624"
             id="iframe"
-            src="index.html"
+            src="about:blank"
             sandbox="allow-scripts allow-same-origin"
             ></iframe>
         </div>
@@ -112,10 +240,52 @@
       let modal;
       let closeIcon;
       let iframe;
+      let currentTheme = getInitialTheme();
+
+      function getInitialTheme() {
+        const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+
+        if (savedTheme === 'dark' || savedTheme === 'light') {
+          return savedTheme;
+        }
+
+        return window.matchMedia('(prefers-color-scheme: dark)').matches
+          ? 'dark'
+          : 'light';
+      }
+
+      function getKetcherUrl() {
+        return `index.html?theme=${currentTheme}`;
+      }
+
+      function postThemeToIframe() {
+        iframe?.contentWindow?.postMessage(
+          {
+            eventType: THEME_MESSAGE_EVENT,
+            data: {
+              theme: currentTheme,
+            },
+          },
+          window.location.origin,
+        );
+      }
+
+      function applyTheme(theme) {
+        currentTheme = theme;
+        document.documentElement.dataset.theme = theme;
+        document.documentElement.style.colorScheme = theme;
+        localStorage.setItem(THEME_STORAGE_KEY, theme);
+        themeToggleButton.textContent =
+          theme === 'dark' ? 'Use light theme' : 'Use dark theme';
+        postThemeToIframe();
+      }
 
       function closeModal() {
         closeIcon.removeEventListener('click', closeModal);
+        iframe?.removeEventListener('load', postThemeToIframe);
         modal.remove();
+        modal = undefined;
+        iframe = undefined;
       }
 
       function createModal() {
@@ -126,13 +296,28 @@
 
         closeIcon = document.querySelector('.close');
         iframe = document.getElementById('iframe');
-        iframe.style.height = height.value + 'px';
-        iframe.style.width = width.value + 'px';
+        iframe.src = getKetcherUrl();
+
+        if (height.value) {
+          iframe.style.height = height.value + 'px';
+        }
+
+        if (width.value) {
+          iframe.style.width = width.value + 'px';
+        }
+
+        iframe.addEventListener('load', postThemeToIframe);
 
         closeIcon.addEventListener('click', closeModal);
       }
 
-      button.onclick = createModal;
+      applyTheme(currentTheme);
+
+      openModalButton.onclick = createModal;
+      themeToggleButton.onclick = () => {
+        applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
+      };
+
       window.onclick = function (event) {
         if (event.target == modal) {
           closeModal();
@@ -140,8 +325,11 @@
       };
 
       window.addEventListener('message', (event) => {
-        if (event.data.eventType === 'init') {
-          iframe.contentWindow.ketcher.setMolecule(textarea.value);
+        const message = event.data || {};
+
+        if (message.eventType === 'init') {
+          postThemeToIframe();
+          iframe?.contentWindow?.ketcher?.setMolecule(textarea.value);
         }
       });
     </script>
