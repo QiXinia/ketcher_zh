@@ -16,6 +16,7 @@
 
 export * from './ifDef';
 export * from './toFixed';
+export * from './EventEmitter';
 export * from './runAsyncAction';
 export * from './b64toBlob';
 export * from './notifyRequestCompleted';

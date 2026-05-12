@@ -14,7 +14,7 @@
  * limitations under the License.
  ***************************************************************************/
 
-import EventEmitter from 'events';
+import { EventEmitter } from './EventEmitter';
 import { KetcherLogger } from './KetcherLogger';
 
 export enum KetcherAsyncEvents {

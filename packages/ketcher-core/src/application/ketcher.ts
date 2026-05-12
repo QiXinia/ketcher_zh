@@ -36,8 +36,8 @@ import { MolfileFormat } from 'domain/serializers/mol/mol.types';
 import { SGroup } from 'domain/entities/sgroup';
 import { Struct } from 'domain/entities/struct';
 import assert from 'assert';
-import { EventEmitter } from 'events';
 import {
+  EventEmitter,
   LogSettings,
   LogLevel,
   runAsyncAction,

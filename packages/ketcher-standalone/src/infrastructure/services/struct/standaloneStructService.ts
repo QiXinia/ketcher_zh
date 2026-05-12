@@ -58,6 +58,7 @@ import {
   ExplicitHydrogensData,
   ExplicitHydrogensResult,
   GenerateImageOptions,
+  EventEmitter,
   getLabelRenderModeForIndigo,
   InfoResult,
   LayoutData,
@@ -70,8 +71,6 @@ import {
   CalculateMacromoleculePropertiesResult,
   provideEditorInstance,
 } from 'ketcher-core';
-
-import EventEmitter from 'events';
 import {
   STRUCT_SERVICE_INITIALIZED_EVENT,
   STRUCT_SERVICE_NO_RENDER_INITIALIZED_EVENT,

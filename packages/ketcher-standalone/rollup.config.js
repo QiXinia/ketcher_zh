@@ -2,7 +2,6 @@ import babel from '@rollup/plugin-babel';
 import cleanup from 'rollup-plugin-cleanup';
 import commonjs from '@rollup/plugin-commonjs';
 import del from 'rollup-plugin-delete';
-import nodePolyfills from 'rollup-plugin-node-polyfills';
 import resolve from '@rollup/plugin-node-resolve';
 import strip from '@rollup/plugin-strip';
 import typescript from 'rollup-plugin-typescript2';
@@ -61,7 +60,6 @@ const baseConfig = {
   },
   external: ['ketcher-core', /@babel\/runtime/],
   plugins: [
-    nodePolyfills(),
     resolve({ extensions }),
     commonjs(),
     typescript(),
