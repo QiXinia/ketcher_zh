@@ -30,6 +30,7 @@ import fullscreen from './fullscreen';
 import { removeStructAction, openInfoModal } from '../state/shared';
 import { Tools, UiAction } from './action.types';
 import Editor from '../../editor/Editor';
+import i18n from '../../../i18n';
 
 export * from './action.types';
 
@@ -57,7 +58,7 @@ const updateConfigItem = (item: UiAction): UiAction => {
 const config: Record<string, UiAction> = {
   clear: {
     shortcut: ['Mod+Delete', 'Mod+Backspace'],
-    title: 'Clear Canvas',
+    title: i18n.t('action.clearCanvas'),
     action: {
       thunk: (dispatch, getState) => {
         const editor = getState().editor;
@@ -72,7 +73,7 @@ const config: Record<string, UiAction> = {
   },
   open: {
     shortcut: 'Mod+o',
-    title: 'Open…',
+    title: i18n.t('action.open'),
     enabledInViewOnly: true,
     action: { dialog: 'open' },
     disabled: (editor) => editor.isMonomerCreationWizardActive,
@@ -80,25 +81,25 @@ const config: Record<string, UiAction> = {
   },
   save: {
     shortcut: 'Mod+s',
-    title: 'Save As…',
+    title: i18n.t('action.saveAs'),
     enabledInViewOnly: true,
     action: { dialog: 'save' },
     disabled: (editor) => editor.isMonomerCreationWizardActive,
     hidden: (options) => isHidden(options, 'save'),
   },
   'atom-props': {
-    title: 'Atom Properties',
+    title: i18n.t('action.atomProperties'),
     action: { dialog: 'atomProps' },
     hidden: (options) => isHidden(options, 'atom-props'),
   },
   'bond-props': {
-    title: 'Bond Properties',
+    title: i18n.t('action.bondProperties'),
     action: { dialog: 'bondProps' },
     hidden: (options) => isHidden(options, 'bond-props'),
   },
   undo: {
     shortcut: 'Mod+z',
-    title: 'Undo',
+    title: i18n.t('action.undo'),
     action: {
       thunk: (_, getState) => {
         const editor = getState().editor;
@@ -110,7 +111,7 @@ const config: Record<string, UiAction> = {
   },
   redo: {
     shortcut: ['Mod+Shift+z', 'Mod+y'],
-    title: 'Redo',
+    title: i18n.t('action.redo'),
     action: {
       thunk: (_, getState) => {
         const editor = getState().editor;
@@ -122,7 +123,7 @@ const config: Record<string, UiAction> = {
   },
   cut: {
     shortcut: 'Mod+x',
-    title: 'Cut',
+    title: i18n.t('action.cut'),
     action: {
       thunk: (dispatch, _) => {
         const isCutSupported = exec('cut');
@@ -145,7 +146,7 @@ const config: Record<string, UiAction> = {
   copy: {
     shortcut: 'Mod+c',
     enabledInViewOnly: true,
-    title: 'Copy',
+    title: i18n.t('action.copy'),
     action: {
       thunk: (dispatch, _) => {
         const isCopySupported = exec('copy');
@@ -161,7 +162,7 @@ const config: Record<string, UiAction> = {
   'copy-image': {
     shortcut: 'Mod+Shift+f',
     enabledInViewOnly: true,
-    title: 'Copy Image',
+    title: i18n.t('action.copyImage'),
     action: () => {
       copyImageToClipboard();
     },
@@ -171,7 +172,7 @@ const config: Record<string, UiAction> = {
   'copy-mol': {
     shortcut: 'Mod+Shift+m',
     enabledInViewOnly: true,
-    title: 'Copy as MOL',
+    title: i18n.t('action.copyAsMOL'),
     action: () => {
       copyAs('mol');
     },
@@ -181,7 +182,7 @@ const config: Record<string, UiAction> = {
   'copy-ket': {
     shortcut: 'Mod+Shift+k',
     enabledInViewOnly: true,
-    title: 'Copy as KET',
+    title: i18n.t('action.copyAsKET'),
     action: () => {
       copyAs('ket');
     },
@@ -190,7 +191,7 @@ const config: Record<string, UiAction> = {
   },
   paste: {
     shortcut: 'Mod+v',
-    title: 'Paste',
+    title: i18n.t('action.paste'),
     action: {
       thunk: (dispatch, _) => {
         const isPasteSupported = exec('paste');
@@ -204,37 +205,37 @@ const config: Record<string, UiAction> = {
     hidden: (options) => isHidden(options, 'paste'),
   },
   settings: {
-    title: 'Settings',
+    title: i18n.t('action.settings'),
     action: { dialog: 'settings' },
     disabled: (editor) => editor.isMonomerCreationWizardActive,
     hidden: (options) => isHidden(options, 'settings'),
   },
   about: {
-    title: 'About',
+    title: i18n.t('action.about'),
     enabledInViewOnly: true,
     action: { dialog: 'about' },
     hidden: (options) => isHidden(options, 'about'),
   },
   'reaction-automap': {
-    title: 'Reaction Auto-Mapping Tool',
+    title: i18n.t('action.reactionAutoMappingTool'),
     action: { dialog: 'automap' },
     hidden: (options) => isHidden(options, 'reaction-automap'),
     disabled: (editor, _server, options) =>
       !options.app.server || !editor.struct().hasRxnArrow(),
   },
   'period-table': {
-    title: 'Periodic Table',
+    title: i18n.t('action.periodicTable'),
     action: { dialog: 'period-table' },
     hidden: (options) => isHidden(options, 'period-table'),
   },
   'extended-table': {
-    title: 'Extended Table',
+    title: i18n.t('action.extendedTable'),
     action: { dialog: 'extended-table' },
     disabled: (editor) => editor.isMonomerCreationWizardActive,
     hidden: (options) => isHidden(options, 'extended-table'),
   },
   'select-all': {
-    title: 'Select All',
+    title: i18n.t('action.selectAll'),
     enabledInViewOnly: true,
     shortcut: 'Mod+a',
     action: {
@@ -247,7 +248,7 @@ const config: Record<string, UiAction> = {
     hidden: (options) => isHidden(options, 'select-all'),
   },
   'deselect-all': {
-    title: 'Deselect All',
+    title: i18n.t('action.deselectAll'),
     enabledInViewOnly: true,
     shortcut: 'Mod+Shift+a',
     action: (editor) => {
@@ -256,7 +257,7 @@ const config: Record<string, UiAction> = {
     hidden: (options) => isHidden(options, 'deselect-all'),
   },
   'select-descriptors': {
-    title: 'Select descriptors',
+    title: i18n.t('action.selectDescriptors'),
     shortcut: 'Mod+d',
     enabledInViewOnly: true,
     action: {
@@ -271,7 +272,7 @@ const config: Record<string, UiAction> = {
     hidden: (options) => isHidden(options, 'select-descriptors'),
   },
   'any-atom': {
-    title: 'Any atom',
+    title: i18n.t('action.anyAtom'),
     action: {
       tool: 'atom',
       opts: {
@@ -284,7 +285,7 @@ const config: Record<string, UiAction> = {
     hidden: (options) => isHidden(options, 'any-atom'),
   },
   'info-modal': {
-    title: 'Error message',
+    title: i18n.t('action.errorMessage'),
     action: { dialog: 'info-modal' },
     hidden: (options) => isHidden(options, 'info-modal'),
   },

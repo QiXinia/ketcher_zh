@@ -16,6 +16,7 @@
 
 import { Divider } from './Divider';
 import { TopToolbarIconButton } from './TopToolbarIconButton';
+import i18n from '../../../../../i18n';
 
 interface UndoRedoProps {
   disabledButtons: string[];
@@ -36,7 +37,7 @@ export const UndoRedo = ({
     <>
       <Divider />
       <TopToolbarIconButton
-        title="Undo"
+        title={i18n.t('topToolbar.undo')}
         onClick={onUndo}
         iconName="undo"
         disabled={disabledButtons.includes('undo')}
@@ -45,7 +46,7 @@ export const UndoRedo = ({
         testId="undo"
       />
       <TopToolbarIconButton
-        title="Redo"
+        title={i18n.t('topToolbar.redo')}
         onClick={onRedo}
         iconName="redo"
         disabled={disabledButtons.includes('redo')}

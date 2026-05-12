@@ -20,6 +20,7 @@ import { Dialog } from '../../../../components';
 import classes from './Automap.module.less';
 import Select from '../../../../../component/form/Select/Select';
 import { getSelectOptionsFromSchema } from '../../../../../utils';
+import i18n from '../../../../../../../i18n';
 
 type Props = BaseProps & BaseCallProps;
 
@@ -41,14 +42,14 @@ const Automap = (props: Props) => {
   const { formState, ...rest } = props;
   return (
     <Dialog
-      title="Reaction Auto-Mapping"
+      title={i18n.t('automap.title')}
       className={classes.automap}
       result={() => formState.result}
       valid={() => formState.valid}
       params={rest}
       withDivider
       buttons={['Cancel', 'OK']}
-      buttonsNameMap={{ OK: 'Apply' }}
+      buttonsNameMap={{ OK: i18n.t('dialog.apply') }}
     >
       <Form schema={automapSchema} {...formState}>
         <Field

@@ -16,11 +16,12 @@
 
 import templates from '../data/templates';
 import isHidden from './isHidden';
+import i18n from '../../../i18n';
 
 const templateLib = {
   'template-lib': {
     shortcut: 'Shift+t',
-    title: 'Structure Library',
+    title: i18n.t('templates.structureLibrary'),
     action: { dialog: 'templates', prop: { tab: null } },
     selected: (editor) => editor._tool.mode === 'classic',
     disabled: (editor, server, options) => !options.app.templates,

@@ -16,12 +16,13 @@
 
 import isHidden from './isHidden';
 import { MODES } from 'src/constants';
+import i18n from '../../../i18n';
 
 const functionalGroupsLib = {
   'functional-groups': {
     shortcut: 'Shift+f',
     // TODO Update HELP about current tools
-    title: 'Functional Groups',
+    title: i18n.t('functionalGroups.title'),
     action: { dialog: 'templates', prop: { tab: 1 } },
     selected: (editor) => editor._tool.mode === MODES.FG,
     disabled: (_, __, options) => {

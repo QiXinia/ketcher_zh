@@ -8,6 +8,7 @@ import {
   standardColors,
 } from './style';
 import { Item, Submenu } from 'react-contexify';
+import i18n from '../../../../i18n';
 
 interface HighlightMenuProps {
   onHighlight: (color: string) => void;
@@ -18,7 +19,7 @@ const HighlightMenu: FC<HighlightMenuProps> = ({ onHighlight, disabled }) => {
   return (
     <Submenu
       data-testid="Highlight-option"
-      label="Highlight"
+      label={i18n.t('contextMenu.highlight')}
       disabled={disabled}
     >
       <ColorContainer>
@@ -40,7 +41,9 @@ const HighlightMenu: FC<HighlightMenuProps> = ({ onHighlight, disabled }) => {
           }}
         >
           <Icon name="no-highlight-cross" />
-          <span style={{ marginLeft: '10px' }}>No highlight</span>
+          <span style={{ marginLeft: '10px' }}>
+            {i18n.t('contextMenu.noHighlight')}
+          </span>
         </div>
       </Item>
     </Submenu>

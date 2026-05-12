@@ -19,6 +19,7 @@ import { useChangeBondDirection } from '../hooks/useChangeBondDirection';
 import { useAppContext } from 'src/hooks/useAppContext';
 import HighlightMenu from 'src/script/ui/action/highlightColors/HighlightColors';
 import { ketcherProvider, MonomerMicromolecule } from 'ketcher-core';
+import i18n from '../../../../../../i18n';
 
 type Params = ItemEventParams<BondsContextMenuProps>;
 
@@ -103,8 +104,8 @@ const BondMenuItems: FC<MenuItemsProps<BondsContextMenuProps>> = (props) => {
         <Icon name="editMenu" className={styles.icon} />
         <span className={styles.contextMenuText}>
           {props.propsFromTrigger?.extraItemsSelected
-            ? 'Edit selected bonds...'
-            : 'Edit...'}
+            ? i18n.t('contextMenu.editSelectedBonds')
+            : i18n.t('contextMenu.edit')}
         </span>
       </Item>
       <Separator />
@@ -132,7 +133,7 @@ const BondMenuItems: FC<MenuItemsProps<BondsContextMenuProps>> = (props) => {
       <Submenu
         {...props}
         data-testid="Query bonds-option"
-        label="Query bonds"
+        label={i18n.t('contextMenu.queryBonds')}
         className={styles.subMenu}
         disabled={disabledForMonomerCreation}
       >
@@ -161,7 +162,7 @@ const BondMenuItems: FC<MenuItemsProps<BondsContextMenuProps>> = (props) => {
           onClick={changeDirection}
           disabled={isBondBetweenMonomers}
         >
-          Change direction
+          {i18n.t('contextMenu.changeDirection')}
         </Item>
       )}
       <Item
@@ -171,7 +172,7 @@ const BondMenuItems: FC<MenuItemsProps<BondsContextMenuProps>> = (props) => {
         onClick={handleSGroupAttach}
         disabled={disabledForMonomerCreation || isBondBetweenMonomers}
       >
-        Attach S-Group...
+        {i18n.t('contextMenu.attachSGroup')}
       </Item>
       <HighlightMenu
         onHighlight={highlightBondWithColor}
@@ -184,12 +185,14 @@ const BondMenuItems: FC<MenuItemsProps<BondsContextMenuProps>> = (props) => {
         disabled={sGroupEditDisabled}
         onClick={handleSGroupEdit}
       >
-        Edit S-Group...
+        {i18n.t('contextMenu.editSGroup')}
       </Item>
       <Separator />
       <Item {...props} data-testid="Delete-option" onClick={handleDelete}>
         <Icon name="deleteMenu" className={styles.icon} />
-        <span className={styles.contextMenuText}>Delete</span>
+        <span className={styles.contextMenuText}>
+          {i18n.t('contextMenu.delete')}
+        </span>
       </Item>
     </>
   );

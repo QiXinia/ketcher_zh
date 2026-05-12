@@ -17,6 +17,7 @@
 import isHidden from './isHidden';
 import { serverTransform } from '../state/server';
 import type { UiAction } from './action.types';
+import i18n from '../../../i18n';
 
 type ServerConfig = {
   [key: string]: UiAction;
@@ -25,7 +26,7 @@ type ServerConfig = {
 const config: ServerConfig = {
   layout: {
     shortcut: 'Mod+l',
-    title: 'Layout',
+    title: i18n.t('server.layout'),
     action: {
       thunk: serverTransform('layout'),
     },
@@ -34,7 +35,7 @@ const config: ServerConfig = {
   },
   clean: {
     shortcut: 'Mod+Shift+l',
-    title: 'Clean Up',
+    title: i18n.t('server.cleanUp'),
     action: {
       thunk: serverTransform('clean'),
     },
@@ -43,7 +44,7 @@ const config: ServerConfig = {
   },
   arom: {
     shortcut: 'Alt+a',
-    title: 'Aromatize',
+    title: i18n.t('server.aromatize'),
     action: {
       thunk: serverTransform('aromatize'),
     },
@@ -52,7 +53,7 @@ const config: ServerConfig = {
   },
   dearom: {
     shortcut: 'Ctrl+Alt+a',
-    title: 'Dearomatize',
+    title: i18n.t('server.dearomatize'),
     action: {
       thunk: serverTransform('dearomatize'),
     },
@@ -61,7 +62,7 @@ const config: ServerConfig = {
   },
   cip: {
     shortcut: 'Mod+p',
-    title: 'Calculate CIP',
+    title: i18n.t('server.calculateCIP'),
     action: {
       thunk: serverTransform('calculateCip'),
     },
@@ -71,7 +72,7 @@ const config: ServerConfig = {
   check: {
     shortcut: 'Alt+s',
     enabledInViewOnly: true,
-    title: 'Check Structure',
+    title: i18n.t('server.checkStructure'),
     action: { dialog: 'check' },
     disabled: (_editor, _server, options) => !options.app.server,
     hidden: (options) => isHidden(options, 'check'),
@@ -79,13 +80,13 @@ const config: ServerConfig = {
   analyse: {
     shortcut: 'Alt+c',
     enabledInViewOnly: true,
-    title: 'Calculated Values',
+    title: i18n.t('server.calculatedValues'),
     action: { dialog: 'analyse' },
     disabled: (_editor, _server, options) => !options.app.server,
     hidden: (options) => isHidden(options, 'analyse'),
   },
   recognize: {
-    title: 'Recognize Molecule',
+    title: i18n.t('server.recognizeMolecule'),
     action: { dialog: 'recognize' },
     disabled: (_editor, _server, options) =>
       !options.app.server ||
@@ -93,13 +94,13 @@ const config: ServerConfig = {
     hidden: (options) => isHidden(options, 'recognize'),
   },
   miew: {
-    title: '3D Viewer',
+    title: i18n.t('server.viewer3D'),
     enabledInViewOnly: true,
     action: { dialog: 'miew' },
     hidden: (options) => isHidden(options, 'miew'),
   },
   'explicit-hydrogens': {
-    title: 'Add/Remove explicit hydrogens',
+    title: i18n.t('server.explicitHydrogens'),
     action: {
       thunk: serverTransform('toggleExplicitHydrogens'),
     },

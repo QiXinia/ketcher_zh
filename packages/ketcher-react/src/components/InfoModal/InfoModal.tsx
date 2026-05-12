@@ -15,7 +15,7 @@
  ***************************************************************************/
 
 import { error } from './constants';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, type ReactElement } from 'react';
 
 import styles from './InfoModal.module.less';
 
@@ -24,7 +24,7 @@ interface InfoModalProps {
   close: () => void;
 }
 
-const InfoModal = ({ message, close }: InfoModalProps): JSX.Element => {
+const InfoModal = ({ message, close }: InfoModalProps): ReactElement => {
   const dialogRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {

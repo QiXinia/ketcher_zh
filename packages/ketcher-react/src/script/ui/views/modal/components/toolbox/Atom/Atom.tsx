@@ -42,6 +42,7 @@ import {
   pseudoAtomValid,
 } from './helper';
 import AtomElement from './AtomElement/AtomElement';
+import i18n from '../../../../../../../i18n';
 
 interface AtomProps extends BaseCallProps, BaseProps {
   alias: string;
@@ -227,12 +228,12 @@ const Atom: FC<Props> = (props: Props) => {
 
   return (
     <Dialog
-      title="Atom Properties"
+      title={i18n.t('atomProperties.title')}
       className={classes.atomProps}
       result={() => formState.result}
       valid={() => formState.valid}
       params={rest}
-      buttonsNameMap={{ OK: 'Apply' }}
+      buttonsNameMap={{ OK: i18n.t('dialog.apply') }}
       buttons={['Cancel', 'OK']}
       withDivider
     >

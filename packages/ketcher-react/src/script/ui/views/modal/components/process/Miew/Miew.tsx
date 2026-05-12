@@ -40,6 +40,7 @@ import { pick } from 'lodash/fp';
 import { Miew as MiewAsType } from 'miew';
 import { createSelector } from 'reselect';
 import { useAppContext } from 'src/hooks';
+import i18n from '../../../../../../../i18n';
 
 const Viewer = lazy(() =>
   import('miew-react').then((module) => ({
@@ -179,11 +180,11 @@ const MiewDialog = ({
 
   return (
     <Dialog
-      title="Miew"
+      title={i18n.t('server.viewer3D')}
       needMargin={false}
       params={prop}
       buttons={[
-        'Cancel',
+        i18n.t('dialog.cancel'),
         <button
           key="apply"
           onClick={exportCML}
@@ -191,7 +192,7 @@ const MiewDialog = ({
           disabled={isDisabled}
           data-testid="miew-modal-button"
         >
-          Apply
+          {i18n.t('dialog.apply')}
         </button>,
       ]}
       footerContent={<FooterContent />}

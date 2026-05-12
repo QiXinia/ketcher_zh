@@ -18,6 +18,7 @@ import styled from '@emotion/styled';
 import { useEffect, useState } from 'react';
 import { shortcutStr } from 'ketcher-core';
 import { TopToolbarIconButton } from './TopToolbarIconButton';
+import i18n from '../../../../../i18n';
 
 interface SystemControlsProps {
   disabledButtons: string[];
@@ -87,7 +88,7 @@ export const SystemControls = ({
         isHidden={hiddenButtons.includes('history')}
       /> */}
       <TopToolbarIconButton
-        title="Settings"
+        title={i18n.t('topToolbar.settings')}
         onClick={onSettingsOpen}
         iconName="settings"
         disabled={disabledButtons.includes('settings')}
@@ -104,7 +105,7 @@ export const SystemControls = ({
       />
       {/* @TODO Temporary About button, when design is ready, reimplement */}
       <TopToolbarIconButton
-        title="About"
+        title={i18n.t('topToolbar.about')}
         onClick={onAboutOpen}
         iconName="about"
         disabled={disabledButtons.includes('about')}
@@ -112,7 +113,7 @@ export const SystemControls = ({
         testId="about-button"
       />
       <TopToolbarIconButton
-        title="Fullscreen mode"
+        title={i18n.t('topToolbar.fullscreenMode')}
         onClick={onFullscreen}
         iconName={isFullscreen ? 'fullscreen-exit' : 'fullscreen-enter'}
         disabled={disabledButtons.includes('fullscreen')}

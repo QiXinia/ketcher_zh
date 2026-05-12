@@ -18,6 +18,7 @@ import { useState, useRef } from 'react';
 import styled from '@emotion/styled';
 import { Button, Popover } from '@mui/material';
 import { Icon } from 'components';
+import i18n from '../../../../../i18n';
 interface IStyledIconProps {
   expanded?: boolean;
   hidden?: boolean;
@@ -173,11 +174,13 @@ export const ModeControl = ({
   const onClose = () => setIsExpanded(false);
   const onExpand = () => setIsExpanded(true);
 
-  const modeLabel = isPolymerEditor ? 'Macromolecules' : 'Molecules';
+  const modeLabel = isPolymerEditor
+    ? i18n.t('modeControl.macromolecules')
+    : i18n.t('modeControl.molecules');
   const modeIcon = isPolymerEditor ? 'macromolecules-mode' : 'molecules-mode';
   const title = isPolymerEditor
-    ? 'Switch to Ketcher mode'
-    : 'Switch to Macromolecule mode';
+    ? i18n.t('modeControl.switchToKetcher')
+    : i18n.t('modeControl.switchToMacromolecule');
 
   return (
     <ElementAndDropdown title={title}>
@@ -220,7 +223,7 @@ export const ModeControl = ({
             }}
           >
             <Icon name="molecules-mode" />
-            <ModeButtonLable>Molecules</ModeButtonLable>
+            <ModeButtonLable>{i18n.t('modeControl.molecules')}</ModeButtonLable>
             {!isPolymerEditor && <StyledIcon name="check-mark" />}
           </ModeControlButton>
 
@@ -231,7 +234,9 @@ export const ModeControl = ({
             }}
           >
             <Icon name="macromolecules-mode" />
-            <ModeButtonLable>Macromolecules</ModeButtonLable>
+            <ModeButtonLable>
+              {i18n.t('modeControl.macromolecules')}
+            </ModeButtonLable>
             {isPolymerEditor && <StyledIcon name="check-mark" />}
           </ModeControlButton>
         </DropDownContent>

@@ -43,6 +43,7 @@ import { isEqual } from 'lodash';
 import { Icon } from 'components';
 import { ACS_STYLE_DEFAULT_SETTINGS } from 'src/constants';
 import { onAction } from 'src/script/ui/state/shared';
+import i18n from '../../../../../../../i18n';
 
 interface SettingsProps extends BaseProps {
   initState: any;
@@ -80,9 +81,9 @@ const HeaderContent = ({
 
   return (
     <div className={classes.headerContent}>
-      <span className={classes.title}> Settings</span>
+      <span className={classes.title}> {i18n.t('settings.title')}</span>
       <OpenButton
-        title="Open from File"
+        title={i18n.t('settings.openFromFile')}
         key="settings"
         server={server}
         onLoad={onOpenFile}
@@ -92,7 +93,7 @@ const HeaderContent = ({
         <Icon name="open-1" />
       </OpenButton>
       <SaveButton
-        title="Save to File"
+        title={i18n.t('settings.saveToFile')}
         key="ketcher-settings"
         data={JSON.stringify(formState.result)}
         filename="ketcher-settings"
@@ -102,7 +103,7 @@ const HeaderContent = ({
         <Icon name="save-1" />
       </SaveButton>
       <button
-        title="Reset"
+        title={i18n.t('settings.reset')}
         key="settings-button"
         onClick={onReset}
         className={classes.button}
@@ -146,7 +147,7 @@ const SettingsDialog = (props: Props) => {
 
   const generalTab = {
     key: 'general',
-    label: 'General',
+    label: i18n.t('settings.general'),
     content: (
       <fieldset>
         <Field
@@ -193,7 +194,7 @@ const SettingsDialog = (props: Props) => {
   };
   const stereoTab = {
     key: 'stereo',
-    label: 'Stereochemistry',
+    label: i18n.t('settings.stereochemistry'),
     content: (
       <fieldset>
         <Field name="showStereoFlags" data-testid="show-stereo-flags" />
@@ -244,7 +245,7 @@ const SettingsDialog = (props: Props) => {
   };
   const atomsTab = {
     key: 'atoms',
-    label: 'Atoms',
+    label: i18n.t('settings.atoms'),
     content: (
       <fieldset>
         <Field name="carbonExplicitly" data-testid="carbon-explicitly" />
@@ -263,7 +264,7 @@ const SettingsDialog = (props: Props) => {
   };
   const bondsTab = {
     key: 'bonds',
-    label: 'Bonds',
+    label: i18n.t('settings.bonds'),
     content: (
       <fieldset>
         <Field name="aromaticCircle" data-testid="aromatic-circle" />
@@ -297,7 +298,7 @@ const SettingsDialog = (props: Props) => {
   };
   const serverTab = {
     key: 'server',
-    label: 'Server',
+    label: i18n.t('settings.server'),
     content: (
       <fieldset disabled={!appOpts.server}>
         <Field name="smart-layout" data-testid="smart-layout" />
@@ -322,7 +323,7 @@ const SettingsDialog = (props: Props) => {
   };
   const threeDViewerTab = {
     key: '3dviewer',
-    label: '3D Viewer',
+    label: i18n.t('settings.viewer3D'),
     content: (
       // eslint-disable-next-line dot-notation
       <fieldset className={classes.viewer}>
@@ -349,7 +350,7 @@ const SettingsDialog = (props: Props) => {
   };
   const debuggingTab = {
     key: 'debugging',
-    label: 'Options for Debugging',
+    label: i18n.t('settings.optionsForDebugging'),
     content: (
       <fieldset>
         <Field name="showAtomIds" data-testid="show-atom-ids" />
@@ -374,7 +375,7 @@ const SettingsDialog = (props: Props) => {
       onClick={onACSStyle}
       data-testid="acs-style-button"
     >
-      Set ACS Settings
+      {i18n.t('settings.setACSSettings')}
     </button>
   );
 
@@ -394,7 +395,7 @@ const SettingsDialog = (props: Props) => {
       result={() => [formState.result, initState]}
       valid={() => formState.valid}
       params={prop}
-      buttonsNameMap={{ OK: 'Apply' }}
+      buttonsNameMap={{ OK: i18n.t('dialog.apply') }}
       buttons={[ACSStyleButton, 'Cancel', 'OK']}
       withDivider
       needMargin={false}
@@ -452,8 +453,7 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
           dialog: 'info-modal',
           prop: {
             title: '',
-            customText:
-              'To fully apply these changes, you need to apply the layout.',
+            customText: i18n.t('settings.applyLayoutNotification'),
             button: 'OK',
           },
         }),

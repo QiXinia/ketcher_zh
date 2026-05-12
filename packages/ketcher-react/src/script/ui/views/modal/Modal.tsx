@@ -14,7 +14,7 @@
  * limitations under the License.
  ***************************************************************************/
 
-import { useRef } from 'react';
+import { RefObject, useRef } from 'react';
 
 import { BaseCallProps, ModalContainerProps } from './modal.types';
 import classes from './Modal.module.less';
@@ -41,7 +41,7 @@ type ModalContentProps = Omit<Props, 'modal'> & {
 function ModalContent({ modal, ...rest }: ModalContentProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const { height, width } = useResizeObserver<HTMLDivElement>({
-    ref: containerRef,
+    ref: containerRef as RefObject<HTMLDivElement>,
   });
 
   const Component = modals[modal.name];

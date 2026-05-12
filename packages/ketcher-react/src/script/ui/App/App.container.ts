@@ -18,6 +18,7 @@ import { App, AppCallProps } from './App';
 
 import { checkServer } from '../state/server';
 import { connect } from 'react-redux';
+import type { ReactElement } from 'react';
 
 const mapDispatchToProps: AppCallProps = {
   checkServer,
@@ -26,7 +27,7 @@ const mapDispatchToProps: AppCallProps = {
 const AppContainer = connect<
   Record<string, never>,
   AppCallProps,
-  { togglerComponent?: JSX.Element }
+  { togglerComponent?: ReactElement }
 >(
   null,
   mapDispatchToProps,

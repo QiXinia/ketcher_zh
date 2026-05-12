@@ -15,6 +15,7 @@
  ***************************************************************************/
 
 import { Root } from 'react-dom/client';
+import type { ReactElement } from 'react';
 import { ButtonsConfig, KetcherBuilder } from './builders';
 
 import { StructServiceProvider } from 'ketcher-core';
@@ -28,7 +29,7 @@ interface Config {
   buttons?: ButtonsConfig;
   customButtons?: Array<CustomButton>;
   errorHandler: (message: string) => void;
-  togglerComponent?: JSX.Element;
+  togglerComponent?: ReactElement;
   ketcherId: string;
 }
 

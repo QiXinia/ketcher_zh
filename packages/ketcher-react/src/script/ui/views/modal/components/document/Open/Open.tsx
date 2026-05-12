@@ -24,6 +24,7 @@ import { DialogActionButton } from './components/DialogActionButton';
 import { ViewSwitcher } from './components/ViewSwitcher';
 import { getFormatMimeTypeByFileName, ketcherProvider } from 'ketcher-core';
 import { useAppContext } from 'src/hooks';
+import i18n from '../../../../../../../i18n';
 interface OpenProps {
   server: any;
   errorHandler: (err: string) => void;
@@ -57,7 +58,7 @@ const FooterContent = ({
         className={classes.cancelButton}
         data-testid="cancel-button"
       >
-        Cancel
+        {i18n.t('dialog.cancel')}
       </button>
       <div className={classes.buttonsContainer}>
         <DialogActionButton
@@ -65,7 +66,7 @@ const FooterContent = ({
           disabled={!structStr.trim()}
           clickHandler={openHandler}
           styles={classes.openButton}
-          label="Open as New Project"
+          label={i18n.t('open.openAsNewProject')}
           testId="open-as-new-button"
         />
         <DialogActionButton
@@ -73,7 +74,7 @@ const FooterContent = ({
           disabled={!structStr.trim() || isAddToCanvasDisabled}
           clickHandler={copyHandler}
           styles={classes.copyButton}
-          label="Add to Canvas"
+          label={i18n.t('open.addToCanvas')}
           title="Structure will be loaded as fragment and added to Clipboard"
           testId="add-to-canvas-button"
         />
@@ -179,7 +180,7 @@ const Open: FC<Props> = (props) => {
 
   return (
     <Dialog
-      title="Open structure"
+      title={i18n.t('open.title')}
       className={classes.open}
       params={rest}
       result={() => null}

@@ -54,13 +54,14 @@ import { LoadingCircles } from 'src/script/ui/views/components/Spinner';
 import { IconButton } from 'components';
 import { ThunkDispatch } from 'redux-thunk';
 import { AnyAction } from 'redux';
+import i18n from '../../../../../../../i18n';
 
 const saveSchema = {
-  title: 'Save',
+  title: i18n.t('save.title'),
   type: 'object',
   properties: {
     filename: {
-      title: 'File name:',
+      title: i18n.t('save.fileName'),
       type: 'string',
       maxLength: 128,
       pattern: '^[^.<>:?"*\\\\|\\/][^<>:?"*\\\\|\\/]*$',
@@ -71,7 +72,7 @@ const saveSchema = {
       },
     },
     format: {
-      title: 'File format:',
+      title: i18n.t('save.fileFormat'),
       enum: Object.keys(formatProperties),
       enumNames: Object.keys(formatProperties).map(
         (format) => formatProperties[format].name,
@@ -486,19 +487,19 @@ class SaveDialog extends Component<SaveDialogProps, SaveDialogState> {
       warnings.length === 0
         ? [
             {
-              caption: 'Preview',
+              caption: i18n.t('save.preview'),
               component: this.renderSaveFile,
               tabIndex: 0,
             },
           ]
         : [
             {
-              caption: 'Preview',
+              caption: i18n.t('save.preview'),
               component: this.renderSaveFile,
               tabIndex: 0,
             },
             {
-              caption: 'Warnings',
+              caption: i18n.t('save.warnings'),
               component: this.renderWarnings,
               tabIndex: 1,
             },
@@ -635,7 +636,7 @@ class SaveDialog extends Component<SaveDialogProps, SaveDialogState> {
         onClick={() => this.props.onTmplSave(this.props.struct)}
         data-testid="save-to-templates-button"
       >
-        Save to Templates
+        {i18n.t('save.saveToTemplates')}
       </button>,
     ];
 
@@ -647,7 +648,7 @@ class SaveDialog extends Component<SaveDialogProps, SaveDialogState> {
         type="button"
         data-testid="cancel-button"
       >
-        Cancel
+        {i18n.t('dialog.cancel')}
       </button>,
     );
 
@@ -670,7 +671,7 @@ class SaveDialog extends Component<SaveDialogProps, SaveDialogState> {
           }
           className={classes.ok}
         >
-          Save
+          {i18n.t('dialog.save')}
         </SaveButton>,
       );
     } else {
@@ -692,7 +693,7 @@ class SaveDialog extends Component<SaveDialogProps, SaveDialogState> {
           disabled={disableControls || !formState.valid || isCleanStruct}
           className={classes.ok}
         >
-          Save
+          {i18n.t('dialog.save')}
         </SaveButton>,
       );
     }
@@ -705,7 +706,7 @@ class SaveDialog extends Component<SaveDialogProps, SaveDialogState> {
       <DialogComponent
         testId="save-structure-dialog"
         className={classes.dialog}
-        title="Save Structure"
+        title={i18n.t('save.title')}
         params={this.props}
         buttons={this.getButtons()}
         needMargin={false}

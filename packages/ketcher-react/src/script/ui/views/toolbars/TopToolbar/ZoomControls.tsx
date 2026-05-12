@@ -18,6 +18,7 @@ import { useState, useRef, useCallback, RefObject } from 'react';
 import styled from '@emotion/styled';
 import { Button, Popover } from '@mui/material';
 
+import i18n from '../../../../../i18n';
 import { zoomList } from '../../../action/zoom';
 import { ZoomInput, updateInputString } from './ZoomInput';
 import { Icon } from 'components';
@@ -191,31 +192,31 @@ export const ZoomControls = ({
           {!hiddenButtons.includes('zoom-out') && (
             <ZoomControlButton
               data-testid="zoom-out"
-              title="Zoom Out"
+              title={i18n.t('topToolbar.zoomOut')}
               onClick={onZoomOut}
               disabled={disabledButtons.includes('zoom-out')}
             >
-              <span>Zoom out</span>
+              <span>{i18n.t('topToolbar.zoomOut')}</span>
               <ShortcutLabel>{shortcuts['zoom-out']}</ShortcutLabel>
             </ZoomControlButton>
           )}
           {!hiddenButtons.includes('zoom-in') && (
             <ZoomControlButton
               data-testid="zoom-in"
-              title="Zoom In"
+              title={i18n.t('topToolbar.zoomIn')}
               onClick={onZoomIn}
               disabled={disabledButtons.includes('zoom-in')}
             >
-              <span>Zoom in</span>
+              <span>{i18n.t('topToolbar.zoomIn')}</span>
               <ShortcutLabel>{shortcuts['zoom-in']}</ShortcutLabel>
             </ZoomControlButton>
           )}
           <ZoomControlButton
             data-testid="zoom-default"
-            title="Zoom 100%"
+            title={i18n.t('topToolbar.zoom100')}
             onClick={resetZoom}
           >
-            <span>Zoom 100%</span>
+            <span>{i18n.t('topToolbar.zoom100')}</span>
             <ShortcutLabel>{shortcuts.zoom}</ShortcutLabel>
           </ZoomControlButton>
         </DropDownContent>

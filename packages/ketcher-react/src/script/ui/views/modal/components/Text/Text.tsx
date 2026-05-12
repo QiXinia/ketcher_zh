@@ -42,6 +42,7 @@ import { TextCommand } from 'ketcher-core';
 import classes from './Text.module.less';
 import { connect } from 'react-redux';
 import { IconName } from 'components';
+import i18n from '../../../../../../i18n';
 
 interface TextProps extends DialogParams {
   formState: any;
@@ -186,11 +187,11 @@ const TextEditorInner = (props: {
   return (
     <Dialog
       className={classes.textEditor}
-      title="Text Editor"
+      title={i18n.t('textEditor.title')}
       params={params}
       result={result}
       valid={() => formState.form.valid}
-      buttonsNameMap={{ OK: 'Apply' }}
+      buttonsNameMap={{ OK: i18n.t('dialog.apply') }}
       buttons={['Cancel', 'OK']}
       withDivider
     >
@@ -213,10 +214,10 @@ const TextEditorInner = (props: {
           );
         })}
         <SpecialSymbolsButton editor={editor} />
-        <span>Font Size</span>
+        <span>{i18n.t('textEditor.fontSize')}</span>
         <FontControl editor={editor} />
       </div>
-      <span>Text:</span>
+      <span>{i18n.t('textEditor.text')}</span>
       <RichTextPlugin
         contentEditable={
           <ContentEditable

@@ -28,6 +28,7 @@ import { Dispatch } from 'redux';
 import { Editor } from 'ketcher-core';
 import { onAction } from '../../../../state';
 import { useState } from 'react';
+import i18n from '../../../../../../i18n';
 
 interface GenericElement {
   type: 'gen';
@@ -68,13 +69,13 @@ const Table = (props: TableProps) => {
 
   return (
     <Dialog
-      title="Extended Table"
+      title={i18n.t('action.extendedTable')}
       withDivider
       className={classes.extendedTable}
       params={props}
       result={result}
-      buttons={['Cancel', 'OK']}
-      buttonsNameMap={{ OK: 'Add' }}
+      buttons={[i18n.t('dialog.cancel'), 'OK']}
+      buttonsNameMap={{ OK: i18n.t('dialog.add') }}
       needMargin={false}
     >
       <GenericGroups

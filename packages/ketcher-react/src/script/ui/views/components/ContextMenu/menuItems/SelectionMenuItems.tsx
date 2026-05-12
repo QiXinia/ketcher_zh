@@ -27,6 +27,7 @@ import isHidden from '../../../../action/isHidden';
 import { useSelector } from 'react-redux';
 import { optionsSelector } from '../../../../state/options/selectors';
 import clsx from 'clsx';
+import i18n from '../../../../../../i18n';
 
 const bondNames = getBondNames(tools);
 
@@ -69,7 +70,7 @@ const SelectionMenuItems: FC<MenuItemsProps<SelectionContextMenuProps>> = (
         <Submenu
           {...props}
           data-testid="Mark as a...-option"
-          label="Mark as a..."
+          label={i18n.t('contextMenu.markAs')}
           disabled={markAsDisabled}
           className={styles.subMenu}
         >
@@ -82,7 +83,7 @@ const SelectionMenuItems: FC<MenuItemsProps<SelectionContextMenuProps>> = (
               name="base"
               className={clsx(styles.icon, styles.markAsComponentIcon)}
             />
-            <span>Base</span>
+            <span>{i18n.t('contextMenu.base')}</span>
           </Item>
           <Item
             {...props}
@@ -93,7 +94,7 @@ const SelectionMenuItems: FC<MenuItemsProps<SelectionContextMenuProps>> = (
               name="sugar"
               className={clsx(styles.icon, styles.markAsComponentIcon)}
             />
-            <span>Sugar</span>
+            <span>{i18n.t('contextMenu.sugar')}</span>
           </Item>
           <Item
             {...props}
@@ -104,7 +105,7 @@ const SelectionMenuItems: FC<MenuItemsProps<SelectionContextMenuProps>> = (
               name="phosphate"
               className={clsx(styles.icon, styles.markAsComponentIcon)}
             />
-            <span>Phosphate</span>
+            <span>{i18n.t('contextMenu.phosphate')}</span>
           </Item>
         </Submenu>
       )}
@@ -115,7 +116,7 @@ const SelectionMenuItems: FC<MenuItemsProps<SelectionContextMenuProps>> = (
         disabled={bondEditDisabled}
         onClick={handleBondEdit}
       >
-        Edit selected bonds...
+        {i18n.t('contextMenu.editSelectedBonds')}
       </Item>
 
       <Item
@@ -124,13 +125,13 @@ const SelectionMenuItems: FC<MenuItemsProps<SelectionContextMenuProps>> = (
         disabled={atomEditDisabled}
         onClick={handleAtomEdit}
       >
-        Edit selected atoms...
+        {i18n.t('contextMenu.editSelectedAtoms')}
       </Item>
 
       <Submenu
         {...props}
         data-testid="Bond type-option"
-        label="Bond type"
+        label={i18n.t('contextMenu.bondType')}
         disabled={bondTypeChangeDisabled}
         className={styles.subMenu}
       >
@@ -160,7 +161,7 @@ const SelectionMenuItems: FC<MenuItemsProps<SelectionContextMenuProps>> = (
           onClick={handleCreateMonomer}
           disabled={createMonomerDisabled}
         >
-          Create a monomer
+          {i18n.t('contextMenu.createMonomer')}
         </Item>
       )}
 
@@ -170,12 +171,12 @@ const SelectionMenuItems: FC<MenuItemsProps<SelectionContextMenuProps>> = (
         disabled={atomStereoDisabled}
         onClick={handleAtomStereo}
       >
-        Enhanced stereochemistry...
+        {i18n.t('contextMenu.enhancedStereochemistry')}
       </Item>
       <HighlightMenu onHighlight={highlightBondWithColor} />
       <Separator />
       <Item {...props} data-testid="Delete-option" onClick={handleDelete}>
-        Delete
+        {i18n.t('contextMenu.delete')}
       </Item>
     </>
   );

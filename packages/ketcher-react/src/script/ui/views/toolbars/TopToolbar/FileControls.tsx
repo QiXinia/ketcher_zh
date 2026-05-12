@@ -14,6 +14,7 @@
  * limitations under the License.
  ***************************************************************************/
 import { TopToolbarIconButton } from './TopToolbarIconButton';
+import i18n from '../../../../../i18n';
 
 interface FileControlsProps {
   onFileOpen: () => void;
@@ -31,7 +32,7 @@ export const FileControls = ({
   return (
     <>
       <TopToolbarIconButton
-        title="Open..."
+        title={i18n.t('topToolbar.open')}
         onClick={onFileOpen}
         iconName="open"
         shortcut={shortcuts.open}
@@ -39,7 +40,7 @@ export const FileControls = ({
         testId="open-file-button"
       />
       <TopToolbarIconButton
-        title="Save as..."
+        title={i18n.t('topToolbar.saveAs')}
         onClick={onSave}
         iconName="save"
         shortcut={shortcuts.save}

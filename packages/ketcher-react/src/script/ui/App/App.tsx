@@ -20,7 +20,7 @@ import {
   RightToolbarContainer,
   TopToolbarContainer,
 } from '../views/toolbars';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, type ReactElement } from 'react';
 import { createTheme, Snackbar, ThemeProvider } from '@mui/material';
 import AppClipArea from '../views/AppClipArea';
 import { AppHiddenContainer } from './AppHidden';
@@ -43,7 +43,7 @@ import { IconButton } from 'components';
 
 interface AppCallProps {
   checkServer: () => void;
-  togglerComponent?: JSX.Element;
+  togglerComponent?: ReactElement;
 }
 
 const muiTheme = createTheme({

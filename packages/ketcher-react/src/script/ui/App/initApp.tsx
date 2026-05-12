@@ -23,7 +23,10 @@ import { StructService } from 'ketcher-core';
 
 import App from './App.container';
 import { Provider } from 'react-redux';
+import type { ReactElement } from 'react';
 import { Root } from 'react-dom/client';
+import { I18nextProvider } from 'react-i18next';
+import i18n from '../../../i18n';
 import createStore, { setServer } from '../state';
 import { initKeydownListener, removeKeydownListener } from '../state/hotkeys';
 import { initResize } from '../state/toolbar';
@@ -41,7 +44,7 @@ function initApp(
     editor: any;
     setServer: (server: StructService) => void;
   }) => void,
-  togglerComponent?: JSX.Element,
+  togglerComponent?: ReactElement,
 ) {
   // hack to return server setter to Editor.tsx
   // because it does not have access to store
@@ -65,20 +68,24 @@ function initApp(
   store.dispatch(initResize());
 
   appRoot.render(
-    <Provider store={store}>
-      <SettingsContext.Provider value={{ staticResourcesUrl }}>
-        <ErrorsContext.Provider value={{ errorHandler: options.errorHandler }}>
-          <AppContext.Provider
-            value={{
-              ketcherId,
-              prevKetcherId,
-            }}
+    <I18nextProvider i18n={i18n}>
+      <Provider store={store}>
+        <SettingsContext.Provider value={{ staticResourcesUrl }}>
+          <ErrorsContext.Provider
+            value={{ errorHandler: options.errorHandler }}
           >
-            <App togglerComponent={togglerComponent} />
-          </AppContext.Provider>
-        </ErrorsContext.Provider>
-      </SettingsContext.Provider>
-    </Provider>,
+            <AppContext.Provider
+              value={{
+                ketcherId,
+                prevKetcherId,
+              }}
+            >
+              <App togglerComponent={togglerComponent} />
+            </AppContext.Provider>
+          </ErrorsContext.Provider>
+        </SettingsContext.Provider>
+      </Provider>
+    </I18nextProvider>,
   );
 
   return () => {

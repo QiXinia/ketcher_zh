@@ -16,6 +16,7 @@
 
 import { ElementWithDropdown } from './ElementWithDropdown';
 import { TopToolbarIconButton } from './TopToolbarIconButton';
+import i18n from '../../../../../i18n';
 
 interface ClipboardControlsProps {
   onCopy: () => void;
@@ -43,25 +44,25 @@ export const ClipboardControls = ({
   const copyButtons = [
     {
       name: 'copy',
-      title: 'Copy',
+      title: i18n.t('topToolbar.copy'),
       handler: onCopy,
       testId: 'copy-button',
     },
     {
       name: 'copy-mol',
-      title: 'Copy as MOL',
+      title: i18n.t('topToolbar.copyAsMOL'),
       handler: onCopyMol,
       testId: 'copy-mol-button',
     },
     {
       name: 'copy-ket',
-      title: 'Copy as KET',
+      title: i18n.t('topToolbar.copyAsKET'),
       handler: onCopyKet,
       testId: 'copy-ket-button',
     },
     {
       name: 'copy-image',
-      title: 'Copy Image',
+      title: i18n.t('topToolbar.copyImage'),
       handler: onCopyImage,
       testId: 'copy-image-button',
     },
@@ -96,7 +97,7 @@ export const ClipboardControls = ({
         />
       )}
       <TopToolbarIconButton
-        title="Paste"
+        title={i18n.t('topToolbar.paste')}
         testId="paste-button"
         onClick={onPaste}
         iconName="paste"
@@ -105,7 +106,7 @@ export const ClipboardControls = ({
         isHidden={hiddenButtons.includes('paste')}
       />
       <TopToolbarIconButton
-        title="Cut"
+        title={i18n.t('topToolbar.cut')}
         testId="cut-button"
         onClick={onCut}
         iconName="cut"

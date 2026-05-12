@@ -29,6 +29,7 @@ import Select from '../../../../../component/form/Select';
 import { getSelectOptionsFromSchema } from '../../../../../utils';
 import { AnalyseValues, StoreState } from '../../../../../state/store.types';
 import classes from './Analyse.module.less';
+import i18n from '../../../../../../../i18n';
 
 interface RoundSettings {
   roundWeight: number;
@@ -66,24 +67,24 @@ const selectOptions = getSelectOptionsFromSchema({ enum: range(0, 8) });
 
 const analyseItems: AnalyseItem[] = [
   {
-    name: 'Chemical Formula',
+    name: i18n.t('analyse.chemicalFormula'),
     key: 'gross',
     withSelector: false,
   },
   {
-    name: 'Molecular Weight',
+    name: i18n.t('analyse.molecularWeight'),
     key: 'molecular-weight',
     round: 'roundWeight',
     withSelector: true,
   },
   {
-    name: 'Exact Mass',
+    name: i18n.t('analyse.exactMass'),
     key: 'monoisotopic-mass',
     round: 'roundMass',
     withSelector: true,
   },
   {
-    name: 'Elemental Analysis',
+    name: i18n.t('analyse.elementalAnalysis'),
     key: 'mass-composition',
     round: 'roundElAnalysis',
     withSelector: false,
@@ -145,13 +146,13 @@ function AnalyseDialog({
 
   return (
     <Dialog
-      title="Calculated Values"
+      title={i18n.t('analyse.title')}
       className={classes.analyse}
       withDivider={true}
       needMargin={true}
       valid={() => true}
       buttons={['OK']}
-      buttonsNameMap={{ OK: 'Close' }}
+      buttonsNameMap={{ OK: i18n.t('dialog.close') }}
       params={props}
     >
       <ul>
@@ -167,7 +168,7 @@ function AnalyseDialog({
             </div>
             {item.withSelector && item.round ? (
               <div className={classes.selectWrapper}>
-                <span>Decimal places</span>
+                <span>{i18n.t('analyse.decimalPlaces')}</span>
                 <Select
                   options={selectOptions}
                   value={round[item.round]}

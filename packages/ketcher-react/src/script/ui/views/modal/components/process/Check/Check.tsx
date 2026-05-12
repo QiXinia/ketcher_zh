@@ -26,6 +26,7 @@ import { check } from '../../../../../state/server';
 import { checkOpts } from '../../../../../state/options';
 import style from './Check.module.less';
 import { LoadingCircles } from 'src/script/ui/views/components/Spinner';
+import i18n from '../../../../../../../i18n';
 
 interface MoleculeErrors {
   [key: string]: string;
@@ -97,11 +98,11 @@ interface State {
 }
 
 const checkSchema: CheckSchema = {
-  title: 'Check',
+  title: i18n.t('check.title'),
   type: 'object',
   properties: {
     checkOptions: {
-      title: 'Settings',
+      title: i18n.t('check.settings'),
       type: 'array',
       items: {
         type: 'string',
@@ -119,17 +120,17 @@ const checkSchema: CheckSchema = {
           'chiral_flag',
         ],
         enumNames: [
-          'Valence',
-          'Radical',
-          'Pseudoatom',
-          'Stereochemistry',
-          'Query',
-          'Overlapping Atoms',
-          'Overlapping Bonds',
-          'R-Groups',
-          'Chirality',
-          '3D Structure',
-          'Chiral flag',
+          i18n.t('check.valence'),
+          i18n.t('check.radical'),
+          i18n.t('check.pseudoatom'),
+          i18n.t('check.stereochemistry'),
+          i18n.t('check.query'),
+          i18n.t('check.overlappingAtoms'),
+          i18n.t('check.overlappingBonds'),
+          i18n.t('check.rgroups'),
+          i18n.t('check.chirality'),
+          i18n.t('check.structure3D'),
+          i18n.t('check.chiralFlag'),
         ],
       },
     },
@@ -175,7 +176,7 @@ const FooterContent: FC<FooterContentProps> = ({
           disabled={!isStructureChecking}
           data-testid="Check"
         >
-          Check
+          {i18n.t('dialog.check')}
         </button>
       </div>
       <div className={style.buttonsRight}>
@@ -184,7 +185,7 @@ const FooterContent: FC<FooterContentProps> = ({
           onClick={onCancel}
           data-testid="Cancel"
         >
-          Cancel
+          {i18n.t('dialog.cancel')}
         </button>
         <button
           className={style.buttonPrimary}
@@ -192,7 +193,7 @@ const FooterContent: FC<FooterContentProps> = ({
           disabled={!isStructureChecking}
           data-testid="Apply"
         >
-          Apply
+          {i18n.t('dialog.apply')}
         </button>
       </div>
     </div>
@@ -228,7 +229,7 @@ const CheckDialog: FC<CheckDialogProps> = (props) => {
 
   return (
     <Dialog
-      title="Structure Check"
+      title={i18n.t('check.title')}
       className={style.dialog_body}
       params={{ ...restProps, onCancel }}
       buttons={[]}
@@ -253,7 +254,9 @@ const CheckDialog: FC<CheckDialogProps> = (props) => {
       >
         <div className={style.wrapper}>
           <div className={style.settings}>
-            <span className={style.sectionTitle}>Settings</span>
+            <span className={style.sectionTitle}>
+              {i18n.t('check.settings')}
+            </span>
             <div
               className={!isStructureChecking ? style.checkBoxesDisabled : ''}
             >
@@ -271,7 +274,7 @@ const CheckDialog: FC<CheckDialogProps> = (props) => {
           </div>
           <div className={style.checkInfo}>
             <span data-testid={'checkInfo-lastCheck'}>
-              Last check:{' '}
+              {i18n.t('check.lastCheck')}
               {lastCheckDate && getFormattedDateString(lastCheckDate)}
             </span>
             <div

@@ -6,6 +6,7 @@ import {
   FunctionalGroupsContextMenuProps,
   MenuItemsProps,
 } from '../contextMenu.types';
+import i18n from '../../../../../../i18n';
 
 const FunctionalGroupMenuItems: FC<
   MenuItemsProps<FunctionalGroupsContextMenuProps>
@@ -22,7 +23,7 @@ const FunctionalGroupMenuItems: FC<
         hidden={(params) => ExpandOrContractHidden(params, true)}
         onClick={(params) => handleExpandOrContract(params, true)}
       >
-        Expand Abbreviation
+        {i18n.t('contextMenu.expandAbbreviation')}
       </Item>
       <Item
         {...props}
@@ -30,14 +31,14 @@ const FunctionalGroupMenuItems: FC<
         hidden={(params) => ExpandOrContractHidden(params, false)}
         onClick={(params) => handleExpandOrContract(params, false)}
       >
-        Contract Abbreviation
+        {i18n.t('contextMenu.contractAbbreviation')}
       </Item>
       <Item
         {...props}
         data-testid="Remove Abbreviation-option"
         onClick={handleRemove}
       >
-        Remove Abbreviation
+        {i18n.t('contextMenu.removeAbbreviation')}
       </Item>
     </>
   );

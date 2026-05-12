@@ -1,3 +1,4 @@
+import i18n from '../../../../../../i18n';
 import classes from '../toolbox/FG/RemoveFG.module.less';
 
 type ConfirmProps = {
@@ -9,23 +10,22 @@ export const Confirm = ({ onOk, onCancel }: ConfirmProps) => {
   return (
     <div className={classes.window}>
       <header className={classes.header} data-testid="confirm-header">
-        Warning!
+        {i18n.t('confirm.warning')}
       </header>
       <div className={classes.question} data-testid="confirm-question">
-        Unsupported S-group type found. Would you like to import structure
-        without it?
+        {i18n.t('confirm.unsupportedSgroup')}
       </div>
       <footer className={classes.footer}>
         <input
           type="button"
-          value={'Cancel'}
+          value={i18n.t('dialog.cancel')}
           className={classes.buttonCancel}
           onClick={() => onCancel()}
           data-testid="cancel-button"
         />
         <input
           type="button"
-          value={'OK'}
+          value={i18n.t('dialog.ok')}
           className={classes.buttonOk}
           onClick={() => onOk()}
           data-testid="ok-button"

@@ -25,6 +25,7 @@ import HighlightMenu from 'src/script/ui/action/highlightColors/HighlightColors'
 import { Icon } from 'components';
 import useMakeAttachmentPointMenuItems from '../hooks/useMakeAttachmentPointMenuItems';
 import clsx from 'clsx';
+import i18n from '../../../../../../i18n';
 
 const {
   ringBondCount,
@@ -77,8 +78,8 @@ const atomPropertiesForSubMenu: {
     title: unsaturatedAtom.title,
     key: 'unsaturatedAtom',
     buttons: [
-      { label: 'Unsaturated', value: 1 },
-      { label: 'Saturated', value: 0 },
+      { label: i18n.t('contextMenu.unsaturated'), value: 1 },
+      { label: i18n.t('contextMenu.saturated'), value: 0 },
     ],
   },
   {
@@ -180,15 +181,17 @@ const AtomMenuItems: FC<MenuItemsProps<AtomContextMenuProps>> = (props) => {
         <Separator />
         <Item {...props} data-testid="Delete-option" onClick={handleDelete}>
           <Icon name="deleteMenu" className={styles.icon} />
-          <span className={styles.contextMenuText}>Delete</span>
+          <span className={styles.contextMenuText}>
+            {i18n.t('contextMenu.delete')}
+          </span>
         </Item>
       </>
     );
   }
 
   const editMenuItemTitle = props.propsFromTrigger?.extraItemsSelected
-    ? 'Edit selected atoms...'
-    : 'Edit...';
+    ? i18n.t('contextMenu.editSelectedAtoms')
+    : i18n.t('contextMenu.edit');
 
   const disabledForMonomerCreation = editor.isMonomerCreationWizardActive;
   const showMarkAsMenu = markAsIsVisible();
@@ -200,7 +203,7 @@ const AtomMenuItems: FC<MenuItemsProps<AtomContextMenuProps>> = (props) => {
         <Submenu
           {...props}
           data-testid="Mark as a...-option"
-          label="Mark as a..."
+          label={i18n.t('contextMenu.markAs')}
           disabled={markAsDisabled}
           className={styles.subMenu}
         >
@@ -213,7 +216,7 @@ const AtomMenuItems: FC<MenuItemsProps<AtomContextMenuProps>> = (props) => {
               name="base"
               className={clsx(styles.icon, styles.markAsComponentIcon)}
             />
-            <span>Base</span>
+            <span>{i18n.t('contextMenu.base')}</span>
           </Item>
           <Item
             {...props}
@@ -224,7 +227,7 @@ const AtomMenuItems: FC<MenuItemsProps<AtomContextMenuProps>> = (props) => {
               name="sugar"
               className={clsx(styles.icon, styles.markAsComponentIcon)}
             />
-            <span>Sugar</span>
+            <span>{i18n.t('contextMenu.sugar')}</span>
           </Item>
           <Item
             {...props}
@@ -235,7 +238,7 @@ const AtomMenuItems: FC<MenuItemsProps<AtomContextMenuProps>> = (props) => {
               name="phosphate"
               className={clsx(styles.icon, styles.markAsComponentIcon)}
             />
-            <span>Phosphate</span>
+            <span>{i18n.t('contextMenu.phosphate')}</span>
           </Item>
         </Submenu>
       )}
@@ -259,11 +262,11 @@ const AtomMenuItems: FC<MenuItemsProps<AtomContextMenuProps>> = (props) => {
         disabled={stereoDisabled}
         onClick={handleStereo}
       >
-        Enhanced stereochemistry...
+        {i18n.t('contextMenu.enhancedStereochemistry')}
       </Item>
       <Submenu
         {...props}
-        label="Query properties"
+        label={i18n.t('contextMenu.queryProperties')}
         data-testid="Query properties-option"
         style={{ overflow: 'visible' }}
         disabled={disabledForMonomerCreation}
@@ -296,7 +299,9 @@ const AtomMenuItems: FC<MenuItemsProps<AtomContextMenuProps>> = (props) => {
       <Separator />
       <Item {...props} data-testid="Delete-option" onClick={handleDelete}>
         <Icon name="deleteMenu" className={styles.icon} />
-        <span className={styles.contextMenuText}>Delete</span>
+        <span className={styles.contextMenuText}>
+          {i18n.t('contextMenu.delete')}
+        </span>
       </Item>
     </>
   );

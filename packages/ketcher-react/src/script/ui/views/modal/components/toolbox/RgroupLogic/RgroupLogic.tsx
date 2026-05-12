@@ -20,6 +20,7 @@ import { Dialog } from '../../../../components';
 import IfThenSelect from './components';
 import classes from './RgroupLogic.module.less';
 import { rgroupLogic as rgroupSchema } from '../../../../../data/schema/struct-schema';
+import i18n from '../../../../../../../i18n';
 
 interface RgroupLogicProps extends BaseProps {
   frags: Set<number>;
@@ -37,12 +38,12 @@ const RgroupLogic = (props: Props) => {
   const { formState, label, rgroupLabels, ...rest } = props;
   return (
     <Dialog
-      title="R-Group Logic Condition"
+      title={i18n.t('rgroup.logicCondition')}
       className={classes.rgroupLogic}
       result={() => formState.result}
       valid={() => formState.valid}
       params={rest}
-      buttonsNameMap={{ OK: 'Apply' }}
+      buttonsNameMap={{ OK: i18n.t('dialog.apply') }}
       buttons={['Cancel', 'OK']}
       withDivider
     >

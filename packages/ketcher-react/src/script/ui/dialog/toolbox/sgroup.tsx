@@ -22,6 +22,7 @@ import SDataFieldset from './SDataFieldset';
 import classes from './sgroup.module.less';
 import SGroupFieldset from './SGroupFieldset';
 import { useMemo } from 'react';
+import i18n from '../../../../i18n';
 
 interface SgroupFormResult {
   type: string;
@@ -80,12 +81,12 @@ function Sgroup({ formState, ...props }: Readonly<SgroupProps>) {
 
   return (
     <Dialog
-      title="S-Group Properties"
+      title={i18n.t('sgroup.title')}
       className={classes.sgroup}
       result={() => result}
       valid={() => valid}
-      buttons={['Cancel', 'OK']}
-      buttonsNameMap={{ OK: 'Apply' }}
+      buttons={[i18n.t('dialog.cancel'), 'OK']}
+      buttonsNameMap={{ OK: i18n.t('dialog.apply') }}
       withDivider={true}
       params={props}
     >
@@ -100,7 +101,10 @@ function Sgroup({ formState, ...props }: Readonly<SgroupProps>) {
           name="type"
           schema={availableSchemes}
           data-testid="s-group-type"
-          {...({ title: 'Type' } as Record<string, unknown>)}
+          {...({ title: i18n.t('bondProperties.type') } as Record<
+            string,
+            unknown
+          >)}
         />
 
         {type === 'DAT' ? (

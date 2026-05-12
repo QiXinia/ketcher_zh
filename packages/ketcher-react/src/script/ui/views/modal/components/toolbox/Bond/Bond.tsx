@@ -28,6 +28,7 @@ import classes from './Bond.module.less';
 import { useMemo, useRef, useState } from 'react';
 import { Bond as CoreBond, SettingsManager } from 'ketcher-core';
 import { MONOMER_WIZARD_DISALLOWED_BOND_TYPES } from '../../../../components/ContextMenu/utils';
+import i18n from '../../../../../../../i18n';
 
 interface BondSettings {
   type: string;
@@ -103,12 +104,12 @@ const Bond = (props: Props) => {
 
   return (
     <Dialog
-      title="Bond Properties"
+      title={i18n.t('bondProperties.title')}
       className={classes.bond}
       result={() => formState.result}
       valid={() => formState.valid}
       params={rest}
-      buttonsNameMap={{ OK: 'Apply' }}
+      buttonsNameMap={{ OK: i18n.t('dialog.apply') }}
       buttons={['Cancel', 'OK']}
       withDivider
     >

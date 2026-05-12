@@ -35,6 +35,7 @@ import { DialogActionButton } from 'src/script/ui/views/modal/components/documen
 import { Icon, StructRender } from 'components';
 import { ketcherProvider, Struct } from 'ketcher-core';
 import { useAppContext } from 'src/hooks';
+import i18n from '../../../../../../../i18n';
 
 type StructStringOrPromise = string | Promise<unknown> | null;
 
@@ -66,7 +67,7 @@ function FooterContent({
         className={classes.openButton}
       >
         <Icon name="open" />
-        <span>Change image</span>
+        <span>{i18n.t('recognize.changeImage')}</span>
       </OpenButton>
       <div>
         <DialogActionButton
@@ -74,15 +75,15 @@ function FooterContent({
           disabled={!structStr}
           clickHandler={openHandler}
           styles={classes.secondaryButton}
-          label="Open as new Project"
+          label={i18n.t('recognize.openAsNewProject')}
         />
         <DialogActionButton
           key="copyButton"
           disabled={!structStr || isAddToCanvasDisabled}
           clickHandler={copyHandler}
           styles={classes.primaryButton}
-          label="Add to Canvas"
-          title="Structure will be loaded as fragment and added to Clipboard"
+          label={i18n.t('recognize.addToCanvas')}
+          title={i18n.t('open.structureAsFragment')}
         />
       </div>
     </div>
@@ -152,7 +153,7 @@ function RecognizeDialog(prop: Readonly<RecognizeDialogProps>) {
 
   return (
     <Dialog
-      title="Import Structure from Image"
+      title={i18n.t('recognize.title')}
       className={classes.recognize}
       params={{ ...props, onOk }}
       result={result}
@@ -174,13 +175,13 @@ function RecognizeDialog(prop: Readonly<RecognizeDialogProps>) {
       <div className={classes.topBody}>
         <label className={classes.imagoVersion}>
           {/* eslint-disable jsx-a11y/label-has-associated-control */}
-          Imago version
+          {i18n.t('recognize.imagoVersion')}
           <Input
             type="text"
             schema={{
               enum: imagoVersions,
-              enumNames: range(1, imagoVersions.length + 1).map(
-                (i) => `Version ${i}`,
+              enumNames: range(1, imagoVersions.length + 1).map((i) =>
+                i18n.t('recognize.version', { version: i }),
               ),
             }}
             value={version}
@@ -188,8 +189,8 @@ function RecognizeDialog(prop: Readonly<RecognizeDialogProps>) {
           />
           {/* eslint-enable jsx-a11y/label-has-associated-control */}
         </label>
-        <span>Original image</span>
-        <span>Recognized structure preview</span>
+        <span>{i18n.t('recognize.originalImage')}</span>
+        <span>{i18n.t('recognize.recognizedStructurePreview')}</span>
       </div>
 
       <div className={classes.imagesContainer}>
@@ -208,14 +209,13 @@ function RecognizeDialog(prop: Readonly<RecognizeDialogProps>) {
           {file && isImage(file) && !canPreviewImage && (
             <div className={classes.messageContainer}>
               <p>
-                Preview of '{file.type}' MIME type is not supported by current
-                browser
+                {i18n.t('recognize.mimeTypeNotSupported', { type: file.type })}
               </p>
             </div>
           )}
           {(!file || (!isImage(file) && clearFile())) && (
             <div className={classes.messageContainer}>
-              <p>Please choose image</p>
+              <p>{i18n.t('recognize.pleaseChooseImage')}</p>
             </div>
           )}
         </div>
@@ -242,7 +242,7 @@ function url(file: File | null): string | null {
   if (!file) return null;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const URL = window.URL || (window as any).webkitURL;
-  return URL ? URL.createObjectURL(file) : 'No preview';
+  return URL ? URL.createObjectURL(file) : i18n.t('recognize.noPreview');
 }
 
 interface RecognizeState {

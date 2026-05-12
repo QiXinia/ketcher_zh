@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState, type ReactElement } from 'react';
 import {
   MicromoleculesEditor as MicromoleculesEditorComponent,
   EditorProps,
@@ -16,7 +16,7 @@ type Props = Omit<EditorProps, 'ketcherId'> & {
 
 interface MacromoleculesEditorProps {
   ketcherId: string;
-  togglerComponent?: JSX.Element;
+  togglerComponent?: ReactElement;
   isMacromoleculesEditorTurnedOn?: boolean;
   monomersLibraryUpdate?: string | JSON;
   monomersLibraryReplace?: string | JSON;

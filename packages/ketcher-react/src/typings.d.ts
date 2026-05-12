@@ -14,8 +14,8 @@ declare module '*.ket' {
 }
 
 declare module '*.svg' {
-  export const ReactComponent: React.FunctionComponent<
-    React.SVGProps<SVGSVGElement> & { title?: string }
+  export const ReactComponent: import('react').FunctionComponent<
+    import('react').SVGProps<SVGSVGElement> & { title?: string }
   >;
 
   const src: ReactComponent;
@@ -76,11 +76,10 @@ declare module 'subscription' {
 }
 
 declare module 'ketcher-macromolecules' {
-  import * as React from 'react';
   interface MacromoleculesEditorProps {
     ketcherId: string;
-    togglerComponent?: JSX.Element;
+    togglerComponent?: import('react').ReactElement;
   }
-  const MacromoleculesEditor: React.ComponentType<MacromoleculesEditorProps>;
+  const MacromoleculesEditor: import('react').ComponentType<MacromoleculesEditorProps>;
   export default MacromoleculesEditor;
 }

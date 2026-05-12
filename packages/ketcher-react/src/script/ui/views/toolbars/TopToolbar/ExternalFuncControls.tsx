@@ -16,6 +16,7 @@
 
 import { ElementWithDropdown } from './ElementWithDropdown';
 import { TopToolbarIconButton } from './TopToolbarIconButton';
+import i18n from '../../../../../i18n';
 
 interface ExternalFuncProps {
   isCollapsed: boolean;
@@ -53,55 +54,55 @@ export const ExternalFuncControls = ({
   const externalFuncButtons = [
     {
       name: 'arom',
-      title: 'Aromatize',
+      title: i18n.t('topToolbar.aromatize'),
       handler: onAromatize,
       testId: 'Aromatize button',
     },
     {
       name: 'dearom',
-      title: 'Dearomatize',
+      title: i18n.t('topToolbar.dearomatize'),
       handler: onDearomatize,
       testId: 'Dearomatize button',
     },
     {
       name: 'layout',
-      title: 'Layout',
+      title: i18n.t('topToolbar.layout'),
       handler: onLayout,
       testId: 'Layout button',
     },
     {
       name: 'clean',
-      title: 'Clean Up',
+      title: i18n.t('topToolbar.cleanUp'),
       handler: onClean,
       testId: 'Clean Up button',
     },
     {
       name: 'cip',
-      title: 'Calculate CIP',
+      title: i18n.t('topToolbar.calculateCIP'),
       handler: onCalculate,
       testId: 'Calculate CIP button',
     },
     {
       name: 'check',
-      title: 'Check Structure',
+      title: i18n.t('topToolbar.checkStructure'),
       handler: onCheck,
       testId: 'Check Structure button',
     },
     {
       name: 'analyse',
-      title: 'Calculated Values',
+      title: i18n.t('topToolbar.calculatedValues'),
       handler: onAnalyse,
       testId: 'Calculated Values button',
     },
     {
       name: 'explicit-hydrogens',
-      title: 'Add/Remove explicit hydrogens',
+      title: i18n.t('topToolbar.explicitHydrogens'),
       handler: onToggleExplicitHydrogens,
       testId: 'Add/Remove explicit hydrogens button',
     },
     {
       name: 'miew',
-      title: '3D Viewer',
+      title: i18n.t('topToolbar.viewer3D'),
       handler: onMiew,
       testId: '3D Viewer button',
     },

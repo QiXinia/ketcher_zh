@@ -114,7 +114,7 @@ const MenuItemWithDropdown = ({
           {!isExpanded && <DropDownArrow name="dropdown" />}
         </DropDownButton>
       )}
-      <Collapse in={isExpanded} timeout="auto" onClick={collapse} unmountOnExit>
+      <Collapse in={isExpanded} timeout="auto" unmountOnExit>
         <ClickAwayListener onClickAway={collapse}>
           <DropDownContent data-testid="selection-toolbar">
             {dropDownElements}

@@ -20,6 +20,7 @@ import Form, { Field } from '../../../../../component/form/form/form';
 import { Dialog } from '../../../../components';
 import { attachmentPoints as attachmentPointsSchema } from '../../../../../data/schema/struct-schema';
 import classes from './Attach.module.less';
+import i18n from '../../../../../../../i18n';
 
 interface AttachPointsProps extends BaseProps {
   primary: boolean;
@@ -32,12 +33,12 @@ const AttachPoints = (props: Props) => {
   const { formState, ...rest } = props;
   return (
     <Dialog
-      title="Attachment Points"
+      title={i18n.t('rgroup.attachmentPoints')}
       className={classes.attachPoints}
       result={() => formState.result}
       valid={() => formState.valid}
       params={rest}
-      buttonsNameMap={{ OK: 'Apply' }}
+      buttonsNameMap={{ OK: i18n.t('dialog.apply') }}
       buttons={['Cancel', 'OK']}
       withDivider
     >

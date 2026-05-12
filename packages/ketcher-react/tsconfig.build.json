@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "outDir": "dist",
+    "rootDir": "src",
     "module": "esnext",
     "lib": ["dom", "esnext"],
     "moduleResolution": "node16",
@@ -26,7 +27,12 @@
     "noFallthroughCasesInSwitch": true,
     "paths": {
       "components": ["./src/components"],
-      "src/*": ["./src/*"]
+      "src/*": ["./src/*"],
+      "ketcher-core": ["../ketcher-core/dist/index.d.ts"],
+      "domain/*": ["../ketcher-core/dist/domain/*"],
+      "infrastructure/*": ["../ketcher-core/dist/infrastructure/*"],
+      "application/*": ["../ketcher-core/dist/application/*"],
+      "utilities": ["../ketcher-core/dist/utilities"]
     }
   },
   "include": ["src"]

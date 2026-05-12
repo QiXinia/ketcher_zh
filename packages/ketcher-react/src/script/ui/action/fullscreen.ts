@@ -16,6 +16,7 @@
 
 import isHidden from './isHidden';
 import { getFullscreenElement } from '../../../utils';
+import i18n from '../../../i18n';
 
 const requestFullscreen = (element: HTMLElement) => {
   if (element.requestFullscreen) {
@@ -57,7 +58,7 @@ const toggleFullscreen = () => {
 
 export default {
   fullscreen: {
-    title: 'Fullscreen mode',
+    title: i18n.t('fullscreen.mode'),
     enabledInViewOnly: true,
     action: () => toggleFullscreen(),
     hidden: (options) => isHidden(options, 'fullscreen'),

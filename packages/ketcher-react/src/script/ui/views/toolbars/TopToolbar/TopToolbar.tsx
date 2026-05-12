@@ -28,6 +28,7 @@ import { Divider } from './Divider';
 import { TopToolbarIconButton } from './TopToolbarIconButton';
 import { CustomButtons } from './CustomButtons';
 import { ketcherProvider } from 'ketcher-core';
+import i18n from '../../../../../i18n';
 import { cloneElement, useCallback, useMemo } from 'react';
 import { CustomButton } from '../../../../builders/ketcher/CustomButtons';
 
@@ -192,7 +193,7 @@ export const TopToolbar = ({
     >
       <BtnsWpapper>
         <TopToolbarIconButton
-          title="Clear Canvas"
+          title={i18n.t('topToolbar.clearCanvas')}
           onClick={onClear}
           iconName="clear"
           shortcut={shortcuts.clear}

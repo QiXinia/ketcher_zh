@@ -20,6 +20,7 @@ import classes from './About.module.less';
 import { connect } from 'react-redux';
 import { Fragment } from 'react';
 import { Dispatch } from 'redux';
+import i18n from '../../../../../../../i18n';
 
 interface AboutDialogProps {
   date: string;
@@ -51,7 +52,7 @@ function AboutDialog(props: Readonly<AboutDialogProps>) {
           key="ok"
           data-testid="ok-button"
         >
-          Ok
+          {i18n.t('about.ok')}
         </button>,
       ]}
     >
@@ -70,11 +71,11 @@ function AboutDialog(props: Readonly<AboutDialogProps>) {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                Version {props.version}
+                {i18n.t('about.version')} {props.version}
               </a>
             </dt>
             <dd data-testid="build-time">
-              Build at <time>{props.date}</time>
+              {i18n.t('about.buildAt')} <time>{props.date}</time>
             </dd>
             <div className={classes.infoLinks}>
               <dt>
@@ -83,7 +84,7 @@ function AboutDialog(props: Readonly<AboutDialogProps>) {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  Feedback
+                  {i18n.t('about.feedback')}
                 </a>
               </dt>
               <dt>
@@ -92,7 +93,7 @@ function AboutDialog(props: Readonly<AboutDialogProps>) {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  EPAM Life Sciences
+                  {i18n.t('about.epamLifeSciences')}
                 </a>
               </dt>
             </div>
@@ -104,18 +105,20 @@ function AboutDialog(props: Readonly<AboutDialogProps>) {
                 rel="noopener noreferrer"
               >
                 {' '}
-                Indigo Toolkit
+                {i18n.t('about.indigoToolkit')}
               </a>
               {props.indigoMachine && <div>{props.indigoMachine}</div>}
             </div>
             <div data-testid="build-indigo-version">
               {props.indigoVersion ? (
                 <Fragment>
-                  <dd>Version {indigoInfo[0]}</dd>
+                  <dd>
+                    {i18n.t('about.version')} {indigoInfo[0]}
+                  </dd>
                   {indigoInfo[1] && <dd>Build {indigoInfo[1]}</dd>}
                 </Fragment>
               ) : (
-                <p>Standalone</p>
+                <p>{i18n.t('about.standalone')}</p>
               )}
             </div>
           </dl>

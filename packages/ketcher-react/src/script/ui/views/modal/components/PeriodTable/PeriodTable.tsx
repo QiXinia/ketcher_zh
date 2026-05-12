@@ -28,6 +28,7 @@ import { Dispatch } from 'redux';
 import { onAction } from '../../../../state';
 import { xor } from 'lodash/fp';
 import { Icon } from 'components';
+import i18n from '../../../../../../i18n';
 
 interface TableOwnProps {
   type?: PeriodTableType;
@@ -96,7 +97,7 @@ class Table extends Component<TableProps, TableState> {
   headerContent = () => (
     <div className={classes.dialogHeader}>
       <Icon name="period-table" />
-      <span>Periodic Table</span>
+      <span>{i18n.t('action.periodicTable')}</span>
     </div>
   );
 
@@ -168,8 +169,8 @@ class Table extends Component<TableProps, TableState> {
         className={classes.elementsTable}
         params={dialogParams}
         result={this.result}
-        buttons={['Cancel', 'OK']}
-        buttonsNameMap={{ OK: 'Add' }}
+        buttons={[i18n.t('dialog.cancel'), 'OK']}
+        buttonsNameMap={{ OK: i18n.t('dialog.add') }}
         needMargin={false}
         footerContent={
           !this.props.isNestedModal ? (

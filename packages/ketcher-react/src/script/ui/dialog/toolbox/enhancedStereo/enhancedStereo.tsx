@@ -22,6 +22,7 @@ import { Dialog } from '../../../views/components';
 import classes from './enhancedStereo.module.less';
 import { connect } from 'react-redux';
 import { range } from 'lodash';
+import i18n from '../../../../../i18n';
 
 interface EnhancedStereoResult {
   andNumber: number;
@@ -58,7 +59,7 @@ const EnhancedStereo: FC<Props> = (props) => {
   const maxOr: number = maxOfOrs(stereoLabels);
 
   const enhancedStereoSchema = {
-    title: 'Enhanced Stereo',
+    title: i18n.t('enhancedStereo.schemaTitle'),
     type: 'object',
     properties: {
       type: {
@@ -75,14 +76,14 @@ const EnhancedStereo: FC<Props> = (props) => {
 
   return (
     <Dialog
-      title="Enhanced Stereochemistry"
+      title={i18n.t('enhancedStereo.title')}
       className={classes.enhancedStereo}
       params={rest}
       result={() => result}
       valid={() => valid}
       withDivider
-      buttons={['Cancel', 'OK']}
-      buttonsNameMap={{ OK: 'Apply' }}
+      buttons={[i18n.t('dialog.cancel'), 'OK']}
+      buttonsNameMap={{ OK: i18n.t('dialog.apply') }}
     >
       <Form schema={enhancedStereoSchema} init={init} {...formState}>
         <fieldset>
@@ -97,7 +98,7 @@ const EnhancedStereo: FC<Props> = (props) => {
               checked={result.type === StereoLabel.Abs}
               data-testid="abs-radio"
             />
-            ABS
+            {i18n.t('enhancedStereo.abs')}
           </label>
           {maxAnd !== 0 && (
             <label>
@@ -110,7 +111,7 @@ const EnhancedStereo: FC<Props> = (props) => {
                 checked={result.type === StereoLabel.And}
                 data-testid="add-to-and-group-radio"
               />
-              Add to AND
+              {i18n.t('enhancedStereo.addToAND')}
               <Field
                 name="andNumber"
                 schema={range(1, maxAnd + 1)}
@@ -118,7 +119,7 @@ const EnhancedStereo: FC<Props> = (props) => {
                 className={classes.labelGroupSelect}
                 data-testid="add-to-and-group"
               />
-              Group
+              {i18n.t('enhancedStereo.group')}
             </label>
           )}
           {maxOr !== 0 && (
@@ -132,7 +133,7 @@ const EnhancedStereo: FC<Props> = (props) => {
                 checked={result.type === StereoLabel.Or}
                 data-testid="add-to-or-group-radio"
               />
-              Add to OR
+              {i18n.t('enhancedStereo.addToOR')}
               <Field
                 name="orNumber"
                 schema={range(1, maxOr + 1)}
@@ -140,7 +141,7 @@ const EnhancedStereo: FC<Props> = (props) => {
                 className={classes.labelGroupSelect}
                 data-testid="add-to-or-group"
               />
-              Group
+              {i18n.t('enhancedStereo.group')}
             </label>
           )}
           <label>
@@ -153,7 +154,7 @@ const EnhancedStereo: FC<Props> = (props) => {
               checked={result.type === `${StereoLabel.And}${maxAnd + 1}`}
               data-testid="create-new-and-group-radio"
             />
-            Create new AND Group
+            {i18n.t('enhancedStereo.createNewANDGroup')}
           </label>
           <label>
             {/* eslint-disable jsx-a11y/label-has-associated-control */}
@@ -165,7 +166,7 @@ const EnhancedStereo: FC<Props> = (props) => {
               checked={result.type === `${StereoLabel.Or}${maxOr + 1}`}
               data-testid="create-new-or-group-radio"
             />
-            Create new OR Group
+            {i18n.t('enhancedStereo.createNewORGroup')}
           </label>
         </fieldset>
       </Form>
