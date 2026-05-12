@@ -26,6 +26,8 @@ import {
 import { Global, ThemeProvider } from '@emotion/react';
 import { createTheme } from '@mui/material/styles';
 import { merge } from 'lodash';
+import { I18nextProvider } from 'react-i18next';
+import { i18n } from 'ketcher-react';
 import {
   BaseMonomer,
   CoreEditor,
@@ -157,26 +159,28 @@ function EditorContainer({
   }, [ketcherId]);
 
   return (
-    <Provider store={store}>
-      <ThemeProvider theme={mergedTheme}>
-        <Global styles={getGlobalStyles} />
-        <RootSizeProvider
-          rootRef={rootElRef as RefObject<HTMLDivElement>}
-          isMacromoleculesEditorTurnedOn={isMacromoleculesEditorTurnedOn}
-        >
-          <EditorWrapper ref={rootElRef} className={EditorClassName}>
-            <Editor
-              ketcherId={ketcherId}
-              theme={editorTheme}
-              togglerComponent={togglerComponent}
-              monomersLibraryUpdate={monomersLibraryUpdate}
-              monomersLibraryReplace={monomersLibraryReplace}
-              onInit={onInit}
-            />
-          </EditorWrapper>
-        </RootSizeProvider>
-      </ThemeProvider>
-    </Provider>
+    <I18nextProvider i18n={i18n}>
+      <Provider store={store}>
+        <ThemeProvider theme={mergedTheme}>
+          <Global styles={getGlobalStyles} />
+          <RootSizeProvider
+            rootRef={rootElRef as RefObject<HTMLDivElement>}
+            isMacromoleculesEditorTurnedOn={isMacromoleculesEditorTurnedOn}
+          >
+            <EditorWrapper ref={rootElRef} className={EditorClassName}>
+              <Editor
+                ketcherId={ketcherId}
+                theme={editorTheme}
+                togglerComponent={togglerComponent}
+                monomersLibraryUpdate={monomersLibraryUpdate}
+                monomersLibraryReplace={monomersLibraryReplace}
+                onInit={onInit}
+              />
+            </EditorWrapper>
+          </RootSizeProvider>
+        </ThemeProvider>
+      </Provider>
+    </I18nextProvider>
   );
 }
 
