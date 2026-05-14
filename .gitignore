@@ -44,3 +44,4 @@ ketcher-autotests/results.json
 .yarn/*
 output.txt
 .github/agents/*
+/output/playwright
