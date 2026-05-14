@@ -1,0 +1,4 @@
+
+> ketcher-react-app@1.0.0 dev:standalone
+> cross-env MODE=standalone vite --host 127.0.0.1 --port 4102
+

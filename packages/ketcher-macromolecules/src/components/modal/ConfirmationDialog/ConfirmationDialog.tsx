@@ -2,6 +2,7 @@ import { ConfirmationDialogProps } from 'components/modal/modalContainer';
 import { Modal } from 'components/shared/modal';
 import { ActionButton } from 'components/shared/actionButton';
 import { ConfirmationText } from './ConfirmationDialog.styles';
+import { i18n } from 'ketcher-react';
 
 export const ConfirmationDialog = ({
   title,
@@ -18,7 +19,7 @@ export const ConfirmationDialog = ({
   return (
     <Modal
       isOpen={isModalOpen}
-      title={title ?? 'Confirm your action'}
+      title={title ?? String(i18n.t('dialog.confirmAction'))}
       onClose={onClose}
       testId="confirmation-dialog"
     >
@@ -29,12 +30,12 @@ export const ConfirmationDialog = ({
       </Modal.Content>
       <Modal.Footer>
         <ActionButton
-          label="Cancel"
+          label={String(i18n.t('dialog.cancel'))}
           clickHandler={onClose}
           data-testid="cancel-button"
         />
         <ActionButton
-          label="Yes"
+          label={String(i18n.t('dialog.yes'))}
           clickHandler={handleConfirm}
           styleType="secondary"
           data-testid="yes-button"

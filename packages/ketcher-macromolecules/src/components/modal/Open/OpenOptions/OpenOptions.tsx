@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ***************************************************************************/
-import { Icon, IconName } from 'ketcher-react';
+import { Icon, IconName, i18n } from 'ketcher-react';
 import styled from '@emotion/styled';
 import { FileDrop } from './FileDrop';
 import { OpenOptionText } from './sharedStyles';
@@ -82,14 +82,16 @@ const OpenOptions = ({
         onClick={selectClipboard}
       >
         <Icon name={ICON_NAMES.PASTE} />
-        <OpenOptionText>Paste from clipboard</OpenOptionText>
+        <OpenOptionText>{i18n.t('open.pasteFromClipboard')}</OpenOptionText>
       </DropContainer>
       <DropContainer data-testid="open-from-file-button">
         <FileDrop
           onDropAccepted={fileLoadHandler}
-          onDropRejected={(e) => errorHandler(`Unable to accept file(s). ${e}`)}
-          buttonLabel="Open from file"
-          textLabel="or drag file here"
+          onDropRejected={(e) =>
+            errorHandler(`${i18n.t('open.unableToAcceptFiles')} ${e}`)
+          }
+          buttonLabel={String(i18n.t('open.openFromFile'))}
+          textLabel={String(i18n.t('open.orDragFileHere'))}
           iconName={ICON_NAMES.FILE}
         />
       </DropContainer>
@@ -97,12 +99,12 @@ const OpenOptions = ({
         <FileDrop
           accept="image/*"
           onDropAccepted={fileLoadHandler}
-          onDropRejected={(e) => errorHandler(`Unable to accept file(s). ${e}`)}
-          buttonLabel="Open from image"
-          textLabel="or drag file here"
+          onDropRejected={() => errorHandler(i18n.t('open.uploadSingleImage'))}
+          buttonLabel={String(i18n.t('open.openFromImage'))}
+          textLabel={String(i18n.t('open.orDragFileHere'))}
           iconName={ICON_NAMES.IMAGE}
           disabled
-          disabledText="Image Recognition service is not available"
+          disabledText={String(i18n.t('open.imageRecognitionUnavailable'))}
         />
       </DropContainer>
     </RootContainer>

@@ -84,8 +84,12 @@ const ControlsPanel = styled('div')`
   gap: 0px;
   height: 36px;
   padding: 0px 22px;
-  background-color: #ffffff;
-  box-shadow: 0px 2px 5px rgba(103, 104, 132, 0.15);
+  background-color: var(--ketcher-toolbar-bg, #ffffff);
+  color: var(--ketcher-toolbar-icon, #333333);
+  box-shadow: var(
+    --ketcher-toolbar-shadow,
+    0px 2px 5px rgba(103, 104, 132, 0.15)
+  );
 
   .group {
     display: flex;

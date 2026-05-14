@@ -23,17 +23,19 @@
   display: flex;
   justify-content: space-between;
   gap: 8px;
-  border-color: #F3F5F7;
+  border-color: var(--ketcher-border-soft, #F3F5F7);
   pointer-events: none;
   font-family: @Inter;
   background-color: transparent;
+  color: var(--ketcher-text-primary, @color-text-primary);
 }
 
 .monomerCreationWizardBackdrop {
   .wizardBox();
   pointer-events: none;
-  background-color: #ffffff;
-  box-shadow: 0px 2px 5px 0px #67688426;
+  background-color: var(--ketcher-surface-raised, #ffffff);
+  border-color: var(--ketcher-border, transparent);
+  box-shadow: var(--ketcher-shadow, 0px 2px 5px 0px #67688426);
 }
 
 .leftColumn {
@@ -68,11 +70,13 @@
   flex-direction: column;
   gap: 16px;
   padding: 12px;
-  background-color: #F3F5F7;
+  background-color: var(--ketcher-surface-muted, #F3F5F7);
+  border: 1px solid var(--ketcher-border, transparent);
   border-radius: 8px;
   pointer-events: auto;
   overflow: auto;
   min-height: 0;
+  color: var(--ketcher-text-primary, @color-text-primary);
 }
 
 .attributesTitle {
@@ -108,7 +112,7 @@
 .divider {
   width: 100%;
   margin: 16px 0;
-  border-bottom: 1px solid @color-grey-3;
+  border-bottom: 1px solid var(--ketcher-border-soft, @color-grey-3);
 }
 
 .attachmentPointsHeader {
@@ -140,7 +144,7 @@
 .attachmentPointIcon {
   width: 16px;
   height: 16px;
-  color: @color-text-primary;
+  color: var(--ketcher-text-primary, @color-text-primary);
   opacity: 0.4;
 }
 
@@ -164,9 +168,9 @@
 }
 
 .buttonDiscard {
-  border: 1px solid @color-grey-6;
+  border: 1px solid var(--ketcher-border, @color-grey-6);
   background-color: transparent;
-  color: @color-grey-6;
+  color: var(--ketcher-text-secondary, @color-grey-6);
 }
 
 .buttonSubmit {
@@ -224,8 +228,8 @@
   width: 100%;
   padding: 2px 0;
   background: none;
-  border: 1px solid @color-grey-6;
-  color: @color-grey-6;
+  border: 1px solid var(--ketcher-border, @color-grey-6);
+  color: var(--ketcher-text-secondary, @color-grey-6);
   border-radius: 3px;
   font-size: 12px;
   cursor: pointer;
@@ -248,7 +252,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.35);
   z-index: 1000;
 }
 

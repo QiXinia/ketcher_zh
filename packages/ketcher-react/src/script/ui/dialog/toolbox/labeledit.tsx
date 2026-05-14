@@ -22,6 +22,7 @@ import { capitalize } from 'lodash/fp';
 import { connect } from 'react-redux';
 import { labelEdit as labelEditSchema } from '../../data/schema/struct-schema';
 import styles from './labelEdit.module.less';
+import i18n from '../../../../i18n';
 
 interface AtomLabelData {
   label: string;
@@ -100,14 +101,14 @@ function LabelEdit(props: Readonly<LabelEditProps>) {
 
   return (
     <Dialog
-      title="Label Edit"
+      title={i18n.t('rgroup.labelEdit')}
       valid={() => valid}
       withDivider={true}
       needMargin={false}
       result={() => deserialize(result.label)}
       className={styles.labelEdit}
       buttons={['Cancel', 'OK']}
-      buttonsNameMap={{ OK: 'Apply' }}
+      buttonsNameMap={{ OK: i18n.t('dialog.apply') }}
       focusable={false}
       params={prop}
     >

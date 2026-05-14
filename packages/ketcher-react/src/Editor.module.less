@@ -36,8 +36,11 @@
   position: relative;
   font: @base-size FreeSans, Arimo, 'Droid Sans', Helvetica, 'Helvetica Neue',
     Arial, sans-serif;
-  background-color: @color-background-canvas-light;
-  color: @main-color;
+  background-color: var(
+    --ketcher-canvas-bg,
+    @color-background-canvas-light
+  );
+  color: var(--ketcher-text-primary, @main-color);
 
   select {
     padding: 0 8px !important;

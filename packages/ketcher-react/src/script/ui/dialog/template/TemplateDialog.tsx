@@ -48,6 +48,8 @@ import Tab from '@mui/material/Tab';
 import useSaltsAndSolvents from './useSaltsAndSolvets';
 import { Icon } from 'components';
 import clsx from 'clsx';
+import i18n from '../../../../i18n';
+import { getTemplateGroupDisplayName } from '../../../../i18n/helpers';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -115,13 +117,15 @@ const FUNCTIONAL_GROUPS = 'Functional Groups';
 const HeaderContent = () => (
   <div className={classes.dialogHeader}>
     <Icon name="template-dialog" />
-    <span>Structure Library</span>
+    <span>{i18n.t('templates.structureLibrary')}</span>
   </div>
 );
 
 const FooterContent = ({ data, tab, isMonomerCreationWizardActive }) => {
   const clickToAddToCanvas = (
-    <span data-testid="add-to-canvas-button">Click to add to canvas</span>
+    <span data-testid="add-to-canvas-button">
+      {i18n.t('templates.clickToAddToCanvas')}
+    </span>
   );
 
   // Determine filename based on tab
@@ -154,7 +158,7 @@ const FooterContent = ({ data, tab, isMonomerCreationWizardActive }) => {
         filename={filename}
         disabled={isMonomerCreationWizardActive}
       >
-        Save to SDF
+        {i18n.t('templates.saveToSdf')}
       </SaveButton>
       {clickToAddToCanvas}
     </div>
@@ -268,7 +272,7 @@ const TemplateDialog: FC<Props> = (props) => {
           type="search"
           value={filter}
           onChange={(value) => onFilter(value)}
-          placeholder="Search by elements..."
+          placeholder={i18n.t('templates.searchByElements')}
           isFocused={true}
           data-testid="template-search-input"
         />
@@ -280,19 +284,19 @@ const TemplateDialog: FC<Props> = (props) => {
         className={classes.tabs}
       >
         <Tab
-          label="Template Library"
+          label={i18n.t('templates.templateLibrary')}
           data-testid="template-library-tab"
           {...a11yProps(TemplateTabs.TemplateLibrary)}
         />
         <Tab
-          label="Functional Groups"
+          label={i18n.t('functionalGroups.title')}
           data-testid="functional-groups-tab"
           disabled={isMonomerCreationWizardActive}
           className={clsx(isMonomerCreationWizardActive && classes.disabled)}
           {...a11yProps(TemplateTabs.FunctionalGroupLibrary)}
         />
         <Tab
-          label="Salts and Solvents"
+          label={i18n.t('templates.saltsAndSolvents')}
           data-testid="salts-and-solvents-tab"
           {...a11yProps(TemplateTabs.SaltsAndSolvents)}
         />
@@ -326,7 +330,7 @@ const TemplateDialog: FC<Props> = (props) => {
                         name="elements-group"
                         className={classes.groupIcon}
                       />
-                      {`${greekify(groupName)} (${
+                      {`${greekify(getTemplateGroupDisplayName(groupName))} (${
                         filteredTemplateLib[groupName].length
                       })`}
                     </AccordionSummary>
@@ -349,7 +353,9 @@ const TemplateDialog: FC<Props> = (props) => {
               })
             ) : (
               <div className={classes.resultsContainer}>
-                <EmptySearchResult textInfo="No items found" />
+                <EmptySearchResult
+                  textInfo={i18n.t('templates.noItemsFound')}
+                />
               </div>
             )}
           </div>
@@ -367,7 +373,7 @@ const TemplateDialog: FC<Props> = (props) => {
             </div>
           ) : (
             <div className={classes.resultsContainer}>
-              <EmptySearchResult textInfo="No items found" />
+              <EmptySearchResult textInfo={i18n.t('templates.noItemsFound')} />
             </div>
           )}
         </TabPanel>
@@ -384,7 +390,7 @@ const TemplateDialog: FC<Props> = (props) => {
             </div>
           ) : (
             <div className={classes.resultsContainer}>
-              <EmptySearchResult textInfo="No items found" />
+              <EmptySearchResult textInfo={i18n.t('templates.noItemsFound')} />
             </div>
           )}
         </TabPanel>

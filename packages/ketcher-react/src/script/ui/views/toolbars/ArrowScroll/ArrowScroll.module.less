@@ -19,7 +19,12 @@
   min-height: 32px;
   width: 36px;
   display: flex;
-  background: @color-background-primary;
+  background: var(--ketcher-toolbar-bg-muted, @color-background-primary);
+  color: var(--ketcher-toolbar-icon, @color-icon-active);
+  border: 1px solid var(--ketcher-toolbar-divider, @color-grey-4);
+  border-radius: 4px;
+  box-shadow: var(--ketcher-toolbar-shadow, 0 2px 5px @color-select-box-shadow);
+  overflow: hidden;
 }
 
 .scroll.upDown {
@@ -31,9 +36,18 @@
   width: 100%;
   border: none;
   background: transparent;
+  color: inherit;
   font-size: 15px !important;
   cursor: pointer;
   user-select: none;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+
+  &:hover {
+    background: var(--ketcher-surface-muted, @color-grey-7);
+    color: var(--ketcher-toolbar-icon, @color-icon-active);
+  }
 }
 
 .button.down,

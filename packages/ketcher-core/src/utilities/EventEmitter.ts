@@ -15,7 +15,7 @@
  ***************************************************************************/
 
 type EventName = string | number | symbol;
-type EventListener = (...args: any[]) => void;
+type EventListener = (...args: unknown[]) => void;
 
 export class EventEmitter {
   private readonly listeners = new Map<EventName, Set<EventListener>>();
@@ -62,7 +62,7 @@ export class EventEmitter {
     return this.removeListener(eventName, listener);
   }
 
-  emit(eventName: EventName, ...args: any[]) {
+  emit(eventName: EventName, ...args: unknown[]) {
     const listeners = this.listeners.get(eventName);
 
     if (!listeners || listeners.size === 0) {

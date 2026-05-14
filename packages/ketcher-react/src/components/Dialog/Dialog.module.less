@@ -26,11 +26,12 @@
   display: flex;
   flex-direction: column;
   text-align: left;
-  background-color: @color-background-primary;
+  background-color: var(--ketcher-surface, @color-background-primary);
   border-radius: 8px;
   background-clip: padding-box;
   font-family: @Inter;
-  color: @color-text-secondary;
+  color: var(--ketcher-text-secondary, @color-text-secondary);
+  box-shadow: var(--ketcher-shadow, 0 10px 28px rgba(33, 44, 71, 0.12));
   .transition-zoom;
 }
 
@@ -41,7 +42,7 @@
   font-size: @font-size-header;
   line-height: @line-height-header;
   border-radius: 6px 6px 0 0;
-  color: @color-text-primary;
+  color: var(--ketcher-text-primary, @color-text-primary);
   font-weight: 500;
   padding: 12px;
 
@@ -55,6 +56,7 @@
   .buttonTop {
     background-color: transparent;
     border: none;
+    color: inherit;
     margin-left: auto;
     padding: 0;
     align-self: center;
@@ -84,7 +86,7 @@
 }
 
 .withDivider {
-  border-bottom: 1px solid @color-grey-3;
+  border-bottom: 1px solid var(--ketcher-border, @color-grey-3);
   margin: 0;
   padding: 0 @padding-modal;
   height: 36px;
@@ -95,6 +97,8 @@
   line-height: @line-height-regular;
   overflow: auto;
   height: 100%;
+  background-color: inherit;
+  color: inherit;
   .scrollbar();
 }
 

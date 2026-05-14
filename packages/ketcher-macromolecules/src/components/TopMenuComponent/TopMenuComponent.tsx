@@ -35,7 +35,7 @@ import {
   isCycleExistsForSelectedMonomers,
 } from 'components/contextMenu/SelectedMonomersContextMenu/helpers';
 import { useEffect, useState } from 'react';
-import { IconName } from 'ketcher-react';
+import { IconName, i18n } from 'ketcher-react';
 import { CalculateMacromoleculePropertiesButton } from 'components/macromoleculeProperties';
 import { hotkeysShortcuts } from 'components/ZoomControls/helpers';
 
@@ -123,27 +123,33 @@ export function TopMenuComponent() {
       <Menu.Group isHorizontal={true} divider={true}>
         <Menu.Item
           itemId="clear"
-          title={`Clear Canvas (${hotkeysShortcuts.clear})`}
+          title={`${i18n.t('topToolbar.clearCanvas')} (${
+            hotkeysShortcuts.clear
+          })`}
           testId="clear-canvas"
         />
         <Menu.Item
           itemId="open"
-          title="Open..."
+          title={String(i18n.t('topToolbar.open'))}
           disabled={isDisabled}
           testId="open-file-button"
         />
-        <Menu.Item itemId="save" title="Save as..." testId="save-file-button" />
+        <Menu.Item
+          itemId="save"
+          title={String(i18n.t('topToolbar.saveAs'))}
+          testId="save-file-button"
+        />
       </Menu.Group>
       <Menu.Group isHorizontal={true} divider={true}>
         <Menu.Item
           itemId="undo"
-          title={`Undo (${hotkeysShortcuts.undo})`}
+          title={`${i18n.t('topToolbar.undo')} (${hotkeysShortcuts.undo})`}
           disabled={isDisabled}
           testId="undo"
         />
         <Menu.Item
           itemId="redo"
-          title={`Redo (${hotkeysShortcuts.redo})`}
+          title={`${i18n.t('topToolbar.redo')} (${hotkeysShortcuts.redo})`}
           disabled={isDisabled}
           testId="redo"
         />
@@ -152,7 +158,9 @@ export function TopMenuComponent() {
         <Menu.Group isHorizontal={true} divider={true}>
           <Menu.Item
             itemId={'arrange-ring' as IconName}
-            title={`Arrange as a Ring (${hotkeysShortcuts.arrangeRing})`}
+            title={`${i18n.t('macromolecules.arrangeAsRing')} (${
+              hotkeysShortcuts.arrangeRing
+            })`}
             disabled={cyclicStructureFormationDisabled}
             testId="arrange-ring"
           />
@@ -169,13 +177,15 @@ export function TopMenuComponent() {
           vertical={true}
           autoSize={true}
           layoutModeButton={true}
-          generalTitle="Create Antisense Strand"
+          generalTitle={String(i18n.t('macromolecules.createAntisenseStrand'))}
           testId="Create Antisense Strand"
           activeItem={antisenseActiveOption}
         >
           <Menu.Item
             itemId="antisenseRnaStrand"
-            title={`Create RNA Antisense Strand (${hotkeysShortcuts.createRnaAntisenseStrand})`}
+            title={`${i18n.t('macromolecules.createAntisenseRnaStrand')} (${
+              hotkeysShortcuts.createRnaAntisenseStrand
+            })`}
             disabled={
               !selectedEntities?.length ||
               !isAntisenseOptionVisible(selectedEntities) ||
@@ -186,7 +196,9 @@ export function TopMenuComponent() {
           />
           <Menu.Item
             itemId="antisenseDnaStrand"
-            title={`Create DNA Antisense Strand (${hotkeysShortcuts.createDnaAntisenseStrand})`}
+            title={`${i18n.t('macromolecules.createAntisenseDnaStrand')} (${
+              hotkeysShortcuts.createDnaAntisenseStrand
+            })`}
             disabled={
               !selectedEntities?.length ||
               !isAntisenseOptionVisible(selectedEntities) ||

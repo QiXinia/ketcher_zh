@@ -26,6 +26,7 @@ import StructRender from '../../../../../../../../../components/StructRender/Str
 import { parseStruct } from '../../../../../../../state/shared';
 import styles from './CDXStructuresViewer.module.less';
 import { editorOptionsSelector } from '../../../../../../../state/editor/selectors';
+import i18n from '../../../../../../../../../i18n';
 
 export type CDXStructuresViewerProps = {
   structList?: string[];
@@ -95,7 +96,11 @@ export const CDXStructuresViewer = ({
       );
     }
     if (structure?.error) {
-      return <div>Error: {itemsMap[selectedIndex]?.error}</div>;
+      return (
+        <div>
+          {i18n.t('open.errorPrefix')} {itemsMap[selectedIndex]?.error}
+        </div>
+      );
     }
     if (structure?.struct) {
       return (
@@ -112,14 +117,14 @@ export const CDXStructuresViewer = ({
     if (!structList?.length) {
       return (
         <div className={styles.centerWrapper}>
-          <div>No embedded structures found in the file</div>
+          <div>{i18n.t('open.noEmbeddedStructures')}</div>
         </div>
       );
     }
     return (
       <div className={styles.structuresWrapper}>
         <div className={styles.menuListWrapper}>
-          <div className={styles.header}>Select structure</div>
+          <div className={styles.header}>{i18n.t('open.selectStructure')}</div>
           <MenuList>
             {structList.map((value, index) => (
               <MenuItem
@@ -128,7 +133,7 @@ export const CDXStructuresViewer = ({
                 selected={index === selectedIndex}
                 onClick={() => setSelectedIndex(index)}
               >
-                {`Structure ${index + 1}`}
+                {i18n.t('open.structureIndex', { index: index + 1 })}
                 {itemsMap[index]?.error && <Icon name="error" />}
               </MenuItem>
             ))}
@@ -144,7 +149,8 @@ export const CDXStructuresViewer = ({
   return (
     <div className={styles.wrapper}>
       <div>
-        File: <span className={styles.fileName}>{fileName}</span>
+        {i18n.t('open.file')}{' '}
+        <span className={styles.fileName}>{fileName}</span>
       </div>
       {renderStructures()}
     </div>

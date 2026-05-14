@@ -18,16 +18,16 @@
 @import '../../../../../../../style/mixins.less';
 
 .dialog_body {
-  background-color: #fff;
+  background-color: var(--ketcher-surface, #fff);
 }
 
 .about {
   width: @width-medium-new;
-  color: @color-text-primary;
+  color: var(--ketcher-text-primary, @color-text-primary);
   font-weight: @font-weight-medium;
 
   & > footer {
-    border-top: 1px solid #e1e5ea;
+    border-top: 1px solid var(--ketcher-border, #e1e5ea);
     margin: 0;
     padding: 15px;
   }
@@ -39,7 +39,7 @@
 
   a {
     // TODO: standard, after redesign, move to global styles
-    color: @color-primary;
+    color: var(--ketcher-accent, @color-primary);
   }
 
   .body {
@@ -49,6 +49,7 @@
     overflow-y: auto;
     overflow-x: hidden;
     margin-right: 3px;
+    background-color: var(--ketcher-surface, @color-background-primary);
     .scrollbar();
 
     .versionName {
@@ -85,7 +86,7 @@
       align-items: center;
       gap: 10px;
       text-decoration: none;
-      color: @color-text-primary;
+      color: var(--ketcher-text-primary, @color-text-primary);
     }
 
     .title {

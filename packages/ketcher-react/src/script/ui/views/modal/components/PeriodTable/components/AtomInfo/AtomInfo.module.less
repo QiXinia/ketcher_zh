@@ -23,7 +23,11 @@
   top: 2em;
   width: 60px;
   font-size: 10px;
-  .highlight-shadow(black);
+  background: var(--ketcher-surface-raised, @color-background-primary);
+  color: var(--ketcher-text-secondary, @color-text-secondary);
+  border: 1px solid var(--ketcher-border, @border-color);
+  border-radius: 6px;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
 
   opacity: 1;
   transition: opacity 1s, visibility 0s;

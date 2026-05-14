@@ -21,41 +21,53 @@
   }
 
   &.info {
-    background-color: #C3FFD7;
+    background-color: rgba(87, 199, 212, 0.16);
+    border: 1px solid rgba(87, 199, 212, 0.28);
 
     & .notificationStrip {
-      background-color: #06A729;
+      background-color: var(--ketcher-accent, #06A729);
     }
   }
 
   &.error {
-    background-color: #FDE0DF;
+    background-color: rgba(255, 106, 106, 0.16);
+    border: 1px solid rgba(255, 106, 106, 0.28);
 
     .notificationStrip {
       background-color: @color-secondary-red;
     }
   }
 
+  &.warning {
+    background-color: rgba(255, 193, 7, 0.14);
+    border: 1px solid rgba(255, 193, 7, 0.26);
+
+    .notificationStrip {
+      background-color: #f4b400;
+    }
+  }
+
   &Icon {
     min-width: 18px;
     min-height: 18px;
-    color: @color-text-primary;
+    color: var(--ketcher-text-primary, @color-text-primary);
   }
 
   &Text {
     flex-grow: 1;
     margin: 0;
+    color: var(--ketcher-text-primary, @color-text-primary);
   }
 
   &Button {
     padding: 4px 8px;
     background-color: transparent;
-    border: 1px solid @color-grey-6;
+    border: 1px solid var(--ketcher-border, @color-grey-6);
     border-radius: 4px;
     cursor: pointer;
+    color: var(--ketcher-text-primary, @color-text-primary);
   }
 }
-
 
 
 

@@ -18,10 +18,10 @@ import {
   StereoLabelStyleType,
   StereoColoringType,
   ShowHydrogenLabels,
-  ShowHydrogenLabelNames,
   defaultBondThickness,
 } from 'ketcher-core';
 import { Validator, Schema } from 'jsonschema';
+import { localizedEnumNames, localizedProperty } from './i18n';
 
 type ExtendedSchema = Schema & {
   enumNames?: Array<string>;
@@ -44,19 +44,31 @@ const editor: {
   resetToSelect: ExtendedSchema;
   rotationStep: ExtendedSchema;
 } = {
-  resetToSelect: {
-    title: 'Reset to Select Tool',
-    enum: [true, 'paste', false],
-    enumNames: ['on', 'After Paste', 'off'],
-    default: 'paste',
-  },
-  rotationStep: {
-    title: 'Rotation Step, º',
-    type: 'integer',
-    minimum: 1,
-    maximum: 90,
-    default: 15,
-  },
+  resetToSelect: localizedEnumNames(
+    localizedProperty(
+      {
+        enum: [true, 'paste', false],
+        default: 'paste',
+      },
+      'settings.resetToSelectTool',
+      'Reset to Select Tool',
+    ),
+    [
+      { key: 'settings.on', defaultValue: 'on' },
+      { key: 'settings.afterPaste', defaultValue: 'After Paste' },
+      { key: 'settings.off', defaultValue: 'off' },
+    ],
+  ),
+  rotationStep: localizedProperty(
+    {
+      type: 'integer',
+      minimum: 1,
+      maximum: 90,
+      default: 15,
+    },
+    'settings.rotationStep',
+    'Rotation Step, º',
+  ),
 };
 
 const render: {
@@ -97,234 +109,367 @@ const render: {
   hashSpacingUnit: ExtendedSchema;
   imageResolution: ExtendedSchema;
 } = {
-  showValenceWarnings: {
-    title: 'Show valence warnings',
-    type: 'boolean',
-    description: 'slider',
-    default: true,
-  },
-  atomColoring: {
-    title: 'Atom coloring',
-    type: 'boolean',
-    description: 'slider',
-    default: true,
-  },
-  showStereoFlags: {
-    title: 'Show the Stereo flags',
-    type: 'boolean',
-    description: 'slider',
-    default: true,
-  },
-  stereoLabelStyle: {
-    title: 'Label display at\u00A0stereogenic\u00A0centers',
-    enum: [
-      StereoLabelStyleType.IUPAC,
-      StereoLabelStyleType.Classic,
-      StereoLabelStyleType.On,
-      StereoLabelStyleType.Off,
+  showValenceWarnings: localizedProperty(
+    {
+      type: 'boolean',
+      description: 'slider',
+      default: true,
+    },
+    'settings.showValenceWarnings',
+    'Show valence warnings',
+  ),
+  atomColoring: localizedProperty(
+    {
+      type: 'boolean',
+      description: 'slider',
+      default: true,
+    },
+    'settings.atomColoring',
+    'Atom coloring',
+  ),
+  showStereoFlags: localizedProperty(
+    {
+      type: 'boolean',
+      description: 'slider',
+      default: true,
+    },
+    'settings.showStereoFlags',
+    'Show the Stereo flags',
+  ),
+  stereoLabelStyle: localizedEnumNames(
+    localizedProperty(
+      {
+        enum: [
+          StereoLabelStyleType.IUPAC,
+          StereoLabelStyleType.Classic,
+          StereoLabelStyleType.On,
+          StereoLabelStyleType.Off,
+        ],
+        default: StereoLabelStyleType.IUPAC,
+      },
+      'settings.labelDisplayStereogenicCenters',
+      'Label display at stereogenic centers',
+    ),
+    [
+      { key: 'settings.iupacStyle', defaultValue: 'IUPAC style' },
+      { key: 'settings.classic', defaultValue: 'Classic' },
+      { key: 'settings.on', defaultValue: 'On' },
+      { key: 'settings.off', defaultValue: 'Off' },
     ],
-    enumNames: ['IUPAC style', 'Classic', 'On', 'Off'],
-    default: StereoLabelStyleType.IUPAC,
-  },
-  colorOfAbsoluteCenters: {
-    title: ' Absolute Center color',
-    type: 'string',
-    default: '#ff0000',
-  },
-  colorOfAndCenters: {
-    title: 'AND Centers color',
-    type: 'string',
-    default: '#0000cd',
-  },
-  colorOfOrCenters: {
-    title: 'OR Centers color',
-    type: 'string',
-    default: '#228b22',
-  },
-  colorStereogenicCenters: {
-    title: 'Color stereogenic centers',
-    enum: [
-      StereoColoringType.LabelsOnly,
-      StereoColoringType.BondsOnly,
-      StereoColoringType.LabelsAndBonds,
-      StereoColoringType.Off,
+  ),
+  colorOfAbsoluteCenters: localizedProperty(
+    {
+      type: 'string',
+      default: '#ff0000',
+    },
+    'settings.absoluteCenterColor',
+    'Absolute Center color',
+  ),
+  colorOfAndCenters: localizedProperty(
+    {
+      type: 'string',
+      default: '#0000cd',
+    },
+    'settings.andCentersColor',
+    'AND Centers color',
+  ),
+  colorOfOrCenters: localizedProperty(
+    {
+      type: 'string',
+      default: '#228b22',
+    },
+    'settings.orCentersColor',
+    'OR Centers color',
+  ),
+  colorStereogenicCenters: localizedEnumNames(
+    localizedProperty(
+      {
+        enum: [
+          StereoColoringType.LabelsOnly,
+          StereoColoringType.BondsOnly,
+          StereoColoringType.LabelsAndBonds,
+          StereoColoringType.Off,
+        ],
+        default: StereoColoringType.LabelsOnly,
+      },
+      'settings.colorStereogenicCenters',
+      'Color stereogenic centers',
+    ),
+    [
+      { key: 'settings.labelsOnly', defaultValue: 'Labels Only' },
+      { key: 'settings.bondsOnly', defaultValue: 'Bonds Only' },
+      { key: 'settings.labelsAndBonds', defaultValue: 'Labels And Bonds' },
+      { key: 'settings.off', defaultValue: 'Off' },
     ],
-    enumNames: ['Labels Only', 'Bonds Only', 'Labels And Bonds', 'Off'],
-    default: StereoColoringType.LabelsOnly,
-  },
-  autoFadeOfStereoLabels: {
-    title: 'Auto fade And/Or center labels',
-    type: 'boolean',
-    description: 'slider',
-    default: true,
-  },
-  absFlagLabel: {
-    title: 'Text of Absolute flag',
-    type: 'string',
-    default: 'ABS',
-  },
-  andFlagLabel: {
-    title: 'Text of AND flag',
-    type: 'string',
-    default: 'AND Enantiomer',
-  },
-  mixedFlagLabel: {
-    title: 'Text of Mixed flag',
-    type: 'string',
-    default: 'Mixed',
-  },
-  ignoreChiralFlag: {
-    title: 'Ignore the chiral flag',
-    type: 'boolean',
-    description: 'slider',
-    default: false,
-  },
-  orFlagLabel: {
-    title: 'Text of OR flag',
-    type: 'string',
-    default: 'OR Enantiomer',
-  },
-  font: {
-    title: 'Font',
-    type: 'string',
-    default: '30px Arial',
-  },
-  fontsz: {
-    title: 'Font size',
-    type: 'number',
-    default: 13,
-    minimum: 0.1,
-    maximum: 96,
-  },
-  fontszUnit: {
-    title: 'Font size unit',
-    enum: Object.values(MeasurementUnits),
-    enumNames: Object.values(MeasurementUnits),
-    default: MeasurementUnits.Px,
-  },
-  fontszsub: {
-    title: 'Sub font size',
-    type: 'number',
-    default: 13,
-    minimum: 0.1,
-    maximum: 96,
-  },
-  fontszsubUnit: {
-    title: 'Sub font size unit',
-    enum: Object.values(MeasurementUnits),
-    enumNames: Object.values(MeasurementUnits),
-    default: MeasurementUnits.Px,
-  },
+  ),
+  autoFadeOfStereoLabels: localizedProperty(
+    {
+      type: 'boolean',
+      description: 'slider',
+      default: true,
+    },
+    'settings.autoFadeAndOrCenterLabels',
+    'Auto fade And/Or center labels',
+  ),
+  absFlagLabel: localizedProperty(
+    {
+      type: 'string',
+      default: 'ABS',
+    },
+    'settings.textOfAbsoluteFlag',
+    'Text of Absolute flag',
+  ),
+  andFlagLabel: localizedProperty(
+    {
+      type: 'string',
+      default: 'AND Enantiomer',
+    },
+    'settings.textOfAndFlag',
+    'Text of AND flag',
+  ),
+  mixedFlagLabel: localizedProperty(
+    {
+      type: 'string',
+      default: 'Mixed',
+    },
+    'settings.textOfMixedFlag',
+    'Text of Mixed flag',
+  ),
+  ignoreChiralFlag: localizedProperty(
+    {
+      type: 'boolean',
+      description: 'slider',
+      default: false,
+    },
+    'settings.ignoreChiralFlag',
+    'Ignore the chiral flag',
+  ),
+  orFlagLabel: localizedProperty(
+    {
+      type: 'string',
+      default: 'OR Enantiomer',
+    },
+    'settings.textOfOrFlag',
+    'Text of OR flag',
+  ),
+  font: localizedProperty(
+    {
+      type: 'string',
+      default: '30px Arial',
+    },
+    'settings.font',
+    'Font',
+  ),
+  fontsz: localizedProperty(
+    {
+      type: 'number',
+      default: 13,
+      minimum: 0.1,
+      maximum: 96,
+    },
+    'settings.fontSize',
+    'Font size',
+  ),
+  fontszUnit: localizedProperty(
+    {
+      enum: Object.values(MeasurementUnits),
+      enumNames: Object.values(MeasurementUnits),
+      default: MeasurementUnits.Px,
+    },
+    'settings.fontSizeUnit',
+    'Font size unit',
+  ),
+  fontszsub: localizedProperty(
+    {
+      type: 'number',
+      default: 13,
+      minimum: 0.1,
+      maximum: 96,
+    },
+    'settings.subFontSize',
+    'Sub font size',
+  ),
+  fontszsubUnit: localizedProperty(
+    {
+      enum: Object.values(MeasurementUnits),
+      enumNames: Object.values(MeasurementUnits),
+      default: MeasurementUnits.Px,
+    },
+    'settings.subFontSizeUnit',
+    'Sub font size unit',
+  ),
   // Atom
-  carbonExplicitly: {
-    title: 'Display carbon explicitly',
-    type: 'boolean',
-    description: 'slider',
-    default: false,
-  },
-  showCharge: {
-    title: 'Display charge',
-    type: 'boolean',
-    description: 'slider',
-    default: true,
-  },
-  showValence: {
-    title: 'Display valence',
-    type: 'boolean',
-    description: 'slider',
-    default: true,
-  },
-  showHydrogenLabels: {
-    title: 'Show hydrogen labels',
-    enum: Object.values(ShowHydrogenLabels),
-    enumNames: Object.values(ShowHydrogenLabelNames),
-    default: ShowHydrogenLabels.TerminalAndHetero,
-  },
+  carbonExplicitly: localizedProperty(
+    {
+      type: 'boolean',
+      description: 'slider',
+      default: false,
+    },
+    'settings.displayCarbonExplicitly',
+    'Display carbon explicitly',
+  ),
+  showCharge: localizedProperty(
+    {
+      type: 'boolean',
+      description: 'slider',
+      default: true,
+    },
+    'settings.displayCharge',
+    'Display charge',
+  ),
+  showValence: localizedProperty(
+    {
+      type: 'boolean',
+      description: 'slider',
+      default: true,
+    },
+    'settings.displayValence',
+    'Display valence',
+  ),
+  showHydrogenLabels: localizedEnumNames(
+    localizedProperty(
+      {
+        enum: Object.values(ShowHydrogenLabels),
+        default: ShowHydrogenLabels.TerminalAndHetero,
+      },
+      'settings.showHydrogenLabels',
+      'Show hydrogen labels',
+    ),
+    [
+      { key: 'settings.off', defaultValue: 'Off' },
+      { key: 'settings.hetero', defaultValue: 'Hetero' },
+      { key: 'settings.terminal', defaultValue: 'Terminal' },
+      {
+        key: 'settings.terminalAndHetero',
+        defaultValue: 'Terminal and Hetero',
+      },
+      { key: 'settings.on', defaultValue: 'On' },
+    ],
+  ),
   // Bonds
-  aromaticCircle: {
-    title: 'Aromatic Bonds as circle',
-    type: 'boolean',
-    description: 'slider',
-    default: true,
-  },
-  bondSpacing: {
-    title: 'Bond spacing',
-    type: 'integer',
-    default: 15,
-    minimum: 1,
-    maximum: 100,
-  },
-  bondThickness: {
-    title: 'Bond thickness',
-    type: 'number',
-    default: defaultBondThickness,
-    minimum: 0.1,
-    maximum: 96,
-  },
-  bondThicknessUnit: {
-    title: 'Bond thickness unit',
-    enum: Object.values(MeasurementUnits),
-    enumNames: Object.values(MeasurementUnits),
-    default: MeasurementUnits.Px,
-  },
-  stereoBondWidth: {
-    title: 'Stereo (Wedge) bond width',
-    type: 'number',
-    default: 6,
-    minimum: 0.1,
-    maximum: 96,
-  },
-  stereoBondWidthUnit: {
-    title: 'Stereo (Wedge) bond width unit',
-    enum: Object.values(MeasurementUnits),
-    enumNames: Object.values(MeasurementUnits),
-    default: MeasurementUnits.Px,
-  },
-  bondLength: {
-    title: 'Bond length',
-    type: 'number',
-    default: 40,
-    minimum: 0.1,
-    maximum: 1000,
-  },
-  bondLengthUnit: {
-    title: 'Bond length unit',
-    enum: Object.values(MeasurementUnits),
-    enumNames: Object.values(MeasurementUnits),
-    default: MeasurementUnits.Px,
-  },
-  reactionComponentMarginSize: {
-    title: 'Reaction component margin size',
-    type: 'number',
-    default: 20, // half of bond length
-    minimum: 0.1,
-    maximum: 1000,
-  },
-  reactionComponentMarginSizeUnit: {
-    title: 'Reaction component margin size unit',
-    enum: Object.values(MeasurementUnits),
-    enumNames: Object.values(MeasurementUnits),
-    default: MeasurementUnits.Px,
-  },
-  hashSpacing: {
-    title: 'Hash spacing',
-    type: 'number',
-    default: 1.2,
-    minimum: 0.1,
-    maximum: 1000,
-  },
-  hashSpacingUnit: {
-    title: 'Hash spacing unit',
-    enum: Object.values(MeasurementUnits),
-    enumNames: Object.values(MeasurementUnits),
-    default: MeasurementUnits.Px,
-  },
-  imageResolution: {
-    title: 'Image resolution',
-    enum: Object.values(ImageResolution),
-    enumNames: Object.keys(ImageResolution),
-    default: ImageResolution.low,
-  },
+  aromaticCircle: localizedProperty(
+    {
+      type: 'boolean',
+      description: 'slider',
+      default: true,
+    },
+    'settings.aromaticBondsAsCircle',
+    'Aromatic Bonds as circle',
+  ),
+  bondSpacing: localizedProperty(
+    {
+      type: 'integer',
+      default: 15,
+      minimum: 1,
+      maximum: 100,
+    },
+    'settings.bondSpacing',
+    'Bond spacing',
+  ),
+  bondThickness: localizedProperty(
+    {
+      type: 'number',
+      default: defaultBondThickness,
+      minimum: 0.1,
+      maximum: 96,
+    },
+    'settings.bondThickness',
+    'Bond thickness',
+  ),
+  bondThicknessUnit: localizedProperty(
+    {
+      enum: Object.values(MeasurementUnits),
+      enumNames: Object.values(MeasurementUnits),
+      default: MeasurementUnits.Px,
+    },
+    'settings.bondThicknessUnit',
+    'Bond thickness unit',
+  ),
+  stereoBondWidth: localizedProperty(
+    {
+      type: 'number',
+      default: 6,
+      minimum: 0.1,
+      maximum: 96,
+    },
+    'settings.stereoBondWidth',
+    'Stereo (Wedge) bond width',
+  ),
+  stereoBondWidthUnit: localizedProperty(
+    {
+      enum: Object.values(MeasurementUnits),
+      enumNames: Object.values(MeasurementUnits),
+      default: MeasurementUnits.Px,
+    },
+    'settings.stereoBondWidthUnit',
+    'Stereo (Wedge) bond width unit',
+  ),
+  bondLength: localizedProperty(
+    {
+      type: 'number',
+      default: 40,
+      minimum: 0.1,
+      maximum: 1000,
+    },
+    'settings.bondLength',
+    'Bond length',
+  ),
+  bondLengthUnit: localizedProperty(
+    {
+      enum: Object.values(MeasurementUnits),
+      enumNames: Object.values(MeasurementUnits),
+      default: MeasurementUnits.Px,
+    },
+    'settings.bondLengthUnit',
+    'Bond length unit',
+  ),
+  reactionComponentMarginSize: localizedProperty(
+    {
+      type: 'number',
+      default: 20,
+      minimum: 0.1,
+      maximum: 1000,
+    },
+    'settings.reactionComponentMargin',
+    'Reaction component margin size',
+  ),
+  reactionComponentMarginSizeUnit: localizedProperty(
+    {
+      enum: Object.values(MeasurementUnits),
+      enumNames: Object.values(MeasurementUnits),
+      default: MeasurementUnits.Px,
+    },
+    'settings.reactionComponentMarginUnit',
+    'Reaction component margin size unit',
+  ),
+  hashSpacing: localizedProperty(
+    {
+      type: 'number',
+      default: 1.2,
+      minimum: 0.1,
+      maximum: 1000,
+    },
+    'settings.hashSpacing',
+    'Hash spacing',
+  ),
+  hashSpacingUnit: localizedProperty(
+    {
+      enum: Object.values(MeasurementUnits),
+      enumNames: Object.values(MeasurementUnits),
+      default: MeasurementUnits.Px,
+    },
+    'settings.hashSpacingUnit',
+    'Hash spacing unit',
+  ),
+  imageResolution: localizedProperty(
+    {
+      enum: Object.values(ImageResolution),
+      enumNames: Object.keys(ImageResolution),
+      default: ImageResolution.low,
+    },
+    'settings.imageResolution',
+    'Image resolution',
+  ),
 };
 
 const server: {
@@ -336,48 +481,69 @@ const server: {
   'dearomatize-on-load': ExtendedSchema;
   ignoreChiralFlag: ExtendedSchema;
 } = {
-  'dearomatize-on-load': {
-    title: 'dearomatize-on-load',
-    type: 'boolean',
-    description: 'slider',
-    default: false,
-  },
-  'smart-layout': {
-    title: 'Smart-layout',
-    type: 'boolean',
-    description: 'slider',
-    default: true,
-  },
-  ignoreChiralFlag: {
-    title: 'Ignore the chiral flag',
-    type: 'boolean',
-    description: 'slider',
-    default: false,
-  },
-  'ignore-stereochemistry-errors': {
-    title: 'Ignore stereochemistry errors',
-    type: 'boolean',
-    description: 'slider',
-    default: true,
-  },
-  'mass-skip-error-on-pseudoatoms': {
-    title: 'Ignore pseudoatoms at mass',
-    type: 'boolean',
-    description: 'slider',
-    default: false,
-  },
-  'gross-formula-add-rsites': {
-    title: 'Add Rsites at mass calculation',
-    type: 'boolean',
-    description: 'slider',
-    default: true,
-  },
-  'gross-formula-add-isotopes': {
-    title: 'Add Isotopes at\u00A0mass\u00A0calculation',
-    type: 'boolean',
-    description: 'slider',
-    default: true,
-  },
+  'dearomatize-on-load': localizedProperty(
+    {
+      type: 'boolean',
+      description: 'slider',
+      default: false,
+    },
+    'settings.dearomatizeOnLoad',
+    'dearomatize-on-load',
+  ),
+  'smart-layout': localizedProperty(
+    {
+      type: 'boolean',
+      description: 'slider',
+      default: true,
+    },
+    'settings.smartLayout',
+    'Smart-layout',
+  ),
+  ignoreChiralFlag: localizedProperty(
+    {
+      type: 'boolean',
+      description: 'slider',
+      default: false,
+    },
+    'settings.ignoreChiralFlag',
+    'Ignore the chiral flag',
+  ),
+  'ignore-stereochemistry-errors': localizedProperty(
+    {
+      type: 'boolean',
+      description: 'slider',
+      default: true,
+    },
+    'settings.ignoreStereochemistryErrors',
+    'Ignore stereochemistry errors',
+  ),
+  'mass-skip-error-on-pseudoatoms': localizedProperty(
+    {
+      type: 'boolean',
+      description: 'slider',
+      default: false,
+    },
+    'settings.ignorePseudoatomsAtMass',
+    'Ignore pseudoatoms at mass',
+  ),
+  'gross-formula-add-rsites': localizedProperty(
+    {
+      type: 'boolean',
+      description: 'slider',
+      default: true,
+    },
+    'settings.addRsitesAtMassCalculation',
+    'Add Rsites at mass calculation',
+  ),
+  'gross-formula-add-isotopes': localizedProperty(
+    {
+      type: 'boolean',
+      description: 'slider',
+      default: true,
+    },
+    'settings.addIsotopesAtMassCalculation',
+    'Add Isotopes at mass calculation',
+  ),
 };
 
 export const SERVER_OPTIONS = Object.keys(server);
@@ -388,30 +554,42 @@ const debug: {
   showHalfBondIds: ExtendedSchema;
   showLoopIds: ExtendedSchema;
 } = {
-  showAtomIds: {
-    title: 'Show atom Ids',
-    type: 'boolean',
-    description: 'slider',
-    default: false,
-  },
-  showBondIds: {
-    title: 'Show bonds Ids',
-    type: 'boolean',
-    description: 'slider',
-    default: false,
-  },
-  showHalfBondIds: {
-    title: 'Show half bonds Ids',
-    type: 'boolean',
-    description: 'slider',
-    default: false,
-  },
-  showLoopIds: {
-    title: 'Show loop Ids',
-    type: 'boolean',
-    description: 'slider',
-    default: false,
-  },
+  showAtomIds: localizedProperty(
+    {
+      type: 'boolean',
+      description: 'slider',
+      default: false,
+    },
+    'settings.showAtomIds',
+    'Show atom Ids',
+  ),
+  showBondIds: localizedProperty(
+    {
+      type: 'boolean',
+      description: 'slider',
+      default: false,
+    },
+    'settings.showBondIds',
+    'Show bonds Ids',
+  ),
+  showHalfBondIds: localizedProperty(
+    {
+      type: 'boolean',
+      description: 'slider',
+      default: false,
+    },
+    'settings.showHalfBondIds',
+    'Show half bonds Ids',
+  ),
+  showLoopIds: localizedProperty(
+    {
+      type: 'boolean',
+      description: 'slider',
+      default: false,
+    },
+    'settings.showLoopIds',
+    'Show loop Ids',
+  ),
 };
 
 const miew: {
@@ -419,40 +597,70 @@ const miew: {
   miewTheme: ExtendedSchema;
   miewAtomLabel: ExtendedSchema;
 } = {
-  miewMode: {
-    title: 'Display mode',
-    enum: ['LN', 'BS', 'LC'],
-    enumNames: ['Lines', 'Balls and Sticks', 'Licorice'],
-    default: 'LN',
-  },
-  miewTheme: {
-    title: 'Background color',
-    enum: ['light', 'dark'],
-    enumNames: ['Light', 'Dark'],
-    default: 'light',
-  },
-  miewAtomLabel: {
-    title: 'Label coloring',
-    enum: ['no', 'bright', 'blackAndWhite', 'black'],
-    enumNames: ['No', 'Bright', 'Black and White', 'Black'],
-    default: 'bright',
-  },
+  miewMode: localizedEnumNames(
+    localizedProperty(
+      {
+        enum: ['LN', 'BS', 'LC'],
+        default: 'LN',
+      },
+      'settings.displayMode',
+      'Display mode',
+    ),
+    [
+      { key: 'settings.lines', defaultValue: 'Lines' },
+      { key: 'settings.ballsAndSticks', defaultValue: 'Balls and Sticks' },
+      { key: 'settings.licorice', defaultValue: 'Licorice' },
+    ],
+  ),
+  miewTheme: localizedEnumNames(
+    localizedProperty(
+      {
+        enum: ['light', 'dark'],
+        default: 'light',
+      },
+      'settings.backgroundColor',
+      'Background color',
+    ),
+    [
+      { key: 'settings.light', defaultValue: 'Light' },
+      { key: 'settings.dark', defaultValue: 'Dark' },
+    ],
+  ),
+  miewAtomLabel: localizedEnumNames(
+    localizedProperty(
+      {
+        enum: ['no', 'bright', 'blackAndWhite', 'black'],
+        default: 'bright',
+      },
+      'settings.labelColoring',
+      'Label coloring',
+    ),
+    [
+      { key: 'settings.no', defaultValue: 'No' },
+      { key: 'settings.bright', defaultValue: 'Bright' },
+      { key: 'settings.blackAndWhite', defaultValue: 'Black and White' },
+      { key: 'settings.black', defaultValue: 'Black' },
+    ],
+  ),
 };
 
 export const MIEW_OPTIONS = Object.keys(miew);
 
-const optionsSchema: ExtendedSchema = {
-  title: 'Settings',
-  type: 'object',
-  required: [],
-  properties: {
-    ...editor,
-    ...render,
-    ...server,
-    ...debug,
-    ...miew,
+const optionsSchema: ExtendedSchema = localizedProperty(
+  {
+    type: 'object',
+    required: [],
+    properties: {
+      ...editor,
+      ...render,
+      ...server,
+      ...debug,
+      ...miew,
+    },
   },
-};
+  'settings.title',
+  'Settings',
+);
 
 export default optionsSchema;
 

@@ -34,10 +34,11 @@ const DropDownContent = styled('div')`
   white-space: nowrap;
   word-break: keep-all;
   padding: 2px;
-  background: white; // TODO use variable
-  border: 1px solid #cad3dd; // TODO use variable
+  background: var(--ketcher-surface-raised, white);
+  color: var(--ketcher-toolbar-icon, #333);
+  border: 1px solid var(--ketcher-border, #cad3dd);
   border-radius: 5px;
-  box-shadow: 0 6px 12px rgb(0 0 0 / 18%);
+  box-shadow: var(--ketcher-shadow, 0 6px 12px rgb(0 0 0 / 18%));
 `;
 
 const DropDownButton = styled(IconButton)`
@@ -50,7 +51,7 @@ const DropDownButton = styled(IconButton)`
     cursor: not-allowed;
     opacity: 0.5;
     background-color: initial;
-    color: #333;
+    color: var(--ketcher-toolbar-icon-disabled, #333);
     pointer-events: auto;
   }
 `;
@@ -62,7 +63,7 @@ const DropDownArrow = styled(Icon)`
   margin: 1px;
 
   &:hover {
-    fill: #005662;
+    fill: var(--ketcher-accent-hover, #005662);
     transform: none;
     box-shadow: none;
     transition: none;

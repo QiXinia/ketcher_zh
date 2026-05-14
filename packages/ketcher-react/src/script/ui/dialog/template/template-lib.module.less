@@ -46,19 +46,33 @@
 }
 
 .dialog_body {
-  background-color: @color-background-primary;
-  color: @color-text-primary;
+  background-color: var(--ketcher-surface, @color-background-primary);
+  color: var(--ketcher-text-primary, @color-text-primary);
   width: 452px;
 
   & > div {
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    background-color: inherit;
+  }
+
+  & > header {
+    background-color: var(--ketcher-surface, @color-background-primary);
+    border-bottom: 1px solid var(--ketcher-border, @color-grey-3);
   }
 
   & > footer {
     min-height: 24px;
-    box-shadow: 0 -6px 6px 0 @color-accordion-shadow;
+    background-color: var(--ketcher-surface, @color-background-primary);
+    color: var(--ketcher-text-secondary, @color-text-secondary);
+    border-top: 1px solid var(--ketcher-border, @color-grey-3);
+    box-shadow: 0 -6px 16px 0
+      color-mix(
+        in srgb,
+        var(--ketcher-shadow, rgba(33, 44, 71, 0.12)) 35%,
+        transparent
+      );
     z-index: 10;
 
     & > input {
@@ -67,22 +81,28 @@
 
     & > span {
       line-height: 24px;
+      color: var(--ketcher-text-secondary, @color-text-secondary);
     }
   }
 
   .inputContainer {
     position: relative;
+    background-color: inherit;
+    padding: 0 14px 16px;
 
     input[type='search'] {
-      width: 424px;
+      width: 100%;
       padding-left: 35px;
-      background-color: @color-primary-light;
-      margin: 0 14px 16px 14px;
       height: 28px;
+      background-color: var(--ketcher-surface-muted, @color-primary-light);
+      border: 1px solid var(--ketcher-border, @color-border-input);
+      color: var(--ketcher-text-primary, @color-text-primary);
+      margin: 0;
 
       &::placeholder {
         font-weight: 400;
         opacity: 90%;
+        color: var(--ketcher-text-secondary, @color-text-secondary);
       }
     }
 
@@ -92,7 +112,7 @@
       position: absolute;
       top: 0;
       left: 14px;
-      color: @color-primary;
+      color: var(--ketcher-accent, @color-primary);
     }
   }
 
@@ -108,7 +128,7 @@
 
   .tabsContent {
     height: 50vh;
-    background-color: @color-primary-light;
+    background-color: var(--ketcher-surface-muted, @color-primary-light);
     overflow-y: auto;
     overflow-x: hidden;
 
@@ -117,32 +137,47 @@
 
   .resultsContainer {
     padding: 12px 14px 4px;
-    background-color: @color-primary-light;
+    background-color: var(--ketcher-surface-muted, @color-primary-light);
   }
 
   .saveButton {
     .button-secondary();
+    background-color: var(--ketcher-surface-raised, @color-background-primary);
+    border-color: var(--ketcher-border, @color-text-secondary);
+    color: var(--ketcher-text-secondary, @color-text-secondary);
 
     &[disabled] {
       pointer-events: none;
       cursor: not-allowed;
       opacity: 0.6;
+      background-color: var(--ketcher-surface-muted, @color-grey-3);
+      border-color: color-mix(
+        in srgb,
+        var(--ketcher-text-secondary, @color-text-secondary) 60%,
+        transparent
+      );
+      color: color-mix(
+        in srgb,
+        var(--ketcher-text-secondary, @color-text-secondary) 70%,
+        transparent
+      );
     }
   }
 
   /* stylelint-disable selector-pseudo-class-no-unknown, no-descending-specificity */
   :global(.MuiTabs-indicator) {
-    background-color: @color-primary;
+    background-color: var(--ketcher-accent, @color-primary);
   }
 
   :global(.MuiTabs-flexContainer) {
-    background-color: @color-primary-light;
+    background-color: var(--ketcher-surface-muted, @color-primary-light);
     padding-left: 14px;
   }
 
   :global(.MuiPaper-root) {
     &:not(:last-child)::after {
       width: 424px;
+      background-color: var(--ketcher-border, @color-grey-5);
     }
   }
 
@@ -153,13 +188,20 @@
   }
 
   .tabs {
-    box-shadow: 0 6px 6px 0 @color-accordion-shadow;
+    background-color: var(--ketcher-surface-muted, @color-primary-light);
+    border-bottom: 1px solid var(--ketcher-border, @color-grey-3);
+    box-shadow: 0 6px 16px 0
+      color-mix(
+        in srgb,
+        var(--ketcher-shadow, rgba(33, 44, 71, 0.12)) 30%,
+        transparent
+      );
     z-index: 10;
   }
 
   :global(.MuiButtonBase-root.MuiTab-root) {
     text-transform: none;
-    color: fade(@color-text-black, 70%);
+    color: var(--ketcher-text-secondary, fade(@color-text-black, 70%));
     padding: 12px 10px 8px;
     line-height: 12px;
   }
@@ -170,12 +212,27 @@
 
   :global(.MuiTab-root.Mui-selected) {
     font-weight: 600;
-    color: @color-text-black;
+    color: var(--ketcher-text-primary, @color-text-black);
   }
 
   :global(.MuiTab-root.Mui-disabled) {
     pointer-events: none;
     cursor: not-allowed;
     opacity: 0.6;
+  }
+
+  :global(.MuiAccordionSummary-root),
+  :global(.MuiAccordionDetails-root) {
+    color: var(--ketcher-text-primary, @color-text-primary);
+  }
+
+  :global(.MuiAccordionSummary-expandIconWrapper) {
+    color: var(--ketcher-text-secondary, @color-text-secondary);
+  }
+
+  :global(.MuiAccordionSummary-root .MuiSvgIcon-root),
+  .dialogHeader > svg,
+  .groupIcon {
+    color: currentColor;
   }
 }

@@ -21,6 +21,7 @@ import { Dialog } from '../../../views/components';
 import classes from './rgroup.module.less';
 import { connect } from 'react-redux';
 import { rgroupSchema } from '../../../data/schema/struct-schema';
+import i18n from '../../../../../i18n';
 
 interface RGroupResult {
   values: number[];
@@ -55,11 +56,11 @@ type Props = RGroupProps & RGroupCallProps;
 function RGroup({ disabledIds, values, formState, type, ...props }: Props) {
   return (
     <Dialog
-      title="R-Group"
+      title={i18n.t('rgroup.title')}
       className={classes.rgroup}
       params={props}
       result={() => formState.result}
-      buttonsNameMap={{ OK: 'Apply' }}
+      buttonsNameMap={{ OK: i18n.t('dialog.apply') }}
       buttons={['Cancel', 'OK']}
       withDivider
     >

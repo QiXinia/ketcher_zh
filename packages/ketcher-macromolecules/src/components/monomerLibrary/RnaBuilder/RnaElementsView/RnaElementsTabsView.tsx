@@ -18,7 +18,7 @@ import {
 } from 'state/library';
 import { MonomerGroups } from '../../../../constants';
 import clsx from 'clsx';
-import { Icon, IconName } from 'ketcher-react';
+import { Icon, IconName, i18n } from 'ketcher-react';
 import {
   RnaBuilderPresetsItem,
   selectActiveMonomerKey,
@@ -114,7 +114,7 @@ const RnaElementsTabsView = ({
                   onClick={onNewPresetClick}
                   data-testid="new-preset-button"
                 >
-                  Add new
+                  {i18n.t('monomerLibrary.addNew')}
                 </NewPresetButton>
                 <FilterIconButton
                   type="button"
@@ -124,7 +124,9 @@ const RnaElementsTabsView = ({
                     event.stopPropagation();
                     setIsFilterOpen((prev) => !prev);
                   }}
-                  aria-label="Filter presets by phosphate position"
+                  aria-label={String(
+                    i18n.t('monomerLibrary.filterPresetsByPhosphatePosition'),
+                  )}
                   data-testid="preset-filter-button"
                 >
                   <Icon name="filter" />

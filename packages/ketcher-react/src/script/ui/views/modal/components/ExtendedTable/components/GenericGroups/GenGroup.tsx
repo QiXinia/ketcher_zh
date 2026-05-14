@@ -18,6 +18,7 @@ import type { GenGroup as GenGroupType } from 'ketcher-core';
 import { GenSet } from './GenSet';
 import { isGenericGroup } from '../../helpers';
 import styles from './GenGroup.module.less';
+import { getGenericGroupDisplayName } from '../../../../../../../../i18n/helpers';
 
 type GenProps = {
   selected: (label: string) => boolean;
@@ -50,7 +51,7 @@ const GenGroup = ({
     <div className={styles.fieldFlexWrapper}>
       <fieldset className={styles.fieldset}>
         <legend className={styles[getLegendClassname(group.title)]}>
-          {group.title}
+          {getGenericGroupDisplayName(group.title)}
         </legend>
         <div
           className={

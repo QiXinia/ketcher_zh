@@ -19,6 +19,7 @@ import { FC } from 'react';
 import styles from './OpenOptions.module.less';
 import { FileDrop } from './FileDrop';
 import { Icon } from 'components';
+import i18n from '../../../../../../../../i18n';
 
 const ICON_NAMES = {
   PASTE: 'open-window-paste-icon',
@@ -56,15 +57,19 @@ export const OpenOptions: FC<OpenOptionsProps> = ({
           {/* <p className={styles.textLabel}>or press Ctrl + V</p> */}
         </div>
         <div className={styles.buttonLabelWrapper}>
-          <p className={styles.buttonLabel}>Paste from clipboard</p>
+          <p className={styles.buttonLabel}>
+            {i18n.t('open.pasteFromClipboard')}
+          </p>
         </div>
       </button>
 
       <FileDrop
         onDropAccepted={fileLoadHandler}
-        onDropRejected={(e) => errorHandler(`Unable to accept file(s). ${e}`)}
-        buttonLabel="Open from file"
-        textLabel="or drag file here"
+        onDropRejected={(e) =>
+          errorHandler(`${i18n.t('open.unableToAcceptFiles')} ${e}`)
+        }
+        buttonLabel={i18n.t('open.openFromFile')}
+        textLabel={i18n.t('open.orDragFileHere')}
         iconName={ICON_NAMES.FILE}
         testId="open-from-file-button"
       />
@@ -72,15 +77,11 @@ export const OpenOptions: FC<OpenOptionsProps> = ({
       <FileDrop
         accept="image/*"
         disabled={isRecognizeDisabled}
-        disabledText="Image Recognition service is not available"
+        disabledText={i18n.t('open.imageRecognitionUnavailable')}
         onDropAccepted={imageLoadHandler}
-        onDropRejected={() =>
-          errorHandler(
-            'Unable to accept file(s). Make sure you upload 1 image.',
-          )
-        }
-        buttonLabel="Open from image"
-        textLabel="or drag file here"
+        onDropRejected={() => errorHandler(i18n.t('open.uploadSingleImage'))}
+        buttonLabel={i18n.t('open.openFromImage')}
+        textLabel={i18n.t('open.orDragFileHere')}
         iconName={ICON_NAMES.IMAGE}
         testId="open-from-image-button"
       />

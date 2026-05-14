@@ -19,11 +19,13 @@
 
 .rgroup {
   width: @width-small;
+  background-color: var(--ketcher-surface, @color-background-primary);
+  color: var(--ketcher-text-primary, @color-text-primary);
 
   > div {
     margin: 0;
     padding: 12px 11px;
-    background-color: @color-primary-light;
+    background-color: var(--ketcher-surface-muted, @color-primary-light);
   }
 
   ul {
@@ -43,22 +45,24 @@
     width: 100%;
     height: 29px;
     padding: 6px 4px;
-    background: @color-background-primary;
-    color: @color-text-secondary;
+    background: var(--ketcher-surface-raised, @color-background-primary);
+    color: var(--ketcher-text-secondary, @color-text-secondary);
     font-weight: 700;
+    border-radius: 6px;
 
     &::first-letter {
       font-weight: 400;
     }
 
     &:hover {
-      color: @color-icon-hover;
+      background: var(--ketcher-surface, @color-background-primary);
+      color: var(--ketcher-accent-hover, @color-icon-hover);
     }
 
     &:active,
     &.selected {
       color: @color-text-light;
-      background: @color-primary;
+      background: var(--ketcher-accent, @color-primary);
     }
   }
 }

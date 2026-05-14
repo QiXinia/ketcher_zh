@@ -7,9 +7,11 @@
   flex-direction: column;
   gap: 8px;
   padding: 8px;
-  background: white;
+  background: var(--ketcher-surface-raised, white);
+  border: 1px solid var(--ketcher-border, @color-grey-4);
   border-radius: 8px;
-  box-shadow: 0 2px 5px 0 rgba(103, 104, 132, 0.15);
+  box-shadow: var(--ketcher-shadow, 0 2px 5px 0 rgba(103, 104, 132, 0.15));
+  color: var(--ketcher-text-primary, @color-text-primary);
   pointer-events: auto;
 }
 
@@ -17,7 +19,7 @@
   margin: 0;
   font-weight: 400;
   font-size: 12px;
-  color: @color-text-primary;
+  color: var(--ketcher-text-primary, @color-text-primary);
 }
 
 .selectsWrapper {

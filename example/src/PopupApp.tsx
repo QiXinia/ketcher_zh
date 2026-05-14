@@ -7,6 +7,7 @@ import 'ketcher-react/dist/index.css';
 
 import { getStructServiceProvider } from './utils';
 import { safePostMessage } from './utils/safePostMessage';
+import { getCurrentKetcherTheme } from './theme';
 
 const getHiddenButtonsConfig = (): ButtonsConfig => {
   const searchParams = new URLSearchParams(window.location.search);
@@ -62,6 +63,9 @@ const PopupApp = () => {
             window.ketcher = ketcher;
             safePostMessage({
               eventType: 'init',
+              data: {
+                theme: getCurrentKetcherTheme(),
+              },
             });
             window.scrollTo(0, 0);
           }}

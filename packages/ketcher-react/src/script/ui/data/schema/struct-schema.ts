@@ -17,6 +17,11 @@
 import { mapOf } from './schema-helper';
 import { range } from 'lodash/fp';
 import { sdataCustomSchema } from './sdata-schema';
+import {
+  localizedEnumNames,
+  localizedInvalidMessage,
+  localizedProperty,
+} from './i18n';
 
 interface CommonStructSchema {
   key?: string;
@@ -41,6 +46,8 @@ export interface StructSchema<
 > extends CommonStructSchema {
   properties: T;
 }
+
+type ExtendedSchemaProperty = Record<string, unknown>;
 
 interface AtomProperties extends Record<string, SchemaProperty> {
   alias: SchemaProperty;
@@ -74,209 +81,456 @@ export const atom: StructSchema<AtomProperties> = {
   type: 'object',
   required: ['label'],
   properties: {
-    atomType: {
-      title: 'Atom Type',
-      enum: ['single', 'list', 'pseudo'],
-      enumNames: ['Single', 'List', 'Special'],
-      default: 'single',
-    },
-    label: {
-      title: 'Label',
-      type: 'string', // TODO:should really be enum of elements
-      maxLength: 3,
-      invalidMessage: 'Wrong label',
-    },
-    atomList: {
-      title: 'List',
-      type: 'string',
-      invalidMessage: 'Invalid atom list',
-    },
-    notList: {
-      title: 'Not list',
-      type: 'boolean',
-      default: false,
-    },
-    pseudo: {
-      title: 'Special',
-      type: 'string',
-      invalidMessage: 'Invalid special atom',
-    },
-    alias: {
-      title: 'Alias',
-      type: 'string',
-      invalidMessage: 'Leading and trailing spaces are not allowed',
-    },
-    charge: {
-      title: 'Charge',
-      type: 'string',
-      pattern: '^([+-]?)(1[0-5]|0|[0-9])([+-]?)$',
-      maxLength: 4,
-      default: '',
-      invalidMessage: 'Invalid charge value',
-    },
-    explicitValence: {
-      title: 'Valence',
-      enum: [-1, 0, 1, 2, 3, 4, 5, 6, 7, 8],
-      enumNames: ['', '0', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII'],
-      default: -1,
-    },
-    isotope: {
-      title: 'Isotope (atomic mass)',
-      type: 'string',
-      pattern: '^[0-9]{1,3}$|(^$)',
-      default: '',
-      maxLength: 3,
-      invalidMessage: 'Invalid isotope value',
-    },
-    radical: {
-      title: 'Radical',
-      enum: [0, 2, 1, 3],
-      enumNames: [
-        '',
-        'Monoradical',
-        'Diradical (singlet)',
-        'Diradical (triplet)',
+    atomType: localizedEnumNames(
+      localizedProperty(
+        {
+          enum: ['single', 'list', 'pseudo'],
+          default: 'single',
+        } as ExtendedSchemaProperty,
+        'atomProperties.atomType',
+        'Atom Type',
+      ),
+      [
+        { key: 'atomProperties.single', defaultValue: 'Single' },
+        { key: 'atomProperties.list', defaultValue: 'List' },
+        { key: 'atomProperties.special', defaultValue: 'Special' },
       ],
-      default: 0,
-    },
-    cip: {
-      title: 'CIP',
-      type: 'string',
-      enum: ['R', 'S', 'r', 's'],
-    },
-    ringBondCount: {
-      title: 'Ring bond count',
-      enum: [0, -2, -1, 2, 3, 4, 5, 6, 7, 8, 9],
-      enumNames: ['', 'As drawn', '0', '2', '3', '4', '5', '6', '7', '8', '9'],
-      default: 0,
-    },
-    hCount: {
-      title: 'H count',
-      enum: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-      enumNames: ['', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
-      default: 0,
-    },
-    substitutionCount: {
-      title: 'Substitution count',
-      enum: [0, -2, -1, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-      enumNames: [
-        '',
-        'As drawn',
-        '0',
-        '1',
-        '2',
-        '3',
-        '4',
-        '5',
-        '6',
-        '7',
-        '8',
-        '9',
+    ) as unknown as SchemaProperty,
+    label: localizedInvalidMessage(
+      localizedProperty(
+        {
+          type: 'string', // TODO:should really be enum of elements
+          maxLength: 3,
+        } as ExtendedSchemaProperty,
+        'atomProperties.label',
+        'Label',
+      ),
+      'atomProperties.wrongLabel',
+      'Wrong label',
+    ) as unknown as SchemaProperty,
+    atomList: localizedInvalidMessage(
+      localizedProperty(
+        {
+          type: 'string',
+        } as ExtendedSchemaProperty,
+        'atomProperties.list',
+        'List',
+      ),
+      'atomProperties.invalidAtomList',
+      'Invalid atom list',
+    ) as unknown as SchemaProperty,
+    notList: localizedProperty(
+      {
+        type: 'boolean',
+        default: false,
+      } as ExtendedSchemaProperty,
+      'atomProperties.notList',
+      'Not list',
+    ) as unknown as SchemaProperty,
+    pseudo: localizedInvalidMessage(
+      localizedProperty(
+        {
+          type: 'string',
+        } as ExtendedSchemaProperty,
+        'atomProperties.special',
+        'Special',
+      ),
+      'atomProperties.invalidSpecialAtom',
+      'Invalid special atom',
+    ) as unknown as SchemaProperty,
+    alias: localizedInvalidMessage(
+      localizedProperty(
+        {
+          type: 'string',
+        } as ExtendedSchemaProperty,
+        'atomProperties.alias',
+        'Alias',
+      ),
+      'atomProperties.leadingTrailingSpacesNotAllowed',
+      'Leading and trailing spaces are not allowed',
+    ) as unknown as SchemaProperty,
+    charge: localizedInvalidMessage(
+      localizedProperty(
+        {
+          type: 'string',
+          pattern: '^([+-]?)(1[0-5]|0|[0-9])([+-]?)$',
+          maxLength: 4,
+          default: '',
+        } as ExtendedSchemaProperty,
+        'atomProperties.charge',
+        'Charge',
+      ),
+      'atomProperties.invalidChargeValue',
+      'Invalid charge value',
+    ) as unknown as SchemaProperty,
+    explicitValence: localizedEnumNames(
+      localizedProperty(
+        {
+          enum: [-1, 0, 1, 2, 3, 4, 5, 6, 7, 8],
+          default: -1,
+        } as ExtendedSchemaProperty,
+        'atomProperties.valence',
+        'Valence',
+      ),
+      [
+        { key: '', defaultValue: '' },
+        { key: '', defaultValue: '0' },
+        { key: '', defaultValue: 'I' },
+        { key: '', defaultValue: 'II' },
+        { key: '', defaultValue: 'III' },
+        { key: '', defaultValue: 'IV' },
+        { key: '', defaultValue: 'V' },
+        { key: '', defaultValue: 'VI' },
+        { key: '', defaultValue: 'VII' },
+        { key: '', defaultValue: 'VIII' },
       ],
-      default: 0,
-    },
-    unsaturatedAtom: {
-      title: 'Unsaturated',
-      type: 'boolean',
-      default: false,
-    },
-    aromaticity: {
-      title: 'Aromaticity',
-      enum: [null, 'aromatic', 'aliphatic'],
-      enumNames: ['', 'aromatic', 'aliphatic'],
-      default: 0,
-    },
-    implicitHCount: {
-      title: 'Implicit H count',
-      enum: [null, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-      enumNames: ['', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
-      default: 0,
-    },
-    ringMembership: {
-      title: 'Ring membership',
-      enum: [null, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-      enumNames: ['', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
-      default: 0,
-    },
-    ringSize: {
-      title: 'Ring size',
-      enum: [null, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-      enumNames: ['', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
-      default: 0,
-    },
-    connectivity: {
-      title: 'Connectivity',
-      enum: [null, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-      enumNames: ['', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
-      default: 0,
-    },
-    chirality: {
-      title: 'Chirality',
-      enum: [null, 'anticlockwise', 'clockwise'],
-      enumNames: ['', 'anticlockwise', 'clockwise'],
-      default: 0,
-    },
-    customQuery: {
-      title: 'Custom Query',
-      pattern: '[^ ]',
-      type: 'string',
-      invalidMessage: 'Invalid custom query',
-    },
-    invRet: {
-      title: 'Inversion',
-      enum: [0, 1, 2],
-      enumNames: ['', 'Inverts', 'Retains'],
-      default: 0,
-    },
-    exactChangeFlag: {
-      title: 'Exact change',
-      type: 'boolean',
-      default: false,
-    },
+    ) as unknown as SchemaProperty,
+    isotope: localizedInvalidMessage(
+      localizedProperty(
+        {
+          type: 'string',
+          pattern: '^[0-9]{1,3}$|(^$)',
+          default: '',
+          maxLength: 3,
+        } as ExtendedSchemaProperty,
+        'atomProperties.isotope',
+        'Isotope (atomic mass)',
+      ),
+      'atomProperties.invalidIsotopeValue',
+      'Invalid isotope value',
+    ) as unknown as SchemaProperty,
+    radical: localizedEnumNames(
+      localizedProperty(
+        {
+          enum: [0, 2, 1, 3],
+          default: 0,
+        } as ExtendedSchemaProperty,
+        'atomProperties.radical',
+        'Radical',
+      ),
+      [
+        { key: '', defaultValue: '' },
+        { key: 'atomProperties.monoradical', defaultValue: 'Monoradical' },
+        {
+          key: 'atomProperties.diradicalSinglet',
+          defaultValue: 'Diradical (singlet)',
+        },
+        {
+          key: 'atomProperties.diradicalTriplet',
+          defaultValue: 'Diradical (triplet)',
+        },
+      ],
+    ) as unknown as SchemaProperty,
+    cip: localizedProperty(
+      {
+        type: 'string',
+        enum: ['R', 'S', 'r', 's'],
+      } as ExtendedSchemaProperty,
+      'atomProperties.cip',
+      'CIP',
+    ) as unknown as SchemaProperty,
+    ringBondCount: localizedEnumNames(
+      localizedProperty(
+        {
+          enum: [0, -2, -1, 2, 3, 4, 5, 6, 7, 8, 9],
+          default: 0,
+        } as ExtendedSchemaProperty,
+        'atomProperties.ringBondCount',
+        'Ring bond count',
+      ),
+      [
+        { key: '', defaultValue: '' },
+        { key: 'atomProperties.asDrawn', defaultValue: 'As drawn' },
+        { key: '', defaultValue: '0' },
+        { key: '', defaultValue: '2' },
+        { key: '', defaultValue: '3' },
+        { key: '', defaultValue: '4' },
+        { key: '', defaultValue: '5' },
+        { key: '', defaultValue: '6' },
+        { key: '', defaultValue: '7' },
+        { key: '', defaultValue: '8' },
+        { key: '', defaultValue: '9' },
+      ],
+    ) as unknown as SchemaProperty,
+    hCount: localizedEnumNames(
+      localizedProperty(
+        {
+          enum: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+          default: 0,
+        } as ExtendedSchemaProperty,
+        'atomProperties.hCount',
+        'H count',
+      ),
+      [
+        { key: '', defaultValue: '' },
+        { key: '', defaultValue: '0' },
+        { key: '', defaultValue: '1' },
+        { key: '', defaultValue: '2' },
+        { key: '', defaultValue: '3' },
+        { key: '', defaultValue: '4' },
+        { key: '', defaultValue: '5' },
+        { key: '', defaultValue: '6' },
+        { key: '', defaultValue: '7' },
+        { key: '', defaultValue: '8' },
+        { key: '', defaultValue: '9' },
+      ],
+    ) as unknown as SchemaProperty,
+    substitutionCount: localizedEnumNames(
+      localizedProperty(
+        {
+          enum: [0, -2, -1, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+          default: 0,
+        } as ExtendedSchemaProperty,
+        'atomProperties.substitutionCount',
+        'Substitution count',
+      ),
+      [
+        { key: '', defaultValue: '' },
+        { key: 'atomProperties.asDrawn', defaultValue: 'As drawn' },
+        { key: '', defaultValue: '0' },
+        { key: '', defaultValue: '1' },
+        { key: '', defaultValue: '2' },
+        { key: '', defaultValue: '3' },
+        { key: '', defaultValue: '4' },
+        { key: '', defaultValue: '5' },
+        { key: '', defaultValue: '6' },
+        { key: '', defaultValue: '7' },
+        { key: '', defaultValue: '8' },
+        { key: '', defaultValue: '9' },
+      ],
+    ) as unknown as SchemaProperty,
+    unsaturatedAtom: localizedProperty(
+      {
+        type: 'boolean',
+        default: false,
+      } as ExtendedSchemaProperty,
+      'atomProperties.unsaturated',
+      'Unsaturated',
+    ) as unknown as SchemaProperty,
+    aromaticity: localizedEnumNames(
+      localizedProperty(
+        {
+          enum: [null, 'aromatic', 'aliphatic'],
+          default: 0,
+        } as ExtendedSchemaProperty,
+        'atomProperties.aromaticity',
+        'Aromaticity',
+      ),
+      [
+        { key: '', defaultValue: '' },
+        { key: 'atomProperties.aromatic', defaultValue: 'aromatic' },
+        { key: 'atomProperties.aliphatic', defaultValue: 'aliphatic' },
+      ],
+    ) as unknown as SchemaProperty,
+    implicitHCount: localizedEnumNames(
+      localizedProperty(
+        {
+          enum: [null, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+          default: 0,
+        } as ExtendedSchemaProperty,
+        'atomProperties.implicitHCount',
+        'Implicit H count',
+      ),
+      [
+        { key: '', defaultValue: '' },
+        { key: '', defaultValue: '0' },
+        { key: '', defaultValue: '1' },
+        { key: '', defaultValue: '2' },
+        { key: '', defaultValue: '3' },
+        { key: '', defaultValue: '4' },
+        { key: '', defaultValue: '5' },
+        { key: '', defaultValue: '6' },
+        { key: '', defaultValue: '7' },
+        { key: '', defaultValue: '8' },
+        { key: '', defaultValue: '9' },
+      ],
+    ) as unknown as SchemaProperty,
+    ringMembership: localizedEnumNames(
+      localizedProperty(
+        {
+          enum: [null, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+          default: 0,
+        } as ExtendedSchemaProperty,
+        'atomProperties.ringMembership',
+        'Ring membership',
+      ),
+      [
+        { key: '', defaultValue: '' },
+        { key: '', defaultValue: '0' },
+        { key: '', defaultValue: '1' },
+        { key: '', defaultValue: '2' },
+        { key: '', defaultValue: '3' },
+        { key: '', defaultValue: '4' },
+        { key: '', defaultValue: '5' },
+        { key: '', defaultValue: '6' },
+        { key: '', defaultValue: '7' },
+        { key: '', defaultValue: '8' },
+        { key: '', defaultValue: '9' },
+      ],
+    ) as unknown as SchemaProperty,
+    ringSize: localizedEnumNames(
+      localizedProperty(
+        {
+          enum: [null, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+          default: 0,
+        } as ExtendedSchemaProperty,
+        'atomProperties.ringSize',
+        'Ring size',
+      ),
+      [
+        { key: '', defaultValue: '' },
+        { key: '', defaultValue: '0' },
+        { key: '', defaultValue: '1' },
+        { key: '', defaultValue: '2' },
+        { key: '', defaultValue: '3' },
+        { key: '', defaultValue: '4' },
+        { key: '', defaultValue: '5' },
+        { key: '', defaultValue: '6' },
+        { key: '', defaultValue: '7' },
+        { key: '', defaultValue: '8' },
+        { key: '', defaultValue: '9' },
+      ],
+    ) as unknown as SchemaProperty,
+    connectivity: localizedEnumNames(
+      localizedProperty(
+        {
+          enum: [null, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+          default: 0,
+        } as ExtendedSchemaProperty,
+        'atomProperties.connectivity',
+        'Connectivity',
+      ),
+      [
+        { key: '', defaultValue: '' },
+        { key: '', defaultValue: '0' },
+        { key: '', defaultValue: '1' },
+        { key: '', defaultValue: '2' },
+        { key: '', defaultValue: '3' },
+        { key: '', defaultValue: '4' },
+        { key: '', defaultValue: '5' },
+        { key: '', defaultValue: '6' },
+        { key: '', defaultValue: '7' },
+        { key: '', defaultValue: '8' },
+        { key: '', defaultValue: '9' },
+      ],
+    ) as unknown as SchemaProperty,
+    chirality: localizedEnumNames(
+      localizedProperty(
+        {
+          enum: [null, 'anticlockwise', 'clockwise'],
+          default: 0,
+        } as ExtendedSchemaProperty,
+        'atomProperties.chirality',
+        'Chirality',
+      ),
+      [
+        { key: '', defaultValue: '' },
+        {
+          key: 'atomProperties.anticlockwise',
+          defaultValue: 'anticlockwise',
+        },
+        { key: 'atomProperties.clockwise', defaultValue: 'clockwise' },
+      ],
+    ) as unknown as SchemaProperty,
+    customQuery: localizedInvalidMessage(
+      localizedProperty(
+        {
+          pattern: '[^ ]',
+          type: 'string',
+        } as ExtendedSchemaProperty,
+        'atomProperties.customQuery',
+        'Custom Query',
+      ),
+      'atomProperties.invalidCustomQuery',
+      'Invalid custom query',
+    ) as unknown as SchemaProperty,
+    invRet: localizedEnumNames(
+      localizedProperty(
+        {
+          enum: [0, 1, 2],
+          default: 0,
+        } as ExtendedSchemaProperty,
+        'atomProperties.inversion',
+        'Inversion',
+      ),
+      [
+        { key: '', defaultValue: '' },
+        { key: 'atomProperties.inverts', defaultValue: 'Inverts' },
+        { key: 'atomProperties.retains', defaultValue: 'Retains' },
+      ],
+    ) as unknown as SchemaProperty,
+    exactChangeFlag: localizedProperty(
+      {
+        type: 'boolean',
+        default: false,
+      } as ExtendedSchemaProperty,
+      'atomProperties.exactChange',
+      'Exact change',
+    ) as unknown as SchemaProperty,
   },
 };
 
-export const rgroupSchema: StructSchema = {
-  title: 'R-group',
-  type: 'object',
-  properties: {
-    values: {
-      type: 'array',
-      items: {
-        type: 'string',
-        enum: range(1, 33),
-        enumNames: range(1, 33).map((item: number) => 'R' + item),
+export const rgroupSchema: StructSchema = localizedProperty(
+  {
+    title: 'R-Group',
+    type: 'object',
+    properties: {
+      values: {
+        type: 'array',
+        items: {
+          type: 'string',
+          enum: range(1, 33),
+          enumNames: range(1, 33).map((item: number) => 'R' + item),
+        },
       },
     },
-  },
-};
+  } as unknown as Record<string, unknown>,
+  'rgroup.title',
+  'R-Group',
+) as unknown as StructSchema;
 
-export const labelEdit: StructSchema = {
-  title: 'Label Edit',
-  type: 'object',
-  required: ['label'],
-  properties: {
-    label: {
-      title: 'Atom',
-      default: '',
-      invalidMessage: 'Wrong atom symbol',
-      type: 'string',
+export const labelEdit: StructSchema = localizedProperty(
+  {
+    title: 'Label Edit',
+    type: 'object',
+    required: ['label'],
+    properties: {
+      label: localizedInvalidMessage(
+        localizedProperty(
+          {
+            default: '',
+            type: 'string',
+          } as ExtendedSchemaProperty,
+          'atomProperties.atom',
+          'Atom',
+        ),
+        'atomProperties.wrongLabel',
+        'Wrong atom symbol',
+      ) as unknown as SchemaProperty,
     },
-  },
-};
+  } as unknown as Record<string, unknown>,
+  'rgroup.labelEdit',
+  'Label Edit',
+) as unknown as StructSchema;
 
 export const attachmentPoints: StructSchema = {
   title: 'Attachment Points',
   type: 'object',
   properties: {
-    primary: {
-      title: 'Primary attachment point',
-      type: 'boolean',
-    },
-    secondary: {
-      title: 'Secondary attachment point',
-      type: 'boolean',
-    },
+    primary: localizedProperty(
+      {
+        type: 'boolean',
+      } as ExtendedSchemaProperty,
+      'rgroup.primaryAttachmentPoint',
+      'Primary attachment point',
+    ) as unknown as SchemaProperty,
+    secondary: localizedProperty(
+      {
+        type: 'boolean',
+      } as ExtendedSchemaProperty,
+      'rgroup.secondaryAttachmentPoint',
+      'Secondary attachment point',
+    ) as unknown as SchemaProperty,
   },
 };
 
@@ -285,76 +539,126 @@ export const bond: StructSchema = {
   type: 'object',
   required: ['type'],
   properties: {
-    type: {
-      title: 'Type',
-      enum: [
-        '',
-        'single',
-        'up',
-        'down',
-        'updown',
-        'double',
-        'crossed',
-        'triple',
-        'aromatic',
-        'any',
-        'hydrogen',
-        'singledouble',
-        'singlearomatic',
-        'doublearomatic',
-        'dative',
+    type: localizedEnumNames(
+      localizedProperty(
+        {
+          enum: [
+            '',
+            'single',
+            'up',
+            'down',
+            'updown',
+            'double',
+            'crossed',
+            'triple',
+            'aromatic',
+            'any',
+            'hydrogen',
+            'singledouble',
+            'singlearomatic',
+            'doublearomatic',
+            'dative',
+          ],
+          default: 'single',
+        } as ExtendedSchemaProperty,
+        'bondProperties.type',
+        'Type',
+      ),
+      [
+        { key: '', defaultValue: '' },
+        { key: 'bondProperties.single', defaultValue: 'Single' },
+        { key: 'bondProperties.singleUp', defaultValue: 'Single Up' },
+        { key: 'bondProperties.singleDown', defaultValue: 'Single Down' },
+        {
+          key: 'bondProperties.singleUpDown',
+          defaultValue: 'Single Up/Down',
+        },
+        { key: 'bondProperties.double', defaultValue: 'Double' },
+        {
+          key: 'bondProperties.doubleCisTrans',
+          defaultValue: 'Double Cis/Trans',
+        },
+        { key: 'bondProperties.triple', defaultValue: 'Triple' },
+        { key: 'bondProperties.aromatic', defaultValue: 'Aromatic' },
+        { key: 'bondProperties.any', defaultValue: 'Any' },
+        { key: 'bondProperties.hydrogen', defaultValue: 'Hydrogen' },
+        {
+          key: 'bondProperties.singleDouble',
+          defaultValue: 'Single/Double',
+        },
+        {
+          key: 'bondProperties.singleAromatic',
+          defaultValue: 'Single/Aromatic',
+        },
+        {
+          key: 'bondProperties.doubleAromatic',
+          defaultValue: 'Double/Aromatic',
+        },
+        { key: 'bondProperties.dative', defaultValue: 'Dative' },
       ],
-      enumNames: [
-        '',
-        'Single',
-        'Single Up',
-        'Single Down',
-        'Single Up/Down',
-        'Double',
-        'Double Cis/Trans',
-        'Triple',
-        'Aromatic',
-        'Any',
-        'Hydrogen',
-        'Single/Double',
-        'Single/Aromatic',
-        'Double/Aromatic',
-        'Dative',
+    ) as unknown as SchemaProperty,
+    topology: localizedEnumNames(
+      localizedProperty(
+        {
+          enum: [null, 0, 1, 2],
+          default: 0,
+        } as ExtendedSchemaProperty,
+        'bondProperties.topology',
+        'Topology',
+      ),
+      [
+        { key: '', defaultValue: '' },
+        { key: 'bondProperties.either', defaultValue: 'Either' },
+        { key: 'bondProperties.ring', defaultValue: 'Ring' },
+        { key: 'bondProperties.chain', defaultValue: 'Chain' },
       ],
-      default: 'single',
-    },
-    topology: {
-      title: 'Topology',
-      enum: [null, 0, 1, 2],
-      enumNames: ['', 'Either', 'Ring', 'Chain'],
-      default: 0,
-    },
-    customQuery: {
-      title: 'Custom Query',
-      pattern: '[^ ]',
-      type: 'string',
-      invalidMessage: 'Invalid custom query',
-    },
-    center: {
-      title: 'Reacting Center',
-      enum: [null, 0, -1, 1, 2, 4, 8, 12], // 5, 9, 13
-      enumNames: [
-        '',
-        'Unmarked',
-        'Not center',
-        'Center',
-        'No change',
-        'Made/broken',
-        'Order changes',
-        'Made/broken and changes',
-      ], // "Order changes" x 3
-      default: 0,
-    },
-    cip: {
-      title: 'CIP',
-      type: 'string',
-      enum: ['E', 'Z', 'M', 'P'],
-    },
+    ) as unknown as SchemaProperty,
+    customQuery: localizedInvalidMessage(
+      localizedProperty(
+        {
+          pattern: '[^ ]',
+          type: 'string',
+        } as ExtendedSchemaProperty,
+        'atomProperties.customQuery',
+        'Custom Query',
+      ),
+      'atomProperties.invalidCustomQuery',
+      'Invalid custom query',
+    ) as unknown as SchemaProperty,
+    center: localizedEnumNames(
+      localizedProperty(
+        {
+          enum: [null, 0, -1, 1, 2, 4, 8, 12], // 5, 9, 13
+          default: 0,
+        } as ExtendedSchemaProperty,
+        'bondProperties.reactingCenter',
+        'Reacting Center',
+      ),
+      [
+        { key: '', defaultValue: '' },
+        { key: 'bondProperties.unmarked', defaultValue: 'Unmarked' },
+        { key: 'bondProperties.notCenter', defaultValue: 'Not center' },
+        { key: 'bondProperties.center', defaultValue: 'Center' },
+        { key: 'bondProperties.noChange', defaultValue: 'No change' },
+        { key: 'bondProperties.madeBroken', defaultValue: 'Made/broken' },
+        {
+          key: 'bondProperties.orderChanges',
+          defaultValue: 'Order changes',
+        },
+        {
+          key: 'bondProperties.madeBrokenAndChanges',
+          defaultValue: 'Made/broken and changes',
+        },
+      ],
+    ) as unknown as SchemaProperty,
+    cip: localizedProperty(
+      {
+        type: 'string',
+        enum: ['E', 'Z', 'M', 'P'],
+      } as ExtendedSchemaProperty,
+      'atomProperties.cip',
+      'CIP',
+    ) as unknown as SchemaProperty,
   },
 };
 
@@ -472,27 +776,43 @@ const sgroup: Omit<StructSchema, 'properties'> & {
 
 export const sgroupMap: Record<string, StructSchema> = mapOf(sgroup, 'type');
 
-export const rgroupLogic: StructSchema = {
-  title: 'R-Group',
-  type: 'object',
-  properties: {
-    range: {
-      title: 'Occurrence',
-      type: 'string',
-      maxLength: 50,
-      invalidMessage: 'Wrong value',
+export const rgroupLogic: StructSchema = localizedProperty(
+  {
+    title: 'R-Group',
+    type: 'object',
+    properties: {
+      range: localizedInvalidMessage(
+        localizedProperty(
+          {
+            type: 'string',
+            maxLength: 50,
+          } as ExtendedSchemaProperty,
+          'rgroup.occurrence',
+          'Occurrence',
+        ),
+        'rgroup.wrongValue',
+        'Wrong value',
+      ) as unknown as SchemaProperty,
+      resth: localizedProperty(
+        {
+          type: 'boolean',
+        } as ExtendedSchemaProperty,
+        'rgroup.resth',
+        'RestH',
+      ) as unknown as SchemaProperty,
+      ifthen: localizedProperty(
+        {
+          type: 'integer',
+          minimum: 0,
+        } as ExtendedSchemaProperty,
+        'rgroup.condition',
+        'Condition',
+      ) as unknown as SchemaProperty,
     },
-    resth: {
-      title: 'RestH',
-      type: 'boolean',
-    },
-    ifthen: {
-      title: 'Condition',
-      type: 'integer',
-      minimum: 0,
-    },
-  },
-};
+  } as unknown as Record<string, unknown>,
+  'rgroup.logicCondition',
+  'R-Group',
+) as unknown as StructSchema;
 
 export const textSchema: StructSchema = {
   title: 'Text Edit',
@@ -511,13 +831,18 @@ export const attachSchema: StructSchema = {
   type: 'object',
   required: ['name'],
   properties: {
-    name: {
-      title: 'Molecule name',
-      type: 'string',
-      minLength: 1,
-      maxLength: 128,
-      invalidMessage:
-        'Template must have a unique name and no more than 128 symbols in length',
-    },
+    name: localizedInvalidMessage(
+      localizedProperty(
+        {
+          type: 'string',
+          minLength: 1,
+          maxLength: 128,
+        } as ExtendedSchemaProperty,
+        'templates.moleculeName',
+        'Molecule name',
+      ),
+      'templates.invalidTemplateName',
+      'Template must have a unique name and no more than 128 symbols in length',
+    ) as unknown as SchemaProperty,
   },
 };

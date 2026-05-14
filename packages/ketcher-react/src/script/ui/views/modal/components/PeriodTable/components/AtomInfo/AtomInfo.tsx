@@ -17,6 +17,7 @@
 import { ElementColor, type Element } from 'ketcher-core';
 import classes from './AtomInfo.module.less';
 import clsx from 'clsx';
+import { getElementDisplayTitle } from '../../../../../../../../i18n/helpers';
 
 interface AtomInfoProps {
   el: Element;
@@ -38,7 +39,7 @@ function AtomInfo({ el, isInfo }: Readonly<AtomInfoProps>) {
       <div style={numberStyle}>{el.number}</div>
       <span style={elemStyle}>{el.label}</span>
       <br />
-      {el.title}
+      {getElementDisplayTitle(el.label, el.title)}
       <br />
       {el.mass}
     </div>

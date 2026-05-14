@@ -80,6 +80,7 @@ const DropzoneButton = styled.button`
 `;
 
 const FileDrop = ({
+  buttonLabel,
   textLabel,
   iconName,
   disabled,
@@ -145,7 +146,7 @@ const FileDrop = ({
           <ButtonContainer>
             {textLabel && <span>{textLabel}</span>}
           </ButtonContainer>
-          <OpenOptionText>Open from file</OpenOptionText>
+          <OpenOptionText>{buttonLabel}</OpenOptionText>
         </>
       )}
     </DropzoneButton>

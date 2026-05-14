@@ -19,6 +19,7 @@ import { useAppSelector, useLayoutMode } from 'hooks';
 import { selectEditor, selectEditorActiveTool } from 'state/common';
 import { hotkeysShortcuts } from 'components/ZoomControls/helpers';
 import { SELECT_SUBMENU_ID } from 'components/menu/constants';
+import { i18n } from 'ketcher-react';
 
 export function LeftMenuComponent() {
   const activeTool = useAppSelector(selectEditorActiveTool);
@@ -39,7 +40,7 @@ export function LeftMenuComponent() {
       <Menu.Group divider={true}>
         <Menu.Item
           itemId="hand"
-          title={`Hand Tool (${hotkeysShortcuts.hand})`}
+          title={`${i18n.t('tools.handTool')} (${hotkeysShortcuts.hand})`}
           testId="hand"
         />
         <Menu.Group>
@@ -50,24 +51,30 @@ export function LeftMenuComponent() {
           >
             <Menu.Item
               itemId="select-rectangle"
-              title={`Select Rectangle (${hotkeysShortcuts.switchSelectTool})`}
+              title={`${i18n.t('tools.rectangleSelection')} (${
+                hotkeysShortcuts.switchSelectTool
+              })`}
               testId="select-rectangle"
             />
             <Menu.Item
               itemId="select-lasso"
-              title={`Lasso selection (${hotkeysShortcuts.switchSelectTool})`}
+              title={`${i18n.t('tools.lassoSelection')} (${
+                hotkeysShortcuts.switchSelectTool
+              })`}
               testId="select-lasso"
             />
             <Menu.Item
               itemId="select-structure"
-              title={`Structure Selection (${hotkeysShortcuts.switchSelectTool})`}
+              title={`${i18n.t('tools.structureSelection')} (${
+                hotkeysShortcuts.switchSelectTool
+              })`}
               testId="select-structure"
             />
           </Menu.Submenu>
         </Menu.Group>
         <Menu.Item
           itemId="erase"
-          title={`Erase (${hotkeysShortcuts.erase})`}
+          title={`${i18n.t('tools.erase')} (${hotkeysShortcuts.erase})`}
           testId="erase"
           disabled={isSequenceMode}
         />
@@ -80,13 +87,13 @@ export function LeftMenuComponent() {
         >
           <Menu.Item
             itemId="bond-single"
-            title="Single Bond (1)"
+            title={`${i18n.t('bond.single')} (1)`}
             testId="single-bond"
             disabled={isSequenceMode}
           />
           <Menu.Item
             itemId="bond-hydrogen"
-            title="Hydrogen Bond (2)"
+            title={`${i18n.t('bond.hydrogen')} (2)`}
             testId="hydrogen-bond"
             disabled={isSequenceMode}
           />

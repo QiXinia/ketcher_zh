@@ -8,7 +8,11 @@ import {
 import React, { useMemo } from 'react';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
-import { Icon, KETCHER_MACROMOLECULES_ROOT_NODE_SELECTOR } from 'ketcher-react';
+import {
+  Icon,
+  KETCHER_MACROMOLECULES_ROOT_NODE_SELECTOR,
+  i18n,
+} from 'ketcher-react';
 import { scrollbarThin } from 'theming/mixins';
 import { EmptyFunction } from 'helpers/emptyFunction';
 import styles from './Modal.module.less';
@@ -169,7 +173,11 @@ export const Modal = ({
           <span>
             {showExpandButton && (
               <IconButton
-                title={expanded ? 'Minimize window' : 'Expand window'}
+                title={String(
+                  i18n.t(
+                    expanded ? 'dialog.minimizeWindow' : 'dialog.expandWindow',
+                  ),
+                )}
                 data-testid={'expand-window-button'}
                 className={styles.expandButton}
                 onClick={() => {
@@ -181,7 +189,7 @@ export const Modal = ({
             )}
             {showCloseButton && (
               <IconButton
-                title={'Close window'}
+                title={String(i18n.t('dialog.closeWindow'))}
                 onClick={onClose}
                 data-testid="close-window-button"
               >

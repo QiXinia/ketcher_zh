@@ -1,13 +1,13 @@
 import { difference } from 'lodash';
 
 /**
- * Remove the word `bond` out of the title
+ * Keep backward compatibility with legacy bond titles while supporting i18n titles.
  *
  * @example
  * formatTitle('Single Bond') === 'Single'
  */
 export const formatTitle = (title: string) => {
-  return title.slice(0, -5);
+  return title.endsWith(' Bond') ? title.slice(0, -5) : title;
 };
 
 /**

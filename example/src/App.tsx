@@ -6,10 +6,7 @@ import 'ketcher-react/dist/index.css';
 
 import { getStructServiceProvider } from './utils';
 import { safePostMessage } from './utils/safePostMessage';
-import {
-  getCurrentKetcherTheme,
-  subscribeToKetcherThemeMessages,
-} from './theme';
+import { getCurrentKetcherTheme } from './theme';
 
 const getHiddenButtonsConfig = (): ButtonsConfig => {
   const searchParams = new URLSearchParams(window.location.search);
@@ -34,8 +31,6 @@ const App = () => {
   useEffect(() => {
     getStructServiceProvider().then(setStructServiceProvider);
   }, []);
-
-  useEffect(() => subscribeToKetcherThemeMessages(), []);
 
   if (!structServiceProvider) {
     return <div>Loading...</div>;

@@ -17,6 +17,7 @@
 import classes from './TypeChoice.module.less';
 import { GenericInput } from 'src/script/ui/component/form/Input/Input';
 import { PeriodTableType } from '../../types';
+import i18n from '../../../../../../../../i18n';
 
 interface TypeSchemaItem {
   title: string;
@@ -25,9 +26,21 @@ interface TypeSchemaItem {
 }
 
 const typeSchema: TypeSchemaItem[] = [
-  { title: 'Single', value: 'atom', testId: 'single-radio-button' },
-  { title: 'List', value: 'list', testId: 'list-radio-button' },
-  { title: 'Not List', value: 'not-list', testId: 'not-list-radio-button' },
+  {
+    title: i18n.t('periodicTable.single'),
+    value: 'atom',
+    testId: 'single-radio-button',
+  },
+  {
+    title: i18n.t('periodicTable.list'),
+    value: 'list',
+    testId: 'list-radio-button',
+  },
+  {
+    title: i18n.t('periodicTable.notList'),
+    value: 'not-list',
+    testId: 'not-list-radio-button',
+  },
 ];
 
 interface TypeChoiceProps {

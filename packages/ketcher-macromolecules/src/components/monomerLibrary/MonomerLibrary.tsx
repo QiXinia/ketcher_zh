@@ -39,7 +39,7 @@ import {
   MonomerLibrarySearchIcon,
   MonomerLibraryToggle,
 } from './styles';
-import { Icon } from 'ketcher-react';
+import { Icon, i18n } from 'ketcher-react';
 
 const COPY = '_Copy';
 
@@ -129,11 +129,11 @@ const MonomerLibrary = ({ toggleLibraryVisibility }: Props) => {
             type="search"
             data-testid="monomer-library-input"
             onChange={filterResults}
-            placeholder="Search by name..."
+            placeholder={String(i18n.t('monomerLibrary.searchByName'))}
           />
         </MonomerLibraryInputContainer>
         <MonomerLibraryToggle
-          title="Hide library"
+          title={String(i18n.t('monomerLibrary.hideLibrary'))}
           onClick={toggleLibraryVisibility}
           data-testid="hide-monomer-library"
         >

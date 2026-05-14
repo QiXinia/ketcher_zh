@@ -24,22 +24,23 @@ import {
 import styled from '@emotion/styled';
 
 const StyledInput = styled('input')`
-  border: 1px solid #cad3dd;
+  border: 1px solid var(--ketcher-border, #cad3dd);
   border-radius: 4px;
   padding: 3px 8px;
-  color: #585858;
+  background: var(--ketcher-surface-raised, #ffffff);
+  color: var(--ketcher-toolbar-icon, #585858);
   font-size: 14px;
   line-height: 16px;
-  caret-color: #43b5c0;
+  caret-color: var(--ketcher-accent-hover, #43b5c0);
   margin-bottom: 8px;
 
   &:hover {
-    border-color: #43b5c0;
+    border-color: var(--ketcher-accent-hover, #43b5c0);
   }
 
   &:active,
   &:focus {
-    border-color: #167782;
+    border-color: var(--ketcher-accent, #167782);
     outline: none;
   }
 

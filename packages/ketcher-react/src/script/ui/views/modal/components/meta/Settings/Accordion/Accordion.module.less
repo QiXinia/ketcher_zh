@@ -20,15 +20,22 @@
 .accordionWrapper {
   overflow-y: auto;
   overflow-x: hidden;
-  background-color: @color-primary-light;
+  background-color: var(--ketcher-surface-muted, @color-primary-light);
   .scrollbar();
 }
 
 .expandIcon {
   width: 16px;
   margin-right: @margin-left-right;
+  color: var(--ketcher-text-secondary, @color-icon-active);
   transform: rotate(180deg);
   transition: transform 300ms ease-in-out;
+
+  :global(path),
+  :global([stroke]) {
+    fill: currentColor;
+    stroke: currentColor;
+  }
 }
 
 .turnedIcon{
@@ -38,13 +45,14 @@
 .accordionSummaryWrapper {
   margin: 0;
   padding-left: @padding-modal;
-  border-bottom: 1px solid @color-grey-3; 
-  background-color: @color-background-primary;
+  border-bottom: 1px solid var(--ketcher-border, @color-grey-3);
+  background-color: var(--ketcher-surface, @color-background-primary);
   width: 100%;
   border-top: none;
   border-left: none;
   border-right: none;
   font: inherit;
+  color: inherit;
   text-align: left;
   cursor: pointer;
 }
@@ -59,7 +67,7 @@
   align-items: center;
   font-size: 14px;
   line-height: 14px;
-  color: @color-text-primary;
+  color: var(--ketcher-text-primary, @color-text-primary);
   font-weight: 400;
 
 }
@@ -78,11 +86,12 @@
 
 .accordionDetails{
   margin-top: @margin-left-right;
-  color: @color-text-primary;
+  color: var(--ketcher-text-primary, @color-text-primary);
   padding-bottom: 4px;
 }
 
 .groupIcon {
+  color: var(--ketcher-text-secondary, @color-icon-active);
   height: 15px;
   width: 15px;
 }

@@ -17,6 +17,7 @@ import {
   UsageInMacromolecule,
   AttachmentPointName,
 } from 'ketcher-core';
+import { i18n } from 'ketcher-react';
 import hydrateLeavingGroup from 'helpers/hydrateLeavingGroup';
 import { getConnectedAttachmentPoints } from 'helpers';
 import MonomerOverview from 'components/shared/ConnectionOverview/components/MonomerOverview/MonomerOverview';
@@ -149,8 +150,8 @@ const MonomerConnection = ({
     <StyledModal
       title={
         isReconnectionDialog
-          ? 'Edit Attachment Points'
-          : 'Select Attachment Points'
+          ? String(i18n.t('macromolecules.editAttachmentPointsTitle'))
+          : String(i18n.t('macromolecules.selectAttachmentPoints'))
       }
       isOpen={isModalOpen}
       onClose={cancelBondCreationAndClose}
@@ -190,13 +191,17 @@ const MonomerConnection = ({
 
       <Modal.Footer>
         <ActionButtonLeft
-          label="Cancel"
+          label={String(i18n.t('dialog.cancel'))}
           data-testid={'cancel-button'}
           styleType="secondary"
           clickHandler={cancelBondCreationAndClose}
         />
         <ActionButtonRight
-          label={isReconnectionDialog ? 'Reconnect' : 'Connect'}
+          label={
+            isReconnectionDialog
+              ? String(i18n.t('macromolecules.reconnect'))
+              : String(i18n.t('macromolecules.connect'))
+          }
           data-testid={
             isReconnectionDialog ? 'Reconnect-button' : 'Connect-button'
           }

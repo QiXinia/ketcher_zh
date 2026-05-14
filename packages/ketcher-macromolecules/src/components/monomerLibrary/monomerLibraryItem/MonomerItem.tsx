@@ -40,6 +40,7 @@ import {
   cardMouseOverHandler,
   getAutochainErrorMessage,
 } from 'components/monomerLibrary/monomerLibraryItem/shared';
+import { i18n } from 'ketcher-react';
 
 export const AUTOCHAIN_ELEMENT_CLASSNAME = 'autochain';
 
@@ -191,7 +192,7 @@ const MonomerItem = ({
             type="button"
             onClick={addFavorite}
             className={`star ${item.favorite ? 'visible' : ''}`}
-            aria-label="Toggle favorite"
+            aria-label={String(i18n.t('monomerLibrary.toggleFavorite'))}
           >
             {FavoriteStarSymbol}
           </button>

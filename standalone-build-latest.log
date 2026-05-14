@@ -1,0 +1,35 @@
+
+> ketcher-react-app@1.0.0 build:standalone
+> cross-env-shell MODE=standalone run-s prebuild build:react postbuild
+
+(node:13504) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+> ketcher-react-app@1.0.0 prebuild
+> cross-env-shell run-s init:build init:dist
+
+(node:15824) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+> ketcher-react-app@1.0.0 init:build
+> shx mkdir -p build
+
+
+> ketcher-react-app@1.0.0 init:dist
+> cross-env-shell shx mkdir -p dist/$MODE
+
+(node:23396) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+> ketcher-react-app@1.0.0 build:react
+> cross-env-shell MODE=$MODE react-app-rewired build && echo $MODE
+
+(node:22308) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:21272) [DEP0176] DeprecationWarning: fs.F_OK is deprecated, use fs.constants.F_OK instead
+(Use `node --trace-deprecation ...` to show where the warning was created)
+Creating an optimized production build...
+Compiled successfully.
+
+File sizes after gzip:
+

@@ -1,0 +1,37 @@
+{
+  "settings": {
+    "dialog": {
+      "backgroundColor": "rgb(17, 24, 32)",
+      "color": "rgb(237, 244, 251)",
+      "boxShadow": "rgba(0, 0, 0, 0.38) 0px 16px 42px 0px"
+    },
+    "body": {
+      "backgroundColor": "rgb(17, 24, 32)",
+      "color": "rgb(237, 244, 251)"
+    },
+    "firstTextInput": {
+      "backgroundColor": "rgb(59, 59, 59)",
+      "color": "rgb(255, 255, 255)",
+      "borderColor": "rgb(202, 211, 221)"
+    },
+    "firstCombobox": {
+      "backgroundColor": "rgb(23, 33, 44)",
+      "color": "rgb(237, 244, 251)",
+      "borderColor": "rgb(44, 58, 73)"
+    }
+  },
+  "about": {
+    "dialog": {
+      "backgroundColor": "rgb(17, 24, 32)",
+      "color": "rgb(237, 244, 251)",
+      "boxShadow": "rgba(0, 0, 0, 0.38) 0px 16px 42px 0px"
+    },
+    "body": {
+      "backgroundColor": "rgb(17, 24, 32)",
+      "color": "rgb(237, 244, 251)"
+    },
+    "firstLink": {
+      "color": "rgb(237, 244, 251)"
+    }
+  }
+}

@@ -18,7 +18,8 @@
 @import '../../../../../../style/variables.less';
 
 .elementsTable {
-  background-color: @color-background-primary;
+  background-color: var(--ketcher-surface, @color-background-primary);
+  color: var(--ketcher-text-secondary, @color-text-secondary);
   width: @width-large;
   height: 368px;
 
@@ -30,7 +31,7 @@
   }
 
   > header {
-    border-bottom: 1px solid @color-grey-3;
+    border-bottom: 1px solid var(--ketcher-border, @color-grey-3);
   }
 
   .dialogHeader {
@@ -43,17 +44,19 @@
 
     & > span {
       line-height: 16px;
+      color: var(--ketcher-text-primary, @color-text-primary);
     }
 
     & > svg {
       width: 16px;
       height: 16px;
+      color: var(--ketcher-text-primary, @color-text-primary);
     }
   }
 
   .tabs {
     outline: none;
-    border-bottom: 1px solid @color-grey-3;
+    border-bottom: 1px solid var(--ketcher-border, @color-grey-3);
     padding-left: 15px;
   }
 

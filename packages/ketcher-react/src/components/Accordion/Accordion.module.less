@@ -15,6 +15,9 @@
   }
 
   &:global(.MuiPaper-root) {
+    background-color: var(--ketcher-surface, @color-background-primary);
+    color: var(--ketcher-text-primary, @color-text-primary);
+
     &:not(:last-child)::after {
       content: '';
       position: absolute;
@@ -23,7 +26,7 @@
       right: 0;
       height: 1px;
       margin: 0 auto;
-      background-color: @color-grey-5;
+      background-color: var(--ketcher-border, @color-grey-5);
       opacity: 1;
     }
   }
@@ -39,8 +42,13 @@
   }
 
   :global(.MuiAccordionDetails-root) {
-    background-color: @color-primary-light;
-    box-shadow: inset 0 -2px 8px 0 @color-accordion-shadow;
+    background-color: var(--ketcher-surface-muted, @color-primary-light);
+    box-shadow: inset 0 -2px 8px 0
+      color-mix(
+        in srgb,
+        var(--ketcher-shadow, @color-accordion-shadow) 22%,
+        transparent
+      );
     padding: 12px 14px 4px;
   }
 
@@ -53,5 +61,6 @@
 
   .expandIcon {
     width: 20px;
+    color: currentColor;
   }
 }

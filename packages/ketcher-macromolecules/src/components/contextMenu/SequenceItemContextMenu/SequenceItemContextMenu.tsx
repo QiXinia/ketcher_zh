@@ -5,6 +5,7 @@ import {
   KETCHER_MACROMOLECULES_ROOT_NODE_SELECTOR,
   Icon,
   IconName,
+  i18n,
 } from 'ketcher-react';
 import { useAppDispatch, useAppSelector, useLayoutMode } from 'hooks';
 import {
@@ -119,20 +120,20 @@ export const SequenceItemContextMenu = ({
     },
     {
       name: SequenceItemContextMenuNames.copy,
-      title: 'Copy',
+      title: String(i18n.t('action.copy')),
       icon: <Icon name={'copyMenu' as IconName} />,
       disabled: selectedMonomers?.length === 0,
     },
     {
       name: SequenceItemContextMenuNames.paste,
-      title: 'Paste',
+      title: String(i18n.t('action.paste')),
       icon: <Icon name={'pasteNavBar' as IconName} />,
       disabled: false,
       separator: true,
     },
     {
       name: SequenceItemContextMenuNames.editSequence,
-      title: 'Edit sequence',
+      title: String(i18n.t('macromolecules.editSequence')),
       disabled: false,
       hidden: ({
         props,
@@ -142,27 +143,27 @@ export const SequenceItemContextMenu = ({
     },
     {
       name: SequenceItemContextMenuNames.startNewSequence,
-      title: 'Start new sequence',
+      title: String(i18n.t('macromolecules.startNewSequence')),
       disabled: false,
       separator: isAntisenseBlockVisible || isHydrogenBondBlockVisible,
     },
     {
       name: SequenceItemContextMenuNames.createRnaAntisenseStrand,
-      title: 'Create RNA antisense strand',
+      title: String(i18n.t('macromolecules.createRnaAntisenseStrand')),
       disabled: isAntisenseCreationDisabled(selectedMonomers),
       hidden: () =>
         !selectedMonomers || !isAntisenseOptionVisible(selectedMonomers),
     },
     {
       name: SequenceItemContextMenuNames.createDnaAntisenseStrand,
-      title: 'Create DNA antisense strand',
+      title: String(i18n.t('macromolecules.createDnaAntisenseStrand')),
       disabled: isAntisenseCreationDisabled(selectedMonomers),
       hidden: () =>
         !selectedMonomers || !isAntisenseOptionVisible(selectedMonomers),
     },
     {
       name: SequenceItemContextMenuNames.establishHydrogenBond,
-      title: 'Establish Hydrogen Bonds',
+      title: String(i18n.t('macromolecules.establishHydrogenBonds')),
       disabled: ({
         props,
       }: {
@@ -182,7 +183,7 @@ export const SequenceItemContextMenu = ({
     },
     {
       name: SequenceItemContextMenuNames.deleteHydrogenBond,
-      title: 'Remove hydrogen bonds',
+      title: String(i18n.t('macromolecules.removeHydrogenBonds')),
       disabled: ({
         props,
       }: {
@@ -204,7 +205,7 @@ export const SequenceItemContextMenu = ({
     },
     {
       name: SequenceItemContextMenuNames.modifyInRnaBuilder,
-      title: 'Modify in RNA Builder...',
+      title: String(i18n.t('macromolecules.modifyInRnaBuilder')),
       disabled:
         !menuProps?.isSelectedOnlyNucleoelements || menuProps.hasAntisense,
       hidden: ({
@@ -220,7 +221,7 @@ export const SequenceItemContextMenu = ({
     },
     {
       name: SequenceItemContextMenuNames.modifyAminoAcids,
-      title: 'Modify amino acids',
+      title: String(i18n.t('macromolecules.modifyAminoAcids')),
       disabled: false,
       hidden: !modifyAminoAcidsMenuItems.length,
       subMenuItems: modifyAminoAcidsMenuItems,
@@ -228,7 +229,7 @@ export const SequenceItemContextMenu = ({
     },
     {
       name: SequenceItemContextMenuNames.delete,
-      title: 'Delete',
+      title: String(i18n.t('contextMenu.delete')),
       disabled: selectedMonomers?.length === 0,
       icon: <Icon name={'deleteMenu' as IconName} />,
     },
@@ -370,9 +371,10 @@ export const SequenceItemContextMenu = ({
 
         if (isGoingToDeleteAllHydrogenBondsForAnyChain) {
           editor.events.openConfirmationDialog.dispatch({
-            title: 'Deletion of all Hydrogen Bonds',
-            confirmationText:
-              'Deleting all hydrogen bonds will cause the separation of two chains. Do you wish to proceed?',
+            title: String(i18n.t('macromolecules.deleteAllHydrogenBondsTitle')),
+            confirmationText: String(
+              i18n.t('macromolecules.deleteAllHydrogenBondsConfirmation'),
+            ),
             onConfirm: () => {
               editor.events.deleteHydrogenBond.dispatch(
                 props.sequenceItemRenderer,

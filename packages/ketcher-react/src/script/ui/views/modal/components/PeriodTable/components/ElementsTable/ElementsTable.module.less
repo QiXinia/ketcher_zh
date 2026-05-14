@@ -16,9 +16,15 @@
 
 @import '../../../../../../../../style/mixins.less';
 
+.periodic-dark-swatch(@tone) {
+  background: mix(#0c1117, @tone, 72%);
+  border: 2px solid mix(#0c1117, @tone, 60%);
+}
+
 .table {
   position: relative;
   border-spacing: 3px;
+  color: var(--ketcher-text-secondary, @color-text-secondary);
 
   td,
   th {
@@ -101,7 +107,56 @@
 
   .unknown-state {
     &::after {
-      color: #222;
+      color: var(--ketcher-text-primary, #222);
+    }
+  }
+}
+
+:global(html[data-theme='dark']) {
+  .table {
+    .noble {
+      .periodic-dark-swatch(@atom-periodic-noble-gas);
+    }
+
+    .alkali {
+      .periodic-dark-swatch(@atom-periodic-alkali-metal);
+    }
+
+    .alkaline-earth {
+      .periodic-dark-swatch(@atom-periodic-alkaline-earth-metal);
+    }
+
+    .metalloid {
+      .periodic-dark-swatch(@atom-periodic-metalloid);
+    }
+
+    .other-nonmetal {
+      .periodic-dark-swatch(@atom-periodic-other-nonmetal);
+    }
+
+    .post-transition {
+      .periodic-dark-swatch(@atom-periodic-post-transition-metal);
+    }
+
+    .transition {
+      .periodic-dark-swatch(@atom-periodic-transition-metal);
+    }
+
+    .lanthanide {
+      .periodic-dark-swatch(@atom-periodic-lanthanide);
+    }
+
+    .actinide {
+      .periodic-dark-swatch(@atom-periodic-actinide);
+    }
+
+    .halogen {
+      .periodic-dark-swatch(@atom-periodic-halogen);
+    }
+
+    .unknown-props {
+      background: mix(#0c1117, @atom-periodic-unknown-properties, 76%);
+      border: 2px solid mix(#0c1117, @atom-periodic-unknown-properties, 64%);
     }
   }
 }
@@ -119,10 +174,10 @@
   border: 0;
   display: block;
   position: relative;
-  color: @color-text-secondary;
+  color: var(--ketcher-text-primary, @color-text-secondary);
 
   &::after {
-    color: @color-text-secondary;
+    color: var(--ketcher-text-secondary, @color-text-secondary);
     position: absolute;
     opacity: 0.6;
     top: 0.3em;
@@ -135,7 +190,7 @@
 
   &:hover {
     z-index: 60;
-    background: #fff;
+    background: var(--ketcher-surface-raised, #fff);
   }
 
   &.selected {

@@ -75,7 +75,7 @@ const FooterContent = ({
           clickHandler={copyHandler}
           styles={classes.copyButton}
           label={i18n.t('open.addToCanvas')}
-          title="Structure will be loaded as fragment and added to Clipboard"
+          title={i18n.t('open.structureAsFragment')}
           testId="add-to-canvas-button"
         />
       </div>
@@ -138,7 +138,7 @@ const Open: FC<Props> = (props) => {
     };
     const onError = () => {
       setIsLoading(false);
-      errorHandler('Error processing file');
+      errorHandler(i18n.t('open.errorProcessingFile'));
     };
 
     setFileName(files[0].name);

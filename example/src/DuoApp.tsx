@@ -4,6 +4,7 @@ import { ButtonsConfig, Editor, InfoModal } from 'ketcher-react';
 import { Ketcher, StructServiceProvider } from 'ketcher-core';
 import { getStructServiceProvider } from './utils';
 import { safePostMessage } from './utils/safePostMessage';
+import { getCurrentKetcherTheme } from './theme';
 
 const getHiddenButtonsConfig = (): ButtonsConfig => {
   const searchParams = new URLSearchParams(window.location.search);
@@ -56,6 +57,9 @@ const DuoApp = () => {
               window.ketcher = ketcher;
               safePostMessage({
                 eventType: 'init',
+                data: {
+                  theme: getCurrentKetcherTheme(),
+                },
               });
               window.scrollTo(0, 0);
             }}
@@ -89,6 +93,9 @@ const DuoApp = () => {
               window.ketcher = ketcher;
               safePostMessage({
                 eventType: 'init',
+                data: {
+                  theme: getCurrentKetcherTheme(),
+                },
               });
               window.scrollTo(0, 0);
             }}

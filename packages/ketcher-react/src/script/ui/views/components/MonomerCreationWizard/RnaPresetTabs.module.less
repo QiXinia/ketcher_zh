@@ -25,7 +25,7 @@
   flex: 0 0 auto;
   font-size: 10px;
   text-transform: none;
-  background: #fff;
+  background: var(--ketcher-surface-raised, #fff);
   border-radius: 4px 4px 0 0;
 
   &.errorTab {
@@ -34,7 +34,7 @@
   }
 
   .tabLabel {
-    color: #333333;
+    color: var(--ketcher-text-primary, #333333);
     margin-left: 4px;
   }
 
@@ -56,7 +56,7 @@
   svg {
     width: 16px;
     height: 16px;
-    color: #b4b9d6;
+    color: var(--ketcher-text-secondary, #b4b9d6);
   }
 
   :global(.MuiTab-iconWrapper) {
@@ -67,14 +67,16 @@
 .tabsContentWrapper {
   width: 292px;
   padding: 8px;
-  background: #fff;
+  background: var(--ketcher-surface-raised, #fff);
+  color: var(--ketcher-text-primary, #333333);
 }
 
 .createComponentWrapper {
   padding: 8px;
   margin-bottom: 8px;
   display: flex;
-  background: #eff2f5;
+  background: var(--ketcher-surface-muted, #eff2f5);
+  color: var(--ketcher-text-primary, #333333);
   font-size: 9px;
   gap: 0 10px;
   border-radius: 4px;
@@ -93,9 +95,9 @@
   }
 
   &:disabled {
-    background: #e1e5ea;
-    color: #333333;
-    border-color: #e1e5ea;
+    background: var(--ketcher-border-soft, #e1e5ea);
+    color: var(--ketcher-text-primary, #333333);
+    border-color: var(--ketcher-border-soft, #e1e5ea);
     cursor: not-allowed;
     opacity: 0.5;
   }
@@ -150,8 +152,8 @@
 }
 
 .phosphatePositionButtonActive {
-  border-color: @color-grey-4;
-  background: @color-background-primary;
+  border-color: var(--ketcher-border, @color-grey-4);
+  background: var(--ketcher-surface-raised, @color-background-primary);
   box-shadow: 0 2px 6px rgba(103, 104, 132, 0.18);
 }
 

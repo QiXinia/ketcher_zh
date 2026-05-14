@@ -16,6 +16,10 @@
 import _ from 'lodash';
 import { escapeRegExp, filter as _filter, flow, reduce } from 'lodash/fp';
 import { Option } from '../component/form/Select';
+import {
+  getTemplateDisplayNameByGroup,
+  getTemplateGroupDisplayName,
+} from '../../../i18n/helpers';
 
 const GREEK_SIMBOLS = {
   Alpha: 'A',
@@ -39,13 +43,20 @@ export function filterLib(lib, filter: string) {
   const trimmedFilter = filter.trim();
   const re = new RegExp(escapeRegExp(greekify(trimmedFilter)), 'i');
   return flow(
-    _filter(
-      (item: any) =>
+    _filter((item: any) => {
+      const searchFields = [
+        item.struct.name,
+        getTemplateDisplayNameByGroup(item.struct.name, item.props.group),
+        item.props.group,
+        getTemplateGroupDisplayName(item.props.group),
+        item.props.abbreviation,
+      ].filter(Boolean);
+
+      return (
         !trimmedFilter ||
-        re.test(greekify(item.struct.name)) ||
-        re.test(greekify(item.props.group)) ||
-        (item.props.abbreviation && re.test(greekify(item.props.abbreviation))),
-    ),
+        searchFields.some((field) => re.test(greekify(String(field))))
+      );
+    }),
     reduce((res, item) => {
       if (!res[item.props.group]) res[item.props.group] = [item];
       else res[item.props.group].push(item);
@@ -60,8 +71,12 @@ export function filterFGLib(lib, filter) {
   const searchFunction = (item) => {
     const fields = [
       item.struct.name,
+      getTemplateDisplayNameByGroup(item.struct.name, item.props.group),
       item.props.abbreviation,
       item.props.name,
+      getTemplateDisplayNameByGroup(item.props.name, item.props.group),
+      item.props.group,
+      getTemplateGroupDisplayName(item.props.group),
     ].filter(Boolean);
     return fields.some((field) => re.test(greekify(field)));
   };

@@ -4,7 +4,7 @@ import {
 } from 'state/library';
 import { MonomerGroups } from '../../../../constants';
 import { Summary } from './Summary';
-import { Icon, IconName } from 'ketcher-react';
+import { Icon, IconName, i18n } from 'ketcher-react';
 import {
   recalculateRnaBuilderValidations,
   RnaBuilderItem,
@@ -112,7 +112,7 @@ const RnaElementsAccordionView = ({
                   onClick={onNewPresetClick}
                   data-testid="new-preset-button"
                 >
-                  Add new
+                  {i18n.t('monomerLibrary.addNew')}
                 </NewPresetButton>
                 <FilterIconButton
                   type="button"
@@ -122,7 +122,9 @@ const RnaElementsAccordionView = ({
                     event.stopPropagation();
                     setIsFilterOpen((prev) => !prev);
                   }}
-                  aria-label="Filter presets by phosphate position"
+                  aria-label={String(
+                    i18n.t('monomerLibrary.filterPresetsByPhosphatePosition'),
+                  )}
                   data-testid="preset-filter-button"
                 >
                   <Icon name="filter" />

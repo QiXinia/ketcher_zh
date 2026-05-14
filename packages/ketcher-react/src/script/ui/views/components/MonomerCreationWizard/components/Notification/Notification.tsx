@@ -36,6 +36,7 @@ const Notification = ({ id, type, message, wizardStateDispatch }: Props) => {
         styles.notification,
         type === 'info' && styles.info,
         type === 'error' && styles.error,
+        type === 'warning' && styles.warning,
       )}
       data-testid={`notification-${id}-message-banner`}
     >

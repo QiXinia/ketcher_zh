@@ -1,4 +1,5 @@
 import { Item } from 'react-contexify';
+import i18n from '../../../../../../i18n';
 import {
   useMultitailArrowTailsAdd,
   useMultitailArrowTailsRemove,
@@ -21,7 +22,7 @@ export function MultitailArrowMenuItems(
         onClick={removeTail}
         hidden={removeTailHidden}
       >
-        Remove tail
+        {i18n.t('contextMenu.removeTail')}
       </Item>
       <Item
         {...props}
@@ -29,7 +30,7 @@ export function MultitailArrowMenuItems(
         onClick={addTail}
         disabled={isAddTailDisabled}
       >
-        Add new tail
+        {i18n.t('contextMenu.addNewTail')}
       </Item>
     </>
   );

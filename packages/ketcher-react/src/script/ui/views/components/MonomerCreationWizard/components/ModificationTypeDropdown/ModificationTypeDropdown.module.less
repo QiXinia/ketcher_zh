@@ -15,13 +15,13 @@
 
       &:global(.Mui-focused.Mui-focusVisible),
       &:hover {
-        background: @color-primary-light;
+        background: var(--ketcher-surface-muted, @color-primary-light);
       }
 
       &.selectedOption,
       &:global([aria-selected="true"].Mui-focused) {
         background: none;
-        border-bottom: 1px solid @color-grey-3;
+        border-bottom: 1px solid var(--ketcher-border-soft, @color-grey-3);
       }
     }
   }

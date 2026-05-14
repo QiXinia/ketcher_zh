@@ -19,6 +19,11 @@ import { Struct } from 'ketcher-core';
 import classes from './TemplateTable.module.less';
 import { greekify } from '../../utils';
 import { Icon, StructRender } from 'components';
+import {
+  getTemplateDisplayNameByGroup,
+  getTemplateGroupDisplayName,
+} from '../../../../i18n/helpers';
+import i18n from '../../../../i18n';
 
 export interface Template {
   struct: Struct;
@@ -42,28 +47,69 @@ interface TemplateTableProps {
   renderOptions?: any;
 }
 
+const THREE_D_TEMPLATES_GROUP = '3D Templates';
+
 const isSaltOrSolventTemplate = (template) =>
   template.props.group === 'Salts and Solvents';
 const isFunctionalGroupTemplate = (template) =>
   template.props.group === 'Functional Groups';
+const is3DTemplate = (template) =>
+  template.props.group === THREE_D_TEMPLATES_GROUP;
+
+const isFormulaLikeAbbreviation = (value?: string) =>
+  !!value && /^[A-Z][A-Za-z0-9()+\-.,]*$/.test(value);
 
 function getTemplateTitle(template: Template, index: number): string {
   if (isSaltOrSolventTemplate(template)) {
-    return template.props.name;
+    return getTemplateDisplayNameByGroup(
+      template.props.name,
+      template.props.group,
+    );
   }
   return (
-    template.struct.name || `${template.props.group} template ${index + 1}`
+    getTemplateDisplayNameByGroup(template.struct.name, template.props.group) ||
+    i18n.t('templates.groupTemplate', {
+      group: getTemplateGroupDisplayName(template.props.group),
+      index: index + 1,
+    })
   );
 }
 
 function tmplName(tmpl: Template, i: number): string {
-  if (isSaltOrSolventTemplate(tmpl)) {
-    return tmpl.props.abbreviation || '';
+  if (isFunctionalGroupTemplate(tmpl)) {
+    return getTemplateDisplayNameByGroup(tmpl.struct.name, tmpl.props.group);
   }
+  if (isSaltOrSolventTemplate(tmpl)) {
+    return getTemplateDisplayNameByGroup(tmpl.props.name, tmpl.props.group);
+  }
+
+  const localizedName = getTemplateDisplayNameByGroup(
+    tmpl.struct.name,
+    tmpl.props.group,
+  );
+
+  if (is3DTemplate(tmpl)) {
+    if (isFormulaLikeAbbreviation(tmpl.props.abbreviation)) {
+      return tmpl.props.abbreviation || tmpl.struct.name;
+    }
+
+    return (
+      localizedName ||
+      tmpl.props.abbreviation ||
+      i18n.t('templates.groupTemplate', {
+        group: getTemplateGroupDisplayName(tmpl.props.group),
+        index: i + 1,
+      })
+    );
+  }
+
   return (
     tmpl.props.abbreviation ||
-    tmpl.struct.name ||
-    `${tmpl.props.group} template ${i + 1}`
+    localizedName ||
+    i18n.t('templates.groupTemplate', {
+      group: getTemplateGroupDisplayName(tmpl.props.group),
+      index: i + 1,
+    })
   );
 }
 

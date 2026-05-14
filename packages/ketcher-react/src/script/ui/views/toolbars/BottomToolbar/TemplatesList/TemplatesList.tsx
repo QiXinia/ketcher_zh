@@ -19,6 +19,7 @@ import action, { Tools, UiAction, UiActionAction } from '../../../../action';
 import { ActionButton } from '../../ToolbarGroupItem/ActionButton';
 import templates from '../../../../data/templates';
 import { getIconName } from 'components';
+import { getTemplateDisplayName } from '../../../../../../i18n/helpers';
 
 interface TemplatesListProps {
   active?: {
@@ -47,7 +48,7 @@ const TemplatesList = (props: Props) => {
   const makeAction = (struct, index): UiAction => ({
     shortcut: action[`template-${index}`].shortcut,
     action: { tool: 'template', opts: { struct } },
-    title: struct.name,
+    title: getTemplateDisplayName(struct.name),
   });
 
   return (

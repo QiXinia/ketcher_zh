@@ -1,0 +1,18 @@
+{
+  "data": {
+    "title": "Ketcher v3.16.0",
+    "theme": "dark",
+    "topToolbar": null,
+    "leftToolbarGroup": null,
+    "rightToolbarButtons": null,
+    "bottomToolbar": null,
+    "canvas": null,
+    "topButton": null,
+    "leftButton": null,
+    "rightButton": null,
+    "bodyBg": "rgb(12, 17, 23)",
+    "rootBg": "rgb(12, 17, 23)"
+  },
+  "messages": [],
+  "screenshot": "D:\\刘子琦~\\三年级\\给YAN的分享\\G_Github\\Ketcher_zh\\output-playwright-ketcher-dark-before.png"
+}

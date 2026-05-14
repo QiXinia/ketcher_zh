@@ -22,6 +22,7 @@ import { omit, without } from 'lodash/fp';
 import { checkErrors } from '../modal/form';
 import { indigoVerification } from '../request';
 import { load } from '../shared';
+import i18n from '../../../../i18n';
 
 export function checkServer() {
   return (dispatch, getState) => {
@@ -81,6 +82,18 @@ function ketcherCheck(struct, checkParams) {
   return errors;
 }
 
+function localizeCheckErrors(errors) {
+  if (!errors || typeof errors !== 'object') return errors;
+
+  return Object.entries(errors).reduce((acc, [key, value]) => {
+    acc[key] =
+      value === 'Structure contains chirality'
+        ? i18n.t('check.structureContainsChirality')
+        : value;
+    return acc;
+  }, {});
+}
+
 export function check(optsTypes) {
   return (dispatch, getState) => {
     const { editor, server } = getState();
@@ -98,6 +111,7 @@ export function check(optsTypes) {
     return serverCall(editor, server, 'check', options)
       .then((res) => {
         res = Object.assign(res, ketcherErrors); // merge Indigo check with Ketcher check
+        res = localizeCheckErrors(res);
         dispatch(checkErrors(res));
       })
       .catch((e) => {

@@ -15,13 +15,13 @@
  ***************************************************************************/
 
 const color = {
-  white: '#FFFFFF',
-  primaryWhite: '#EFF2F5',
-  green: '#167782',
-  lightGreen: '#188794',
-  graphite: '#333333',
-  grey: '#cad3dd',
-  darkGrey: '#b4b9d6',
+  white: 'var(--ketcher-toolbar-bg, #FFFFFF)',
+  primaryWhite: 'var(--ketcher-toolbar-bg-muted, #EFF2F5)',
+  green: 'var(--ketcher-accent, #167782)',
+  lightGreen: 'var(--ketcher-accent-hover, #188794)',
+  graphite: 'var(--ketcher-toolbar-icon, #333333)',
+  grey: 'var(--ketcher-toolbar-divider, #cad3dd)',
+  darkGrey: 'var(--ketcher-toolbar-divider, #b4b9d6)',
 } as const;
 
 const text = {

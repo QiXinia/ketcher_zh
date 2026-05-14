@@ -20,6 +20,7 @@
 .headerContent {
   display: flex;
   gap: 8px;
+  color: var(--ketcher-text-primary, @color-text-primary);
 
   .title {
     padding-right: 4px;
@@ -28,7 +29,7 @@
   .button {
     background-color: transparent;
     border: none;
-    color: @color-icon-active;
+    color: var(--ketcher-text-secondary, @color-icon-active);
     padding: 0;
     font-size: 0;
 
@@ -37,11 +38,11 @@
     }
 
     &:hover {
-      color: @color-icon-hover;
+      color: var(--ketcher-accent-hover, @color-icon-hover);
     }
 
     &:disabled {
-      color: @color-icon-disabled;
+      color: var(--ketcher-toolbar-icon-disabled, @color-icon-disabled);
     }
   }
 }
@@ -67,7 +68,7 @@
     align-items: center;
     line-height: 14px;
     margin-bottom: 12px;
-    color: @color-text-primary;
+    color: var(--ketcher-text-primary, @color-text-primary);
     height: 24px;
 
     input[type='checkbox'] {
@@ -92,6 +93,8 @@
   width: @width-settings;
   height: 70vh;
   overflow: hidden;
+  background-color: var(--ketcher-surface, @color-background-primary);
+  color: var(--ketcher-text-primary, @color-text-primary);
 
   fieldset[disabled] {
     label>span {
@@ -105,12 +108,13 @@
 
   >header {
     flex-shrink: 0;
-    box-shadow: 0 2px 4px 0 @color-accordion-shadow;
+    box-shadow: 0 2px 4px 0 var(--ketcher-border-soft, @color-accordion-shadow);
     z-index: 10;
   }
 
   >footer {
-    box-shadow: 0 -2px 4px 0 @color-accordion-shadow;
+    border-top: 1px solid var(--ketcher-border, @color-grey-3);
+    box-shadow: 0 -2px 4px 0 var(--ketcher-border-soft, @color-accordion-shadow);
     z-index: 10;
   }
 }

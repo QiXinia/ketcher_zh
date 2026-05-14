@@ -34,6 +34,7 @@ import classes from './template-lib.module.less';
 import { css } from '@emotion/react';
 import { Button } from '@mui/material';
 import { Editor, ketcherProvider, Struct } from 'ketcher-core';
+import i18n from '../../../../i18n';
 
 interface AttachPoints {
   atomid: number;
@@ -81,13 +82,20 @@ type AttachProps = AttachOwnProps & AttachStateProps & AttachDispatchProps;
 
 // @TODO When theming is implemented, use theme wherever possible
 const TemplateEditDialog = styled(Dialog)`
-  background-color: #fff;
+  background-color: var(--ketcher-surface, #fff);
+  color: var(--ketcher-text-primary, #333333);
 
   & header {
     text-transform: none;
-    border-bottom: 1px solid #e1e5ea;
+    background-color: var(--ketcher-surface, #fff);
+    border-bottom: 1px solid var(--ketcher-border, #e1e5ea);
     margin: 0;
     padding: 12px;
+  }
+
+  & footer {
+    background-color: var(--ketcher-surface, #fff);
+    border-top: 1px solid var(--ketcher-border, #e1e5ea);
   }
 
   & form {
@@ -101,8 +109,8 @@ const TemplateEditDialog = styled(Dialog)`
 `;
 
 const EditorContainer = styled('div')`
-  border: 1px solid #b4b9d6;
-  background-color: #ffff;
+  border: 1px solid var(--ketcher-border, #b4b9d6);
+  background-color: var(--ketcher-surface-raised, #fff);
   border-radius: 5px;
   position: relative;
   height: 300px;
@@ -121,17 +129,17 @@ const Warning = styled('div')`
 `;
 
 const Message = styled('div')`
-  background-color: #e1e5ea;
-  color: #333333;
+  background-color: var(--ketcher-surface-muted, #e1e5ea);
+  color: var(--ketcher-text-primary, #333333);
   padding: 10px 12px;
-  border-top: 1px solid #cad3dd;
-  border-bottom: 1px solid #cad3dd;
+  border-top: 1px solid var(--ketcher-border, #cad3dd);
+  border-bottom: 1px solid var(--ketcher-border, #cad3dd);
 `;
 
 const LeftColumn = styled('div')`
   padding: 12px;
   border-radius: 0 0 0 8px;
-  background-color: #eff2f5;
+  background-color: var(--ketcher-surface-muted, #eff2f5);
 `;
 
 const RightColumn = styled('div')`
@@ -141,6 +149,8 @@ const RightColumn = styled('div')`
   padding: 12px;
   display: flex;
   flex-direction: column;
+  background-color: var(--ketcher-surface, #fff);
+  color: var(--ketcher-text-primary, #333333);
 `;
 
 const NameInput = styled(Field)`
@@ -152,14 +162,16 @@ const NameInput = styled(Field)`
     display: block;
     width: 100%;
     box-sizing: border-box;
-    border: 1px solid #cad3dd;
+    border: 1px solid var(--ketcher-border, #cad3dd);
     border-radius: 4px;
     line-height: 16px;
     font-size: 14px;
     margin-top: 4px;
+    background-color: var(--ketcher-surface-raised, #fff);
+    color: var(--ketcher-text-primary, #333333);
 
     &:hover {
-      border-color: #43b5c0;
+      border-color: var(--ketcher-accent-hover, #43b5c0);
     }
 
     &:hover,
@@ -180,11 +192,12 @@ const AttachmentOutput = styled('span')`
   height: 24px;
   box-sizing: border-box;
   padding: 4px 8px;
-  border: 1px solid #cad3dd;
+  border: 1px solid var(--ketcher-border, #cad3dd);
   border-radius: 4px;
   line-height: 14px;
   font-size: 14px;
-  background-color: #eff2f5;
+  color: var(--ketcher-text-primary, #333333);
+  background-color: var(--ketcher-surface-muted, #eff2f5);
   margin-top: 4px;
 `;
 
@@ -207,27 +220,27 @@ const buttonCommonStyles = css`
 
 const SaveButton = styled(Button)`
   ${buttonCommonStyles}
-  background-color: #167782;
+  background-color: var(--ketcher-accent, #167782);
 
   &:hover {
-    background-color: #43b5c0;
+    background-color: var(--ketcher-accent-hover, #43b5c0);
     box-shadow: none;
   }
 
   &:disabled {
-    background-color: #e1e5ea;
-    color: #333333;
+    background-color: var(--ketcher-surface-muted, #e1e5ea);
+    color: var(--ketcher-text-secondary, #333333);
   }
 `;
 
 const CancelButton = styled(Button)`
   ${buttonCommonStyles}
-  border-color: #585858;
-  color: #585858;
+  border-color: var(--ketcher-border, #585858);
+  color: var(--ketcher-text-secondary, #585858);
 
   &:hover {
-    border-color: #333333;
-    color: #333333;
+    border-color: var(--ketcher-text-primary, #333333);
+    color: var(--ketcher-text-primary, #333333);
     box-shadow: none;
   }
 `;
@@ -304,7 +317,9 @@ class Attach extends Component<AttachProps> {
       reuseRestructIfExist: false,
     });
     const dialogTitle =
-      this.mode === 'save' ? 'Save to Templates' : 'Template Edit';
+      this.mode === 'save'
+        ? i18n.t('templates.saveToTemplates')
+        : i18n.t('templates.templateEdit');
     const warningObject =
       this.mode === 'save' ? 'Templates' : 'Edited templates';
 
@@ -370,7 +385,7 @@ class Attach extends Component<AttachProps> {
                 className={classes.button}
                 data-testid="template-cancel-button"
               >
-                Cancel
+                {i18n.t('dialog.cancel')}
               </CancelButton>
               <SaveButton
                 variant="contained"
@@ -383,7 +398,9 @@ class Attach extends Component<AttachProps> {
                     : 'template-edit-button'
                 }
               >
-                {this.mode === 'save' ? 'Save' : 'Edit'}
+                {this.mode === 'save'
+                  ? i18n.t('dialog.save')
+                  : i18n.t('dialog.edit')}
               </SaveButton>
             </Buttons>
           </RightColumn>

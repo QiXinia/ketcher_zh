@@ -80,7 +80,7 @@ import { getCountOfNucleoelements } from 'helpers/countNucleoelents';
 import clsx from 'clsx';
 import Tooltip from '@mui/material/Tooltip';
 import { getPhosphatePositionAvailability } from 'helpers/rnaValidations';
-import { Icon } from 'ketcher-react';
+import { Icon, i18n } from 'ketcher-react';
 import styles from './RnaEditorExpanded.module.less';
 
 type SequenceSelectionGroupNames = {
@@ -196,11 +196,11 @@ export const RnaEditorExpanded = ({
   const saveButtonDisabledByPhosphatePosition =
     !phosphatePosition && isPhosphateOrientationRequired;
   const saveButtonDisabledTooltip = saveButtonDisabledByPhosphatePosition
-    ? 'Before saving you must choose the position of the phosphate.'
+    ? String(i18n.t('monomerLibrary.phosphatePositionRequired'))
     : '';
   const phosphatePositionDisabledTooltip = {
-    left: 'Sugar must have R1, and phosphate must have R2.',
-    right: 'Sugar must have R2, and phosphate must have R1.',
+    left: String(i18n.t('monomerLibrary.phosphateLeftRequirement')),
+    right: String(i18n.t('monomerLibrary.phosphateRightRequirement')),
   };
 
   const updatePresetMonomerGroup = () => {
@@ -446,7 +446,9 @@ export const RnaEditorExpanded = ({
   );
 
   const getPhosphatePositionTooltip = (position: RnaPhosphatePosition) =>
-    position === 'left' ? 'Phosphate on the left' : 'Phosphate on the right';
+    position === 'left'
+      ? String(i18n.t('monomerLibrary.phosphateOnLeft'))
+      : String(i18n.t('monomerLibrary.phosphateOnRight'));
 
   const renderPhosphatePositionSelector = (position?: RnaPhosphatePosition) => {
     const triggerDisabled = !is5PrimeAvailable && !is3PrimeAvailable;
@@ -476,7 +478,9 @@ export const RnaEditorExpanded = ({
               type="button"
               className={styles.phosphatePositionTrigger}
               disabled={triggerDisabled}
-              aria-label="Select phosphate position"
+              aria-label={String(
+                i18n.t('monomerLibrary.selectPhosphatePosition'),
+              )}
             >
               {renderPhosphateTriggerIcon(
                 triggerPosition,
@@ -615,7 +619,7 @@ export const RnaEditorExpanded = ({
           data-testid="add-to-presets-btn"
           onClick={onSave}
         >
-          Add to Presets
+          {i18n.t('monomerLibrary.addToPresets')}
         </StyledButton>
       </Tooltip>
     );
@@ -632,7 +636,9 @@ export const RnaEditorExpanded = ({
           data-testid="save-btn"
           onClick={isSequenceEditInRNABuilderMode ? onUpdateSequence : onSave}
         >
-          {isSequenceEditInRNABuilderMode ? 'Update' : 'Save'}
+          {isSequenceEditInRNABuilderMode
+            ? i18n.t('dialog.update')
+            : i18n.t('dialog.save')}
         </StyledButton>
       </Tooltip>
     );
@@ -643,7 +649,7 @@ export const RnaEditorExpanded = ({
         onClick={turnOnEditMode}
         disabled={activePreset.default}
       >
-        Edit
+        {i18n.t('dialog.edit')}
       </StyledButton>
     );
   }
@@ -665,7 +671,7 @@ export const RnaEditorExpanded = ({
               ? sequenceSelectionName
               : newPreset?.name
           }
-          placeholder="Name your structure"
+          placeholder={String(i18n.t('monomerLibrary.nameYourStructure'))}
           data-testid="name-your-structure-editbox"
           disabled={isSequenceEditInRNABuilderMode}
           onChange={onChangeName}
@@ -682,7 +688,7 @@ export const RnaEditorExpanded = ({
                   ? sequenceSelectionName
                   : newPreset?.name
               }
-              placeholder="Name your structure"
+              placeholder={String(i18n.t('monomerLibrary.nameYourStructure'))}
               data-testid="name-your-structure-editbox"
               disabled={isSequenceEditInRNABuilderMode}
               onChange={onChangeName}
@@ -723,7 +729,7 @@ export const RnaEditorExpanded = ({
       <ButtonsContainer>
         {isEditMode ? (
           <StyledButton data-testid="cancel-btn" onClick={onCancel}>
-            Cancel
+            {i18n.t('dialog.cancel')}
           </StyledButton>
         ) : (
           <StyledButton
@@ -731,7 +737,7 @@ export const RnaEditorExpanded = ({
             disabled={!selectIsPresetReadyToSave(newPreset)}
             onClick={() => onDuplicate(newPreset)}
           >
-            Duplicate and Edit
+            {i18n.t('macromolecules.duplicateAndEdit')}
           </StyledButton>
         )}
         {mainButton}

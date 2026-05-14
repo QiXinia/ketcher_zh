@@ -9,9 +9,13 @@ import App from './App';
 import PopupApp from './PopupApp';
 import DuoApp from './DuoApp';
 import ClosableApp from './ClosableApp';
-import { initializeKetcherTheme } from './theme';
+import {
+  initializeKetcherTheme,
+  subscribeToKetcherThemeMessages,
+} from './theme';
 
 initializeKetcherTheme();
+subscribeToKetcherThemeMessages();
 
 const container = document.getElementById('root');
 const root = createRoot(container as HTMLElement);

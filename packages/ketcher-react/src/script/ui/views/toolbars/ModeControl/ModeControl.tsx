@@ -44,7 +44,7 @@ const ElementAndDropdown = styled('div')`
 const DropDownButton = styled(Button)(() => ({
   display: 'flex',
   justifyContent: 'space-between',
-  color: '#000000',
+  color: 'var(--ketcher-toolbar-icon, #000000)',
   padding: '0px',
   width: '100%',
   minWidth: '0px',
@@ -112,9 +112,10 @@ const ModeControlButton = styled('div')`
   align-items: center;
   justify-content: space-between;
   padding: 0 3px;
+  color: var(--ketcher-toolbar-icon, #333333);
 
   :hover {
-    background-color: #f3f8f9;
+    background-color: var(--ketcher-toolbar-bg-muted, #f3f8f9);
   }
 `;
 
@@ -129,9 +130,14 @@ const Dropdown = styled(Popover)`
   & .MuiPopover-paper {
     padding: 3px 0px;
     width: 162px;
-    border: none;
+    background: var(--ketcher-surface-raised, #ffffff);
+    color: var(--ketcher-toolbar-icon, #333333);
+    border: 1px solid var(--ketcher-border, #cad3dd);
     border-radius: 0px 0px 4px 4px;
-    box-shadow: 0px 30px 48px -17px rgba(160, 165, 174, 0.3);
+    box-shadow: var(
+      --ketcher-shadow,
+      0px 30px 48px -17px rgba(160, 165, 174, 0.3)
+    );
     box-sizing: border-box;
   }
 `;
@@ -141,7 +147,8 @@ const DropDownContent = styled('div')`
   flex-direction: column;
   white-space: nowrap;
   word-break: keep-all;
-  background: white;
+  background: var(--ketcher-surface-raised, white);
+  color: var(--ketcher-toolbar-icon, #333333);
   cursor: pointer;
 `;
 

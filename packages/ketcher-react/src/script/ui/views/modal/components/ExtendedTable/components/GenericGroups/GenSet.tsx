@@ -18,6 +18,7 @@ import type { GenItemSet } from 'ketcher-core';
 import classes from './GenSet.module.less';
 import { isGenericGroup } from '../../helpers';
 import ButtonGenSet from './components/ButtonGenSet';
+import { getGenericGroupDisplayName } from '../../../../../../../../i18n/helpers';
 
 type GenSetProps = {
   labels: GenItemSet[];
@@ -44,7 +45,9 @@ function GenSet({
     <>
       {labels.map((item) => {
         const buttons = item.items;
-        const caption = item.displayName;
+        const caption = item.displayName
+          ? getGenericGroupDisplayName(item.displayName)
+          : item.displayName;
         const fieldsetKey =
           caption ??
           buttons

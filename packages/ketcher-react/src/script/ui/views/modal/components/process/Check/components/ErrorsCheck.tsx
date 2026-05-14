@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ***************************************************************************/
+import i18n from '../../../../../../../../i18n';
 
 interface CheckSchemaItem {
   type: string;
@@ -57,12 +58,14 @@ function ErrorsCheck(props: Readonly<ErrorsCheckProps>) {
     <fieldset>
       {moleculeErrorsTypes.length === 0 ? (
         <div>
-          <dd>No errors detected</dd>
+          <dd>{i18n.t('check.noErrorsDetected')}</dd>
         </div>
       ) : (
         moleculeErrorsTypes.map((type) => (
           <div key={type} data-testid={`${type}-warning`}>
-            <dt>{getOptionName(type)} warning:</dt>
+            <dt>
+              {getOptionName(type)} {i18n.t('check.warningSuffix')}
+            </dt>
             <dd>{moleculeErrors[type]}</dd>
           </div>
         ))

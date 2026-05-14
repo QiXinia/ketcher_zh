@@ -28,6 +28,7 @@ import { Icon } from '../Icon';
 import styles from './Dialog.module.less';
 import { KETCHER_ROOT_NODE_CSS_SELECTOR } from 'src/constants';
 import { CLIP_AREA_BASE_CLASS } from '../../script/ui/component/cliparea/cliparea';
+import i18n from '../../i18n';
 
 interface DialogParamsCallProps {
   onCancel: () => void;
@@ -83,6 +84,20 @@ export const Dialog: FC<PropsWithChildren & Props> = (props) => {
     ...rest
   } = props;
   const dialogRef = useRef<HTMLDialogElement>(null);
+
+  const getButtonLabel = (button: string): string => {
+    const commonButtonsMap: Record<string, string> = {
+      OK: i18n.t('dialog.ok'),
+      Cancel: i18n.t('dialog.cancel'),
+      Save: i18n.t('dialog.save'),
+      Edit: i18n.t('dialog.edit'),
+      Apply: i18n.t('dialog.apply'),
+      Yes: i18n.t('dialog.yes'),
+      Close: i18n.t('dialog.close'),
+    };
+
+    return buttonsNameMap?.[button] ?? commonButtonsMap[button] ?? button;
+  };
 
   useLayoutEffect(() => {
     const dialogElement = dialogRef.current;
@@ -212,7 +227,7 @@ export const Dialog: FC<PropsWithChildren & Props> = (props) => {
                     isPrimary(button) ? styles.ok : styles.cancel,
                     button === 'Save' && styles.save,
                   )}
-                  value={buttonsNameMap?.[button] ?? button}
+                  value={getButtonLabel(button)}
                   disabled={isButtonOk(button) && !valid()}
                   onClick={() => exit(button)}
                   data-testid={button}

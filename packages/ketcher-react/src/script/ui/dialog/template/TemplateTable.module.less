@@ -30,10 +30,15 @@
   border: 1px solid transparent;
   border-radius: 6px;
   overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  white-space: normal;
+  word-break: break-word;
+  line-height: 14px;
   max-width: 100px;
-  max-height: 30px;
+  height: 30px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  color: var(--ketcher-text-primary, @color-text-primary);
 }
 
 .twoRowsTitleTable {
@@ -44,7 +49,7 @@
   grid-auto-rows: 134px;
   
   .structTitle {
-    max-height: 16px;
+    height: 30px;
   }
 }
 
@@ -52,12 +57,12 @@
   box-sizing: border-box;
   width: 100px;
   height: 100px;
-  border: 1px solid @color-grey-5;
+  border: 1px solid var(--ketcher-border, @color-grey-5);
   border-radius: 5px;
-  background-color: @color-background-primary;
+  background-color: var(--ketcher-surface-raised, @color-background-primary);
 
   &:hover {
-    background: @form-hover-background;
+    background: var(--ketcher-surface, @form-hover-background);
   }
 
   & svg {
@@ -69,7 +74,11 @@
 }
 
 .selectedTitle {
-  background-color: fade(@color-background-primary, 70%);
+  background-color: color-mix(
+    in srgb,
+    var(--ketcher-surface-raised, @color-background-primary) 70%,
+    transparent
+  );
 }
 
 .td {
@@ -83,8 +92,12 @@
   align-self: start;
 
   &.selected .struct {
-    background-color: fade(@color-primary, 5%);
-    border: 2px solid @color-primary;
+    background-color: color-mix(
+      in srgb,
+      var(--ketcher-accent, @color-primary) 12%,
+      var(--ketcher-surface-raised, @color-background-primary)
+    );
+    border: 2px solid var(--ketcher-accent, @color-primary);
   }
 }
 
@@ -96,7 +109,7 @@
     width: 18px;
     height: 18px;
     border: none;
-    color: #636363;
+    color: var(--ketcher-text-secondary, #636363);
     background-color: transparent;
     cursor: pointer;
     padding: 0;
@@ -107,9 +120,14 @@
     }
 
     &:hover, &:active {
-      & path {
-        fill: @color-button-primary-hover;
-      }
+      color: var(--ketcher-accent-hover, @color-button-primary-hover);
+    }
+
+    & > svg,
+    & > svg * {
+      color: currentColor;
+      fill: currentColor;
+      stroke: currentColor;
     }
   }
 
@@ -127,5 +145,5 @@
 
 div.structure {
   padding: 0; // TODO: tmp hack to fit viewbox
-  background-color: @color-background-primary;
+  background-color: var(--ketcher-surface-raised, @color-background-primary);
 }

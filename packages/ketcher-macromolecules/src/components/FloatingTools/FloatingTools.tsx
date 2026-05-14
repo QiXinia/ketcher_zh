@@ -16,7 +16,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import styled from '@emotion/styled';
-import { Icon, IconName } from 'ketcher-react';
+import { Icon, IconName, i18n } from 'ketcher-react';
 import { useAppSelector } from 'hooks';
 import { selectEditor } from 'state/common';
 import {
@@ -179,21 +179,21 @@ export const FloatingTools = () => {
     <FloatingToolsWrapper left={position.x} top={position.y}>
       <ToolButton
         onClick={handleFlipHorizontal}
-        title="Flip horizontally"
+        title={String(i18n.t('tools.horizontalFlip'))}
         data-testid="transform-flip-h"
       >
         <Icon name={'transform-flip-h' as IconName} />
       </ToolButton>
       <ToolButton
         onClick={handleFlipVertical}
-        title="Flip vertically"
+        title={String(i18n.t('tools.verticalFlip'))}
         data-testid="transform-flip-v"
       >
         <Icon name={'transform-flip-v' as IconName} />
       </ToolButton>
       <ToolButton
         onClick={handleDelete}
-        title="Delete"
+        title={String(i18n.t('contextMenu.delete'))}
         data-testid="float-delete"
       >
         <Icon name={'delete' as IconName} />

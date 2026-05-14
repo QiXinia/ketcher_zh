@@ -23,11 +23,13 @@
   :global(.MuiPaper-root) {
     border-radius: 0 0 4px 4px;
     box-shadow: 0 6px 10px @color-select-box-shadow;
-    color: @color-text-primary;
+    background-color: var(--ketcher-surface-raised, @color-background-primary);
+    border: 1px solid var(--ketcher-border, @color-border-input);
+    color: var(--ketcher-text-primary, @color-text-primary);
   }
 
   :global(.MuiMenuItem-root) {
-    color: @color-text-primary;
+    color: var(--ketcher-text-primary, @color-text-primary);
     font-family: @Inter;
     font-size: 14px;
     padding: 0 8px;
@@ -36,15 +38,15 @@
 
     &:hover {
       padding-left: 6px;
-      border-left: 2px solid #167782;
-      background-color: @color-select-background;
+      border-left: 2px solid var(--ketcher-accent, #167782);
+      background-color: var(--ketcher-surface-muted, @color-select-background);
     }
   }
 
   :global(.MuiList-root.MuiMenu-list) {
     display: inline-block;
     width: 100%;
-    background-color: @color-background-primary;
+    background-color: var(--ketcher-surface-raised, @color-background-primary);
     padding: 0;
     box-shadow: none;
     overflow: auto;
@@ -52,7 +54,7 @@
     .scrollbar();
 
     &::-webkit-scrollbar {
-      background-color: @color-background-primary;
+      background-color: var(--ketcher-surface-raised, @color-background-primary);
       width: 4px;
     }
 
@@ -62,12 +64,12 @@
     }
 
     :global(.Mui-selected) {
-      background-color: @color-background-primary;
+      background-color: var(--ketcher-surface-raised, @color-background-primary);
     }
   }
 
   .listDivider {
-    border: 0.5px solid #e1e5ea;
+    border: 0.5px solid var(--ketcher-border, #e1e5ea);
     margin: 4px 8px;
   }
 }
@@ -81,9 +83,9 @@
     box-shadow: none;
     border-radius: 4px;
     min-height: 24px;
-    border: 1px solid @color-border-input;
-    background-color: @color-background-primary;
-    color: @color-text-primary;
+    border: 1px solid var(--ketcher-border, @color-border-input);
+    background-color: var(--ketcher-surface-raised, @color-background-primary);
+    color: var(--ketcher-text-primary, @color-text-primary);
     font-family: @Inter;
     font-size: @font-size-input;
     padding: 0 8px;
@@ -98,18 +100,18 @@
     }
 
     &:hover {
-      border: 1px solid @color-input-hover;
+      border: 1px solid var(--ketcher-accent-hover, @color-input-hover);
     }
   }
 
   :global(.MuiOutlinedInput-root.Mui-disabled .MuiSelect-select) {
     &:hover {
-      border: 1px solid @color-border-input;
+      border: 1px solid var(--ketcher-border, @color-border-input);
     }
   }
 
   :global(.Mui-focused .MuiSelect-select) {
-    border-color: @color-primary;
+    border-color: var(--ketcher-accent, @color-primary);
   }
 
   :global(.MuiOutlinedInput-notchedOutline) {
@@ -124,5 +126,6 @@
   :global(.MuiSelect-icon) {
     width: 16px;
     height: 16px;
+    color: var(--ketcher-text-secondary, @color-icon-active);
   }
 }

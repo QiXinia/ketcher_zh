@@ -15,7 +15,11 @@
  ***************************************************************************/
 
 import { useState, useRef, useCallback, useEffect, RefObject } from 'react';
-import { KETCHER_MACROMOLECULES_ROOT_NODE_SELECTOR, Icon } from 'ketcher-react';
+import {
+  KETCHER_MACROMOLECULES_ROOT_NODE_SELECTOR,
+  Icon,
+  i18n,
+} from 'ketcher-react';
 import { ZoomInput } from 'components/ZoomControls/ZoomInput';
 import { ZoomTool } from 'ketcher-core';
 import {
@@ -110,26 +114,26 @@ export const ZoomControls = () => {
           />
           <ZoomControlButton
             data-testid="zoom-out"
-            title="Zoom Out"
+            title={String(i18n.t('topToolbar.zoomOut'))}
             onClick={onZoomOut}
           >
-            <span>Zoom out</span>
+            <span>{i18n.t('topToolbar.zoomOut')}</span>
             <ShortcutLabel>{hotkeysShortcuts['zoom-minus']}</ShortcutLabel>
           </ZoomControlButton>
           <ZoomControlButton
             data-testid="zoom-in"
-            title="Zoom In"
+            title={String(i18n.t('topToolbar.zoomIn'))}
             onClick={onZoomIn}
           >
-            <span>Zoom in</span>
+            <span>{i18n.t('topToolbar.zoomIn')}</span>
             <ShortcutLabel>{hotkeysShortcuts['zoom-plus']}</ShortcutLabel>
           </ZoomControlButton>
           <ZoomControlButton
             data-testid="zoom-default"
-            title="Zoom 100%"
+            title={String(i18n.t('topToolbar.zoom100'))}
             onClick={onZoomReset}
           >
-            <span>Zoom 100%</span>
+            <span>{i18n.t('topToolbar.zoom100')}</span>
             <ShortcutLabel>{hotkeysShortcuts['zoom-reset']}</ShortcutLabel>
           </ZoomControlButton>
         </DropDownContent>

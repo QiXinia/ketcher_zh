@@ -25,7 +25,7 @@ import {
 } from './PresetPreview.styles';
 import styled from '@emotion/styled';
 import { selectShowPreview } from 'state/common';
-import { IconName } from 'ketcher-react';
+import { IconName, i18n } from 'ketcher-react';
 import { KetMonomerClass, MonomerItemType } from 'ketcher-core';
 import useIDTAliasesTextForPreset from '../../hooks/useIDTAliasesTextForPreset';
 import MonomerPreviewProperties from '../MonomerPreviewProperties/MonomerPreviewProperties';
@@ -84,11 +84,13 @@ const PresetPreview = ({ className }: Props) => {
 
   let phosphatePositionTooltip: string | undefined;
   if (preview.phosphatePosition === 'left') {
-    phosphatePositionTooltip = "Phosphate on the left (5')";
+    phosphatePositionTooltip = `${String(
+      i18n.t('monomerLibrary.phosphateOnLeft'),
+    )} (5')`;
   } else {
     phosphatePositionTooltip =
       preview.phosphatePosition === 'right'
-        ? "Phosphate on the right (3')"
+        ? `${String(i18n.t('monomerLibrary.phosphateOnRight'))} (3')`
         : undefined;
   }
   const getMonomerNameText = (monomer: MonomerItemType) =>

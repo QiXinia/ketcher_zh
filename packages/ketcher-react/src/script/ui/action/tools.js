@@ -29,6 +29,7 @@ import { toBondType } from '../data/convert/structconv';
 import { isFlipDisabled } from './flips';
 import { MONOMER_WIZARD_DISALLOWED_BOND_TYPES } from '../views/components/ContextMenu/utils';
 import i18n from '../../../i18n';
+import { getBondDisplayTitle } from '../../../i18n/helpers';
 
 const toolActions = {
   hand: {
@@ -420,7 +421,7 @@ const monomerWizardDisallowedBondTypes = new Set(
 
 export default typeSchema.enum.reduce((res, type, i) => {
   res[`bond-${type}`] = {
-    title: `${typeSchema.enumNames[i]} Bond`,
+    title: type ? getBondDisplayTitle(type) : typeSchema.enumNames[i],
     shortcut: bondCuts[type],
     action: {
       tool: 'bond',

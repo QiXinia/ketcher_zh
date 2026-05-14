@@ -184,7 +184,7 @@ const SettingsDialog = (props: Props) => {
         />
         <Field
           name="imageResolution"
-          tooltip="option applicable to PNG/SVG pictures renderer"
+          tooltip={i18n.t('settings.pngSvgRendererOption')}
           component={Select}
           options={getSelectOptionsFromSchema(settingsProps?.imageResolution)}
           data-testid="image-resolution"
@@ -237,7 +237,7 @@ const SettingsDialog = (props: Props) => {
         <Field name="mixedFlagLabel" data-testid="mixed-flag-label" />
         <Field
           name="ignoreChiralFlag"
-          tooltip="Ignore chiral flag while loading from molfiles. By default all the stereo will be ABS"
+          tooltip={i18n.t('settings.ignoreChiralFlagTooltip')}
           data-testid="ignore-chiral-flag"
         />
       </fieldset>
@@ -274,7 +274,10 @@ const SettingsDialog = (props: Props) => {
           labelPos={false}
           extraName="bondLengthUnit"
         />
-        <Field name="bondSpacing" extraLabel="% of length" />
+        <Field
+          name="bondSpacing"
+          extraLabel={i18n.t('settings.percentOfLength')}
+        />
         <Field
           name="bondThickness"
           component={MeasureInput}

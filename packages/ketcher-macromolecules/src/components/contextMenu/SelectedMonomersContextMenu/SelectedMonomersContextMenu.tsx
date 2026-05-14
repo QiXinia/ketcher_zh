@@ -5,6 +5,7 @@ import {
   KETCHER_MACROMOLECULES_ROOT_NODE_SELECTOR,
   Icon,
   IconName,
+  i18n,
 } from 'ketcher-react';
 import { useAppSelector } from 'hooks';
 import { selectEditor } from 'state/common';
@@ -72,21 +73,21 @@ export const SelectedMonomersContextMenu = ({
   const menuItems = [
     {
       name: 'copy',
-      title: 'Copy',
+      title: String(i18n.t('action.copy')),
       icon: <Icon name={'copyMenu' as IconName} />,
       disabled: ({ props = {} }) =>
         isBondContext(props) || isCanvasContext(props),
     },
     {
       name: SequenceItemContextMenuNames.paste,
-      title: 'Paste',
+      title: String(i18n.t('action.paste')),
       icon: <Icon name={'pasteNavBar' as IconName} />,
       disabled: ({ props = {} }) => !isCanvasContext(props),
       separator: true,
     },
     {
       name: 'create_antisense_rna_chain',
-      title: 'Create Antisense RNA Strand',
+      title: String(i18n.t('macromolecules.createAntisenseRnaStrand')),
       separator: false,
       disabled: isAntisenseCreationDisabled(selectedMonomers),
       hidden: ({ props }: { props?: { selectedMonomers?: BaseMonomer[] } }) => {
@@ -98,7 +99,7 @@ export const SelectedMonomersContextMenu = ({
     },
     {
       name: 'create_antisense_dna_chain',
-      title: 'Create Antisense DNA Strand',
+      title: String(i18n.t('macromolecules.createAntisenseDnaStrand')),
       disabled: isAntisenseCreationDisabled(selectedMonomers),
       hidden: ({ props }: { props?: { selectedMonomers?: BaseMonomer[] } }) => {
         return (
@@ -110,20 +111,20 @@ export const SelectedMonomersContextMenu = ({
     },
     {
       name: SequenceItemContextMenuNames.modifyAminoAcids,
-      title: 'Modify amino acids',
+      title: String(i18n.t('macromolecules.modifyAminoAcids')),
       disabled: false,
       hidden: !modifyAminoAcidsMenuItems.length,
       subMenuItems: modifyAminoAcidsMenuItems,
     },
     {
       name: 'layout_circular',
-      title: 'Arrange as a Ring',
+      title: String(i18n.t('macromolecules.arrangeAsRing')),
       disabled: cyclicStructureFormationDisabled,
       hidden: !isFlexMode,
     },
     {
       name: 'edit_attachment_points',
-      title: 'Edit Attachment Points...',
+      title: String(i18n.t('macromolecules.editAttachmentPoints')),
       disabled: ({
         props,
       }: {
@@ -136,7 +137,7 @@ export const SelectedMonomersContextMenu = ({
     },
     {
       name: 'delete',
-      title: 'Delete',
+      title: String(i18n.t('contextMenu.delete')),
       icon: <Icon name={'deleteMenu' as IconName} />,
       disabled: ({ props = {} }) => isCanvasContext(props),
     },

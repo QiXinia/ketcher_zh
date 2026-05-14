@@ -33,7 +33,7 @@ const ElementAndDropdown = styled('div')`
 
 const DropDownButton = styled(Button)`
   display: flex;
-  color: #000000;
+  color: var(--ketcher-toolbar-icon, #000000);
   padding-right: 0;
   padding-left: 0;
 
@@ -52,9 +52,14 @@ const Dropdown = styled(Popover)`
   & .MuiPopover-paper {
     padding: 8px;
     width: 175px;
-    border: none;
+    background: var(--ketcher-surface-raised, #ffffff);
+    color: var(--ketcher-toolbar-icon, #333333);
+    border: 1px solid var(--ketcher-border, #cad3dd);
     border-radius: 0px 0px 4px 4px;
-    box-shadow: 0px 30px 48px -17px rgba(160, 165, 174, 0.3);
+    box-shadow: var(
+      --ketcher-shadow,
+      0px 30px 48px -17px rgba(160, 165, 174, 0.3)
+    );
     box-sizing: border-box;
   }
 `;
@@ -64,7 +69,7 @@ const DropDownContent = styled('div')`
   flex-direction: column;
   white-space: nowrap;
   word-break: keep-all;
-  background: white;
+  background: var(--ketcher-surface-raised, white);
 `;
 
 const ZoomControlButton = styled(Button)`
@@ -75,11 +80,11 @@ const ZoomControlButton = styled(Button)`
   line-height: 14px;
   padding: 7px 8px;
   text-transform: none;
-  color: #333333;
+  color: var(--ketcher-toolbar-icon, #333333);
 `;
 
 const ShortcutLabel = styled('span')`
-  color: #cad3dd;
+  color: var(--ketcher-toolbar-divider, #cad3dd);
 `;
 
 const getIntegerFromString = (zoomInput: string | undefined): number => {

@@ -17,6 +17,7 @@
 import templates from '../data/templates';
 import isHidden from './isHidden';
 import i18n from '../../../i18n';
+import { getTemplateDisplayName } from '../../../i18n/helpers';
 
 const templateLib = {
   'template-lib': {
@@ -31,7 +32,7 @@ const templateLib = {
 
 export default templates.reduce((res, struct, i) => {
   res[`template-${i}`] = {
-    title: `${struct.name}`,
+    title: getTemplateDisplayName(struct.name),
     shortcut: 't',
     action: {
       tool: 'template',

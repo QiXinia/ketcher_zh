@@ -1,0 +1,5 @@
+
+> ketcher-react-app@1.0.0 serve:standalone
+> serve dist/standalone -c serve.json -l tcp://127.0.0.1:4002
+
+ INFO  Accepting connections at http://localhost:51231

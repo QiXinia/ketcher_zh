@@ -104,7 +104,13 @@ function TextArea({
   ...rest
 }) {
   return (
-    <textarea value={value ?? ''} ref={innerRef} onInput={onChange} {...rest} />
+    <textarea
+      value={value ?? ''}
+      ref={innerRef}
+      onInput={onChange}
+      className={clsx(classes.input, classes.genericInput, classes.textArea)}
+      {...rest}
+    />
   );
 }
 

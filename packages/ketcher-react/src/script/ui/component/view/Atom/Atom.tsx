@@ -18,6 +18,7 @@ import classes from './Atom.module.less';
 import clsx from 'clsx';
 import type { ButtonHTMLAttributes } from 'react';
 import type { Element } from 'ketcher-core';
+import { getElementDisplayTitle } from '../../../../../i18n/helpers';
 
 type AtomProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'value'> & {
   el: Element;
@@ -26,9 +27,11 @@ type AtomProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'value'> & {
 };
 
 function Atom({ el, shortcut, selected, ...props }: Readonly<AtomProps>) {
+  const localizedTitle = getElementDisplayTitle(el.label, el.title);
+
   return (
     <button
-      title={shortcut ? `${el.title} (${shortcut})` : el.title}
+      title={shortcut ? `${localizedTitle} (${shortcut})` : localizedTitle}
       className={clsx(classes.atom, {
         selected,
       })}
