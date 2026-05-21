@@ -159,6 +159,7 @@ const SettingsDialog = (props: Props) => {
         <Field name="rotationStep" data-testid="rotation-step" />
         <Field name="showValenceWarnings" data-testid="show-valence-warnings" />
         <Field name="atomColoring" data-testid="atom-coloring" />
+        <Field name="windowedMode" data-testid="windowed-mode" />
         <Field
           name="font"
           component={SystemFonts}

@@ -21,7 +21,7 @@
   background-color: var(--ketcher-surface, @color-background-primary);
   color: var(--ketcher-text-secondary, @color-text-secondary);
   width: @width-large;
-  height: 368px;
+  min-height: 368px;
 
   > div {
     overflow: hidden;
@@ -69,7 +69,7 @@
   }
 
   .periodTable {
-    position: fixed;
+    position: relative;
 
     & > * {
       line-height: normal;

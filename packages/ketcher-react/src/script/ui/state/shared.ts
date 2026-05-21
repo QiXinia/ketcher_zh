@@ -34,9 +34,12 @@ import { isNumber } from 'lodash';
 
 export function onAction(action) {
   if (action?.dialog) {
-    return {
-      type: 'MODAL_OPEN',
-      data: { name: action.dialog, prop: action.prop },
+    return (dispatch, getState) => {
+      const windowedMode = getState().options?.settings?.windowedMode ?? true;
+      dispatch({
+        type: windowedMode ? 'WINDOW_OPEN' : 'MODAL_OPEN',
+        data: { name: action.dialog, prop: action.prop },
+      });
     };
   }
   if (action?.thunk) {
@@ -246,22 +249,22 @@ export function load(struct: Struct, options?) {
   };
 }
 
-export function openInfoModal(command: 'Paste' | 'Copy' | 'Cut'): {
-  type: 'MODAL_OPEN';
-  data: { name: 'info-modal'; prop: { message: 'Paste' | 'Copy' | 'Cut' } };
-} {
-  return {
-    type: 'MODAL_OPEN',
-    data: { name: 'info-modal', prop: { message: command } },
+export function openInfoModal(command: 'Paste' | 'Copy' | 'Cut'): any {
+  return (dispatch, getState) => {
+    const windowedMode = getState().options?.settings?.windowedMode ?? true;
+    dispatch({
+      type: windowedMode ? 'WINDOW_OPEN' : 'MODAL_OPEN',
+      data: { name: 'info-modal', prop: { message: command } },
+    });
   };
 }
 
-export function openInfoModalWithCustomMessage(message: string): {
-  type: 'MODAL_OPEN';
-  data: { name: 'info-modal'; prop: { customText: string } };
-} {
-  return {
-    type: 'MODAL_OPEN',
-    data: { name: 'info-modal', prop: { customText: message } },
+export function openInfoModalWithCustomMessage(message: string): any {
+  return (dispatch, getState) => {
+    const windowedMode = getState().options?.settings?.windowedMode ?? true;
+    dispatch({
+      type: windowedMode ? 'WINDOW_OPEN' : 'MODAL_OPEN',
+      data: { name: 'info-modal', prop: { customText: message } },
+    });
   };
 }

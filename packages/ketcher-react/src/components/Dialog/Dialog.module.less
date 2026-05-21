@@ -96,7 +96,8 @@
   font-size: @font-size-regular;
   line-height: @line-height-regular;
   overflow: auto;
-  height: 100%;
+  flex: 1;
+  min-height: 0;
   background-color: inherit;
   color: inherit;
   .scrollbar();
@@ -104,4 +105,14 @@
 
 .withMargin {
   margin: 0 @margin-left-right;
+}
+
+.draggable {
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+
+  &:active {
+    cursor: grabbing;
+  }
 }

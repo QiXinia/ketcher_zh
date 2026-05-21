@@ -1,6 +1,7 @@
 const fieldGroups = {
   resetToSelect: 'General',
   rotationStep: 'General',
+  windowedMode: 'General',
   showValenceWarnings: 'General',
   atomColoring: 'General',
   font: 'General',

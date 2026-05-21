@@ -54,17 +54,22 @@ export function openDialog(
   props?: Record<string, unknown>,
 ): Promise<unknown> {
   return new Promise((resolve, reject) => {
-    dispatch({
-      type: 'MODAL_OPEN',
-      data: {
-        name: dialogName,
-        prop: {
-          ...props,
-          onResult: resolve,
-          onCancel: reject,
+    dispatch(((innerDispatch: Dispatch, getState: () => any) => {
+      const state = getState();
+      const windowedMode = state.options?.settings?.windowedMode ?? true;
+      const actionType = windowedMode ? 'WINDOW_OPEN' : 'MODAL_OPEN';
+      innerDispatch({
+        type: actionType,
+        data: {
+          name: dialogName,
+          prop: {
+            ...props,
+            onResult: resolve,
+            onCancel: reject,
+          },
         },
-      },
-    });
+      });
+    }) as any);
   });
 }
 
@@ -106,6 +111,20 @@ function modalReducer(
         prop: (data.prop as ModalDialogProps) || null,
         parentModal: data.prop?.isNestedModal ? state : null,
       };
+    }
+
+    case 'WINDOW_OPEN': {
+      const { data } = action;
+      return {
+        name: data.name,
+        form: formsState[data.name] || null,
+        prop: (data.prop as ModalDialogProps) || null,
+        parentModal: null,
+      };
+    }
+
+    case 'WINDOW_CLOSE': {
+      return null;
     }
 
     default:

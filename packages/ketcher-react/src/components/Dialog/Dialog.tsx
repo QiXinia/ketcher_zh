@@ -18,6 +18,7 @@ import {
   FC,
   PropsWithChildren,
   ReactElement,
+  Ref,
   useEffect,
   useLayoutEffect,
   useRef,
@@ -28,6 +29,7 @@ import { Icon } from '../Icon';
 import styles from './Dialog.module.less';
 import { KETCHER_ROOT_NODE_CSS_SELECTOR } from 'src/constants';
 import { CLIP_AREA_BASE_CLASS } from '../../script/ui/component/cliparea/cliparea';
+import { useDraggableDialog } from '../../hooks/useDraggableDialog';
 import i18n from '../../i18n';
 
 interface DialogParamsCallProps {
@@ -55,6 +57,8 @@ interface DialogProps {
   };
   focusable?: boolean;
   primaryButtons?: string[];
+  headerRef?: Ref<HTMLElement>;
+  isDraggable?: boolean;
 }
 
 interface DialogCallProps {
@@ -81,9 +85,14 @@ export const Dialog: FC<PropsWithChildren & Props> = (props) => {
     withDivider = false,
     focusable = true,
     primaryButtons,
+    headerRef,
+    isDraggable = false,
     ...rest
   } = props;
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const draggableCtx = useDraggableDialog();
+  const effectiveIsDraggable = isDraggable || draggableCtx.isDraggable;
+  const effectiveHeaderRef = headerRef || draggableCtx.headerRef;
 
   const getButtonLabel = (button: string): string => {
     const commonButtonsMap: Record<string, string> = {
@@ -192,7 +201,12 @@ export const Dialog: FC<PropsWithChildren & Props> = (props) => {
       {...rest}
     >
       <header
-        className={clsx(styles.header, withDivider && styles.withDivider)}
+        ref={effectiveHeaderRef}
+        className={clsx(
+          styles.header,
+          withDivider && styles.withDivider,
+          effectiveIsDraggable && styles.draggable,
+        )}
       >
         {headerContent || <span>{title}</span>}
         <div className={styles.btnContainer}>

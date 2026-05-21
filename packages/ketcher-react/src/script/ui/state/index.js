@@ -26,6 +26,7 @@ import functionalGroupsReducer from './functionalGroups';
 import saltsAndSolventsReducer from './saltsAndSolvents';
 import { logger } from 'redux-logger';
 import modalReducer from './modal';
+import windowsReducer from './modal/windows';
 import { pick } from 'lodash/fp';
 import requestReducer from './request';
 import { thunk } from 'redux-thunk';
@@ -42,6 +43,7 @@ const shared = combineReducers({
   actionState: actionStateReducer,
   toolbar: toolbarReducer,
   modal: modalReducer,
+  windows: windowsReducer,
   abbreviationLookup: abbreviationLookupReducer,
   server: (store = null) => store,
   editor: (store = null) => store,
@@ -120,6 +122,7 @@ export default function (options, server, setEditor) {
     actionState: null,
     editor: null,
     modal: null,
+    windows: { windows: [], nextZIndex: 50 },
     options: Object.assign(initOptionsState, {
       app: restOptions,
       buttons,

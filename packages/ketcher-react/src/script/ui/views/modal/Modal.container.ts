@@ -20,31 +20,52 @@ import { BaseCallProps, ModalContainerProps } from './modal.types';
 import { Dispatch } from 'redux';
 import { connect } from 'react-redux';
 import { omit } from 'lodash/fp';
+import { WindowState } from '../../state/modal/windows';
 
-type StateProps = Pick<ModalProps, 'modal'>;
+interface WindowCallProps {
+  onWindowClose: (id: string) => void;
+  onBringToFront: (id: string) => void;
+}
+
+type StateProps = Pick<ModalProps, 'modal'> & {
+  windows: WindowState[];
+  windowedMode: boolean;
+};
 
 const mapStateToProps = (state): StateProps => ({
   modal: state.modal,
+  windows: state.windows?.windows ?? [],
+  windowedMode: state.options?.settings?.windowedMode ?? true,
 });
 
-const mapDispatchToProps = (dispatch: Dispatch): BaseCallProps => ({
+const mapDispatchToProps = (
+  dispatch: Dispatch,
+): BaseCallProps & WindowCallProps => ({
   onOk: (_result) => {
     dispatch({ type: 'MODAL_CLOSE' });
   },
   onCancel: () => {
     dispatch({ type: 'MODAL_CLOSE' });
   },
+  onWindowClose: (id: string) => {
+    dispatch({ type: 'WINDOW_CLOSE', id });
+  },
+  onBringToFront: (id: string) => {
+    dispatch({ type: 'WINDOW_BRING_TO_FRONT', id });
+  },
 });
 
 const mergeProps = (
   stateProps: StateProps,
-  dispatchProps: BaseCallProps,
+  dispatchProps: BaseCallProps & WindowCallProps,
   ownProps: ModalContainerProps,
 ): ModalProps => {
   const prop = stateProps.modal?.prop;
   const initProps = prop ? omit(['onResult', 'onCancel'], prop) : {};
   return {
     modal: stateProps.modal,
+    windows: stateProps.windows,
+    windowedMode: stateProps.windowedMode,
     ...initProps,
     onOk: (result) => {
       prop?.onResult?.(result);
@@ -54,6 +75,8 @@ const mergeProps = (
       prop?.onCancel?.();
       dispatchProps.onCancel();
     },
+    onWindowClose: dispatchProps.onWindowClose,
+    onBringToFront: dispatchProps.onBringToFront,
     ...ownProps,
   };
 };

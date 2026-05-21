@@ -45,7 +45,7 @@ export function initMouseListener(element) {
     };
 
     element.addEventListener('pointermove', pointerMoveListener);
-    element.addEventListener('mousedown', mouseDownListener, true);
+    element.addEventListener('pointerdown', mouseDownListener, true);
   };
 }
 
@@ -56,7 +56,7 @@ export function removeMouseListeners(element) {
     }
 
     if (mouseDownListener) {
-      element.removeEventListener('mousedown', mouseDownListener, true);
+      element.removeEventListener('pointerdown', mouseDownListener, true);
     }
   };
 }

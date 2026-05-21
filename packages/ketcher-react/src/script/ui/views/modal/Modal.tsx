@@ -23,6 +23,8 @@ import clsx from 'clsx';
 import mediaSizes from './mediaSizes';
 import modals from '../../dialog';
 import useResizeObserver from 'use-resize-observer/polyfilled';
+import { WindowedModal } from './WindowedModal';
+import { WindowState } from '../../state/modal/windows';
 
 interface ModalProps extends BaseCallProps {
   modal: {
@@ -30,6 +32,10 @@ interface ModalProps extends BaseCallProps {
     form: any;
     prop: any;
   };
+  windows?: WindowState[];
+  windowedMode?: boolean;
+  onWindowClose?: (id: string) => void;
+  onBringToFront?: (id: string) => void;
 }
 
 type Props = ModalProps & BaseCallProps & ModalContainerProps;
@@ -68,7 +74,25 @@ function ModalContent({ modal, ...rest }: ModalContentProps) {
 }
 
 function Modal(props: Props) {
-  const { modal, ...rest } = props;
+  const {
+    modal,
+    windows,
+    windowedMode,
+    onWindowClose,
+    onBringToFront,
+    ...rest
+  } = props;
+
+  if (windowedMode && windows && windows.length > 0) {
+    return (
+      <WindowedModal
+        windows={windows}
+        onWindowClose={onWindowClose!}
+        onBringToFront={onBringToFront!}
+        ketcherId={(rest as any).ketcherId}
+      />
+    );
+  }
 
   if (!modal) return null;
 

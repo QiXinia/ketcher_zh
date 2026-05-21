@@ -43,6 +43,7 @@ export enum ImageResolution {
 const editor: {
   resetToSelect: ExtendedSchema;
   rotationStep: ExtendedSchema;
+  windowedMode: ExtendedSchema;
 } = {
   resetToSelect: localizedEnumNames(
     localizedProperty(
@@ -68,6 +69,15 @@ const editor: {
     },
     'settings.rotationStep',
     'Rotation Step, º',
+  ),
+  windowedMode: localizedProperty(
+    {
+      type: 'boolean',
+      description: 'slider',
+      default: true,
+    },
+    'settings.windowedMode',
+    'Windowed mode (draggable dialogs)',
   ),
 };
 
