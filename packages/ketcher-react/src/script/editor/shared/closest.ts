@@ -27,7 +27,15 @@ import {
 import { ClosestItem, ClosestItemWithMap } from './closest.types';
 
 const SELECTION_DISTANCE_COEFFICIENT = 0.4;
+const TOUCH_SELECTION_DISTANCE_COEFFICIENT = 0.7;
 const SELECTION_WITHIN_TEXT = 0;
+
+function getSelectionDistanceCoefficient(): number {
+  if (typeof navigator !== 'undefined' && navigator.maxTouchPoints > 0) {
+    return TOUCH_SELECTION_DISTANCE_COEFFICIENT;
+  }
+  return SELECTION_DISTANCE_COEFFICIENT;
+}
 
 const findMaps = {
   atoms: findClosestAtom,
@@ -122,7 +130,7 @@ function findClosestSimpleObject(restruct: ReStruct, pos: Vec2) {
 
 function findClosestAtom(restruct: ReStruct, pos: Vec2, skip, minDist) {
   let closestAtom: null | number = null;
-  const maxMinDist = SELECTION_DISTANCE_COEFFICIENT;
+  const maxMinDist = getSelectionDistanceCoefficient();
   const skipId = skip?.map === 'atoms' ? skip.id : null;
   const sGroups = restruct.sgroups;
   const functionalGroups = restruct.molecule.functionalGroups;
@@ -174,7 +182,7 @@ function findClosestBond(
   // eslint-disable-line max-params
   let closestBond: number | null = null;
   let closestBondCenter: number | null = null;
-  const maxMinDist = 0.8 * SELECTION_DISTANCE_COEFFICIENT;
+  const maxMinDist = 0.8 * getSelectionDistanceCoefficient();
   const skipId = skip?.map === 'bonds' ? skip.id : null;
 
   minDist = minDist ?? maxMinDist;

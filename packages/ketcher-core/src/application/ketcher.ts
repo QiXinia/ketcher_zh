@@ -674,6 +674,39 @@ export class Ketcher {
     if (editor && value) editor.zoomTool.zoomTo(value);
   }
 
+  getZoom(): number {
+    const editor = provideEditorInstance();
+    if (editor) {
+      return editor.zoomTool?.getZoomLevel?.() ?? 1;
+    }
+    return 1;
+  }
+
+  private _zoomChangeHandlers: Array<(zoomLevel: number) => void> = [];
+
+  onZoomChange(handler: (zoomLevel: number) => void): void {
+    this._zoomChangeHandlers.push(handler);
+  }
+
+  offZoomChange(handler: (zoomLevel: number) => void): void {
+    this._zoomChangeHandlers = this._zoomChangeHandlers.filter(
+      (h) => h !== handler,
+    );
+  }
+
+  /** @internal called by the editor layer when zoom changes */
+  _dispatchZoomChange(zoomLevel: number): void {
+    this._zoomChangeHandlers.forEach((h) => h(zoomLevel));
+    if (window.parent !== window) {
+      try {
+        window.parent.postMessage(
+          { eventType: 'zoom:change', data: { zoomLevel } },
+          '*',
+        );
+      } catch {}
+    }
+  }
+
   setMode(mode: SupportedModes) {
     const editor = provideEditorInstance();
     if (editor && mode) {

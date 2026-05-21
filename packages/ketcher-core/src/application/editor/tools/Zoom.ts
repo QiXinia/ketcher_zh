@@ -401,6 +401,22 @@ export class ZoomTool implements BaseTool {
     this.zoomToLeftTopCorner(zoomLevel);
   }
 
+  public zoomAtPoint(newZoomLevel: number, centerX: number, centerY: number) {
+    newZoomLevel = Math.min(newZoomLevel, this.MAXZOOMSCALE);
+    newZoomLevel = Math.max(newZoomLevel, this.MINZOOMSCALE);
+
+    const { x, y } = this._zoomTransform;
+    const scaleFactor = newZoomLevel / this.zoomLevel;
+
+    const newX = centerX - (centerX - x) * scaleFactor;
+    const newY = centerY - (centerY - y) * scaleFactor;
+
+    this.zoom?.transform(
+      this.canvasWrapper,
+      new ZoomTransform(newZoomLevel, newX, newY),
+    );
+  }
+
   public resetZoom() {
     this.zoom?.transform(this.canvasWrapper, new ZoomTransform(1, 0, 0));
   }

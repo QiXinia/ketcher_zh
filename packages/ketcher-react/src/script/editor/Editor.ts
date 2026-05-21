@@ -96,6 +96,7 @@ import { Highlighter } from './highlighter';
 import { setFunctionalGroupsTooltip } from './utils/functionalGroupsTooltip';
 import { ContextMenuInfo } from '../ui/views/components/ContextMenu/contextMenu.types';
 import { HoverIcon } from './HoverIcon';
+import { GestureRecognizer } from './GestureRecognizer';
 import RotateController from './tool/rotate-controller';
 import {
   HoverTarget,
@@ -198,6 +199,7 @@ class Editor implements KetcherEditor {
   errorHandler: ((message: string) => void) | null;
   highlights: Highlighter;
   hoverIcon: HoverIcon;
+  gestureRecognizer: GestureRecognizer | null;
   lastCursorPosition: { x: number; y: number };
   contextMenu: ContextMenuInfo;
   rotateController: RotateController;
@@ -291,6 +293,40 @@ class Editor implements KetcherEditor {
     };
 
     domEventSetup(this, clientArea);
+    this.gestureRecognizer = new GestureRecognizer(clientArea, {
+      onPinchZoom: (scaleFactor, centerX, centerY) => {
+        const MIN_ZOOM = 0.2;
+        const MAX_ZOOM = 4;
+        const newZoom = Math.min(
+          MAX_ZOOM,
+          Math.max(MIN_ZOOM, this.render.options.zoom * scaleFactor),
+        );
+        if (newZoom === this.render.options.zoom) return;
+        const fakeEvent = { clientX: centerX, clientY: centerY } as WheelEvent;
+        this.render.setZoom(newZoom, fakeEvent);
+        this.render.update();
+        this.event.zoomChanged.dispatch();
+        this._notifyZoomChange();
+      },
+      onTwoFingerPan: (dx, dy) => {
+        const zoom = this.render.options.zoom;
+        this.render.setViewBox((prev) => ({
+          ...prev,
+          minX: prev.minX - dx / zoom,
+          minY: prev.minY - dy / zoom,
+        }));
+        this.render.update();
+      },
+      onLongPress: (x, y, target) => {
+        const contextMenuEvent = new MouseEvent('contextmenu', {
+          bubbles: true,
+          cancelable: true,
+          clientX: x,
+          clientY: y,
+        });
+        (target as Element)?.dispatchEvent(contextMenuEvent);
+      },
+    });
     this.render.paper.canvas.setAttribute('data-testid', 'canvas');
   }
 
@@ -475,7 +511,15 @@ class Editor implements KetcherEditor {
 
     this.render.update();
     this.rotateController.rerender();
+    this._notifyZoomChange();
     return this.render.options.zoom;
+  }
+
+  private _notifyZoomChange() {
+    const zoomLevel = this.render.options.zoom;
+    try {
+      ketcherProvider.getKetcher(this.ketcherId)._dispatchZoomChange(zoomLevel);
+    } catch {}
   }
 
   centerStruct() {
@@ -2997,8 +3041,12 @@ class Editor implements KetcherEditor {
  * Main button pressed, usually the left button or the un-initialized state
  * See: https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
  */
-function isMouseMainButtonPressed(event: MouseEvent) {
-  return event.button === 0;
+function isMouseMainButtonPressed(event: PointerEvent | MouseEvent) {
+  return (
+    event.button === 0 &&
+    (!(event as PointerEvent).isPrimary ||
+      (event as PointerEvent).isPrimary === true)
+  );
 }
 
 function resetSelectionOnCanvasClick(
@@ -3017,7 +3065,13 @@ function resetSelectionOnCanvasClick(
 }
 
 function updateLastCursorPosition(editor: Editor, event) {
-  const events = ['mousemove', 'click', 'mousedown', 'mouseup', 'mouseover'];
+  const events = [
+    'pointermove',
+    'click',
+    'pointerdown',
+    'pointerup',
+    'pointerover',
+  ];
   if (events.includes(event.type)) {
     const clientAreaBoundingBox =
       editor.render.clientArea.getBoundingClientRect();
@@ -3078,32 +3132,32 @@ function domEventSetup(editor: Editor, clientArea: HTMLElement) {
     },
     {
       target: clientArea,
-      eventName: 'mousedown',
+      eventName: 'pointerdown',
       toolEventHandler: 'mousedown',
     },
     {
       target: document,
-      eventName: 'mousemove',
+      eventName: 'pointermove',
       toolEventHandler: 'mousemove',
     },
     {
       target: document,
-      eventName: 'mouseup',
+      eventName: 'pointerup',
       toolEventHandler: 'mouseup',
     },
     {
       target: document,
-      eventName: 'mouseleave',
+      eventName: 'pointerleave',
       toolEventHandler: 'mouseleave',
     },
     {
       target: clientArea,
-      eventName: 'mouseleave',
+      eventName: 'pointerleave',
       toolEventHandler: 'mouseLeaveClientArea',
     },
     {
       target: clientArea,
-      eventName: 'mouseover',
+      eventName: 'pointerover',
       toolEventHandler: 'mouseover',
     },
   ];
@@ -3118,13 +3172,18 @@ function domEventSetup(editor: Editor, clientArea: HTMLElement) {
     });
 
     subs.add((event) => {
+      if (event.isPrimary === false) return true;
+      if (editor.gestureRecognizer?.isGestureActive()) return true;
+
       updateLastCursorPosition(editor, event);
 
       if (
-        !['mouseup', 'mousedown', 'click', 'dbclick'].includes(event.type) ||
+        !['pointerup', 'pointerdown', 'click', 'dbclick'].includes(
+          event.type,
+        ) ||
         isMouseMainButtonPressed(event)
       ) {
-        if (eventName === 'mousemove') {
+        if (eventName === 'pointermove') {
           const itemUnderCursor = editor.findItem(event, [
             'atoms',
             'bonds',
@@ -3136,8 +3195,8 @@ function domEventSetup(editor: Editor, clientArea: HTMLElement) {
         }
 
         const isScrollClick =
-          eventName !== 'mouseup' &&
-          eventName !== 'mouseleave' &&
+          eventName !== 'pointerup' &&
+          eventName !== 'pointerleave' &&
           (!event.target || event.target.nodeName === 'DIV');
 
         if (isScrollClick) {

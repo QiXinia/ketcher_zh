@@ -251,6 +251,13 @@ export class CoreEditor {
     this.resetCanvasOffset();
     this.resetKetcherRootElementOffset();
     this.zoomTool = ZoomTool.initInstance(this.drawingEntitiesManager);
+    this.zoomTool.subscribeOnZoomEvent(() => {
+      try {
+        ketcherProvider
+          .getKetcher(this.ketcherId)
+          ._dispatchZoomChange(this.zoomTool.getZoomLevel());
+      } catch {}
+    });
     this.transientDrawingView = new TransientDrawingView();
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     editor = this;
