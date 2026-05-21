@@ -199,6 +199,9 @@
       <div class="controls">
         <button class="open-modal">Open Modal</button>
         <button class="theme-toggle" type="button">Use dark theme</button>
+        <div style="margin: 10px 0; font-size: 14px; color: var(--host-muted);">
+          Zoom: <span class="zoom-display">100%</span>
+        </div>
         <div class="inputs">
           <div>
             <label for="height">Height</label>
@@ -330,6 +333,12 @@
         if (message.eventType === 'init') {
           postThemeToIframe();
           iframe?.contentWindow?.ketcher?.setMolecule(textarea.value);
+        }
+
+        if (message.eventType === 'zoom:change') {
+          const zoomLevel = message.data?.zoomLevel ?? 1;
+          document.querySelector('.zoom-display').textContent =
+            Math.round(zoomLevel * 100) + '%';
         }
       });
     </script>
