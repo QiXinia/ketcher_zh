@@ -82,13 +82,7 @@ const RightToolbar = (props: Props) => {
     >
       <div ref={scrollRef} className={classes.buttons}>
         <div ref={startRef}>
-          <Group
-            className={clsx(
-              classes.atomsList,
-              classes.buttons,
-              classes.groupItem,
-            )}
-          >
+          <Group className={clsx(classes.atomsList, classes.groupItem)}>
             <AtomsList
               atoms={basicAtoms.slice(0, 1)}
               active={active}

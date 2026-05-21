@@ -209,6 +209,14 @@
   @canvas-padding: @toolbar-size + @toolbar-gap + @app-gap;
 }
 
+#touch-dim() {
+  @button-size: 40px;
+  @icon-size: 24px;
+  @button-grow: 4px;
+
+  @toolbar-size: @button-size + 2 * @button-grow;
+}
+
 // Periodic table coloring
 
 @atom-periodic-alkali-metal: #ffa2a5;

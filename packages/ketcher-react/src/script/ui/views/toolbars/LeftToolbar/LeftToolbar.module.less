@@ -46,7 +46,8 @@
   padding: 2px;
   background-color: @color-background-primary;
   border-radius: 4px;
-  box-shadow: 0 2px 5px @color-select-box-shadow;
+  box-shadow: 0 3px 4px -1px @color-select-box-shadow;
+  clip-path: inset(-1px -5px -5px -5px);
 
   // TODO: move to action button styles, when all buttons will have same style
   svg {
@@ -63,5 +64,17 @@
       top: 3px;
       left: 3px;
     }
+  }
+}
+
+@media (pointer: coarse) {
+  .root {
+    width: 52px;
+  }
+
+  .groupItem button {
+    width: 40px;
+    height: 40px;
+    margin: 3px;
   }
 }

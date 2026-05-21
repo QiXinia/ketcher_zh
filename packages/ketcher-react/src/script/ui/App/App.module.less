@@ -27,6 +27,7 @@
   grid-template-rows: auto 1fr auto;
   /* stylelint-disable-next-line */
   container-type: size;
+  touch-action: manipulation;
 }
 
 .canvas {
@@ -47,6 +48,12 @@
 
 .bottom {
   grid-area: toolbar-bottom;
+}
+
+@media (max-width: 768px) {
+  .app {
+    grid-template-columns: max-content 1fr max-content;
+  }
 }
 
 :global(.smallEditor) .app {

@@ -20,6 +20,7 @@ const mediaSizes = {
   rGroupCollapsableHeight: 1000,
   shapeCollapsableHeight: 1000,
   transformCollapsableHeight: 870,
+  mobileBreakpointWidth: 768,
 };
 
 export { mediaSizes };

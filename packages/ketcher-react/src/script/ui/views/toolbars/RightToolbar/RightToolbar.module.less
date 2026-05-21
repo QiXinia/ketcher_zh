@@ -48,7 +48,8 @@
   scroll-behavior: smooth;
   background-color: @color-background-primary;
   border-radius: 4px;
-  box-shadow: 0 2px 5px @color-select-box-shadow;
+  box-shadow: 0 3px 4px -1px @color-select-box-shadow;
+  clip-path: inset(-1px -5px -5px -5px);
 
   .button {
     margin-top: 4px;
@@ -71,5 +72,17 @@
       right: 1px;
       margin: auto;
     }
+  }
+}
+
+@media (pointer: coarse) {
+  .root {
+    width: 52px;
+  }
+
+  .buttons button {
+    width: 40px;
+    height: 40px;
+    margin: 3px;
   }
 }
