@@ -311,6 +311,7 @@
     "applyLayoutNotification": "要完全应用这些更改，您需要应用布局。",
     "resetToSelectTool": "重置为选择工具",
     "rotationStep": "旋转步长，度",
+    "windowedMode": "窗口模式（可拖拽对话框）",
     "showValenceWarnings": "显示价态警告",
     "atomColoring": "原子着色",
     "showStereoFlags": "显示立体标志",

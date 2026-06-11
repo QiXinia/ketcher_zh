@@ -309,8 +309,11 @@ const CheckDialog: FC<CheckDialogProps> = (props) => {
   );
 };
 
-const mapStateToProps = (state: State): CheckDialogStateProps => ({
-  formState: state.modal.form,
+const mapStateToProps = (
+  state: State,
+  ownProps: any,
+): CheckDialogStateProps => ({
+  formState: ownProps.formState ?? state.modal?.form,
   checkState: state.options.check,
 });
 

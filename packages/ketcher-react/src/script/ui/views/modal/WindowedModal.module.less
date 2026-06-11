@@ -1,0 +1,37 @@
+.windowedContainer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 40;
+  overflow: hidden;
+}
+
+.draggableWindow {
+  pointer-events: auto;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 95vw;
+  max-height: 95vh;
+  display: inline-block;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+  border-radius: 8px;
+  overflow: hidden;
+
+  dialog {
+    position: relative;
+    inset: unset;
+    width: auto;
+    height: auto;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: none;
+  }
+}
+
+.dragging {
+  user-select: none;
+}

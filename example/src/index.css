@@ -459,6 +459,35 @@ html[data-theme='dark'] [data-testid='zoom-value'] {
   color: var(--ketcher-toolbar-icon) !important;
 }
 
+html[data-theme='dark']
+  .Ketcher-root
+  .MuiToggleButton-root {
+  background-color: var(--ketcher-surface-muted) !important;
+  color: var(--ketcher-text-primary) !important;
+  border-color: var(--ketcher-border) !important;
+}
+
+html[data-theme='dark']
+  .Ketcher-root
+  .MuiToggleButton-root:hover {
+  background-color: var(--ketcher-surface-raised) !important;
+  color: var(--ketcher-accent-hover) !important;
+}
+
+html[data-theme='dark']
+  .Ketcher-root
+  .MuiToggleButton-root.Mui-selected {
+  background-color: var(--ketcher-accent) !important;
+  color: #0c1117 !important;
+}
+
+html[data-theme='dark']
+  .Ketcher-root
+  .MuiToggleButton-root.Mui-selected:hover {
+  background-color: var(--ketcher-accent-hover) !important;
+  color: #0c1117 !important;
+}
+
 .MuiPaper-root.ketcher-dialog {
   align-self: center;
   width: 800px;

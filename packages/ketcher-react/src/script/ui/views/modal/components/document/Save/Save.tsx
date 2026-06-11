@@ -727,12 +727,12 @@ const serverSettingsSelector = createSelector([getOptions], (options) =>
   options.getServerSettings(),
 );
 
-const mapStateToProps = (state: AppState) => ({
+const mapStateToProps = (state: AppState, ownProps: any) => ({
   server: state.options.app.server ? state.server : null,
   struct: state.editor.struct(),
   options: serverSettingsSelector(state),
-  formState: state.modal.form,
-  moleculeErrors: state.modal.form.moleculeErrors,
+  formState: ownProps.formState ?? state.modal?.form,
+  moleculeErrors: (ownProps.formState ?? state.modal?.form)?.moleculeErrors,
   checkState: state.options.check,
   bondThickness: state.options.settings.bondThickness,
   ignoreChiralFlag: state.editor.render.options.ignoreChiralFlag,

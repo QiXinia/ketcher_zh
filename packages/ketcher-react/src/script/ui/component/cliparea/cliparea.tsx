@@ -110,6 +110,12 @@ class ClipArea extends Component<ClipAreaProps> {
     this.listeners = {
       mouseup: (event: MouseEvent) => {
         if (
+          'ontouchstart' in window &&
+          (event as PointerEvent).pointerType === 'touch'
+        ) {
+          return;
+        }
+        if (
           el === event.target ||
           (!isActiveElement(event.target as HTMLElement) &&
             this.props.focused())
@@ -276,6 +282,7 @@ class ClipArea extends Component<ClipAreaProps> {
         data-cliparea
         contentEditable
         autoFocus // eslint-disable-line jsx-a11y/no-autofocus
+        inputMode="none"
         suppressContentEditableWarning={true}
       />
     );

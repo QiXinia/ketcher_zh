@@ -261,7 +261,6 @@ function Slider({ value, onChange, name, innerRef, ...rest }) {
         ref={innerRef}
         type="checkbox"
         checked={value}
-        onClick={onChange}
         onChange={onChange}
         name={name}
         {...rest}

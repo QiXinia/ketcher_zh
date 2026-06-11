@@ -29,8 +29,10 @@ import { TopToolbarIconButton } from './TopToolbarIconButton';
 import { CustomButtons } from './CustomButtons';
 import { ketcherProvider } from 'ketcher-core';
 import i18n from '../../../../../i18n';
-import { cloneElement, useCallback, useMemo } from 'react';
+import { cloneElement, useCallback, useMemo, useRef, RefObject } from 'react';
 import { CustomButton } from '../../../../builders/ketcher/CustomButtons';
+import { useInView } from 'react-intersection-observer';
+import { ArrowScroll } from '../ArrowScroll';
 
 type VoidFunction = () => void;
 
@@ -120,10 +122,20 @@ const ControlsPanel = styled('div')`
   }
 `;
 
-const BtnsWpapper = styled.div`
+const ScrollableButtonsWrapper = styled.div`
   display: flex;
   align-items: center;
   height: 100%;
+  overflow: hidden;
+  scroll-behavior: smooth;
+  flex: 1;
+  min-width: 0;
+`;
+
+const ScrollSentinel = styled.span`
+  flex-shrink: 0;
+  width: 1px;
+  height: 1px;
 `;
 
 export const TopToolbar = ({
@@ -189,13 +201,43 @@ export const TopToolbar = ({
       })
     : undefined;
 
+  const scrollRef = useRef(null) as RefObject<HTMLDivElement | null>;
+  const [startRef, startInView] = useInView({
+    threshold: 1,
+  });
+  const [endRef, endInView] = useInView({
+    threshold: 1,
+  });
+
+  const scrollForward = (dtMs: number) => {
+    if (!scrollRef.current) return;
+    scrollRef.current.scrollLeft += dtMs * 0.3;
+  };
+
+  const scrollBack = (dtMs: number) => {
+    if (!scrollRef.current) return;
+    scrollRef.current.scrollLeft -= dtMs * 0.3;
+  };
+
+  const showScrollArrows = !startInView || !endInView;
+
   return (
     <ControlsPanel
       className={className}
       ref={resizeRef}
       data-testid="top-toolbar"
     >
-      <BtnsWpapper>
+      {showScrollArrows && (
+        <ArrowScroll
+          startInView={startInView}
+          endInView={endInView}
+          scrollForward={scrollForward}
+          scrollBack={scrollBack}
+          isLeftRight
+        />
+      )}
+      <ScrollableButtonsWrapper ref={scrollRef}>
+        <ScrollSentinel ref={startRef} />
         <TopToolbarIconButton
           title={i18n.t('topToolbar.clearCanvas')}
           onClick={onClear}
@@ -250,11 +292,9 @@ export const TopToolbar = ({
           customButtons={customButtons}
           onCustomAction={onCustomAction}
         />
-      </BtnsWpapper>
-      <BtnsWpapper>
+        <Divider />
         {renderedTogglerComponent}
         {renderedTogglerComponent && <Divider />}
-
         <SystemControls
           onSettingsOpen={onSettingsOpen}
           onFullscreen={onFullscreen}
@@ -275,7 +315,8 @@ export const TopToolbar = ({
             hiddenButtons={hiddenButtons}
           />
         )}
-      </BtnsWpapper>
+        <ScrollSentinel ref={endRef} />
+      </ScrollableButtonsWrapper>
     </ControlsPanel>
   );
 };

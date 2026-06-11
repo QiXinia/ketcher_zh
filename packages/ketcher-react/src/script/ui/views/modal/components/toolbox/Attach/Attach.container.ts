@@ -20,8 +20,8 @@ import { connect } from 'react-redux';
 
 type StateProps = Pick<BaseProps, 'formState'>;
 
-const mapStateToProps = (state: any): StateProps => ({
-  formState: state.modal.form,
+const mapStateToProps = (state: any, ownProps: any): StateProps => ({
+  formState: ownProps.formState ?? state.modal?.form,
 });
 
 const AttachPointsContainer = connect(mapStateToProps)(AttachPoints);

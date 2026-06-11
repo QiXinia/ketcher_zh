@@ -68,6 +68,8 @@ const ArrowScroll = ({
           }}
           onMouseUp={() => setIsScrollDown(false)}
           onMouseDown={() => setIsScrollDown(true)}
+          onTouchStart={() => setIsScrollDown(true)}
+          onTouchEnd={() => setIsScrollDown(false)}
           className={clsx(
             classes.button,
             isLeftRight ? classes.right : classes.down,
@@ -87,6 +89,8 @@ const ArrowScroll = ({
           }}
           onMouseUp={() => setIsScrollUp(false)}
           onMouseDown={() => setIsScrollUp(true)}
+          onTouchStart={() => setIsScrollUp(true)}
+          onTouchEnd={() => setIsScrollUp(false)}
           className={clsx(
             classes.button,
             isLeftRight ? classes.left : classes.up,

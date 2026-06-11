@@ -23,8 +23,8 @@ import { connect } from 'react-redux';
 type StateProps = Pick<BaseProps, 'formState'>;
 type DispatchProps = Pick<BaseCallProps, 'onOk'>;
 
-const mapStateToProps = (state: any): StateProps => ({
-  formState: state.modal.form,
+const mapStateToProps = (state: any, ownProps: any): StateProps => ({
+  formState: ownProps.formState ?? state.modal?.form,
 });
 
 const mapDispatchToProps = (dispatch: any, ownProps: any): DispatchProps => ({

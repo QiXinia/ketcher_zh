@@ -311,6 +311,7 @@
     "applyLayoutNotification": "To fully apply these changes, you need to apply the layout.",
     "resetToSelectTool": "Reset to Select Tool",
     "rotationStep": "Rotation Step, º",
+    "windowedMode": "Windowed mode (draggable dialogs)",
     "showValenceWarnings": "Show valence warnings",
     "atomColoring": "Atom coloring",
     "showStereoFlags": "Show the Stereo flags",

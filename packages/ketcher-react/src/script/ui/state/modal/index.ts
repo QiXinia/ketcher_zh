@@ -114,17 +114,11 @@ function modalReducer(
     }
 
     case 'WINDOW_OPEN': {
-      const { data } = action;
-      return {
-        name: data.name,
-        form: formsState[data.name] || null,
-        prop: (data.prop as ModalDialogProps) || null,
-        parentModal: null,
-      };
+      return state;
     }
 
     case 'WINDOW_CLOSE': {
-      return null;
+      return state;
     }
 
     default:

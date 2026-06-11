@@ -79,6 +79,6 @@ function RGroup({ disabledIds, values, formState, type, ...props }: Props) {
   );
 }
 
-export default connect((state: RGroupStoreState) => ({
-  formState: state.modal.form,
+export default connect((state: RGroupStoreState, ownProps: any) => ({
+  formState: ownProps.formState ?? state.modal?.form,
 }))(RGroup);

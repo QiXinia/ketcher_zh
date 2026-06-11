@@ -204,7 +204,8 @@ interface State {
 // Workaround: @types/react version conflict with connect()
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const EnhancedStereoAny = EnhancedStereo as any;
-export default connect((state: State) => ({
-  formState: state.modal.form || { result: {}, valid: false },
+export default connect((state: State, ownProps: any) => ({
+  formState: ownProps.formState ??
+    state.modal?.form ?? { result: {}, valid: false },
   struct: state.editor.struct(),
 }))(EnhancedStereoAny) as React.ComponentType<EnhancedStereoCallProps>;

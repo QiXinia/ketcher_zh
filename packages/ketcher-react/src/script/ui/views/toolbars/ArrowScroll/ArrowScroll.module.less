@@ -16,6 +16,7 @@
 @import '../../../../../style/variables';
 
 .scroll {
+  position: relative;
   min-height: 32px;
   width: 36px;
   display: flex;
@@ -31,15 +32,26 @@
   flex-direction: column;
 }
 
+.scroll.leftRight {
+  flex-direction: row;
+  width: auto;
+  min-height: unset;
+  height: 100%;
+  min-width: 32px;
+}
+
 .button {
-  height: 50%;
-  width: 100%;
   border: none;
   background: transparent;
   color: inherit;
   font-size: 15px !important;
   cursor: pointer;
   user-select: none;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
   transition:
     background-color 0.15s ease,
     color 0.15s ease;
@@ -52,38 +64,28 @@
 
 .button.down,
 .button.up {
-  height: 50%;
   width: 100%;
 }
 
 .button.left,
 .button.right {
   height: 100%;
-  width: 50%;
-  display: flex;
-  padding: 0;
-  justify-content: center;
-  align-items: center;
 }
 
 .down {
-  position: absolute;
-  bottom: 0;
+  order: 2;
 }
 
 .up {
-  position: absolute;
-  top: 0;
+  order: 1;
 }
 
 .left {
-  position: absolute;
-  left: 0;
+  order: 1;
 }
 
 .right {
-  position: absolute;
-  right: 0;
+  order: 2;
 }
 
 @media (pointer: coarse) {
@@ -92,7 +94,23 @@
     width: 48px;
   }
 
+  .scroll.upDown {
+    min-height: 88px;
+  }
+
+  .scroll.leftRight {
+    width: auto;
+    min-height: unset;
+    height: 100%;
+    min-width: 88px;
+  }
+
   .button {
     min-height: 44px;
+  }
+
+  .scroll.leftRight .button {
+    min-height: unset;
+    min-width: 44px;
   }
 }
