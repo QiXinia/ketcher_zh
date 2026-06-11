@@ -61,6 +61,10 @@ const config = {
     typescript({
       typescript: ttypescript,
       tsconfigOverride: {
+        compilerOptions: {
+          module: 'ESNext',
+          moduleResolution: 'node',
+        },
         exclude: ['__tests__/**/*'],
       },
     }),

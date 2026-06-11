@@ -208,15 +208,15 @@ export class RotationView extends TransientView {
       .attr('fill', 'transparent')
       .attr('stroke', 'none')
       .attr('style', 'pointer-events: all')
-      .on('mousedown', (event: PointerEvent) => {
+      .on('pointerdown', (event: PointerEvent) => {
         event.stopPropagation();
         event.preventDefault();
         RotationView.rotationCenterSubscribers.forEach((listener) =>
           listener({ type: 'down', event }),
         );
       })
-      .on('mousemove', (event: PointerEvent) => {
-        if (event.buttons !== 1) return;
+      .on('pointermove', (event: PointerEvent) => {
+        if (event.pressure === 0) return;
         RotationView.rotationCenterSubscribers.forEach((listener) =>
           listener({ type: 'drag', event }),
         );
@@ -238,11 +238,11 @@ export class RotationView extends TransientView {
       const defaultLinkPath = linkPath;
 
       crossGroup
-        .on('mouseenter', () => {
+        .on('pointerenter', () => {
           crossPath.attr('stroke', STYLE.ACTIVE_COLOR);
           link.attr('d', hoverLinkPath).attr('stroke', STYLE.ACTIVE_COLOR);
         })
-        .on('mouseleave', () => {
+        .on('pointerleave', () => {
           crossPath.attr('stroke', STYLE.INITIAL_COLOR);
           link.attr('d', defaultLinkPath).attr('stroke', STYLE.INITIAL_COLOR);
         });
@@ -254,17 +254,11 @@ export class RotationView extends TransientView {
       .attr('class', 'rotation-handle')
       .attr('data-testid', 'rotation-handle')
       .attr('transform', `translate(${handleCenterX},${handleCenterY})`)
-      .on('mousedown', (event: PointerEvent) => {
+      .on('pointerdown', (event: PointerEvent) => {
         event.stopPropagation();
         event.preventDefault();
         RotationView.rotationHandleSubscribers.forEach((listener) =>
           listener({ type: 'down', event }),
-        );
-      })
-      .on('mousedown', (event: PointerEvent) => {
-        if (event.buttons !== 1) return;
-        RotationView.rotationHandleSubscribers.forEach((listener) =>
-          listener({ type: 'drag', event }),
         );
       });
 
@@ -290,10 +284,10 @@ export class RotationView extends TransientView {
 
     if (!isRotating) {
       handleGroup
-        .on('mouseenter', () => {
+        .on('pointerenter', () => {
           handleGroup.select('circle').attr('fill', STYLE.ACTIVE_COLOR);
         })
-        .on('mouseleave', () => {
+        .on('pointerleave', () => {
           handleGroup.select('circle').attr('fill', STYLE.INITIAL_COLOR);
         });
     }

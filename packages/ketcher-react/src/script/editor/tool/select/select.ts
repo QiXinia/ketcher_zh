@@ -564,6 +564,18 @@ class SelectTool implements Tool {
     this.editor.hover(null);
   }
 
+  cancel() {
+    if (this.dragCtx?.stopTapping) this.dragCtx.stopTapping();
+
+    if (this.dragCtx?.action) {
+      this.dragCtx.action.perform(this.editor.render.ctab);
+    }
+    this.dragCtx = null;
+    this.isMouseDown = false;
+    this.#lassoHelper.cancel();
+    this.editor.hover(null);
+  }
+
   private isDraggingStructureOnSaltOrSolvent(
     dragCtx: Pick<NonNullable<DragContext>, 'mergeItems'> | null | undefined,
     sgroups: Map<number, ReSGroup>,

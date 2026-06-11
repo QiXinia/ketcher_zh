@@ -317,6 +317,41 @@ class Editor implements KetcherEditor {
         }));
         this.render.update();
       },
+      onTransform: (scaleFactor, centerX, centerY, panDx, panDy) => {
+        const MIN_ZOOM = 0.2;
+        const MAX_ZOOM = 4;
+        const oldZoom = this.render.options.zoom;
+        const newZoom = Math.min(
+          MAX_ZOOM,
+          Math.max(MIN_ZOOM, oldZoom * scaleFactor),
+        );
+        const actualScale = newZoom / oldZoom;
+
+        if (actualScale !== 1) {
+          const fakeEvent = {
+            clientX: centerX,
+            clientY: centerY,
+          } as WheelEvent;
+          this.render.setZoom(newZoom, fakeEvent);
+        }
+
+        if (panDx !== 0 || panDy !== 0) {
+          const zoom = actualScale !== 1 ? newZoom : oldZoom;
+          this.render.setViewBox((prev) => ({
+            ...prev,
+            minX: prev.minX - panDx / zoom,
+            minY: prev.minY - panDy / zoom,
+          }));
+        }
+
+        if (actualScale !== 1 || panDx !== 0 || panDy !== 0) {
+          this.render.update();
+          if (actualScale !== 1) {
+            this.event.zoomChanged.dispatch();
+            this._notifyZoomChange();
+          }
+        }
+      },
       onLongPress: (x, y, target) => {
         const contextMenuEvent = new MouseEvent('contextmenu', {
           bubbles: true,
@@ -325,6 +360,11 @@ class Editor implements KetcherEditor {
           clientY: y,
         });
         (target as Element)?.dispatchEvent(contextMenuEvent);
+      },
+      onGestureStart: () => {
+        if (this._tool?.cancel) {
+          this._tool.cancel();
+        }
       },
     });
     this.render.paper.canvas.setAttribute('data-testid', 'canvas');

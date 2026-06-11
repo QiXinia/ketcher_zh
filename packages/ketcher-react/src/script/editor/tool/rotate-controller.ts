@@ -98,12 +98,14 @@ class RotateController {
     this.handle?.unmousedown(this.dragStart);
     this.handle?.unmouseup(this.dragEnd);
     this.handle?.undrag();
+    this.handle?.node?.removeEventListener('pointerdown', this.dragStart);
 
     const crossArea = this.cross?.[1];
     crossArea?.unhover(this.hoverCrossIn, this.hoverCrossOut);
     crossArea?.unmousedown(this.dragCrossStart);
     crossArea?.unmouseup(this.dragCrossEnd);
     crossArea?.undrag();
+    crossArea?.node?.removeEventListener('pointerdown', this.dragCrossStart);
 
     this.cross?.remove();
     delete this.cross;
@@ -213,6 +215,7 @@ class RotateController {
       undefined,
       this.dragEnd, // Fix rotation getting stuck when mouseup outside window
     );
+    this.handle?.node?.addEventListener('pointerdown', this.dragStart);
 
     if (this.isPartOfFragmentSelected()) {
       return;
@@ -227,6 +230,7 @@ class RotateController {
       undefined,
       this.dragCrossEndOUtOfBounding,
     );
+    crossArea?.node?.addEventListener('pointerdown', this.dragCrossStart);
   }
 
   private drawCross(state?: CrossState) {
@@ -631,7 +635,7 @@ class RotateController {
     ] as const;
   }
 
-  private readonly dragStart = (event: MouseEvent) => {
+  private readonly dragStart = (event: MouseEvent | PointerEvent) => {
     event.stopPropagation(); // Avoid triggering SelectTool's mousedown
 
     const isLeftButtonPressed = event.buttons === 1;
@@ -771,7 +775,7 @@ class RotateController {
     this.drawLink('short');
   };
 
-  private readonly dragCrossStart = (event: MouseEvent) => {
+  private readonly dragCrossStart = (event: MouseEvent | PointerEvent) => {
     event.stopPropagation();
     this.isMovingCenter = true;
   };
