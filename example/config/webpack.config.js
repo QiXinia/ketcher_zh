@@ -22,12 +22,13 @@ const envVariables = {
 
 module.exports = override(
   addBundleVisualizer({}, true),
-  addWebpackModuleRule({
-    test: /\.js$/,
-    enforce: 'pre',
-    loader: 'source-map-loader',
-    exclude: /node_modules/,
-  }),
+  process.env.DISABLE_SOURCE_MAP_LOADER !== 'true' &&
+    addWebpackModuleRule({
+      test: /\.js$/,
+      enforce: 'pre',
+      loader: 'source-map-loader',
+      exclude: /node_modules/,
+    }),
   addWebpackResolve({
     fallback: { url: false },
   }),
@@ -90,6 +91,18 @@ module.exports = override(
       duo: './src/duoIndex.tsx',
       closable: './src/closableIndex.tsx',
     };
+    if (process.env.DISABLE_TERSER_PARALLEL === 'true') {
+      config.optimization.minimizer?.forEach((minimizer) => {
+        if (minimizer?.options && 'parallel' in minimizer.options) {
+          minimizer.options.parallel = false;
+        }
+      });
+    }
+    if (process.env.DISABLE_FORK_TS_CHECKER === 'true') {
+      config.plugins = config.plugins.filter(
+        (plugin) => plugin.constructor?.name !== 'ForkTsCheckerWebpackPlugin',
+      );
+    }
     return config;
   },
 );
