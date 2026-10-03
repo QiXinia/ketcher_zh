@@ -16,7 +16,7 @@
 
 import { BaseOperation } from '../BaseOperation';
 import { OperationType } from '../OperationType';
-import { ReStruct } from '../../../render';
+import type { ReStruct } from '../../../render';
 
 type Data = {
   rgid: any;
@@ -68,8 +68,8 @@ export class RGroupAttr extends BaseOperation {
   isDummy(restruct: ReStruct) {
     if (this.data) {
       const { rgid, attribute, value } = this.data;
-      const rgroup = restruct.molecule.rgroups.get(rgid)!;
-      return rgroup[attribute] === value;
+      const rgroup = restruct.molecule.rgroups.get(rgid);
+      return rgroup ? rgroup[attribute] === value : false;
     }
     return false;
   }

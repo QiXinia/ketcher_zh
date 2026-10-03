@@ -24,16 +24,16 @@ import {
 } from '../../state/templates';
 
 import { connect } from 'react-redux';
-import { Dispatch } from 'redux';
-import { StoreState } from '../../state/store.types';
+import type { Dispatch } from 'redux';
+import type { StoreState } from '../../state/store.types';
 import { storage } from '../../storage-ext';
-import Form, { Field, FormState } from '../../component/form/form/form';
+import Form, { type FormState, Field } from '../../component/form/form/form';
 import { attachSchema } from '../../data/schema/struct-schema';
 import styled from '@emotion/styled';
 import classes from './template-lib.module.less';
 import { css } from '@emotion/react';
 import { Button } from '@mui/material';
-import { Editor, ketcherProvider, Struct } from 'ketcher-core';
+import { type Editor, type Struct, ketcherProvider } from 'ketcher-core';
 import i18n from '../../../../i18n';
 
 interface AttachPoints {
@@ -290,6 +290,7 @@ class Attach extends Component<AttachProps> {
   checkIsValidName(name: string) {
     return (
       !!name &&
+      name.trim().length > 0 &&
       !this.props.templateLib.some(
         (tmpl) =>
           tmpl.struct.name === name && tmpl.props.group === 'User Templates',

@@ -139,7 +139,9 @@ test.describe('Ketcher bugs in 3.0.0', () => {
     });
   });
 
-  test('Case 2: Switching from Sequence mode to Flex mode and back not shifts visible area of canvas beyond visible frame', async () => {
+  test('Case 2: Switching from Sequence mode to Flex mode and back not shifts visible area of canvas beyond visible frame', async ({
+    SnakeCanvas: _,
+  }) => {
     /*
      * Test case: https://github.com/epam/ketcher/issues/6600
      * Bug: https://github.com/epam/ketcher/issues/5115
@@ -150,7 +152,6 @@ test.describe('Ketcher bugs in 3.0.0', () => {
      * 3. Switch view to Sequence mode
      * 4. Switch back to Flex mode
      */
-    await MacromoleculesTopToolbar(page).selectLayoutModeTool(LayoutMode.Snake);
     await openFileAndAddToCanvasAsNewProjectMacro(
       page,
       'KET/switching-from-sequence-mode-to-snake-mode-and-back.ket',
@@ -173,7 +174,9 @@ test.describe('Ketcher bugs in 3.0.0', () => {
     });
   });
 
-  test('Case 3: Connection between molecule and monomer affect an amount of implicit hydrogens', async () => {
+  test('Case 3: Connection between molecule and monomer affect an amount of implicit hydrogens', async ({
+    FlexCanvas: _,
+  }) => {
     /*
      * Test case: https://github.com/epam/ketcher/issues/6600
      * Bug: https://github.com/epam/ketcher/issues/6021
@@ -182,7 +185,6 @@ test.describe('Ketcher bugs in 3.0.0', () => {
      * 1. Open prepared file in Macro mode -> Flex mode
      * 2. Connect monomer to molecule's atom with implicit hydrogen in label
      */
-    await MacromoleculesTopToolbar(page).selectLayoutModeTool(LayoutMode.Flex);
     await openFileAndAddToCanvasAsNewProjectMacro(
       page,
       'KET/monomer-and-micro-structure.ket',
@@ -197,7 +199,9 @@ test.describe('Ketcher bugs in 3.0.0', () => {
     await takeEditorScreenshot(page);
   });
 
-  test(`Case 4: Replacing all monomers (or part of them) in edit mode system not cuts sequence on two`, async () => {
+  test(`Case 4: Replacing all monomers (or part of them) in edit mode system not cuts sequence on two`, async ({
+    SequenceCanvas: _,
+  }) => {
     /*
      * Test case: https://github.com/epam/ketcher/issues/6600
      * Bug: https://github.com/epam/ketcher/issues/5341
@@ -208,9 +212,7 @@ test.describe('Ketcher bugs in 3.0.0', () => {
      * 3. Select three @ symbols in edit mode (having blinking cursor somewhere in the middle of sequence - this is important!
      * 4. Click any monomer from the library (C peptide in my case) - click Yes in appeared Confirm Your Action dialog
      */
-    await MacromoleculesTopToolbar(page).selectLayoutModeTool(
-      LayoutMode.Sequence,
-    );
+
     await openFileAndAddToCanvasAsNewProjectMacro(
       page,
       'KET/Bugs/Replacing all monomers (or part of them) in edit mode - works wrong - system cuts sequence on two.ket',
@@ -237,7 +239,9 @@ test.describe('Ketcher bugs in 3.0.0', () => {
     });
   });
 
-  test(`Case 5: Side chain attachment point shown in wrong place in Snake mode`, async () => {
+  test(`Case 5: Side chain attachment point shown in wrong place in Snake mode`, async ({
+    SnakeCanvas: _,
+  }) => {
     /*
      * Test case: https://github.com/epam/ketcher/issues/6600
      * Bug: https://github.com/epam/ketcher/issues/6022
@@ -249,7 +253,6 @@ test.describe('Ketcher bugs in 3.0.0', () => {
      * 4. Hover mouse cursor over base
      * 5. Take a screenshot to validate the side chain attachment point is shown in the right place
      */
-    await MacromoleculesTopToolbar(page).selectLayoutModeTool(LayoutMode.Snake);
     await pasteFromClipboardAndAddToMacromoleculesCanvas(
       page,
       MacroFileType.HELM,
@@ -264,7 +267,9 @@ test.describe('Ketcher bugs in 3.0.0', () => {
     });
   });
 
-  test(`Case 6: When pressing Enter, a user can create new sequences in the “Modify RNA Builder” mode`, async () => {
+  test(`Case 6: When pressing Enter, a user can create new sequences in the “Modify RNA Builder” mode`, async ({
+    SequenceCanvas: _,
+  }) => {
     /*
      * Test case: https://github.com/epam/ketcher/issues/6600
      * Bug: https://github.com/epam/ketcher/issues/4723
@@ -277,9 +282,7 @@ test.describe('Ketcher bugs in 3.0.0', () => {
      * 5. Enter letters
      * 6. Take a screenshot to validate user can not create new sequences in the “Modify RNA Builder” mode
      */
-    await MacromoleculesTopToolbar(page).selectLayoutModeTool(
-      LayoutMode.Sequence,
-    );
+
     await pasteFromClipboardAndAddToMacromoleculesCanvas(
       page,
       MacroFileType.HELM,
@@ -287,7 +290,6 @@ test.describe('Ketcher bugs in 3.0.0', () => {
     );
     await selectAllStructuresOnCanvas(page);
     const symbolU = getSymbolLocator(page, { symbolAlias: 'U' }).first();
-    await symbolU.click();
     await modifyInRnaBuilder(page, symbolU);
     await keyboardPressOnCanvas(page, 'Enter');
     await keyboardTypeOnCanvas(page, 'AAA');
@@ -297,7 +299,9 @@ test.describe('Ketcher bugs in 3.0.0', () => {
     });
   });
 
-  test(`Case 7: Bond length is different for monomers loaded from HELM and from the library`, async () => {
+  test(`Case 7: Bond length is different for monomers loaded from HELM and from the library`, async ({
+    FlexCanvas: _,
+  }) => {
     /*
      * Test case: https://github.com/epam/ketcher/issues/6600
      * Bug: https://github.com/epam/ketcher/issues/4723
@@ -308,7 +312,6 @@ test.describe('Ketcher bugs in 3.0.0', () => {
      * 3. Put the same preset from the library and put it above first one
      * 4. Take a screenshot to validate bonds length should be the same (1.5 angstroms)
      */
-    await MacromoleculesTopToolbar(page).selectLayoutModeTool(LayoutMode.Flex);
     await pasteFromClipboardAndAddToMacromoleculesCanvas(
       page,
       MacroFileType.HELM,
@@ -326,7 +329,9 @@ test.describe('Ketcher bugs in 3.0.0', () => {
     });
   });
 
-  test(`Case 8: After inserting a nucleotide in the Text-editing mode, the cursor blinks in the wrong place`, async () => {
+  test(`Case 8: After inserting a nucleotide in the Text-editing mode, the cursor blinks in the wrong place`, async ({
+    FlexCanvas: _,
+  }) => {
     /*
      * Test case: https://github.com/epam/ketcher/issues/6600
      * Bug: https://github.com/epam/ketcher/issues/4533
@@ -339,7 +344,6 @@ test.describe('Ketcher bugs in 3.0.0', () => {
      * 5. Paste the copied preset to the beginning of the sequence
      * 6. Take a screenshot to validate the cursor blinks in the right place
      */
-    await MacromoleculesTopToolbar(page).selectLayoutModeTool(LayoutMode.Flex);
     await Library(page).dragMonomerOnCanvas(Preset.T, {
       x: 0,
       y: 0,
@@ -389,7 +393,9 @@ test.describe('Ketcher bugs in 3.0.0', () => {
     });
   });
 
-  test(`Case 10: System not opens "intellisence"-like dropdown control`, async () => {
+  test(`Case 10: System not opens "intellisence"-like dropdown control`, async ({
+    MoleculesCanvas: _,
+  }) => {
     /*
      * Test case: https://github.com/epam/ketcher/issues/6600
      * Bug: https://github.com/epam/ketcher/issues/6112
@@ -399,7 +405,6 @@ test.describe('Ketcher bugs in 3.0.0', () => {
      * 2. Change C1 of a molecule to O using the keyboard and then try to change C2 to N very
      *    quickly afterward
      */
-    await CommonTopRightToolbar(page).turnOnMicromoleculesEditor();
     await drawBenzeneRing(page);
     await CommonLeftToolbar(page).areaSelectionTool(
       SelectionToolType.Rectangle,
@@ -415,7 +420,9 @@ test.describe('Ketcher bugs in 3.0.0', () => {
     await takeEditorScreenshot(page);
   });
 
-  test(`Case 11: Undo operation work for monomer at micro mode if it was deleted`, async () => {
+  test(`Case 11: Undo operation work for monomer at micro mode if it was deleted`, async ({
+    MoleculesCanvas: _,
+  }) => {
     /*
      * Test case: https://github.com/epam/ketcher/issues/6600
      * Bug: https://github.com/epam/ketcher/issues/6112
@@ -426,7 +433,6 @@ test.describe('Ketcher bugs in 3.0.0', () => {
      * 3. Press Undo
      * 4. Take a screenshot
      */
-    await CommonTopRightToolbar(page).turnOnMicromoleculesEditor();
     await openFileAndAddToCanvasAsNewProject(
       page,
       'KET/Bugs/1. Peptide X (ambiguouse, alternatives, from library).ket',
@@ -545,7 +551,9 @@ test.describe('Ketcher bugs in 3.0.0', () => {
     });
   });
 
-  test(`Case 16: Undo/Redo operation for bonds and molecules (multi-select) works`, async () => {
+  test(`Case 16: Undo/Redo operation for bonds and molecules (multi-select) works`, async ({
+    FlexCanvas: _,
+  }) => {
     /*
      * Test case: https://github.com/epam/ketcher/issues/6600
      * Bug: https://github.com/epam/ketcher/issues/5966
@@ -558,7 +566,6 @@ test.describe('Ketcher bugs in 3.0.0', () => {
      * 5. Press Undo button
      * 6. Take a screenshot
      */
-    await MacromoleculesTopToolbar(page).selectLayoutModeTool(LayoutMode.Flex);
     await openFileAndAddToCanvasAsNewProject(
       page,
       'KET/Bugs/Undo_Redo operation for bonds and molecules (multi-select) works wrong.ket',
@@ -680,7 +687,9 @@ test.describe('Ketcher bugs in 3.0.0', () => {
     await takeEditorScreenshot(page);
   });
 
-  test(`Case 21: Structural distortion not occurs during multi expand and multi collapse of macromolecule abbreviations in Micro mode`, async () => {
+  test(`Case 21: Structural distortion not occurs during multi expand and multi collapse of macromolecule abbreviations in Micro mode`, async ({
+    FlexCanvas: _,
+  }) => {
     /*
      * Test case: https://github.com/epam/ketcher/issues/6600
      * Bug: https://github.com/epam/ketcher/issues/5670
@@ -691,7 +700,6 @@ test.describe('Ketcher bugs in 3.0.0', () => {
      * 3. Select all monomers and expand it and collapse it
      * 4. Take a screenshot
      */
-    await MacromoleculesTopToolbar(page).selectLayoutModeTool(LayoutMode.Flex);
     await openFileAndAddToCanvasAsNewProject(
       page,
       'KET/Bugs/monomers-cycled.ket',
@@ -737,7 +745,9 @@ test.describe('Ketcher bugs in 3.0.0', () => {
     await takeEditorScreenshot(page);
   });
 
-  test(`Case 23: Correct representation of hydrogens for Alias, Charge, Valence, and Radical properties in Macro mode`, async () => {
+  test(`Case 23: Correct representation of hydrogens for Alias, Charge, Valence, and Radical properties in Macro mode`, async ({
+    MoleculesCanvas: _,
+  }) => {
     /*
      * Test case: https://github.com/epam/ketcher/issues/6600
      * Bug: https://github.com/epam/ketcher/issues/6235
@@ -748,7 +758,6 @@ test.describe('Ketcher bugs in 3.0.0', () => {
      * 3. Switch to Macro mode
      * 4. Take a screenshot
      */
-    await CommonTopRightToolbar(page).turnOnMicromoleculesEditor();
     await openFileAndAddToCanvasAsNewProject(
       page,
       'KET/Bugs/ketcher - 2025-01-06T160012.582.ket',
@@ -790,7 +799,9 @@ test.describe('Ketcher bugs in 3.0.0', () => {
     );
   });
 
-  test(`Case 25: Super G and Super T monomers can be load from a saved RXN V3000 file`, async () => {
+  test(`Case 25: Super G and Super T monomers can be load from a saved RXN V3000 file`, async ({
+    MoleculesCanvas: _,
+  }) => {
     /*
      * Test case: https://github.com/epam/ketcher/issues/6600
      * Bug: https://github.com/epam/ketcher/issues/6291
@@ -800,7 +811,6 @@ test.describe('Ketcher bugs in 3.0.0', () => {
      * 2. Load RXN V3000 file with Super G and Super T monomers
      * 3. Take a screenshot
      */
-    await CommonTopRightToolbar(page).turnOnMicromoleculesEditor();
     await openFileAndAddToCanvasAsNewProject(
       page,
       'KET/Bugs/super-g-and-super-t.ket',
@@ -870,7 +880,9 @@ test.describe('Ketcher bugs in 3.0.0', () => {
     await takeEditorScreenshot(page);
   });
 
-  test.skip(`Case 28: Ambiguous DNA bases (N, D, H, W) not converted to DNA bases on antisense creation`, async () => {
+  test.skip(`Case 28: Ambiguous DNA bases (N, D, H, W) not converted to DNA bases on antisense creation`, async ({
+    SnakeCanvas: _,
+  }) => {
     /*
      * Test case: https://github.com/epam/ketcher/issues/6600
      * Bug: https://github.com/epam/ketcher/issues/6196
@@ -881,7 +893,6 @@ test.describe('Ketcher bugs in 3.0.0', () => {
      * 3. Create antisense for that chain
      * 4. Take a screenshot
      */
-    await MacromoleculesTopToolbar(page).selectLayoutModeTool(LayoutMode.Snake);
     await pasteFromClipboardAndAddToMacromoleculesCanvas(
       page,
       MacroFileType.HELM,
@@ -900,7 +911,9 @@ test.describe('Ketcher bugs in 3.0.0', () => {
     );
   });
 
-  test(`Case 29: Cursor position after adding preset in sequence mode not causes an incorrect sequence formation`, async () => {
+  test(`Case 29: Cursor position after adding preset in sequence mode not causes an incorrect sequence formation`, async ({
+    SequenceCanvas: _,
+  }) => {
     /*
      * Test case: https://github.com/epam/ketcher/issues/6600
      * Bug: https://github.com/epam/ketcher/issues/6272
@@ -912,9 +925,7 @@ test.describe('Ketcher bugs in 3.0.0', () => {
      * 4. Continue adding presets and observe the chain formation.
      * 5. Take a screenshot
      */
-    await MacromoleculesTopToolbar(page).selectLayoutModeTool(
-      LayoutMode.Sequence,
-    );
+
     await Library(page).switchToRNATab();
     await Library(page).selectMonomers([
       Preset.A,
@@ -954,7 +965,9 @@ test.describe('Ketcher bugs in 3.0.0', () => {
     await takeEditorScreenshot(page);
   });
 
-  test(`Case 31: Modified phosphates not shift away from main structure during expand in Micro Mode`, async () => {
+  test(`Case 31: Modified phosphates not shift away from main structure during expand in Micro Mode`, async ({
+    MoleculesCanvas: _,
+  }) => {
     /*
      * Test case: https://github.com/epam/ketcher/issues/6600
      * Bug: https://github.com/epam/ketcher/issues/6557
@@ -965,7 +978,6 @@ test.describe('Ketcher bugs in 3.0.0', () => {
      * 3. Expand structure
      * 4. Take a screenshot
      */
-    await CommonTopRightToolbar(page).turnOnMicromoleculesEditor();
     await openFileAndAddToCanvasAsNewProject(
       page,
       'KET/Bugs/modified-phosphates.ket',

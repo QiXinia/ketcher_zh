@@ -29,3 +29,4 @@ export * from './getSvgFromDrawnStructures';
 export * from './ensureString';
 export * from './normalizeError';
 export * from './monomers';
+export * from './dom';

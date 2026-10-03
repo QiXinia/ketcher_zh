@@ -842,7 +842,7 @@ export const attachSchema: StructSchema = {
         'Molecule name',
       ),
       'templates.invalidTemplateName',
-      'Template must have a unique name and no more than 128 symbols in length',
+      'Template must have a unique non-empty name and no more than 128 symbols in length',
     ) as unknown as SchemaProperty,
   },
 };

@@ -1,6 +1,6 @@
-import { FC, useEffect, useState } from 'react';
+import { type FC, useEffect, useState } from 'react';
 import { Item, Submenu, Separator } from 'react-contexify';
-import Editor from 'src/script/editor';
+import type Editor from 'src/script/editor';
 import tools from '../../../../action/tools';
 import styles from '../ContextMenu.module.less';
 import useBondEdit from '../hooks/useBondEdit';
@@ -9,7 +9,7 @@ import useBondSGroupEdit from '../hooks/useBondSGroupEdit';
 import useBondTypeChange from '../hooks/useBondTypeChange';
 import useDelete from '../hooks/useDelete';
 import { formatTitle, getNonQueryBondNames, queryBondNames } from '../utils';
-import {
+import type {
   BondsContextMenuProps,
   ItemEventParams,
   MenuItemsProps,
@@ -124,7 +124,7 @@ const BondMenuItems: FC<MenuItemsProps<BondsContextMenuProps>> = (props) => {
             disabled={isDisabled}
           >
             {iconName && <Icon name={iconName} className={styles.icon} />}
-            <span>{formatTitle(tools[name].title)}</span>
+            <span>{formatTitle(tools[name].title ?? '')}</span>
           </Item>
         );
       })}
@@ -149,7 +149,7 @@ const BondMenuItems: FC<MenuItemsProps<BondsContextMenuProps>> = (props) => {
               disabled={isDisabled}
             >
               {iconName && <Icon name={iconName} className={styles.icon} />}
-              <span>{formatTitle(tools[name].title)}</span>
+              <span>{formatTitle(tools[name].title ?? '')}</span>
             </Item>
           );
         })}

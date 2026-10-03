@@ -15,16 +15,16 @@
  ***************************************************************************/
 
 import {
+  type ReStruct,
+  type ImageReferencePositionInfo,
   Fragment,
   Vec2,
   Scale,
-  ReStruct,
   IMAGE_KEY,
-  ImageReferencePositionInfo,
   MULTITAIL_ARROW_KEY,
   FunctionalGroup,
 } from 'ketcher-core';
-import { ClosestItem, ClosestItemWithMap } from './closest.types';
+import type { ClosestItem, ClosestItemWithMap } from './closest.types';
 
 const SELECTION_DISTANCE_COEFFICIENT = 0.4;
 const TOUCH_SELECTION_DISTANCE_COEFFICIENT = 0.7;
@@ -622,26 +622,24 @@ function findCloseMerge(
           mergeAtomToFunctionalGroup(atomId, restruct, atomPosition, result);
       });
     } else {
-      result[map] = Array.from(pos[map].keys()).reduce(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (res: Map<any, any>, srcId) => {
-          const skip = { map, id: srcId };
-          const item = findMaps[map](
-            restruct,
-            pos[map].get(srcId),
-            skip,
-            null,
-            options,
-          );
+      result[map] = Array.from<number>(pos[map].keys()).reduce<
+        Map<number, number>
+      >((res, srcId) => {
+        const skip = { map, id: srcId };
+        const item = findMaps[map](
+          restruct,
+          pos[map].get(srcId),
+          skip,
+          null,
+          options,
+        );
 
-          if (item && !selected[map].includes(item.id)) {
-            res.set(srcId, item.id);
-          }
+        if (item && !selected[map].includes(item.id)) {
+          res.set(srcId, item.id);
+        }
 
-          return res;
-        },
-        new Map(),
-      );
+        return res;
+      }, new Map());
     }
   });
 

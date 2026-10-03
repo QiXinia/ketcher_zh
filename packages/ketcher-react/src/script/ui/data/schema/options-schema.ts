@@ -20,7 +20,7 @@ import {
   ShowHydrogenLabels,
   defaultBondThickness,
 } from 'ketcher-core';
-import { Validator, Schema } from 'jsonschema';
+import { type Schema, Validator } from 'jsonschema';
 import { localizedEnumNames, localizedProperty } from './i18n';
 
 type ExtendedSchema = Schema & {
@@ -487,8 +487,10 @@ const server: {
   'ignore-stereochemistry-errors': ExtendedSchema;
   'mass-skip-error-on-pseudoatoms': ExtendedSchema;
   'gross-formula-add-rsites': ExtendedSchema;
+  'aromatize-skip-superatoms': ExtendedSchema;
   'gross-formula-add-isotopes': ExtendedSchema;
   'dearomatize-on-load': ExtendedSchema;
+  'valence-mode': ExtendedSchema;
   ignoreChiralFlag: ExtendedSchema;
 } = {
   'dearomatize-on-load': localizedProperty(
@@ -553,6 +555,30 @@ const server: {
     },
     'settings.addIsotopesAtMassCalculation',
     'Add Isotopes at mass calculation',
+  ),
+  'valence-mode': localizedEnumNames(
+    localizedProperty(
+      {
+        enum: ['biovia-2009', 'biovia-2017', 'default'],
+        default: 'default',
+      },
+      'settings.valenceMode',
+      'Valence mode',
+    ),
+    [
+      { key: 'settings.biovia2009', defaultValue: 'BIOVIA 2009' },
+      { key: 'settings.biovia2017', defaultValue: 'BIOVIA 2017' },
+      { key: 'common.default', defaultValue: 'Default' },
+    ],
+  ),
+  'aromatize-skip-superatoms': localizedProperty(
+    {
+      type: 'boolean',
+      description: 'slider',
+      default: true,
+    },
+    'settings.skipSuperatomsAtAromatization',
+    'Skip Superatoms at aromatization',
   ),
 };
 

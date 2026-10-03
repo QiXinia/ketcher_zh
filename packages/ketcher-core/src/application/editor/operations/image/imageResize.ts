@@ -1,7 +1,7 @@
 import { BaseOperation } from 'application/editor/operations/BaseOperation';
-import { ImageReferenceName } from 'domain/entities/image';
+import type { ImageReferenceName } from 'domain/entities/image';
 import { Vec2 } from 'domain/entities/vec2';
-import { ReStruct } from 'application/render';
+import type { ReStruct } from 'application/render';
 import { OperationType } from 'application/editor/operations/OperationType';
 
 const moveLeftPositions: Array<ImageReferenceName> = [
@@ -76,6 +76,18 @@ export class ImageResize extends BaseOperation {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       this.previousPosition!,
       this.referencePositionName,
+    );
+  }
+
+  isDummy(restruct?: ReStruct) {
+    if (!restruct) return false;
+    const item = restruct.molecule.images.get(this.id);
+    if (!item) return false;
+    const currentPosition =
+      item.getReferencePositions()[this.referencePositionName];
+    return (
+      this.position.x === currentPosition.x &&
+      this.position.y === currentPosition.y
     );
   }
 }

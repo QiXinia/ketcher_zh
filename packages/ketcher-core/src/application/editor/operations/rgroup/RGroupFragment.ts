@@ -14,7 +14,7 @@
  * limitations under the License.
  ***************************************************************************/
 
-import { ReRGroup, ReStruct } from '../../../render';
+import { type ReStruct, ReRGroup } from '../../../render';
 
 import { BaseOperation } from '../BaseOperation';
 import { OperationType } from '../OperationType';
@@ -84,5 +84,14 @@ export class RGroupFragment extends BaseOperation {
 
   invert() {
     return new RGroupFragment(this.rgid_old, this.frid, this.rg_old);
+  }
+
+  isDummy(restruct?: ReStruct) {
+    if (!restruct) return false;
+    const currentRgid = RGroup.findRGroupByFragment(
+      restruct.molecule.rgroups,
+      this.frid,
+    );
+    return currentRgid === this.rgid_new;
   }
 }

@@ -77,7 +77,7 @@ import {
 } from './constants';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import { indigoWorker } from '_indigo-worker-import-alias_';
+import { getIndigoWorker } from '_indigo-worker-import-alias_';
 
 interface KeyValuePair {
   [key: string]: number | string | boolean | object;
@@ -161,6 +161,10 @@ function convertMimeTypeToOutputFormat(
       format = SupportedFormat.HELM;
       break;
     }
+    case ChemicalMimeType.BILN: {
+      format = SupportedFormat.BILN;
+      break;
+    }
     case ChemicalMimeType.RDF:
       format = SupportedFormat.RDF;
       break;
@@ -210,6 +214,23 @@ const messageTypeToEventMapping: {
     WorkerEvent.CalculateMacromoleculeProperties,
 };
 
+// Worker action that resolves with a `{ struct, format: Mol }` payload,
+// shared by every command whose result type is `WithStruct & WithFormat`
+// (Aromatize/Dearomatize/ExplicitHydrogens — all extend the same shape).
+function makeMolResultAction(
+  resolve: (value: { struct: string; format: ChemicalMimeType.Mol }) => void,
+  reject: (reason?: unknown) => void,
+) {
+  return ({ data }: OutputMessageWrapper) => {
+    const msg: OutputMessage<string> = data;
+    if (!msg.hasError) {
+      resolve({ struct: msg.payload, format: ChemicalMimeType.Mol });
+    } else {
+      reject(new Error(msg.error));
+    }
+  };
+}
+
 class IndigoService implements StructService {
   private readonly defaultOptions: StructServiceOptions;
   private readonly worker: Worker;
@@ -218,7 +239,7 @@ class IndigoService implements StructService {
 
   constructor(defaultOptions: StructServiceOptions) {
     this.defaultOptions = defaultOptions;
-    this.worker = indigoWorker;
+    this.worker = getIndigoWorker();
     this.worker.onmessage = (e: MessageEvent<OutputMessage<string>>) => {
       if (e.data.type === Command.Info) {
         const callbackMethod = process.env.SEPARATE_INDIGO_RENDER
@@ -482,19 +503,8 @@ class IndigoService implements StructService {
     const { struct, output_format: outputFormat } = data;
     const format = convertMimeTypeToOutputFormat(outputFormat);
 
-    return new Promise((resolve, reject) => {
-      const action = ({ data }: OutputMessageWrapper) => {
-        const msg: OutputMessage<string> = data;
-        if (!msg.hasError) {
-          const result: AromatizeResult = {
-            struct: msg.payload,
-            format: ChemicalMimeType.Mol,
-          };
-          resolve(result);
-        } else {
-          reject(new Error(msg.error));
-        }
-      };
+    return new Promise<AromatizeResult>((resolve, reject) => {
+      const action = makeMolResultAction(resolve, reject);
 
       const commandData: AromatizeCommandData = {
         struct,
@@ -520,19 +530,8 @@ class IndigoService implements StructService {
     const { struct, output_format: outputFormat } = data;
     const format = convertMimeTypeToOutputFormat(outputFormat);
 
-    return new Promise((resolve, reject) => {
-      const action = ({ data }: OutputMessageWrapper) => {
-        const msg: OutputMessage<string> = data;
-        if (!msg.hasError) {
-          const result: AromatizeResult = {
-            struct: msg.payload,
-            format: ChemicalMimeType.Mol,
-          };
-          resolve(result);
-        } else {
-          reject(new Error(msg.error));
-        }
-      };
+    return new Promise<DearomatizeResult>((resolve, reject) => {
+      const action = makeMolResultAction(resolve, reject);
 
       const commandData: DearomatizeCommandData = {
         struct,
@@ -794,19 +793,8 @@ class IndigoService implements StructService {
     const format = convertMimeTypeToOutputFormat(outputFormat);
     const mode = 'auto';
 
-    return new Promise((resolve, reject) => {
-      const action = ({ data }: OutputMessageWrapper) => {
-        const msg: OutputMessage<string> = data;
-        if (!msg.hasError) {
-          const result: AromatizeResult = {
-            struct: msg.payload,
-            format: ChemicalMimeType.Mol,
-          };
-          resolve(result);
-        } else {
-          reject(new Error(msg.error));
-        }
-      };
+    return new Promise<ExplicitHydrogensResult>((resolve, reject) => {
+      const action = makeMolResultAction(resolve, reject);
 
       const commandData: ExplicitHydrogensCommandData = {
         struct,

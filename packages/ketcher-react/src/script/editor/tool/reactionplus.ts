@@ -19,8 +19,8 @@ import {
   fromPlusAddition,
   CoordinateTransformation,
 } from 'ketcher-core';
-import Editor from '../Editor';
-import { Tool } from './Tool';
+import type Editor from '../Editor';
+import type { Tool } from './Tool';
 import { handleMovingPosibilityCursor } from '../utils';
 
 class ReactionPlusTool implements Tool {
@@ -47,7 +47,7 @@ class ReactionPlusTool implements Tool {
     const editor = this.editor;
     const rnd = editor.render;
 
-    if ('dragCtx' in this) {
+    if (this.dragCtx) {
       if (this.dragCtx.action) {
         this.dragCtx.action.perform(rnd.ctab);
       }
@@ -76,7 +76,7 @@ class ReactionPlusTool implements Tool {
         this.editor.update(this.dragCtx.action); // TODO investigate, subsequent undo/redo fails
       }
 
-      delete this.dragCtx;
+      this.dragCtx = undefined;
     }
 
     return true;

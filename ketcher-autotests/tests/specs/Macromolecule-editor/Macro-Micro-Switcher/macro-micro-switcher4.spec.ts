@@ -72,7 +72,7 @@ test(`Verify that undo/redo functionality restores deleted bonds correctly in ma
   await CommonLeftToolbar(page).erase();
 
   const bondsToDelete = [
-    { bondType: BondType.Single, bondStereo: BondStereo.None, bondId: 137 },
+    { bondType: BondType.Single, bondStereo: BondStereo.None, bondId: 138 },
     { bondType: BondType.Double, bondStereo: BondStereo.None },
     { bondType: BondType.Triple },
     { bondType: BondType.Any },
@@ -147,7 +147,9 @@ test(`Verify that connections between monomers and molecules are maintained corr
   await CommonTopRightToolbar(page).turnOnMacromoleculesEditor();
 });
 
-test(`Verify that switching between micro and macro modes displays molecules without structural changes`, async () => {
+test(`Verify that switching between micro and macro modes displays molecules without structural changes`, async ({
+  MoleculesCanvas: _,
+}) => {
   /*
    * Test task: https://github.com/epam/ketcher/issues/5960
    * Description: Verify that switching between micro and macro modes displays molecules without structural changes
@@ -158,7 +160,6 @@ test(`Verify that switching between micro and macro modes displays molecules wit
    *       4. Take screenshot to witness canvas was rendered correct at micro
    *       Canvases should be equal
    */
-  await CommonTopRightToolbar(page).turnOnMicromoleculesEditor();
   await openFileAndAddToCanvasAsNewProject(
     page,
     'KET/Micro-Macro-Switcher/Complicated structures on the canvas.ket',
@@ -187,11 +188,11 @@ test(`Verify that deleting a bond in macro mode removes the bond while maintaini
   await takeEditorScreenshot(page);
 
   await CommonLeftToolbar(page).erase();
-  // 106 113 120 121
-  await getBondLocator(page, { bondId: 106 }).first().click({ force: true });
-  await getBondLocator(page, { bondId: 113 }).first().click({ force: true });
-  await getBondLocator(page, { bondId: 120 }).first().click({ force: true });
-  await getBondLocator(page, { bondId: 121 }).first().click({ force: true });
+  // 108 115 122 123
+  await getBondLocator(page, { bondId: 108 }).first().click({ force: true });
+  await getBondLocator(page, { bondId: 115 }).first().click({ force: true });
+  await getBondLocator(page, { bondId: 122 }).first().click({ force: true });
+  await getBondLocator(page, { bondId: 123 }).first().click({ force: true });
 
   await takeEditorScreenshot(page);
 });
@@ -215,7 +216,9 @@ test(`Verify that all 16 bond types are displayed correctly in macromolecules mo
   await takeEditorScreenshot(page);
 });
 
-test(`Verify that small molecules with any bond type retain their representation when switching from molecules mode to macromolecules mode`, async () => {
+test(`Verify that small molecules with any bond type retain their representation when switching from molecules mode to macromolecules mode`, async ({
+  MoleculesCanvas: _,
+}) => {
   /*
    * Test task: https://github.com/epam/ketcher/issues/6318
    * Description: Verify that small molecules with any bond type retain their representation
@@ -231,7 +234,6 @@ test(`Verify that small molecules with any bond type retain their representation
    * https://github.com/epam/ketcher/issues/6236
    * Will require to update screens after fix
    */
-  await CommonTopRightToolbar(page).turnOnMicromoleculesEditor();
   await openFileAndAddToCanvasAsNewProject(
     page,
     'KET/Micro-Macro-Switcher/All 16 types of bonds.ket',
@@ -432,7 +434,9 @@ test(`Verify that all 16 types of bonds saved in macro mode can be opened in mic
   await CommonTopRightToolbar(page).turnOnMacromoleculesEditor();
 });
 
-test(`Verify that switching back from macromolecules mode to molecules mode does not corrupt or change bond types`, async () => {
+test(`Verify that switching back from macromolecules mode to molecules mode does not corrupt or change bond types`, async ({
+  MoleculesCanvas: _,
+}) => {
   /*
    * Test task: https://github.com/epam/ketcher/issues/6318
    * Description: Verify that switching back from macromolecules mode to molecules mode does not corrupt or change bond types
@@ -449,7 +453,6 @@ test(`Verify that switching back from macromolecules mode to molecules mode does
    * https://github.com/epam/ketcher/issues/6236
    * Will require to update screens after fix
    */
-  await CommonTopRightToolbar(page).turnOnMicromoleculesEditor();
   await openFileAndAddToCanvasAsNewProject(
     page,
     'KET/Micro-Macro-Switcher/All 16 types of bonds.ket',
@@ -506,7 +509,9 @@ test(`Verify that deleting a bond in macromolecules mode removes only the select
   }
 });
 
-test(`Verify that copying and pasting structures with all bond types in macromolecules mode retains the bond representations`, async () => {
+test(`Verify that copying and pasting structures with all bond types in macromolecules mode retains the bond representations`, async ({
+  MoleculesCanvas: _,
+}) => {
   /*
    * Test task: https://github.com/epam/ketcher/issues/6318
    * Description: Verify that copying and pasting structures with all bond types in macromolecules mode retains the bond representations
@@ -523,7 +528,6 @@ test(`Verify that copying and pasting structures with all bond types in macromol
    * https://github.com/epam/ketcher/issues/6236
    * Will require to update screens after fix
    */
-  await CommonTopRightToolbar(page).turnOnMicromoleculesEditor();
   await openFileAndAddToCanvasAsNewProject(
     page,
     'KET/Micro-Macro-Switcher/All 16 types of bonds.ket',
@@ -636,7 +640,7 @@ test(`Verify that selecting a bond highlights it properly, even in complex struc
   await CommonLeftToolbar(page).areaSelectionTool(SelectionToolType.Rectangle);
 
   const bondsToDrag = [
-    { bondType: BondType.Single, bondStereo: BondStereo.None, bondId: 137 },
+    { bondType: BondType.Single, bondStereo: BondStereo.None, bondId: 138 },
     { bondType: BondType.Double, bondStereo: BondStereo.None },
     { bondType: BondType.Triple },
     { bondType: BondType.Any },

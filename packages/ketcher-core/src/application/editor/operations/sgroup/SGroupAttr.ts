@@ -16,7 +16,7 @@
 
 import { BaseOperation } from '../BaseOperation';
 import { OperationPriority, OperationType } from '../OperationType';
-import { ReStruct } from '../../../render';
+import type { ReStruct } from '../../../render';
 import { MonomerMicromolecule } from 'domain/entities/monomerMicromolecule';
 
 export class SGroupAttr extends BaseOperation {
@@ -68,5 +68,12 @@ export class SGroupAttr extends BaseOperation {
     const inverted = new SGroupAttr();
     inverted.data = this.data;
     return inverted;
+  }
+
+  isDummy(restruct?: ReStruct) {
+    if (!restruct) return false;
+    const sgroup = restruct.molecule.sgroups.get(this.data.sgid);
+    if (!sgroup) return false;
+    return sgroup.checkAttr(this.data.attr, this.data.value);
   }
 }

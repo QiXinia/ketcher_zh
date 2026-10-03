@@ -119,7 +119,7 @@
     "groupTemplate": "{{group}} 模板 {{index}}",
     "moleculeName": "分子名称",
     "templateEdit": "模板编辑",
-    "invalidTemplateName": "模板名称必须唯一，且长度不能超过 128 个字符",
+    "invalidTemplateName": "模板名称不能为空且必须唯一，长度不能超过 128 个字符",
     "groups": {
       "alphaDSugars": "α-D-糖",
       "aromatics": "芳香环",
@@ -366,6 +366,10 @@
     "ignorePseudoatomsAtMass": "质量计算时忽略伪原子",
     "addRsitesAtMassCalculation": "质量计算时添加 R 位点",
     "addIsotopesAtMassCalculation": "质量计算时添加同位素",
+    "valenceMode": "价态模式",
+    "biovia2009": "BIOVIA 2009",
+    "biovia2017": "BIOVIA 2017",
+    "skipSuperatomsAtAromatization": "芳香化时跳过超原子",
     "showAtomIds": "显示原子 ID",
     "showBondIds": "显示化学键 ID",
     "showHalfBondIds": "显示半键 ID",
@@ -638,9 +642,12 @@
     "phosphateRightRequirement": "糖必须具有 R2，磷酸必须具有 R1。",
     "phosphateOnLeft": "磷酸在左侧",
     "phosphateOnRight": "磷酸在右侧",
-    "selectPhosphatePosition": "选择磷酸位置"
+    "selectPhosphatePosition": "选择磷酸位置",
+    "switchPhosphateLeft": "切换到左侧",
+    "switchPhosphateRight": "切换到右侧"
   },
   "common": {
+    "default": "默认",
     "error": "错误",
     "warning": "警告",
     "success": "成功",

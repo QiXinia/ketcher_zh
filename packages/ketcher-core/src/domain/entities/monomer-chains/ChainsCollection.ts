@@ -1,11 +1,11 @@
 import { Chain } from 'domain/entities/monomer-chains/Chain';
 import { AmbiguousMonomer } from 'domain/entities/AmbiguousMonomer';
-import { BaseMonomer } from 'domain/entities/BaseMonomer';
+import type { BaseMonomer } from 'domain/entities/BaseMonomer';
 import { Chem } from 'domain/entities/Chem';
 import {
+  type SequenceNode,
+  type SubChainNode,
   IsChainCycled,
-  SequenceNode,
-  SubChainNode,
 } from 'domain/entities/monomer-chains/types';
 import { Peptide } from 'domain/entities/Peptide';
 import { Phosphate } from 'domain/entities/Phosphate';
@@ -21,7 +21,7 @@ import {
   isRnaBaseApplicableForAntisense,
   isRnaBaseOrAmbiguousRnaBase,
 } from 'domain/helpers/monomers';
-import { BaseSubChain } from 'domain/entities/monomer-chains/BaseSubChain';
+import type { BaseSubChain } from 'domain/entities/monomer-chains/BaseSubChain';
 import { MonomerToAtomBond } from 'domain/entities/MonomerToAtomBond';
 import { isMonomerSgroupWithAttachmentPoints } from '../../../utilities/monomers';
 
@@ -81,16 +81,22 @@ export class ChainsCollection {
       // The factor is used to reduce the influence of the X coordinate on the sorting
       // to make the sorting more oriented to Y coordinate
       const X_COORDINATE_REDUCTION_FACTOR = 0.01;
-      if (
-        chain2.firstNode?.monomer.position.x * X_COORDINATE_REDUCTION_FACTOR +
-          chain2.firstNode?.monomer.position.y >
-        chain1.firstNode?.monomer.position.x * X_COORDINATE_REDUCTION_FACTOR +
-          chain1.firstNode?.monomer.position.y
-      ) {
-        return -1;
-      } else {
-        return 1;
+      const chain1Weight =
+        (chain1.firstNode?.monomer.position.x ?? 0) *
+          X_COORDINATE_REDUCTION_FACTOR +
+        (chain1.firstNode?.monomer.position.y ?? 0);
+      const chain2Weight =
+        (chain2.firstNode?.monomer.position.x ?? 0) *
+          X_COORDINATE_REDUCTION_FACTOR +
+        (chain2.firstNode?.monomer.position.y ?? 0);
+
+      if (chain1Weight !== chain2Weight) {
+        return chain1Weight - chain2Weight;
       }
+      return (
+        (chain1.firstNode?.monomer.id ?? 0) -
+        (chain2.firstNode?.monomer.id ?? 0)
+      );
     });
 
     const reorderedChains = new Set<Chain>();

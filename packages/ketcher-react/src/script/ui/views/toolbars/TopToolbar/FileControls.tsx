@@ -21,6 +21,7 @@ interface FileControlsProps {
   onSave: () => void;
   shortcuts: { [key in string]: string };
   hiddenButtons: string[];
+  disabledButtons: string[];
 }
 
 export const FileControls = ({
@@ -28,6 +29,7 @@ export const FileControls = ({
   onSave,
   shortcuts,
   hiddenButtons,
+  disabledButtons,
 }: FileControlsProps) => {
   return (
     <>
@@ -37,6 +39,7 @@ export const FileControls = ({
         iconName="open"
         shortcut={shortcuts.open}
         isHidden={hiddenButtons.includes('open')}
+        disabled={disabledButtons.includes('open')}
         testId="open-file-button"
       />
       <TopToolbarIconButton
@@ -45,6 +48,7 @@ export const FileControls = ({
         iconName="save"
         shortcut={shortcuts.save}
         isHidden={hiddenButtons.includes('save')}
+        disabled={disabledButtons.includes('save')}
         testId="save-file-button"
       />
     </>

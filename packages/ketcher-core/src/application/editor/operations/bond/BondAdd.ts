@@ -14,10 +14,10 @@
  * limitations under the License.
  ***************************************************************************/
 
-import { ReBond, ReStruct } from '../../../render';
+import { type ReStruct, ReBond } from '../../../render';
 
 import { BaseOperation } from '../BaseOperation';
-import { Bond, BondAttributes } from 'domain/entities';
+import { type BondAttributes, Bond } from 'domain/entities';
 import { OperationPriority, OperationType } from '../OperationType';
 
 type Data = {
@@ -30,7 +30,6 @@ type Data = {
 
 class BondAdd extends BaseOperation {
   data: Data;
-  static InverseConstructor: new (bondId?: number) => BaseOperation;
 
   constructor(
     begin?: number,
@@ -92,12 +91,6 @@ class BondAdd extends BaseOperation {
     // notifyBondAdded
     restruct.bonds.set(bid, new ReBond(structBond));
     restruct.markBond(bid, 1);
-  }
-
-  invert() {
-    const inverted = new BondAdd.InverseConstructor();
-    inverted.data = this.data;
-    return inverted;
   }
 }
 

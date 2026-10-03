@@ -1,4 +1,4 @@
-import Editor from '../Editor';
+import type Editor from '../Editor';
 
 interface ToolEventHandler {
   click?(event: Event): void;
@@ -20,7 +20,7 @@ interface ToolEventHandler {
 
 export type HoverTarget =
   | { id: number; map: string }
-  | { map: 'merge'; items: Record<string, number[]> };
+  | { id: string; map: 'merge'; items: Record<string, number[]> };
 
 export interface Tool extends ToolEventHandler {
   cancel?(): void;

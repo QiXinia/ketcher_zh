@@ -14,7 +14,7 @@
  * limitations under the License.
  ***************************************************************************/
 
-import { ReStruct } from 'application/render';
+import type { ReStruct } from 'application/render';
 import assert from 'assert';
 import { RxnArrow } from 'domain/entities/rxnArrow';
 import { Vec2 } from 'domain/entities/vec2';
@@ -168,6 +168,11 @@ export class RxnArrowResize extends Base {
       this.data.noinvalidate,
       this.isSnappingEnabled,
     );
+  }
+
+  isDummy() {
+    const { d } = this.data;
+    return d.x === 0 && d.y === 0;
   }
 }
 

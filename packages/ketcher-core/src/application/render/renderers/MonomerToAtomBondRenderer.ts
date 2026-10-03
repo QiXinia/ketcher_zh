@@ -1,8 +1,8 @@
 import { AtomRenderer } from 'application/render/renderers/AtomRenderer';
 import { BaseRenderer } from 'application/render/renderers/BaseRenderer';
-import { D3SvgElementSelection } from 'application/render/types';
+import type { D3SvgElementSelection } from 'application/render/types';
 import { Scale } from 'domain/helpers';
-import { MonomerToAtomBond } from 'domain/entities/MonomerToAtomBond';
+import type { MonomerToAtomBond } from 'domain/entities/MonomerToAtomBond';
 import { SELECTION_COLOR } from 'application/render/renderers/constants';
 import { Box2Abs } from 'domain/entities/box2Abs';
 import { Vec2 } from 'domain/entities/vec2';
@@ -169,8 +169,8 @@ export class MonomerToAtomBondRenderer extends BaseRenderer {
         'y2',
         this.scaledPosition.endPosition.y - this.scaledPosition.startPosition.y,
       )
-      .attr('stroke', '#333333')
-      .attr('stroke-width', 1);
+      .attr('stroke', '#000')
+      .attr('stroke-width', this.editorSettings.microModeScale / 20);
     this.appendHover();
   }
 

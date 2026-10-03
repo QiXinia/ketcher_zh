@@ -1,9 +1,7 @@
 {
   "extends": "./tsconfig.build.json",
   "compilerOptions": {
-    "baseUrl": ".",
-    "module": "Node16",
-    "moduleResolution": "Node16",
+    "module": "esnext",
     "paths": {
       "components": ["./src/components"],
       "src/*": ["./src/*"],
@@ -11,9 +9,11 @@
       "domain/*": ["../ketcher-core/src/domain/*"],
       "infrastructure/*": ["../ketcher-core/src/infrastructure/*"],
       "application/*": ["../ketcher-core/src/application/*"],
-      "utilities": ["../ketcher-core/src/utilities"]
+      "utilities": ["../ketcher-core/src/utilities"],
+      "types": ["../ketcher-core/src/types"]
     },
+    "moduleResolution": "bundler",
     "rootDir": "../.."
   },
-  "include": ["src", "rollup.config.ts", "rollup-plugin-shims.d.ts"]
+  "include": ["src", "rollup-plugin-shims.d.ts"]
 }

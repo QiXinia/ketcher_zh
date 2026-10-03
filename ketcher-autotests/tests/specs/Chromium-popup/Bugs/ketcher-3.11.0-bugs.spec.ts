@@ -1041,7 +1041,7 @@ test.describe('Bugs: ketcher-3.11.0 — first trio', () => {
     await presetSection.setupBase({
       atomIds: [0, 1, 2, 3, 4],
       bondIds: [0, 1, 2, 3],
-      symbol: Base.Base.alias,
+      code: Base.Base.alias,
       name: 'B1',
       naturalAnalogue: NucleotideNaturalAnalogue.A,
       HELMAlias: 'BaseAlias',
@@ -1056,7 +1056,7 @@ test.describe('Bugs: ketcher-3.11.0 — first trio', () => {
     await presetSection.setupSugar({
       atomIds: [5, 6, 7],
       bondIds: [5, 6],
-      symbol: Sugar.Sugar.alias,
+      code: Sugar.Sugar.alias,
       name: 'S1',
       HELMAlias: 'SugAlias',
     });
@@ -1067,7 +1067,7 @@ test.describe('Bugs: ketcher-3.11.0 — first trio', () => {
     await presetSection.setupPhosphate({
       atomIds: [8, 9, 10, 11, 12],
       bondIds: [8, 9, 10, 11],
-      symbol: Phosphate.Phosphate.alias,
+      code: Phosphate.Phosphate.alias,
       name: 'P1',
       HELMAlias: 'PhosAlias',
     });
@@ -1127,7 +1127,7 @@ test.describe('Bugs: ketcher-3.11.0 — first trio', () => {
     await pasteFromClipboardAndAddToMacromoleculesCanvas(
       page,
       MacroFileType.HELM,
-      'RNA1{[d12r]}$$$$V2.0',
+      'RNA1{[12ddR]}$$$$V2.0',
     );
     await CommonTopLeftToolbar(page).saveFile();
     await SaveStructureDialog(page).chooseFileFormat(
@@ -1196,7 +1196,7 @@ test.describe('Bugs: ketcher-3.11.0 — first trio', () => {
     await presetSection.setupBase({
       atomIds: [0, 1, 2, 3, 4],
       bondIds: [0, 1, 2, 3],
-      symbol: Base.Base.alias,
+      code: Base.Base.alias,
       name: 'B1',
       naturalAnalogue: NucleotideNaturalAnalogue.A,
       HELMAlias: 'BaseAlias',
@@ -1211,7 +1211,7 @@ test.describe('Bugs: ketcher-3.11.0 — first trio', () => {
     await presetSection.setupSugar({
       atomIds: [5, 6, 7],
       bondIds: [5, 6],
-      symbol: Sugar.Sugar.alias,
+      code: Sugar.Sugar.alias,
       name: 'S1',
       HELMAlias: 'SugAlias',
     });
@@ -1219,13 +1219,14 @@ test.describe('Bugs: ketcher-3.11.0 — first trio', () => {
     await presetSection.setupPhosphate({
       atomIds: [8, 9, 10, 11, 12],
       bondIds: [8, 9, 10, 11],
-      symbol: Phosphate.Phosphate.alias,
+      code: Phosphate.Phosphate.alias,
       name: 'P1',
       HELMAlias: 'PhosAlias',
     });
 
     await dialog.submit();
 
+    await clickOnCanvas(page, 0, 0);
     await page.waitForTimeout(1000);
     await takeElementScreenshot(page, getAtomLocator(page, { atomId: 5 }), {
       padding: 240,
@@ -1406,7 +1407,7 @@ test.describe('Bugs: ketcher-3.11.0 — first trio', () => {
       getMonomerLocator(page, Sugar.R),
       getMonomerLocator(page, Base._Base3),
     );
-    await verifyHELMExport(page, 'RNA1{r([_Base3_HELM***---])}$$$$V2.0');
+    await verifyHELMExport(page, 'RNA1{R([_Base3_HELM***---])}$$$$V2.0');
   });
 
   test('Case 38 - SVG/PNG: Export of any atom with Isotope (atomic mass) value set does not work', async () => {

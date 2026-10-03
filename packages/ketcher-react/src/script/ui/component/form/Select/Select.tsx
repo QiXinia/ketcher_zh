@@ -15,10 +15,10 @@
  * limitations under the License.
  ***************************************************************************/
 
-import MuiSelect, { SelectChangeEvent } from '@mui/material/Select';
+import MuiSelect, { type SelectChangeEvent } from '@mui/material/Select';
 import Divider from '@mui/material/Divider';
 import MenuItem from '@mui/material/MenuItem';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import clsx from 'clsx';
 import styles from './Select.module.less';
 import { Icon } from 'components';
@@ -28,6 +28,7 @@ export interface Option {
   label: string;
   children?: ReactNode;
   disabled?: boolean;
+  markedAsUsed?: boolean;
 }
 
 interface Props {
@@ -112,8 +113,10 @@ const Select = ({
             key={option.value}
             disableRipple={true}
             disabled={option.disabled}
+            title={option.markedAsUsed ? 'Already in use' : undefined}
             className={clsx({
               [`dropdown-${formName}_${name}`]: formName,
+              [styles.usedOption]: option.markedAsUsed,
             })}
             data-testid={`${option.label}-option`}
           >

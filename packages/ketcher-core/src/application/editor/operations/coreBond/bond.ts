@@ -17,9 +17,9 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 
 import type { RenderersManager } from 'application/render/renderers/RenderersManager';
-import { Operation } from 'domain/entities/Operation';
-import { Bond } from 'domain/entities/CoreBond';
-import { Bond as MicromoleculesBond } from 'domain/entities/bond';
+import type { Operation } from 'domain/entities/Operation';
+import type { Bond } from 'domain/entities/CoreBond';
+import type { Bond as MicromoleculesBond } from 'domain/entities/bond';
 
 function addBondToMoleculeStruct(
   bond: Bond,
@@ -101,9 +101,11 @@ export class BondDeleteOperation implements Operation {
 
   public executeAfterAllOperations(renderersManager: RenderersManager) {
     renderersManager.deleteBond(this.bond);
+    renderersManager.rerenderSGroups();
   }
 
   public invertAfterAllOperations(renderersManager: RenderersManager) {
     renderersManager.addBond(this.bond);
+    renderersManager.rerenderSGroups();
   }
 }

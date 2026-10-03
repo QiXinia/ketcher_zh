@@ -16,7 +16,7 @@
 
 import { BaseOperation } from '../BaseOperation';
 import { OperationType } from '../OperationType';
-import { ReStruct } from '../../../render';
+import type { ReStruct } from '../../../render';
 
 export class SGroupDataMove extends BaseOperation {
   data: {
@@ -44,5 +44,10 @@ export class SGroupDataMove extends BaseOperation {
     const inverted = new SGroupDataMove();
     inverted.data = this.data;
     return inverted;
+  }
+
+  isDummy() {
+    const { d } = this.data;
+    return d?.x === 0 && d?.y === 0;
   }
 }

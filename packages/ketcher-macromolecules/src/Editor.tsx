@@ -36,6 +36,7 @@ import {
   SetEditorLineLengthAction,
   NodeSelection,
   NodesSelection,
+  DeepPartial,
 } from 'ketcher-core';
 import { store } from 'state';
 import {
@@ -58,6 +59,7 @@ import {
   initKetcherId,
   setContextMenuActive,
   setEditorLineLength,
+  setMonomerLibraryLoadError,
   toggleMacromoleculesPropertiesWindowVisibility,
 } from 'state/common';
 import {
@@ -65,14 +67,14 @@ import {
   useAppSelector,
   useSequenceEditInRNABuilderMode,
 } from 'hooks';
-import { closeErrorTooltip, selectErrorTooltipText } from 'state/modal';
+import { closeErrorTooltip, selectErrorTooltips } from 'state/modal';
 import { ModalContainer } from 'components/modal/modalContainer';
-import { DeepPartial } from './types';
 import { EditorClassName } from 'ketcher-react';
 import { Snackbar } from '@mui/material';
 import {
   StyledIconButton,
   StyledToast,
+  StyledToastContainer,
   StyledToastContent,
 } from 'components/shared/StyledToast/styles';
 import {
@@ -193,7 +195,7 @@ function Editor({
 }: Readonly<EditorProps>) {
   const dispatch = useAppDispatch();
   const canvasRef = useRef<SVGSVGElement>(null);
-  const errorTooltipText = useAppSelector(selectErrorTooltipText);
+  const errorTooltips = useAppSelector(selectErrorTooltips);
   const editor = useAppSelector(selectEditor);
   const isHandToolSelected = useAppSelector(selectIsHandToolSelected);
   const isLoading = useLoading();
@@ -217,6 +219,15 @@ function Editor({
         monomersLibraryUpdate,
         monomersLibraryReplace,
         onInit,
+        onLibraryError: (err) => {
+          dispatch(
+            setMonomerLibraryLoadError(
+              err instanceof Error
+                ? err.message
+                : 'Failed to load monomers library',
+            ),
+          );
+        },
       }),
     );
 
@@ -324,8 +335,8 @@ function Editor({
     };
   }, [dispatch]);
 
-  const handleCloseErrorTooltip = () => {
-    dispatch(closeErrorTooltip());
+  const handleCloseErrorTooltip = (text: string) => {
+    dispatch(closeErrorTooltip(text));
   };
 
   const toggleLibraryVisibility = useCallback(() => {
@@ -435,20 +446,25 @@ function Editor({
       <ErrorModal />
       <Snackbar
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-        open={Boolean(errorTooltipText)}
-        onClose={handleCloseErrorTooltip}
-        autoHideDuration={6000}
+        open={errorTooltips.length > 0}
       >
-        <StyledToast id="error-tooltip">
-          <StyledToastContent data-testid="error-tooltip">
-            {errorTooltipText}
-          </StyledToastContent>
-          <StyledIconButton
-            testId="error-tooltip-close"
-            iconName="close"
-            onClick={handleCloseErrorTooltip}
-          ></StyledIconButton>
-        </StyledToast>
+        <StyledToastContainer
+          id="error-tooltip-list"
+          data-testid="error-tooltip-list"
+        >
+          {errorTooltips.map((text, index) => (
+            <StyledToast key={text}>
+              <StyledToastContent data-testid={`error-tooltip-${index}`}>
+                {text}
+              </StyledToastContent>
+              <StyledIconButton
+                testId={`error-tooltip-close-${index}`}
+                iconName="close"
+                onClick={() => handleCloseErrorTooltip(text)}
+              ></StyledIconButton>
+            </StyledToast>
+          ))}
+        </StyledToastContainer>
       </Snackbar>
     </>
   );

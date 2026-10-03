@@ -4,7 +4,7 @@ import {
   useMultitailArrowTailsAdd,
   useMultitailArrowTailsRemove,
 } from '../hooks/useMultitailArrowTails';
-import {
+import type {
   MenuItemsProps,
   MultitailArrowContextMenuProps,
 } from '../contextMenu.types';

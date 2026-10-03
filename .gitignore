@@ -45,3 +45,6 @@ ketcher-autotests/results.json
 output.txt
 .github/agents/*
 /output/playwright
+
+.cursor
+.cursor/*

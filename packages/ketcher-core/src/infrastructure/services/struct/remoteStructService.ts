@@ -16,36 +16,36 @@ import { provideEditorInstance } from 'application/editor/editorSingleton';
  ***************************************************************************/
 
 import {
-  AromatizeData,
-  AromatizeResult,
-  AutomapData,
-  AutomapResult,
-  CalculateCipData,
-  CalculateCipResult,
-  CalculateData,
-  CalculateMacromoleculePropertiesData,
-  CalculateMacromoleculePropertiesResult,
-  CalculateResult,
-  CheckData,
-  CheckResult,
-  ChemicalMimeType,
-  CleanData,
-  CleanResult,
-  ConvertData,
-  ConvertResult,
-  DearomatizeData,
-  DearomatizeResult,
-  ExplicitHydrogensData,
-  ExplicitHydrogensResult,
-  GenerateImageOptions,
-  InfoResult,
-  LayoutData,
-  LayoutResult,
-  OutputFormatType,
-  RecognizeResult,
-  StructService,
-  StructServiceOptions,
+  type AromatizeData,
+  type AromatizeResult,
+  type AutomapData,
+  type AutomapResult,
+  type CalculateCipData,
+  type CalculateCipResult,
+  type CalculateData,
+  type CalculateMacromoleculePropertiesData,
+  type CalculateMacromoleculePropertiesResult,
+  type CalculateResult,
+  type CheckData,
+  type CheckResult,
+  type CleanData,
+  type CleanResult,
+  type ConvertData,
+  type ConvertResult,
+  type DearomatizeData,
+  type DearomatizeResult,
+  type ExplicitHydrogensData,
+  type ExplicitHydrogensResult,
+  type GenerateImageOptions,
+  type InfoResult,
+  type LayoutData,
+  type LayoutResult,
+  type OutputFormatType,
+  type RecognizeResult,
+  type StructService,
+  type StructServiceOptions,
 } from 'domain/services';
+import { ChemicalMimeType } from 'domain/services/struct/structService.types';
 import { KetcherLogger, normalizeError } from 'utilities';
 import { getLabelRenderModeForIndigo } from 'infrastructure/services/helpers';
 import { ketcherProvider } from 'application/ketcherProvider';
@@ -156,6 +156,7 @@ export function pickStandardServerOptions(
     'gross-formula-add-isotopes': options?.['gross-formula-add-isotopes'],
     'ignore-no-chiral-flag': ketcherInstance.editor.options().ignoreChiralFlag,
     'aromatize-skip-superatoms': true,
+    'valence-mode': options?.['valence-mode'],
   };
 }
 
@@ -213,7 +214,12 @@ export class RemoteStructService implements StructService {
     let isAvailable = false;
 
     try {
-      const response = await request('GET', this.apiPath + 'info');
+      const response = await request(
+        'GET',
+        this.apiPath + 'info',
+        undefined,
+        this.customHeaders,
+      );
       indigoVersion = response.indigo_version;
       imagoVersions = response.imago_versions;
       isAvailable = true;
@@ -393,13 +399,13 @@ export class RemoteStructService implements StructService {
       blob,
       {
         'Content-Type': blob.type ?? 'application/octet-stream',
+        ...this.customHeaders,
       },
     );
-    const status = request.bind(
-      null,
-      'GET',
-      this.apiPath + 'imago/uploads/:id',
-    );
+    const statusUrl = this.apiPath + 'imago/uploads/:id';
+    const { customHeaders } = this;
+    const status = (data: { id: string }) =>
+      request('GET', statusUrl, data, customHeaders);
     return req
       .then((data) =>
         pollDeferred(

@@ -14,8 +14,8 @@
  * limitations under the License.
  ***************************************************************************/
 
-import { FC, KeyboardEvent } from 'react';
-import { Struct } from 'ketcher-core';
+import type { FC, KeyboardEvent } from 'react';
+import type { Struct } from 'ketcher-core';
 import classes from './TemplateTable.module.less';
 import { greekify } from '../../utils';
 import { Icon, StructRender } from 'components';
@@ -143,9 +143,8 @@ const TemplateTable: FC<TemplateTableProps> = (props) => {
     >
       {templates.map((tmpl, i) => {
         return (
-          <div
-            role="button"
-            tabIndex={0}
+          <button
+            type="button"
             className={
               tmpl.struct !== selected?.struct
                 ? classes.td
@@ -158,7 +157,6 @@ const TemplateTable: FC<TemplateTableProps> = (props) => {
                 : `${tmpl.struct.name}_${i}_selected`
             }
             onClick={() => onSelect(tmpl)}
-            onKeyDown={createKeyDownHandler(() => onSelect(tmpl))}
           >
             <StructRender
               testId={tmpl.struct.name}
@@ -206,7 +204,7 @@ const TemplateTable: FC<TemplateTableProps> = (props) => {
                   <Icon name="edit" />
                 </button>
               )}
-          </div>
+          </button>
         );
       })}
     </div>

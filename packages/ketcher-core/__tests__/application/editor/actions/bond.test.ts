@@ -1,7 +1,7 @@
 import * as utils from 'application/editor/actions/utils';
 
-import { Action, fromBondAddition } from 'application/editor/actions';
-import { ReStruct } from 'application/render';
+import { type Action, fromBondAddition } from 'application/editor/actions';
+import type { ReStruct } from 'application/render';
 
 import { restruct, singleBond } from '../../../mock-data';
 
@@ -14,9 +14,10 @@ describe.skip('Bond Addition', () => {
 
   beforeAll(() => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const reStruct = { ...((restruct as any) || {}) };
-    reStruct.molecule.sgroups = [];
-    reStruct.visibleAtoms = new Map();
+    const mockStruct: any = { ...((restruct as any) || {}) };
+    mockStruct.molecule.sgroups = [];
+    mockStruct.visibleAtoms = new Map();
+    reStruct = mockStruct;
     const [actionData, beginData, endData] = fromBondAddition(
       reStruct,
       singleBond,

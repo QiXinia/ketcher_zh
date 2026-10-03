@@ -18,9 +18,9 @@ import { Pool } from 'domain/entities/pool';
 import { SGroup } from 'domain/entities/sgroup';
 import { Vec2 } from 'domain/entities/vec2';
 import { SGroupAttachmentPoint } from 'domain/entities/sGroupAttachmentPoint';
-import { Struct } from 'domain/entities/struct';
+import type { Struct } from 'domain/entities/struct';
 
-import { SGroupMap, AtomMap, PostLoadHandler } from './mol.types';
+import type { SGroupMap, AtomMap, PostLoadHandler } from './mol.types';
 import utils from './utils';
 import assert from 'assert';
 
@@ -150,10 +150,8 @@ function postLoadMer(_sgroup: SGroup): void {
 }
 
 function postLoadCop(sgroup: SGroup): void {
-  sgroup.data.connectivity = (sgroup.data.connectivity || 'eu')
-    .trim()
-    .toLowerCase();
-  sgroup.data.subtype = (sgroup.data.subtype || '').trim().toLowerCase();
+  // COP post-load is identical to GEN.
+  postLoadGen(sgroup);
 }
 
 function postLoadCro(_sgroup: SGroup): void {
@@ -327,9 +325,9 @@ function applyDataSGroupInfo(sg: SGroup, propData: string): void {
 }
 
 function applyDataSGroupInfoLine(sGroups: SGroupMap, propData: string): void {
-  const id = utils.parseDecimalInt(propData.substr(0, 4)) - 1;
+  const id = utils.parseDecimalInt(propData.substring(0, 4)) - 1;
   const sg = sGroups[id];
-  applyDataSGroupInfo(sg, propData.substr(5));
+  applyDataSGroupInfo(sg, propData.substring(5));
 }
 
 function applyDataSGroupData(
@@ -344,9 +342,9 @@ function applyDataSGroupData(
       sg.data.fieldValue.startsWith('"') &&
       sg.data.fieldValue.endsWith('"')
     ) {
-      sg.data.fieldValue = sg.data.fieldValue.substr(
+      sg.data.fieldValue = sg.data.fieldValue.substring(
         1,
-        sg.data.fieldValue.length - 2,
+        sg.data.fieldValue.length - 1,
       );
     }
   }
@@ -357,8 +355,8 @@ function applyDataSGroupDataLine(
   propData: string,
   finalize: boolean,
 ): void {
-  const id = utils.parseDecimalInt(propData.substr(0, 5)) - 1;
-  const data = propData.substr(5);
+  const id = utils.parseDecimalInt(propData.substring(0, 5)) - 1;
+  const data = propData.substring(5);
   const sg = sGroups[id];
   applyDataSGroupData(sg, data, finalize);
 }

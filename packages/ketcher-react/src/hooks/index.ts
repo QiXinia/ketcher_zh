@@ -22,3 +22,4 @@ export * from './useRequestAnimationFrame';
 export * from './useSubscribtionOnEvents';
 export * from './useDraggable';
 export * from './useDraggableDialog';
+export * from './useSettings';

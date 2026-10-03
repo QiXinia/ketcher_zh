@@ -14,11 +14,11 @@
  * limitations under the License.
  ***************************************************************************/
 
-import { Point, Vec2 } from './vec2';
+import { type Point, Vec2 } from './vec2';
 
 import { Bond } from './bond';
 import { StereoLabel } from './atom';
-import { Struct, StructProperty } from './struct';
+import type { Struct, StructProperty } from './struct';
 
 export enum StereoFlag {
   Mixed = 'MIXED',
@@ -102,9 +102,9 @@ export class Fragment {
     struct: Struct,
     fragmentId: number,
   ): Vec2 | undefined {
-    const fragment = struct.getFragment(fragmentId);
-    if (!fragment) return undefined;
-    const bb = fragment.getCoordBoundingBox();
+    const fragmentAtomIds = struct.getFragmentIds(fragmentId);
+    if (fragmentAtomIds.size === 0) return undefined;
+    const bb = struct.getCoordBoundingBox(fragmentAtomIds);
     return new Vec2(bb.max.x, bb.min.y - 1);
   }
 

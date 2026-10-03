@@ -16,12 +16,12 @@
 
 import { Box2Abs } from 'domain/entities/box2Abs';
 import { Vec2 } from 'domain/entities/vec2';
-import { RGroup } from 'domain/entities/rgroup';
+import type { RGroup } from 'domain/entities/rgroup';
 import { LayerMap } from './generalEnumTypes';
 import ReObject from './reobject';
 import type ReStruct from './restruct';
-import { Render } from '../raphaelRender';
-import { RenderOptions } from '../render.types';
+import type { Render } from '../raphaelRender';
+import type { RenderOptions } from '../render.types';
 import { Scale } from 'domain/helpers';
 import draw from '../draw';
 import util from '../util';
@@ -200,20 +200,17 @@ class ReRGroup extends ReObject {
   }
 
   show(restruct: ReStruct, _id: number, options: RenderOptions): void {
-    const drawing = this.draw(restruct.render, options);
+    const { data } = this.draw(restruct.render, options);
 
-    Object.keys(drawing).forEach((group) => {
-      const items = drawing[group as keyof typeof drawing] as unknown[];
-      while (items.length > 0) {
-        restruct.addReObjectPath(
-          LayerMap.data,
-          this.visel,
-          items.shift(),
-          null,
-          true,
-        );
-      }
-    });
+    while (data.length > 0) {
+      restruct.addReObjectPath(
+        LayerMap.data,
+        this.visel,
+        data.shift(),
+        null,
+        true,
+      );
+    }
   }
 }
 

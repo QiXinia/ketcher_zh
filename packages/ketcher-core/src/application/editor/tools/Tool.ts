@@ -1,11 +1,12 @@
-import {
+import type {
   MonomerItemType,
   Entities,
   MonomerOrAmbiguousType,
 } from 'domain/types';
-import {
+import type {
   IKetMonomerGroupTemplate,
   IKetTemplateConnection,
+  IKetIdtAliases,
 } from 'application/formatters/types/ket';
 
 interface ToolEventHandler {
@@ -107,6 +108,8 @@ export interface IRnaPreset {
   phosphatePosition?: 'left' | 'right';
   default?: boolean;
   favorite?: boolean;
+  readonly idtAliases?: IKetIdtAliases;
+  readonly aliasAxoLabs?: string;
   editedName?: boolean;
   connections?: IKetTemplateConnection[];
 }

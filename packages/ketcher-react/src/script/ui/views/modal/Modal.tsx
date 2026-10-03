@@ -14,9 +14,9 @@
  * limitations under the License.
  ***************************************************************************/
 
-import { RefObject, useRef } from 'react';
+import { type RefObject, useRef } from 'react';
 
-import { BaseCallProps, ModalContainerProps } from './modal.types';
+import type { BaseCallProps, ModalContainerProps } from './modal.types';
 import classes from './Modal.module.less';
 import selectClasses from '../../component/form/Select/Select.module.less';
 import clsx from 'clsx';

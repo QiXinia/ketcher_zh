@@ -1,7 +1,7 @@
-import { Vec2 } from 'domain/entities/vec2';
+import type { Vec2 } from 'domain/entities/vec2';
 import { OperationType } from 'application/editor/operations/OperationType';
 import { BaseOperation } from 'application/editor/operations/BaseOperation';
-import { ReStruct } from 'application/render';
+import type { ReStruct } from 'application/render';
 import { Scale } from 'domain/helpers';
 
 export class ImageMove extends BaseOperation {
@@ -27,5 +27,9 @@ export class ImageMove extends BaseOperation {
 
   invert(): BaseOperation {
     return new ImageMove(this.id, this.offset.negated());
+  }
+
+  isDummy() {
+    return this.offset.x === 0 && this.offset.y === 0;
   }
 }

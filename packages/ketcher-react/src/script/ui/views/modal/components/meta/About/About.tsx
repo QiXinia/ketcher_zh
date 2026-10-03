@@ -19,7 +19,7 @@ import Logo from './logo.svg';
 import classes from './About.module.less';
 import { connect } from 'react-redux';
 import { Fragment } from 'react';
-import { Dispatch } from 'redux';
+import type { Dispatch } from 'redux';
 import i18n from '../../../../../../../i18n';
 
 interface AboutDialogProps {

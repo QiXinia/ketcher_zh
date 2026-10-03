@@ -20,7 +20,7 @@ import { Action } from './action';
 import { Vec2 } from 'domain/entities/vec2';
 import { atomGetAttr } from './utils';
 import { fromBondAddition } from './bond';
-import { ReAtom, ReStruct } from 'application/render';
+import type { ReAtom, ReStruct } from 'application/render';
 
 export const removeInfoLabelFromAtoms = (restruct: ReStruct) => {
   restruct.atoms.forEach((atom: ReAtom) => {
@@ -78,8 +78,8 @@ export function fromChain(
       pos,
     );
     action = ret[0].mergeWith(action);
-    id0 = ret[2] as number;
-    chainItems.bonds.push(ret[3] as number);
+    id0 = ret[2];
+    chainItems.bonds.push(ret[3]);
     chainItems.atoms.push(id0);
   }
 

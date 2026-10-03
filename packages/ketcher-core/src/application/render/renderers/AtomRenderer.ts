@@ -1,14 +1,18 @@
 import { provideEditorInstance } from 'application/editor/editorSingleton';
 import { BaseRenderer } from 'application/render/renderers/BaseRenderer';
-import { Atom, AtomRadical } from 'domain/entities/CoreAtom';
+import { type Atom, AtomRadical } from 'domain/entities/CoreAtom';
 import { Coordinates } from 'application/editor/shared/coordinates';
-import { editorEvents } from 'application/editor';
+import { editorEvents } from 'application/editor/editorEvents';
+import { ketcherProvider } from 'application/ketcherProvider';
 import { AtomLabel, ElementColor, Elements } from 'domain/constants';
-import { D3SvgElementSelection } from 'application/render/types';
+import type { D3SvgElementSelection } from 'application/render/types';
 import { VALENCE_MAP } from 'application/render/restruct/constants';
 import { Box2Abs } from 'domain/entities/box2Abs';
 import { Vec2 } from 'domain/entities/vec2';
 import { StereoLabel } from 'domain/entities/atom';
+import { StereoLabelStyleType } from 'application/render/restruct/generalEnumTypes';
+import { StereoFlag } from 'domain/entities/fragment';
+import type { Settings } from 'application/settings';
 import util from '../util';
 import assert from 'assert';
 import {
@@ -17,6 +21,25 @@ import {
   SELECTION_COLOR,
   SELECTION_HOVERED_COLOR,
 } from 'application/render/renderers/constants';
+
+// Extra clearance in canvas units that keeps labels away from the atom bbox.
+const LABEL_CLEARANCE_OFFSET = 5;
+const STEREO_CIP_GAP = 2;
+
+export type AtomHoverContour =
+  | {
+      type: 'circle';
+      center: Vec2;
+      radius: number;
+    }
+  | {
+      type: 'rect';
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+      radius: number;
+    };
 
 export class AtomRenderer extends BaseRenderer {
   private selectionElement?: D3SvgElementSelection<SVGEllipseElement, void>;
@@ -139,6 +162,37 @@ export class AtomRenderer extends BaseRenderer {
         .attr('rx', HOVER_RECTANGLE_RADIUS)
         .attr('ry', HOVER_RECTANGLE_RADIUS);
     }
+  }
+
+  public getHoverContour(): AtomHoverContour {
+    if (
+      (this.labelLength < 2 || !this.isLabelVisible) &&
+      !this.atom.hasCharge
+    ) {
+      const macroModeScale = this.editorSettings.macroModeScale;
+
+      return {
+        type: 'circle',
+        center: this.center,
+        radius: Math.ceil(1.9 * (macroModeScale / 6)),
+      };
+    }
+
+    const labelBbox = this.textElement?.node()?.getBBox();
+    const labelX = labelBbox?.x ?? 0;
+    const labelWidth = labelBbox?.width ?? 8;
+    const labelHeight = labelBbox?.height ?? 8;
+    const HOVER_PADDING = 4;
+    const HOVER_RECTANGLE_RADIUS = 10;
+
+    return {
+      type: 'rect',
+      x: this.center.x + labelX - HOVER_PADDING,
+      y: this.center.y - (labelHeight / 2 + HOVER_PADDING),
+      width: labelWidth + HOVER_PADDING * 2,
+      height: labelHeight + HOVER_PADDING * 2,
+      radius: HOVER_RECTANGLE_RADIUS,
+    };
   }
 
   /**
@@ -279,6 +333,13 @@ export class AtomRenderer extends BaseRenderer {
       !hasExplicitValence &&
       !hasExplicitIsotope
     ) {
+      // Show carbon label when bonds are collinear (180 degree angle),
+      if (atomNeighborsHalfEdges?.length === 2) {
+        const [hb1, hb2] = atomNeighborsHalfEdges;
+        if (Math.abs(Vec2.cross(hb1.direction, hb2.direction)) < 0.2) {
+          return true;
+        }
+      }
       return false;
     }
 
@@ -613,8 +674,9 @@ export class AtomRenderer extends BaseRenderer {
     this.textElement = this.appendLabel();
     this.appendAtomProperties();
     this.appendBadValenceWarning();
-    this.appendCIPLabel();
+    // Must come before appendCIPLabel: CIP positioning depends on the stereo bbox.
     this.appendStereoLabel();
+    this.appendCIPLabel();
     this.hoverElement = this.appendHover();
     this.drawSelection();
   }
@@ -662,30 +724,47 @@ export class AtomRenderer extends BaseRenderer {
       return;
     }
 
-    const { width, height } = this.cipTextElementBBox;
-
-    const modifiedTextBBox = {
-      x: this.scaledPosition.x - width / 2,
-      y: this.scaledPosition.y - height / 2,
-      width,
-      height,
-    };
     const direction = this.bisectLargestSector();
+    let projectedDistance = this.getProjectedLabelDistance(
+      this.cipTextElementBBox.width,
+      this.cipTextElementBBox.height,
+      direction,
+    );
 
-    const baseDistance = 3;
-    const shiftDistance =
-      baseDistance +
-      util.shiftRayBox(
-        this.scaledPosition,
-        direction.negated(),
-        Box2Abs.fromRelBox(modifiedTextBBox),
+    if (this.stereoTextElementBBox) {
+      const stereoProjectedDistance = this.getProjectedLabelDistance(
+        this.stereoTextElementBBox.width,
+        this.stereoTextElementBBox.height,
+        direction,
       );
-    const shiftVector = direction.scaled(3 + shiftDistance);
+      const stereoProjectionRadius = this.getLabelProjectionRadius(
+        this.stereoTextElementBBox.width,
+        this.stereoTextElementBBox.height,
+        direction,
+      );
+      const cipProjectionRadius = this.getLabelProjectionRadius(
+        this.cipTextElementBBox.width,
+        this.cipTextElementBBox.height,
+        direction,
+      );
+
+      projectedDistance = Math.max(
+        projectedDistance,
+        stereoProjectedDistance +
+          stereoProjectionRadius +
+          cipProjectionRadius +
+          STEREO_CIP_GAP,
+      );
+    }
+
+    const shiftVector = direction.scaled(projectedDistance);
 
     const cipPosition = this.scaledPosition.add(
       new Vec2(
-        shiftVector.x - this.cipLabelElementBBox.width / 2,
-        shiftVector.y + this.cipLabelElementBBox.height / 2,
+        shiftVector.x -
+          (this.cipLabelElementBBox.x + this.cipLabelElementBBox.width / 2),
+        shiftVector.y -
+          (this.cipLabelElementBBox.y + this.cipLabelElementBBox.height / 2),
       ),
     );
 
@@ -731,11 +810,27 @@ export class AtomRenderer extends BaseRenderer {
       return false;
     }
 
-    const stereoLabelType = stereoLabel.match(/\D+/g)?.[0];
+    const editor = provideEditorInstance();
+    const settings = ketcherProvider
+      .getKetcher(editor.ketcherId)
+      .settingsService?.getSettings();
+    const labelStyle = getStereoLabelStyleType(settings?.stereoLabelStyle);
+    const ignoreChiralFlag = settings?.ignoreChiralFlag ?? false;
+    const enhancedStereoFlag = this.getEnhancedStereoFlag();
 
-    return (
-      stereoLabelType === StereoLabel.And || stereoLabelType === StereoLabel.Or
+    return shouldDisplayStereoLabel(
+      stereoLabel,
+      labelStyle,
+      ignoreChiralFlag,
+      enhancedStereoFlag,
     );
+  }
+
+  private getEnhancedStereoFlag(): StereoFlag | undefined {
+    const struct = this.atom.monomer.monomerItem.struct;
+    const structAtom = struct.atoms.get(this.atom.atomIdInMicroMode);
+
+    return struct.frags.get(Number(structAtom?.fragment))?.enhancedStereoFlag;
   }
 
   private appendStereoLabel() {
@@ -773,36 +868,62 @@ export class AtomRenderer extends BaseRenderer {
       return;
     }
 
-    const { width, height } = this.stereoTextElementBBox;
-
-    const modifiedTextBBox = {
-      x: this.scaledPosition.x - width / 2,
-      y: this.scaledPosition.y - height / 2,
-      width,
-      height,
-    };
     const direction = this.bisectLargestSector();
 
-    const baseDistance = 3;
-    const shiftDistance =
-      baseDistance +
-      util.shiftRayBox(
-        this.scaledPosition,
-        direction.negated(),
-        Box2Abs.fromRelBox(modifiedTextBBox),
-      );
-    const shiftVector = direction.scaled(baseDistance + shiftDistance);
+    const projectedDistance = this.getProjectedLabelDistance(
+      this.stereoTextElementBBox.width,
+      this.stereoTextElementBBox.height,
+      direction,
+    );
+
+    const shiftVector = direction.scaled(projectedDistance);
 
     const stereoPosition = this.scaledPosition.add(
       new Vec2(
-        shiftVector.x - this.stereoLabelElementBBox.width / 2,
-        shiftVector.y + this.stereoLabelElementBBox.height / 2,
+        shiftVector.x -
+          (this.stereoLabelElementBBox.x +
+            this.stereoLabelElementBBox.width / 2),
+        shiftVector.y -
+          (this.stereoLabelElementBBox.y +
+            this.stereoLabelElementBBox.height / 2),
       ),
     );
 
     this.stereoLabelElement?.attr(
       'transform',
       `translate(${stereoPosition.x}, ${stereoPosition.y})`,
+    );
+  }
+
+  private getProjectedLabelDistance(
+    width: number,
+    height: number,
+    direction: Vec2,
+  ): number {
+    const baseDistance = 3;
+    const labelBox = {
+      x: this.scaledPosition.x - width / 2,
+      y: this.scaledPosition.y - height / 2,
+      width,
+      height,
+    };
+
+    const backwardShift = util.shiftRayBox(
+      this.scaledPosition,
+      direction.negated(),
+      Box2Abs.fromRelBox(labelBox),
+    );
+
+    return LABEL_CLEARANCE_OFFSET + baseDistance + backwardShift;
+  }
+
+  private getLabelProjectionRadius(
+    width: number,
+    height: number,
+    direction: Vec2,
+  ): number {
+    return (
+      Math.abs(direction.x) * (width / 2) + Math.abs(direction.y) * (height / 2)
     );
   }
 
@@ -823,6 +944,16 @@ export class AtomRenderer extends BaseRenderer {
     super.remove();
   }
 
+  public setVisibility(isVisible: boolean): void {
+    super.setVisibility(isVisible);
+
+    const display = isVisible ? '' : 'none';
+    this.rootElement?.style('display', display);
+    this.selectionElement?.style('display', display);
+    this.cipLabelElement?.style('display', display);
+    this.stereoLabelElement?.style('display', display);
+  }
+
   protected appendHoverAreaElement(): void {
     // intentional no-op: this renderer type does not require a hover area element
   }
@@ -830,5 +961,50 @@ export class AtomRenderer extends BaseRenderer {
   protected removeHover(): void {
     this.hoverElement?.remove();
     this.hoverElement = undefined;
+  }
+}
+function getStereoLabelStyleType(
+  stereoLabelStyle: Settings['stereoLabelStyle'] | undefined,
+): StereoLabelStyleType | undefined {
+  switch (stereoLabelStyle) {
+    case 'IUPAC':
+      return StereoLabelStyleType.IUPAC;
+    case 'classic':
+      return StereoLabelStyleType.Classic;
+    case 'On-Atoms':
+      return StereoLabelStyleType.On;
+    case 'off':
+      return StereoLabelStyleType.Off;
+    default:
+      return undefined;
+  }
+}
+
+function shouldDisplayStereoLabel(
+  stereoLabel: string,
+  labelStyle: StereoLabelStyleType | undefined,
+  ignoreChiralFlag: boolean,
+  flag: StereoFlag | undefined,
+): boolean {
+  const stereoLabelType = stereoLabel.match(/\D+/g)?.[0];
+
+  if (ignoreChiralFlag && stereoLabelType === StereoLabel.Abs) {
+    return false;
+  }
+  if (ignoreChiralFlag && stereoLabelType !== StereoLabel.Abs) {
+    return true;
+  }
+
+  switch (labelStyle) {
+    case StereoLabelStyleType.Off:
+      return false;
+    case StereoLabelStyleType.On:
+      return true;
+    case StereoLabelStyleType.Classic:
+      return flag === StereoFlag.Mixed || stereoLabelType === StereoLabel.Or;
+    case StereoLabelStyleType.IUPAC:
+      return flag === StereoFlag.Mixed && stereoLabelType !== StereoLabel.Abs;
+    default:
+      return true;
   }
 }

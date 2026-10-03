@@ -119,7 +119,7 @@
     "groupTemplate": "{{group}} template {{index}}",
     "moleculeName": "Molecule name",
     "templateEdit": "Template Edit",
-    "invalidTemplateName": "Template must have a unique name and no more than 128 symbols in length",
+    "invalidTemplateName": "Template must have a unique non-empty name and no more than 128 symbols in length",
     "groups": {
       "alphaDSugars": "α-D-Sugars",
       "aromatics": "Aromatics",
@@ -366,6 +366,10 @@
     "ignorePseudoatomsAtMass": "Ignore pseudoatoms at mass",
     "addRsitesAtMassCalculation": "Add Rsites at mass calculation",
     "addIsotopesAtMassCalculation": "Add isotopes at mass calculation",
+    "valenceMode": "Valence mode",
+    "biovia2009": "BIOVIA 2009",
+    "biovia2017": "BIOVIA 2017",
+    "skipSuperatomsAtAromatization": "Skip Superatoms at aromatization",
     "showAtomIds": "Show atom IDs",
     "showBondIds": "Show bond IDs",
     "showHalfBondIds": "Show half-bond IDs",
@@ -638,9 +642,12 @@
     "phosphateRightRequirement": "Sugar must have R2, and phosphate must have R1.",
     "phosphateOnLeft": "Phosphate on the left",
     "phosphateOnRight": "Phosphate on the right",
-    "selectPhosphatePosition": "Select phosphate position"
+    "selectPhosphatePosition": "Select phosphate position",
+    "switchPhosphateLeft": "Switch to left",
+    "switchPhosphateRight": "Switch to right"
   },
   "common": {
+    "default": "Default",
     "error": "Error",
     "warning": "Warning",
     "success": "Success",

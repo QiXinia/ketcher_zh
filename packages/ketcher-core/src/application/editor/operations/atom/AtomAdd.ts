@@ -14,8 +14,14 @@
  * limitations under the License.
  ***************************************************************************/
 
-import { Atom, AtomAttributes, Pile, Point, Vec2 } from 'domain/entities';
-import { ReAtom, ReStruct } from '../../../render';
+import {
+  type AtomAttributes,
+  type Point,
+  Atom,
+  Pile,
+  Vec2,
+} from 'domain/entities';
+import { type ReStruct, ReAtom } from '../../../render';
 
 import { BaseOperation } from '../BaseOperation';
 import { OperationType } from '../OperationType';
@@ -28,7 +34,6 @@ type Data = {
 
 class AtomAdd extends BaseOperation {
   data: Data;
-  static InverseConstructor: new () => BaseOperation;
 
   constructor(atom?: Partial<AtomAttributes>, pos?: Point) {
     super(OperationType.ATOM_ADD);
@@ -76,12 +81,6 @@ class AtomAdd extends BaseOperation {
         );
       }
     }
-  }
-
-  invert() {
-    const inverted = new AtomAdd.InverseConstructor();
-    inverted.data = this.data;
-    return inverted;
   }
 }
 

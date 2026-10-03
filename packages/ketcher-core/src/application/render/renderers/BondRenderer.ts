@@ -1,17 +1,17 @@
 import { provideEditorInstance } from 'application/editor/editorSingleton';
 import { BaseRenderer } from 'application/render/renderers/BaseRenderer';
-import { Atom } from 'domain/entities/CoreAtom';
+import type { Atom } from 'domain/entities/CoreAtom';
 import { Coordinates } from 'application/editor/shared/coordinates';
-import { Bond, BondStereo, BondType } from 'domain/entities/CoreBond';
+import { type Bond, BondStereo, BondType } from 'domain/entities/CoreBond';
 import { Bond as StructBond } from 'domain/entities/bond';
 import { Scale } from 'domain/helpers';
 import { Box2Abs } from 'domain/entities/box2Abs';
 import { Vec2 } from 'domain/entities/vec2';
-import { HalfEdge } from 'application/render/view-model/HalfEdge';
-import { ViewModel } from 'application/render/view-model/ViewModel';
+import type { HalfEdge } from 'application/render/view-model/HalfEdge';
+import type { ViewModel } from 'application/render/view-model/ViewModel';
 import { KetcherLogger } from 'utilities';
-import { D3SvgElementSelection } from 'application/render/types';
-import {
+import type { D3SvgElementSelection } from 'application/render/types';
+import type {
   SVGPathAttributes,
   BondVectors,
 } from 'application/render/renderers/BondPathRenderer/constants';
@@ -211,6 +211,10 @@ export class BondRenderer extends BaseRenderer {
   public appendSelection() {
     const pathShape = this.getSelectionContour();
 
+    if (!pathShape) {
+      return;
+    }
+
     if (this.selectionElement) {
       this.selectionElement.attr('d', pathShape);
     } else {
@@ -241,6 +245,10 @@ export class BondRenderer extends BaseRenderer {
     }
 
     const pathShape = this.getSelectionContour();
+
+    if (!pathShape) {
+      return;
+    }
 
     this.hoverElement = this.canvas
       ?.insert('path', ':first-child')
@@ -450,7 +458,17 @@ export class BondRenderer extends BaseRenderer {
     ];
   }
 
-  private getSelectionContour() {
+  public getHoverContourPath(): string | undefined {
+    return this.getSelectionContour();
+  }
+
+  private getSelectionContour(): string | undefined {
+    const selectionPoints = this.getSelectionPoints();
+
+    if (selectionPoints.length !== 8) {
+      return undefined;
+    }
+
     const [
       startPadTop,
       startTop,
@@ -460,17 +478,15 @@ export class BondRenderer extends BaseRenderer {
       endBottom,
       startPadBottom,
       startBottom,
-    ] = this.getSelectionPoints();
+    ] = selectionPoints;
 
-    const pathString = `
+    return `
       M ${startTop.x} ${startTop.y}
       L ${endTop.x} ${endTop.y}
       C ${endPadTop.x} ${endPadTop.y}, ${endPadBottom.x} ${endPadBottom.y}, ${endBottom.x} ${endBottom.y}
       L ${startBottom.x} ${startBottom.y}
       C ${startPadBottom.x} ${startPadBottom.y}, ${startPadTop.x} ${startPadTop.y}, ${startTop.x} ${startTop.y}
     `;
-
-    return pathString;
   }
 
   public moveSelection() {
@@ -1015,6 +1031,14 @@ export class BondRenderer extends BaseRenderer {
     super.remove();
     this.removeHover();
     this.removeSelection();
+  }
+
+  public setVisibility(isVisible: boolean): void {
+    super.setVisibility(isVisible);
+
+    const display = isVisible ? '' : 'none';
+    this.rootElement?.style('display', display);
+    this.selectionElement?.style('display', display);
   }
 
   public move() {

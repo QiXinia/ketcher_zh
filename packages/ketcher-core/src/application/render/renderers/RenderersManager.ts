@@ -1,12 +1,12 @@
 import { provideEditorInstance } from 'application/editor/editorSingleton';
-import { monomerFactory } from 'application/editor/operations/monomer/monomerFactory';
+import { monomerFactory } from './monomerFactory';
 import { notifyRenderComplete } from 'application/render/internal';
-import { BaseMonomerRenderer } from 'application/render/renderers/BaseMonomerRenderer';
-import { FlexModePolymerBondRenderer } from 'application/render/renderers/PolymerBondRenderer/FlexModePolymerBondRenderer';
+import type { BaseMonomerRenderer } from 'application/render/renderers/BaseMonomerRenderer';
+import type { FlexModePolymerBondRenderer } from 'application/render/renderers/PolymerBondRenderer/FlexModePolymerBondRenderer';
 import { PolymerBondRendererFactory } from 'application/render/renderers/PolymerBondRenderer/PolymerBondRendererFactory';
-import { SnakeModePolymerBondRenderer } from 'application/render/renderers/PolymerBondRenderer/SnakeModePolymerBondRenderer';
+import type { SnakeModePolymerBondRenderer } from 'application/render/renderers/PolymerBondRenderer/SnakeModePolymerBondRenderer';
 import assert from 'assert';
-import { HydrogenBond } from 'domain/entities/HydrogenBond';
+import type { HydrogenBond } from 'domain/entities/HydrogenBond';
 import { LinkerSequenceNode } from 'domain/entities/LinkerSequenceNode';
 import { MonomerSequenceNode } from 'domain/entities/MonomerSequenceNode';
 import { Nucleoside } from 'domain/entities/Nucleoside';
@@ -14,12 +14,13 @@ import { Nucleotide } from 'domain/entities/Nucleotide';
 import { Sugar } from 'domain/entities/Sugar';
 import { UnsplitNucleotide } from 'domain/entities/UnsplitNucleotide';
 import { Vec2 } from 'domain/entities/vec2';
-import { BaseMonomer } from 'domain/entities/BaseMonomer';
-import { Command } from 'domain/entities/Command';
-import { DrawingEntity } from 'domain/entities/DrawingEntity';
+import type { BaseMonomer } from 'domain/entities/BaseMonomer';
+import type { Command } from 'domain/entities/Command';
+import type { DrawingEntity } from 'domain/entities/DrawingEntity';
 import { ChainsCollection } from 'domain/entities/monomer-chains/ChainsCollection';
-import { PolymerBond } from 'domain/entities/PolymerBond';
-import { AttachmentPointName } from 'domain/types';
+import type { PolymerBond } from 'domain/entities/PolymerBond';
+import type { AttachmentPointName } from 'domain/types';
+import type { EditorTheme } from 'domain/types/theme';
 import { AmbiguousMonomer } from 'domain/entities/AmbiguousMonomer';
 import { AmbiguousMonomerRenderer } from 'application/render/renderers/AmbiguousMonomerRenderer';
 import { Atom } from 'domain/entities/CoreAtom';
@@ -28,26 +29,35 @@ import { BondRenderer } from 'application/render/renderers/BondRenderer';
 import { Bond } from 'domain/entities/CoreBond';
 import { MonomerToAtomBondRenderer } from 'application/render/renderers/MonomerToAtomBondRenderer';
 import { MonomerToAtomBond } from 'domain/entities/MonomerToAtomBond';
+import { MonomerToAtomBondSequenceRenderer } from 'application/render/renderers/sequence/MonomerToAtomBondSequenceRenderer';
+import { SequenceRenderer } from 'application/render/renderers/sequence/SequenceRenderer';
 import { PeptideSubChain } from 'domain/entities/monomer-chains/PeptideSubChain';
 import { RnaSubChain } from 'domain/entities/monomer-chains/RnaSubChain';
 import { PhosphateSubChain } from 'domain/entities/monomer-chains/PhosphateSubChain';
-import { RxnArrow } from 'domain/entities/CoreRxnArrow';
+import type { RxnArrow } from 'domain/entities/CoreRxnArrow';
 import { RxnArrowRenderer } from 'application/render/renderers/RxnArrowRenderer';
-import { MultitailArrow } from 'domain/entities/CoreMultitailArrow';
+import type { MultitailArrow } from 'domain/entities/CoreMultitailArrow';
 import { MultitailArrowRenderer } from 'application/render/renderers/MultitailArrowRenderer';
-import { RxnPlus } from 'domain/entities/CoreRxnPlus';
+import type { RxnPlus } from 'domain/entities/CoreRxnPlus';
 import { RxnPlusRenderer } from 'application/render/renderers/RxnPlusRenderer';
+import type { CoreStereoFlag } from 'domain/entities/CoreStereoFlag';
+import { StereoFlagRenderer } from 'application/render/renderers/StereoFlagRenderer';
 import { Scale } from 'domain/helpers';
 import { provideEditorSettings } from 'application/editor/editorSettings';
 import ZoomTool from 'application/editor/tools/Zoom';
+import type { Loop } from '../view-model/Loop';
+import type { DeepPartial } from 'types';
+import type { SGroupDrawingEntity } from 'domain/entities/SGroupDrawingEntity';
+import { SGroupRenderer } from 'application/render/renderers/SGroupRenderer';
 
 type FlexModeOrSnakeModePolymerBondRenderer =
   | FlexModePolymerBondRenderer
   | SnakeModePolymerBondRenderer;
 
+type ThemeType = DeepPartial<{ ketcher: EditorTheme }>;
+
 export class RenderersManager {
-  // FIXME: Specify the types.
-  private readonly theme;
+  private readonly theme: ThemeType;
   public monomers: Map<number, BaseMonomerRenderer | AmbiguousMonomerRenderer> =
     new Map();
 
@@ -60,9 +70,11 @@ export class RenderersManager {
 
   public bonds = new Map<number, BondRenderer>();
 
+  public sgroups = new Map<number, SGroupRenderer>();
+
   private needRecalculateMonomersEnumeration = false;
 
-  constructor({ theme }) {
+  constructor({ theme }: { theme: ThemeType }) {
     this.theme = theme;
   }
 
@@ -105,7 +117,7 @@ export class RenderersManager {
     monomer: BaseMonomer | AmbiguousMonomer,
     callback?: () => void,
   ) {
-    let monomerRenderer;
+    let monomerRenderer: BaseMonomerRenderer | AmbiguousMonomerRenderer;
 
     if (monomer instanceof AmbiguousMonomer) {
       monomerRenderer = new AmbiguousMonomerRenderer(monomer);
@@ -145,6 +157,9 @@ export class RenderersManager {
     });
     this.polymerBonds.forEach((polymerBondRenderer) => {
       polymerBondRenderer.remove();
+    });
+    this.sgroups.forEach((sgroupRenderer) => {
+      sgroupRenderer.remove();
     });
   }
 
@@ -283,7 +298,6 @@ export class RenderersManager {
     this.needRecalculateMonomersEnumeration = false;
   }
 
-  // FIXME: Specify the types.
   public finishPolymerBondCreation(polymerBond: PolymerBond) {
     assert(polymerBond.secondMonomer);
 
@@ -314,7 +328,10 @@ export class RenderersManager {
     secondMonomer?.renderer?.redrawHover();
   }
 
-  public hoverMonomer(monomer: BaseMonomer, needRedrawAttachmentPoints) {
+  public hoverMonomer(
+    monomer: BaseMonomer,
+    needRedrawAttachmentPoints: boolean,
+  ) {
     this.hoverDrawingEntity(monomer as DrawingEntity);
     if (needRedrawAttachmentPoints) {
       monomer.renderer?.redrawAttachmentPoints();
@@ -411,15 +428,75 @@ export class RenderersManager {
     bond.renderer?.remove();
   }
 
-  public addMonomerToAtomBond(bond: MonomerToAtomBond) {
-    if (bond.renderer) {
-      bond.renderer.remove();
+  public addSGroup(sgroupDrawingEntity: SGroupDrawingEntity) {
+    if (sgroupDrawingEntity.renderer) {
+      sgroupDrawingEntity.renderer.remove();
     }
 
-    const bondRenderer = new MonomerToAtomBondRenderer(bond);
+    const sgroupRenderer = new SGroupRenderer(sgroupDrawingEntity);
+
+    this.sgroups.set(sgroupDrawingEntity.id, sgroupRenderer);
+    sgroupRenderer.show();
+    sgroupRenderer.applyExpandedStateToStructure(this.atoms, this.bonds);
+    sgroupRenderer.moveLabelsToFront();
+  }
+
+  public deleteSGroup(sgroupDrawingEntity: SGroupDrawingEntity) {
+    this.sgroups.delete(sgroupDrawingEntity.id);
+    sgroupDrawingEntity.renderer?.remove();
+  }
+
+  public rerenderSGroups() {
+    this.atoms.forEach((atomRenderer) => {
+      atomRenderer.setVisibility(true);
+    });
+    this.bonds.forEach((bondRenderer) => {
+      bondRenderer.setVisibility(true);
+    });
+
+    this.sgroups.forEach((sgroupRenderer) => {
+      sgroupRenderer.remove();
+      sgroupRenderer.show();
+      sgroupRenderer.applyExpandedStateToStructure(this.atoms, this.bonds);
+      sgroupRenderer.moveLabelsToFront();
+    });
+  }
+
+  public addMonomerToAtomBond(bond: MonomerToAtomBond) {
+    bond.renderer?.remove();
     this.redrawDrawingEntity(bond.atom);
 
-    bondRenderer.show();
+    const sequenceNode = this.getSequenceNodeForMonomerToAtomBond(bond);
+
+    if (sequenceNode) {
+      const renderer = new MonomerToAtomBondSequenceRenderer(
+        bond,
+        sequenceNode,
+      );
+
+      SequenceRenderer.showBondRenderer(renderer);
+      this.redrawMonomerToAtomBondRelatedState(bond);
+
+      return;
+    }
+
+    const renderer = new MonomerToAtomBondRenderer(bond);
+    renderer.show();
+
+    this.redrawMonomerToAtomBondRelatedState(bond);
+  }
+
+  private getSequenceNodeForMonomerToAtomBond(bond: MonomerToAtomBond) {
+    const editor = provideEditorInstance();
+
+    if (editor.mode.modeName !== 'sequence-layout-mode') {
+      return;
+    }
+
+    return SequenceRenderer.chainsCollection?.monomerToNode.get(bond.monomer);
+  }
+
+  private redrawMonomerToAtomBondRelatedState(bond: MonomerToAtomBond) {
     bond.monomer.renderer?.redrawAttachmentPoints();
     bond.monomer.renderer?.redrawHover();
   }
@@ -457,6 +534,16 @@ export class RenderersManager {
 
   public deleteRxnPlus(rxnPlus: RxnPlus) {
     rxnPlus.renderer?.remove();
+  }
+
+  public addStereoFlag(stereoFlag: CoreStereoFlag) {
+    const stereoFlagRenderer = new StereoFlagRenderer(stereoFlag);
+
+    stereoFlagRenderer.show();
+  }
+
+  public deleteStereoFlag(stereoFlag: CoreStereoFlag) {
+    stereoFlag.renderer?.remove();
   }
 
   private renderAromaticCircles() {
@@ -514,7 +601,7 @@ export class RenderersManager {
     });
   }
 
-  private calculateDashedPolygonPath(loop) {
+  private calculateDashedPolygonPath(loop: Loop) {
     const editorSettings = provideEditorSettings();
     let pathStr = '';
 
@@ -552,7 +639,7 @@ export class RenderersManager {
     return pathStr;
   }
 
-  private calculateLoopCenterAndRadius(loop) {
+  private calculateLoopCenterAndRadius(loop: Loop) {
     const editorSettings = provideEditorSettings();
 
     let center = new Vec2(0, 0);

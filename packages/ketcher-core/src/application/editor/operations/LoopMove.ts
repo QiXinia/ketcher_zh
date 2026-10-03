@@ -16,7 +16,7 @@
 
 import { BaseOperation } from './BaseOperation';
 import { OperationType } from './OperationType';
-import { ReStruct } from '../../render';
+import type { ReStruct } from '../../render';
 import { Scale } from 'domain/helpers';
 
 export class LoopMove extends BaseOperation {
@@ -48,5 +48,10 @@ export class LoopMove extends BaseOperation {
     const inverted = new LoopMove();
     inverted.data = this.data;
     return inverted;
+  }
+
+  isDummy() {
+    const { d } = this.data;
+    return d?.x === 0 && d?.y === 0;
   }
 }
