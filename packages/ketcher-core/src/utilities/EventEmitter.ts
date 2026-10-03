@@ -33,10 +33,14 @@ export class EventEmitter {
     return this.addListener(eventName, listener);
   }
 
-  once(eventName: EventName, listener: EventListener) {
+  once<TArgs extends unknown[]>(
+    eventName: EventName,
+    listener: (...args: TArgs) => void,
+  ): this;
+  once(eventName: EventName, listener: (...args: never[]) => void) {
     const onceListener: EventListener = (...args) => {
       this.removeListener(eventName, onceListener);
-      listener(...args);
+      listener(...(args as never[]));
     };
 
     return this.addListener(eventName, onceListener);
