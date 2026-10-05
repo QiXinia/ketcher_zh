@@ -82,9 +82,7 @@ describe('Test Rna Editor Expanded component', () => {
 
     // In sequence edit mode the phosphate position picker is shown but disabled
     // (req 5.2 of #9120).
-    expect(
-      screen.getByRole('button', { name: 'Select phosphate position' }),
-    ).toBeDisabled();
+    expect(screen.getByRole('button', { name: '选择磷酸位置' })).toBeDisabled();
     expect(rnaEditorExpanded).toMatchSnapshot();
   });
 

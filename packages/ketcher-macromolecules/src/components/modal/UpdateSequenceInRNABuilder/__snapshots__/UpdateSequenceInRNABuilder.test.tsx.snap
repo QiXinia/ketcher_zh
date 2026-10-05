@@ -48,7 +48,7 @@ exports[`UpdateSequenceInRNABuilder modal component should render correctly 1`] 
                 class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-78trlr-MuiButtonBase-root-MuiIconButton-root"
                 data-testid="close-window-button"
                 tabindex="0"
-                title="Close window"
+                title="关闭窗口"
                 type="button"
               >
                 <svg

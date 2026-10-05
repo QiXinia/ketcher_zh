@@ -41,14 +41,14 @@ exports[`Delete component should render correctly 1`] = `
             <div
               class="css-1uarmuk"
             >
-              Delete RNA Preset
+              删除 RNA 预设
             </div>
             <span>
               <button
                 class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-78trlr-MuiButtonBase-root-MuiIconButton-root"
                 data-testid="close-window-button"
                 tabindex="0"
-                title="Close window"
+                title="关闭窗口"
                 type="button"
               >
                 <svg
@@ -78,15 +78,13 @@ exports[`Delete component should render correctly 1`] = `
               data-testid="delete-preset-popup-content"
             >
               <div>
-                You are about to delete
+                您即将删除
               </div>
               <div>
-                "
-                name
-                " RNA preset.
+                “name”RNA 预设。
               </div>
               <div>
-                This operation cannot be undone.
+                此操作无法撤销。
               </div>
             </div>
           </div>
@@ -97,10 +95,10 @@ exports[`Delete component should render correctly 1`] = `
               class="MuiButtonBase-root css-1gtlr3p-MuiButtonBase-root"
               data-testid="cancel-delete-preset-button"
               tabindex="0"
-              title="Cancel"
+              title="取消"
               type="button"
             >
-              Cancel
+              取消
               <span
                 class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
               />
@@ -109,10 +107,10 @@ exports[`Delete component should render correctly 1`] = `
               class="MuiButtonBase-root css-1arq8ci-MuiButtonBase-root"
               data-testid="delete-preset-button"
               tabindex="0"
-              title="Delete"
+              title="删除"
               type="button"
             >
-              Delete
+              删除
               <span
                 class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
               />
