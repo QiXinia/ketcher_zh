@@ -746,7 +746,9 @@
     "switchPhosphateLeft": "切换到左侧",
     "switchPhosphateRight": "切换到右侧",
     "selectMonomerWithR2": "请选择一个具有可用 R2 的单体或链。",
-    "cannotAddLacksR1": "该单体缺少 R1，无法使用此按钮添加到链中。"
+    "cannotAddLacksR1": "该单体缺少 R1，无法使用此按钮添加到链中。",
+    "favoritesMonomers": "单体",
+    "favoritesPresets": "预设"
   },
   "common": {
     "default": "默认",
@@ -941,5 +943,16 @@
     "phosphate5": "5'-磷酸",
     "phosphate3": "3'-磷酸",
     "noPhosphateGroup": "无磷酸基团"
+  },
+  "macromoleculeProperties": {
+    "noData": "暂无数据",
+    "selectPeptide": "请选择单体、链或链的一部分",
+    "selectNucleotide": "请选择核苷酸/核苷、链，或包含核苷酸/核苷的链的一部分",
+    "isoelectricPoint": "等电点",
+    "extinctionCoef": "消光系数 (1/M·cm)",
+    "hydrophobicity": "疏水性",
+    "meltingTemp": "解链温度 (°C)",
+    "unipositiveIons": "[一价阳离子]",
+    "oligonucleotides": "[寡核苷酸]"
   }
 }

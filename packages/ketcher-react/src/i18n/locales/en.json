@@ -746,7 +746,9 @@
     "switchPhosphateLeft": "Switch to left",
     "switchPhosphateRight": "Switch to right",
     "selectMonomerWithR2": "Select a monomer or a chain that has one R2 available.",
-    "cannotAddLacksR1": "This monomer cannot be added to a chain using this button, as it lacks R1."
+    "cannotAddLacksR1": "This monomer cannot be added to a chain using this button, as it lacks R1.",
+    "favoritesMonomers": "Monomers",
+    "favoritesPresets": "Presets"
   },
   "common": {
     "default": "Default",
@@ -941,5 +943,16 @@
     "phosphate5": "5'-phosphate",
     "phosphate3": "3'-phosphate",
     "noPhosphateGroup": "No phosphate group"
+  },
+  "macromoleculeProperties": {
+    "noData": "No Data Available",
+    "selectPeptide": "Select monomer, chain or part of a chain",
+    "selectNucleotide": "Select a nucleotide/nucleoside, chain or part of a chain containing nucleotides/nucleosides",
+    "isoelectricPoint": "Isoelectric Point",
+    "extinctionCoef": "Extinction Coef.(1/Mcm)",
+    "hydrophobicity": "Hydrophobicity",
+    "meltingTemp": "Melting Temp. (°C)",
+    "unipositiveIons": "[Unipositive Ions]",
+    "oligonucleotides": "[Oligonucleotides]"
   }
 }
