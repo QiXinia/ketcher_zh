@@ -271,8 +271,42 @@ const CORE_ERROR_KEYS: Record<string, string> = {
     'coreErrors.disallowedModificationType',
 };
 
+// ketcher-core 中以内联字符串抛出、未抽成导出常量的用户可见报错，
+// 按完整英文原句精确匹配；core 文案若变更则未命中、安全回退原文。
+const LITERAL_ERROR_KEYS: Record<string, string> = {
+  'SMILES format is not available in macro mode': 'coreErrors.macroSmiles',
+  'RXN format is not available in macro mode': 'coreErrors.macroRxn',
+  'SMARTS format is not available in macro mode': 'coreErrors.macroSmarts',
+  'CML format is not available in macro mode': 'coreErrors.macroCml',
+  'SDF format is not available in macro mode': 'coreErrors.macroSdf',
+  'RDF format is not available in macro mode': 'coreErrors.macroRdf',
+  'CDXML format is not available in macro mode': 'coreErrors.macroCdxml',
+  'CDX format is not available in macro mode': 'coreErrors.macroCdx',
+  'Layout is not available in macro mode': 'coreErrors.macroLayout',
+  'Aromatize is not available in macro mode': 'coreErrors.macroAromatize',
+  'Dearomatize is not available in macro mode': 'coreErrors.macroDearomatize',
+  'Calculate is not available in macro mode': 'coreErrors.macroCalculate',
+  'Recognize is not available in macro mode': 'coreErrors.macroRecognize',
+  'Cannot export image': 'coreErrors.cannotExportImage',
+  'Error during parsing file': 'coreErrors.errorParsingFile',
+  'File format invalid': 'coreErrors.fileFormatInvalid',
+  'RGFile format invalid': 'coreErrors.rgFileFormatInvalid',
+  'Unexpected end of file': 'coreErrors.unexpectedEndOfFile',
+  'localStorage is not available': 'coreErrors.localStorageUnavailable',
+  'localStorage not available': 'coreErrors.localStorageUnavailable',
+  'Cannot assign more than 8 attachment points':
+    'coreErrors.tooManyAttachmentPoints',
+  'S-Group not empty!': 'coreErrors.sgroupNotEmpty',
+  'S-group declaration incomplete.': 'coreErrors.sgroupDeclarationIncomplete',
+  'Brace balance broken. S-group properies invalid!':
+    'coreErrors.sgroupBraceInvalid',
+  'Ring bond count invalid': 'coreErrors.ringBondCountInvalid',
+  'Substitution count invalid': 'coreErrors.substitutionCountInvalid',
+  'Unsaturated atom invalid value': 'coreErrors.unsaturatedAtomInvalid',
+};
+
 export const translateErrorMessage = (message?: string): string => {
   if (!message) return message ?? '';
-  const key = CORE_ERROR_KEYS[message];
+  const key = CORE_ERROR_KEYS[message] ?? LITERAL_ERROR_KEYS[message];
   return key ? i18n.t(key) : message;
 };

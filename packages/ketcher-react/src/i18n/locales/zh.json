@@ -888,6 +888,40 @@
     "idtAliasSlash": "斜杠（/）只能出现在 IDT 别名的第一个或最后一个字符位置。",
     "idtAliasLength": "IDT 别名中不含斜杠（/）的字符数最多为 10 个。",
     "monomerGroupTemplateNameLength": "单体分组模板名称不能超过 200 个字符。",
-    "disallowedModificationType": "修饰类型为未知、歧义或分子的单体无法添加到单体库。"
+    "disallowedModificationType": "修饰类型为未知、歧义或分子的单体无法添加到单体库。",
+    "macroSmiles": "大分子模式下不支持 SMILES 格式",
+    "macroRxn": "大分子模式下不支持 RXN 格式",
+    "macroSmarts": "大分子模式下不支持 SMARTS 格式",
+    "macroCml": "大分子模式下不支持 CML 格式",
+    "macroSdf": "大分子模式下不支持 SDF 格式",
+    "macroRdf": "大分子模式下不支持 RDF 格式",
+    "macroCdxml": "大分子模式下不支持 CDXML 格式",
+    "macroCdx": "大分子模式下不支持 CDX 格式",
+    "macroLayout": "大分子模式下不支持重新布局",
+    "macroAromatize": "大分子模式下不支持芳构化",
+    "macroDearomatize": "大分子模式下不支持去芳构化",
+    "macroCalculate": "大分子模式下不支持计算",
+    "macroRecognize": "大分子模式下不支持识别",
+    "cannotExportImage": "无法导出图片",
+    "errorParsingFile": "解析文件时出错",
+    "fileFormatInvalid": "文件格式无效",
+    "rgFileFormatInvalid": "RGFile 文件格式无效",
+    "unexpectedEndOfFile": "文件意外结束",
+    "localStorageUnavailable": "当前环境不支持本地存储（localStorage）",
+    "tooManyAttachmentPoints": "最多只能分配 8 个连接点",
+    "sgroupNotEmpty": "S-基团不为空！",
+    "sgroupDeclarationIncomplete": "S-基团声明不完整。",
+    "sgroupBraceInvalid": "括号配对错误，S-基团属性无效！",
+    "ringBondCountInvalid": "环键数无效",
+    "substitutionCountInvalid": "取代基数无效",
+    "unsaturatedAtomInvalid": "不饱和原子的值无效"
+  },
+  "image": {
+    "unsupportedType": "不支持的图片类型",
+    "minSize": "图片尺寸至少应为 16×16 像素",
+    "cannotLoad": "无法加载图片"
+  },
+  "hotkeys": {
+    "copyInIE": "您尝试复制的结构包含简单对象或/和文本对象。在 Internet Explorer 中复制简单对象或文本对象，请尝试“复制为 KET”按钮。"
   }
 }

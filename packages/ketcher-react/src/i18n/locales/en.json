@@ -888,6 +888,40 @@
     "idtAliasSlash": "The slashes (`/`) can only be the first and last character of an IDT alias.",
     "idtAliasLength": "The maximum number of characters of an IDT alias without slashes (/) is 10.",
     "monomerGroupTemplateNameLength": "The monomer group template name must not exceed 200 characters.",
-    "disallowedModificationType": "Monomers with an unknown, ambiguous, or molecule modification type cannot be added to the library."
+    "disallowedModificationType": "Monomers with an unknown, ambiguous, or molecule modification type cannot be added to the library.",
+    "macroSmiles": "SMILES format is not available in macro mode",
+    "macroRxn": "RXN format is not available in macro mode",
+    "macroSmarts": "SMARTS format is not available in macro mode",
+    "macroCml": "CML format is not available in macro mode",
+    "macroSdf": "SDF format is not available in macro mode",
+    "macroRdf": "RDF format is not available in macro mode",
+    "macroCdxml": "CDXML format is not available in macro mode",
+    "macroCdx": "CDX format is not available in macro mode",
+    "macroLayout": "Layout is not available in macro mode",
+    "macroAromatize": "Aromatize is not available in macro mode",
+    "macroDearomatize": "Dearomatize is not available in macro mode",
+    "macroCalculate": "Calculate is not available in macro mode",
+    "macroRecognize": "Recognize is not available in macro mode",
+    "cannotExportImage": "Cannot export image",
+    "errorParsingFile": "Error during parsing file",
+    "fileFormatInvalid": "File format invalid",
+    "rgFileFormatInvalid": "RGFile format invalid",
+    "unexpectedEndOfFile": "Unexpected end of file",
+    "localStorageUnavailable": "localStorage is not available",
+    "tooManyAttachmentPoints": "Cannot assign more than 8 attachment points",
+    "sgroupNotEmpty": "S-Group not empty!",
+    "sgroupDeclarationIncomplete": "S-group declaration incomplete.",
+    "sgroupBraceInvalid": "Brace balance broken. S-group properies invalid!",
+    "ringBondCountInvalid": "Ring bond count invalid",
+    "substitutionCountInvalid": "Substitution count invalid",
+    "unsaturatedAtomInvalid": "Unsaturated atom invalid value"
+  },
+  "image": {
+    "unsupportedType": "Unsupported image type",
+    "minSize": "Image should be at least 16x16 pixels",
+    "cannotLoad": "Cannot load image"
+  },
+  "hotkeys": {
+    "copyInIE": "The structure you are trying to copy contains Simple object or/and Text object. To copy Simple object or Text object in Internet Explorer try \"Copy as KET\" button"
   }
 }

@@ -15,6 +15,7 @@ import type { Tool } from './Tool';
 import type Editor from '../Editor';
 import { handleMovingPosibilityCursor } from '../utils';
 import { getItemCursor } from '../utils/getItemCursor';
+import i18n from '../../../i18n';
 
 const TAG = 'tool/image.ts';
 const supportedMimes = ['png', 'svg+xml'];
@@ -125,7 +126,7 @@ export class ImageTool implements Tool {
       const reader = new FileReader();
 
       if (!file.type || !allowList.exec(file.type)) {
-        const errorMessage = `Unsupported image type`;
+        const errorMessage = i18n.t('image.unsupportedType');
         KetcherLogger.error(`${TAG}:onFileUpload`, errorMessage);
         if (errorHandler) {
           errorHandler(errorMessage);
@@ -150,7 +151,7 @@ export class ImageTool implements Tool {
           image.src.length >= MIN_SIZELESS_IMAGE_SRC_LENGTH;
 
         if (!isValidSize && !isValidSizeless) {
-          const errorMessage = 'Image should be at least 16x16 pixels';
+          const errorMessage = i18n.t('image.minSize');
           KetcherLogger.error(`${TAG}:onLoad`, errorMessage);
           if (errorHandler) {
             errorHandler(errorMessage);
@@ -179,7 +180,7 @@ export class ImageTool implements Tool {
 
       image.onerror = (e) => {
         this.resetElementValue();
-        const errorMessage = 'Cannot load image';
+        const errorMessage = i18n.t('image.cannotLoad');
         KetcherLogger.error(`${TAG}:onerror`, errorMessage, e);
         if (errorHandler) {
           errorHandler(errorMessage);
