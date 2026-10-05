@@ -566,7 +566,8 @@
     "fivePrimeLeft": "5' 端（左）",
     "threePrimeRight": "3' 端（右）",
     "examplePeg2": "例如 PEG-2",
-    "internalApTooltip": "内部连接点的编号由磷酸位置切换开关决定。"
+    "internalApTooltip": "内部连接点的编号由磷酸位置切换开关决定。",
+    "selectAnalogue": "选择类似物"
   },
   "atomProperties": {
     "title": "原子属性",

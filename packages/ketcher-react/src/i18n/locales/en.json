@@ -566,7 +566,8 @@
     "fivePrimeLeft": "5'-left",
     "threePrimeRight": "3'-right",
     "examplePeg2": "e.g. PEG-2",
-    "internalApTooltip": "Attachment point numbers of internal attachment points determined by the phosphate position switcher."
+    "internalApTooltip": "Attachment point numbers of internal attachment points determined by the phosphate position switcher.",
+    "selectAnalogue": "Select an analogue"
   },
   "atomProperties": {
     "title": "Atom Properties",
