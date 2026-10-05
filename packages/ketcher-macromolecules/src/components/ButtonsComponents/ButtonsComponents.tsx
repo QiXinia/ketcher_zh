@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { IconButton } from 'ketcher-react';
+import { IconButton, i18n } from 'ketcher-react';
 import { About } from '../modal/About/About';
 
 export function ButtonsComponents() {
@@ -27,7 +27,7 @@ export function ButtonsComponents() {
         />
         <IconButton
           iconName="about"
-          title="About"
+          title={String(i18n.t('action.about'))}
           onClick={() => setAboutOpen(true)}
           testId="about-button"
         />

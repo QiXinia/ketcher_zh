@@ -22,6 +22,7 @@ import {
   selectEditor,
   selectIsSequenceEditInRNABuilderMode,
 } from 'state/common';
+import { i18n } from 'ketcher-react';
 
 export const LayoutModeButton = () => {
   const editor = useAppSelector(selectEditor);
@@ -64,17 +65,17 @@ export const LayoutModeButton = () => {
         <Menu.Item
           itemId="sequence-layout-mode"
           testId="sequence-layout-mode"
-          title="Switch to sequence layout mode"
+          title={String(i18n.t('layoutMode.switchSequence'))}
         ></Menu.Item>
         <Menu.Item
           itemId="snake-layout-mode"
           testId="snake-layout-mode"
-          title="Switch to snake layout mode"
+          title={String(i18n.t('layoutMode.switchSnake'))}
         ></Menu.Item>
         <Menu.Item
           itemId="flex-layout-mode"
           testId="flex-layout-mode"
-          title="Switch to flex layout mode"
+          title={String(i18n.t('layoutMode.switchFlex'))}
         ></Menu.Item>
       </Menu.Submenu>
     </MenuContext.Provider>

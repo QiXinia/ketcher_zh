@@ -923,5 +923,23 @@
   },
   "hotkeys": {
     "copyInIE": "The structure you are trying to copy contains Simple object or/and Text object. To copy Simple object or Text object in Internet Explorer try \"Copy as KET\" button"
+  },
+  "layoutMode": {
+    "switchSequence": "Switch to sequence layout mode",
+    "switchSnake": "Switch to snake layout mode",
+    "switchFlex": "Switch to flex layout mode"
+  },
+  "ruler": {
+    "monomersInLine": "Number of monomers in a line"
+  },
+  "rnaBuilder": {
+    "updateSequence": "Update sequence",
+    "resetAll": "Reset all",
+    "updateSequenceConfirmPrefix": "You are going to modify ",
+    "updateSequenceConfirmSuffix": " nucleotides. Are you sure?",
+    "filter": "Filter",
+    "phosphate5": "5'-phosphate",
+    "phosphate3": "3'-phosphate",
+    "noPhosphateGroup": "No phosphate group"
   }
 }

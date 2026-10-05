@@ -923,5 +923,23 @@
   },
   "hotkeys": {
     "copyInIE": "您尝试复制的结构包含简单对象或/和文本对象。在 Internet Explorer 中复制简单对象或文本对象，请尝试“复制为 KET”按钮。"
+  },
+  "layoutMode": {
+    "switchSequence": "切换到序列布局模式",
+    "switchSnake": "切换到蛇形布局模式",
+    "switchFlex": "切换到自由布局模式"
+  },
+  "ruler": {
+    "monomersInLine": "每行单体数量"
+  },
+  "rnaBuilder": {
+    "updateSequence": "更新序列",
+    "resetAll": "全部重置",
+    "updateSequenceConfirmPrefix": "您即将修改 ",
+    "updateSequenceConfirmSuffix": " 个核苷酸。确定吗？",
+    "filter": "筛选",
+    "phosphate5": "5'-磷酸",
+    "phosphate3": "3'-磷酸",
+    "noPhosphateGroup": "无磷酸基团"
   }
 }

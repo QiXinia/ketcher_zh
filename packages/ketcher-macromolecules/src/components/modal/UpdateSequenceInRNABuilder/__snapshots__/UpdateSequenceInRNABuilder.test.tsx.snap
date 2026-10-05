@@ -41,7 +41,7 @@ exports[`UpdateSequenceInRNABuilder modal component should render correctly 1`] 
             <div
               class="css-1uarmuk"
             >
-              Update sequence
+              更新序列
             </div>
             <span>
               <button
@@ -77,9 +77,9 @@ exports[`UpdateSequenceInRNABuilder modal component should render correctly 1`] 
             <div
               class="css-pp7hf1"
             >
-              You are going to modify 
+              您即将修改 
               2
-               nucleotides. Are you sure?
+               个核苷酸。确定吗？
             </div>
           </div>
           <div
@@ -92,7 +92,7 @@ exports[`UpdateSequenceInRNABuilder modal component should render correctly 1`] 
               title=""
               type="button"
             >
-              Cancel
+              取消
               <span
                 class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
               />
@@ -104,7 +104,7 @@ exports[`UpdateSequenceInRNABuilder modal component should render correctly 1`] 
               title=""
               type="button"
             >
-              Yes
+              是
               <span
                 class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
               />
