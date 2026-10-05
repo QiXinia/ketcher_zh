@@ -209,7 +209,8 @@
     "confirmAction": "请确认此操作",
     "expandWindow": "展开窗口",
     "minimizeWindow": "最小化窗口",
-    "closeWindow": "关闭窗口"
+    "closeWindow": "关闭窗口",
+    "textEdit": "文本编辑"
   },
   "save": {
     "title": "保存结构",
@@ -644,7 +645,8 @@
     "noChange": "无变化",
     "madeBroken": "生成/断裂",
     "orderChanges": "键级变化",
-    "madeBrokenAndChanges": "生成/断裂且变化"
+    "madeBrokenAndChanges": "生成/断裂且变化",
+    "bond": "键"
   },
   "rgroup": {
     "title": "R-基团",
@@ -665,7 +667,20 @@
     "formattingToolbar": "文本格式工具栏"
   },
   "sgroup": {
-    "title": "S-基团属性"
+    "title": "S-基团属性",
+    "sgroup": "S-基团",
+    "multipleGroup": "多重基团",
+    "repeatCount": "重复次数",
+    "sruPolymer": "SRU 聚合物",
+    "polymerLabel": "聚合物标签",
+    "repeatPattern": "重复模式",
+    "copolymer": "共聚物",
+    "subtype": "子类型",
+    "superatom": "超原子",
+    "name": "名称",
+    "queryComponent": "查询组分",
+    "nucleotideComponent": "核苷酸组分",
+    "component": "组分"
   },
   "enhancedStereo": {
     "title": "增强立体化学",
@@ -795,5 +810,84 @@
     "enhancedStereoLost": "结构包含增强立体化学特征，部分信息将会丢失。",
     "noFunctionalGroups": "在 {{format}} 中，结构将在不包含官能团的情况下保存。",
     "cmlFunctionalGroupsLost": "结构包含官能团，在 {{format}} 中部分信息将会丢失。"
+  },
+  "sdata": {
+    "context": "上下文",
+    "fragment": "片段",
+    "multifragment": "多片段",
+    "bond": "键",
+    "atom": "原子",
+    "group": "基团",
+    "fieldName": "字段名",
+    "fieldValue": "字段值",
+    "data": "数据",
+    "specifyFieldValue": "请指定字段值",
+    "specifyFieldName": "请指定字段名"
+  },
+  "fragmentSelection": {
+    "cycleTooltip": "片段选择工具不能用于参与成环的键。",
+    "componentTooltip": "此方向的结构片段已被标记为核苷酸组分。"
+  },
+  "generics": {
+    "isDisabled": "{{label}} 已禁用",
+    "items": {
+      "*": "任意原子（含氢）",
+      "A": "除氢外的任意原子",
+      "ABC": "碳环",
+      "ABH": "碳环或氢",
+      "ACH": "无环基团或氢",
+      "ACY": "无环基团",
+      "AEH": "烯基或氢",
+      "AEL": "烯基",
+      "AH": "任意原子（含氢）",
+      "AHC": "杂无环基团",
+      "AHH": "杂环或氢",
+      "ALH": "烷基或氢",
+      "ALK": "烷基",
+      "AOH": "烷氧基或氢",
+      "AOX": "烷氧基",
+      "ARH": "任意芳基或氢",
+      "ARY": "任意芳基",
+      "AYH": "炔基或氢",
+      "AYL": "炔基",
+      "CAH": "任意环烷基或氢",
+      "CAL": "任意环烷基",
+      "CBC": "碳环衍生物",
+      "CBH": "碳环衍生物或氢",
+      "CEH": "任意环烯基或氢",
+      "CEL": "任意环烯基",
+      "CHC": "杂环基团",
+      "CHH": "杂环基团或氢",
+      "CXH": "不含碳原子的环状基团或氢",
+      "CXX": "不含碳原子的环状基团",
+      "CYC": "环状基团",
+      "CYH": "环状基团或氢",
+      "D": "氘（重氢）",
+      "G": "任意基团",
+      "G*": "带环闭合的任意基团",
+      "GH": "任意基团或氢",
+      "GH*": "带环闭合的任意基团或氢",
+      "H+": "质子",
+      "HAH": "杂芳基或氢",
+      "HAR": "杂芳基",
+      "M": "任意金属",
+      "MH": "任意金属或氢",
+      "Pol": "聚合物珠",
+      "Q": "任意杂原子（除碳、氢外的任意原子）",
+      "QH": "除碳外的任意原子",
+      "R": "伪原子",
+      "T": "氚（超重氢）",
+      "X": "任意卤素",
+      "XH": "任意卤素或氢"
+    }
+  },
+  "coreErrors": {
+    "helmAliasFormat": "HELM 别名只能包含大小写字母、数字、下划线（_）、星号（*）、方括号（[]）、圆括号（()）、点号（.）和连字符（-），且不能包含空格。",
+    "bilnAliasFormat": "BILN 别名只能包含大小写字母、数字、连字符（-）、下划线（_）和星号（*）。",
+    "helmAliasLength": "HELM 别名长度不能超过 23 个字符。",
+    "idtAliasSlash": "斜杠（/）只能出现在 IDT 别名的第一个或最后一个字符位置。",
+    "idtAliasLength": "IDT 别名中不含斜杠（/）的字符数最多为 10 个。",
+    "monomerGroupTemplateNameLength": "单体分组模板名称不能超过 200 个字符。",
+    "disallowedModificationType": "修饰类型为未知、歧义或分子的单体无法添加到单体库。"
   }
 }

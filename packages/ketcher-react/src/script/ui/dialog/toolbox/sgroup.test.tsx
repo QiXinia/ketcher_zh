@@ -8,7 +8,7 @@ describe('Multiple repeating S-groups limitations should be in [1, 200]', () => 
   const setup = () => {
     const props = { type: 'MUL' };
     const utils = renderWithMockStore(<SGroup {...props} />);
-    const input = screen.getByLabelText('Repeat count');
+    const input = screen.getByLabelText('重复次数');
     return {
       input,
       ...utils,
@@ -53,12 +53,12 @@ describe('Copolymer S-Group type availability', () => {
 
   it('should hide Copolymer option when fewer than two SRUs are selected', () => {
     renderAndOpenTypeSelect(1);
-    expect(screen.queryByTestId('Copolymer-option')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('共聚物-option')).not.toBeInTheDocument();
   });
 
   it('should show Copolymer option when at least two SRUs are selected', () => {
     renderAndOpenTypeSelect(2);
-    expect(screen.getByTestId('Copolymer-option')).toBeInTheDocument();
+    expect(screen.getByTestId('共聚物-option')).toBeInTheDocument();
   });
 
   it('should show Copolymer option when editing existing Copolymer S-Group', () => {
@@ -73,7 +73,7 @@ describe('Copolymer S-Group type availability', () => {
     });
     const typeSelect = screen.getAllByRole('combobox')[0];
     fireEvent.mouseDown(typeSelect);
-    expect(screen.getByTestId('Copolymer-option')).toBeInTheDocument();
+    expect(screen.getByTestId('共聚物-option')).toBeInTheDocument();
   });
 });
 
@@ -91,7 +91,7 @@ describe('S-Group DAT type rendering', () => {
         },
       },
     });
-    expect(screen.getByText('S-Group Properties')).toBeInTheDocument();
+    expect(screen.getByText('S-基团属性')).toBeInTheDocument();
   });
 });
 

@@ -209,7 +209,8 @@
     "confirmAction": "Confirm your action",
     "expandWindow": "Expand window",
     "minimizeWindow": "Minimize window",
-    "closeWindow": "Close window"
+    "closeWindow": "Close window",
+    "textEdit": "Text Edit"
   },
   "save": {
     "title": "Save Structure",
@@ -644,7 +645,8 @@
     "noChange": "No change",
     "madeBroken": "Made/broken",
     "orderChanges": "Order changes",
-    "madeBrokenAndChanges": "Made/broken and changes"
+    "madeBrokenAndChanges": "Made/broken and changes",
+    "bond": "Bond"
   },
   "rgroup": {
     "title": "R-Group",
@@ -665,7 +667,20 @@
     "formattingToolbar": "Text formatting toolbar"
   },
   "sgroup": {
-    "title": "S-Group Properties"
+    "title": "S-Group Properties",
+    "sgroup": "S-Group",
+    "multipleGroup": "Multiple group",
+    "repeatCount": "Repeat count",
+    "sruPolymer": "SRU polymer",
+    "polymerLabel": "Polymer label",
+    "repeatPattern": "Repeat Pattern",
+    "copolymer": "Copolymer",
+    "subtype": "Subtype",
+    "superatom": "Superatom",
+    "name": "Name",
+    "queryComponent": "Query component",
+    "nucleotideComponent": "Nucleotide Component",
+    "component": "Component"
   },
   "enhancedStereo": {
     "title": "Enhanced Stereochemistry",
@@ -795,5 +810,84 @@
     "enhancedStereoLost": "Structure contains enhanced stereochemistry features. Information will be partly lost.",
     "noFunctionalGroups": "In {{format}} the structure will be saved without functional groups.",
     "cmlFunctionalGroupsLost": "Structure contains functional groups. In {{format}} information will be partly lost."
+  },
+  "sdata": {
+    "context": "Context",
+    "fragment": "Fragment",
+    "multifragment": "Multifragment",
+    "bond": "Bond",
+    "atom": "Atom",
+    "group": "Group",
+    "fieldName": "Field name",
+    "fieldValue": "Field value",
+    "data": "Data",
+    "specifyFieldValue": "Please, specify field value",
+    "specifyFieldName": "Please, specify field name"
+  },
+  "fragmentSelection": {
+    "cycleTooltip": "Fragment Selection Tool cannot be used on bonds that participate in a cycle.",
+    "componentTooltip": "The structure fragment in this direction is already marked as a nucleotide component."
+  },
+  "generics": {
+    "isDisabled": "{{label}} is disabled",
+    "items": {
+      "*": "Any atom, including hydrogen",
+      "A": "Any atom except hydrogen",
+      "ABC": "Carbocyclic",
+      "ABH": "Carbocyclic of hydrogen",
+      "ACH": "Acyclic group or hydrogen",
+      "ACY": "Acyclic group",
+      "AEH": "Alkenyl or hydrogen",
+      "AEL": "Alkenyl",
+      "AH": "Any atom, including hydrogen",
+      "AHC": "Heteroacyclic",
+      "AHH": "Heterocyclic or hydrogen",
+      "ALH": "Alkyl or hydrogen",
+      "ALK": "Alkyl",
+      "AOH": "Alkoxy or hydrogen",
+      "AOX": "Alkoxy",
+      "ARH": "Any aryl group or hydrogen",
+      "ARY": "Any aryl group",
+      "AYH": "Alkynyl or hydrogen",
+      "AYL": "Alkynyl",
+      "CAH": "Any cycloalkyl group or hydrogen",
+      "CAL": "Any cycloalkyl group",
+      "CBC": "Carbocyclic derivatives",
+      "CBH": "Carbocyclic derivatives or hydrogen",
+      "CEH": "Any cyloalkenyl group or hydrogen",
+      "CEL": "Any cyloalkenyl group",
+      "CHC": "Heterocyclic group",
+      "CHH": "Heterocyclic group or hydrogen",
+      "CXH": "Cyclic group with no Carbon atoms or hydrogen",
+      "CXX": "Cyclic group with no Carbon atoms",
+      "CYC": "Cyclic group",
+      "CYH": "Cyclic group or hydrogen",
+      "D": "Deuterium",
+      "G": "Any group",
+      "G*": "Any group with a ring closure",
+      "GH": "Any group or hydrogen",
+      "GH*": "Any group with a ring closure or hydrogen",
+      "H+": "Proton",
+      "HAH": "Heteroaryl group or hydrogen",
+      "HAR": "Heteroaryl group",
+      "M": "Any metal",
+      "MH": "Any metal or hydrogen",
+      "Pol": "Polymer Bead",
+      "Q": "Any heteroatom (any atom except C or H)",
+      "QH": "Any atom except C",
+      "R": "Pseudoatom",
+      "T": "Tritium",
+      "X": "Any halogen",
+      "XH": "Any halogen or hydrogen"
+    }
+  },
+  "coreErrors": {
+    "helmAliasFormat": "The HELM alias must consist only of uppercase and lowercase letters, numbers, underscores (_), asterisks (*), square brackets ([]), parentheses (()), dots (.), and hyphens (-), spaces prohibited.",
+    "bilnAliasFormat": "The BILN alias must consist only of uppercase and lowercase letters, numbers, hyphens (`-`), underscores (`_`), and asterisks (`*`).",
+    "helmAliasLength": "The HELM alias must be no more than 23 symbols long.",
+    "idtAliasSlash": "The slashes (`/`) can only be the first and last character of an IDT alias.",
+    "idtAliasLength": "The maximum number of characters of an IDT alias without slashes (/) is 10.",
+    "monomerGroupTemplateNameLength": "The monomer group template name must not exceed 200 characters.",
+    "disallowedModificationType": "Monomers with an unknown, ambiguous, or molecule modification type cannot be added to the library."
   }
 }

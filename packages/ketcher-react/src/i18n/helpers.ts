@@ -3,6 +3,15 @@ import {
   getLocalizedTemplateGroupName,
   getLocalizedTemplateName,
 } from './templateDisplayNames';
+import {
+  HELM_ALIAS_FORMAT_ERROR_MESSAGE,
+  BILN_ALIAS_FORMAT_ERROR_MESSAGE,
+  HELM_ALIAS_LENGTH_ERROR_MESSAGE,
+  IDT_ALIAS_SLASH_ERROR_MESSAGE,
+  IDT_ALIAS_LENGTH_ERROR_MESSAGE,
+  MONOMER_GROUP_TEMPLATE_NAME_MAX_LENGTH_ERROR_MESSAGE,
+  DISALLOWED_MODIFICATION_TYPE_ERROR_MESSAGE,
+} from 'ketcher-core';
 
 const TEMPLATE_NAME_KEYS: Record<string, string> = {
   Benzene: 'templates.names.benzene',
@@ -246,4 +255,24 @@ export const getElementDisplayTitle = (
   }
 
   return i18n.resolvedLanguage?.startsWith('zh') ? entry.zh : entry.en;
+};
+
+// 已知的 ketcher-core 用户可见报错（英文常量）到 i18n key 的精确映射。
+// core 不反向依赖 react，因此在表现层按完整英文消息匹配；未命中则原样返回。
+const CORE_ERROR_KEYS: Record<string, string> = {
+  [HELM_ALIAS_FORMAT_ERROR_MESSAGE]: 'coreErrors.helmAliasFormat',
+  [BILN_ALIAS_FORMAT_ERROR_MESSAGE]: 'coreErrors.bilnAliasFormat',
+  [HELM_ALIAS_LENGTH_ERROR_MESSAGE]: 'coreErrors.helmAliasLength',
+  [IDT_ALIAS_SLASH_ERROR_MESSAGE]: 'coreErrors.idtAliasSlash',
+  [IDT_ALIAS_LENGTH_ERROR_MESSAGE]: 'coreErrors.idtAliasLength',
+  [MONOMER_GROUP_TEMPLATE_NAME_MAX_LENGTH_ERROR_MESSAGE]:
+    'coreErrors.monomerGroupTemplateNameLength',
+  [DISALLOWED_MODIFICATION_TYPE_ERROR_MESSAGE]:
+    'coreErrors.disallowedModificationType',
+};
+
+export const translateErrorMessage = (message?: string): string => {
+  if (!message) return message ?? '';
+  const key = CORE_ERROR_KEYS[message];
+  return key ? i18n.t(key) : message;
 };

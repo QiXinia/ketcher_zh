@@ -16,6 +16,7 @@
 
 import { error } from './constants';
 import { useEffect, useRef, type ReactElement } from 'react';
+import { translateErrorMessage } from '../../i18n/helpers';
 
 import styles from './InfoModal.module.less';
 
@@ -55,7 +56,7 @@ const InfoModal = ({ message, close }: InfoModalProps): ReactElement => {
           id="dialog-content"
           data-testid="error-message-body"
         >
-          {message}
+          {translateErrorMessage(message)}
         </div>
         <footer>
           <button
