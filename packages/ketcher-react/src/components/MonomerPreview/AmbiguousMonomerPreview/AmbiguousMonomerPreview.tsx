@@ -7,6 +7,7 @@ import {
   RatioBar,
 } from './AmbiguousMonomerPreview.styles';
 import type { AmbiguousMonomerPreviewState } from './types';
+import i18n from '../../../i18n';
 
 interface Props {
   className?: string;
@@ -18,9 +19,13 @@ const AmbiguousMonomerPreview = ({ className, preview, style }: Props) => {
   const { monomer, presetMonomers } = preview;
 
   const isAlternatives = monomer.subtype === 'alternatives';
-  const header = isAlternatives ? 'Alternatives' : 'Mixed';
-  const aminoAcidFallback = monomer.label === 'X' ? 'Any amino acid' : null;
-  const baseFallback = monomer.label === 'N' ? 'Any base' : null;
+  const header = isAlternatives
+    ? i18n.t('monomerPreview.alternatives')
+    : i18n.t('monomerPreview.mixed');
+  const aminoAcidFallback =
+    monomer.label === 'X' ? i18n.t('monomerPreview.anyAminoAcid') : null;
+  const baseFallback =
+    monomer.label === 'N' ? i18n.t('monomerPreview.anyBase') : null;
   const fallback = aminoAcidFallback ?? baseFallback;
 
   const { monomers, options } = monomer;

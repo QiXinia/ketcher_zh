@@ -65,7 +65,7 @@ describe('AmbiguousMonomerPreview', () => {
     const { container } = render(<AmbiguousMonomerPreview preview={preview} />);
 
     const header = screen.getByTestId('preview-tooltip-title');
-    expect(header).toHaveTextContent('Mixed');
+    expect(header).toHaveTextContent('混合');
 
     // Get the text content and extract percentages
     const containerText = container.textContent || '';
@@ -136,13 +136,13 @@ describe('AmbiguousMonomerPreview', () => {
     const { container } = render(<AmbiguousMonomerPreview preview={preview} />);
 
     const header = screen.getByTestId('preview-tooltip-title');
-    expect(header).toHaveTextContent('Mixed');
+    expect(header).toHaveTextContent('混合');
 
     // Get the text content and extract monomer names
     const containerText = container.textContent || '';
     // Extract names after percentage values
     const names = containerText
-      .replace('Mixed', '')
+      .replace('混合', '')
       .split(/\d+%/)
       .slice(1)
       .map((name) => name.trim())
@@ -199,13 +199,13 @@ describe('AmbiguousMonomerPreview', () => {
     const { container } = render(<AmbiguousMonomerPreview preview={preview} />);
 
     const header = screen.getByTestId('preview-tooltip-title');
-    expect(header).toHaveTextContent('Alternatives');
+    expect(header).toHaveTextContent('可选项');
 
     // Get the text content and extract the monomer names
     // Remove the header text to get just the names
     const containerText = container.textContent || '';
     const names = containerText
-      .replace('Alternatives', '')
+      .replace('可选项', '')
       .split(/(?=[A-Z])/)
       .filter((name) => name.trim().length > 0);
 

@@ -33,7 +33,7 @@ import {
   HeaderButton,
   HeaderTitle,
 } from './Settings.styles';
-import { Icon } from 'ketcher-react';
+import { Icon, i18n } from 'ketcher-react';
 
 export const Settings = ({ isModalOpen, onClose }: RequiredModalProps) => {
   const settingsService = window.ketcher?.settingsService;
@@ -158,7 +158,7 @@ export const Settings = ({ isModalOpen, onClose }: RequiredModalProps) => {
     } catch (error) {
       KetcherLogger.error('Failed to export settings:', error);
       // eslint-disable-next-line no-alert
-      alert('Export failed');
+      alert(i18n.t('settings.exportFailed'));
     }
   };
 
@@ -186,11 +186,11 @@ export const Settings = ({ isModalOpen, onClose }: RequiredModalProps) => {
 
   const headerTitle = (
     <HeaderContent>
-      <HeaderTitle>Settings</HeaderTitle>
+      <HeaderTitle>{i18n.t('settings.title')}</HeaderTitle>
       <HeaderButton
         onClick={handleImport}
         disabled={isLoading}
-        title="Open from File"
+        title={i18n.t('settings.openFromFile')}
         data-testid="open-settings-from-file-button"
       >
         <Icon name="open-1" />
@@ -198,7 +198,7 @@ export const Settings = ({ isModalOpen, onClose }: RequiredModalProps) => {
       <HeaderButton
         onClick={handleExport}
         disabled={isLoading}
-        title="Save to File"
+        title={i18n.t('settings.saveToFile')}
         data-testid="save-settings-to-file-button"
       >
         <Icon name="save-1" />
@@ -206,7 +206,7 @@ export const Settings = ({ isModalOpen, onClose }: RequiredModalProps) => {
       <HeaderButton
         onClick={handleReset}
         disabled={isLoading}
-        title="Reset"
+        title={i18n.t('settings.reset')}
         data-testid="reset-settings-button"
       >
         <Icon name="reset" />
@@ -237,7 +237,7 @@ export const Settings = ({ isModalOpen, onClose }: RequiredModalProps) => {
       <Modal.Footer>
         <FooterLeft>
           <ActionButton
-            label="Set ACS Settings"
+            label={i18n.t('settings.setACSSettings')}
             styleType="secondary"
             clickHandler={handleACSStyle}
             disabled={isLoading}
@@ -246,13 +246,13 @@ export const Settings = ({ isModalOpen, onClose }: RequiredModalProps) => {
         </FooterLeft>
         <FooterRight>
           <ActionButton
-            label="Cancel"
+            label={i18n.t('dialog.cancel')}
             styleType="secondary"
             clickHandler={handleCancel}
             disabled={isLoading}
           />
           <ActionButton
-            label="Apply"
+            label={i18n.t('dialog.apply')}
             clickHandler={handleApply}
             disabled={!hasChanges || isLoading}
           />

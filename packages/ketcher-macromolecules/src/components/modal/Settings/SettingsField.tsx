@@ -15,6 +15,7 @@
  ***************************************************************************/
 
 import { Select, MenuItem, FormControl, Switch } from '@mui/material';
+import { i18n } from 'ketcher-react';
 import { FieldWrapper } from './Settings.styles';
 
 interface SettingsFieldProps {
@@ -43,12 +44,13 @@ export const SettingsField = ({
   max,
   step,
 }: SettingsFieldProps) => {
+  const translatedLabel = i18n.t(label);
   const renderField = () => {
     switch (type) {
       case 'checkbox':
         return (
           <label>
-            <span>{label}</span>
+            <span>{translatedLabel}</span>
             <Switch
               checked={Boolean(value)}
               onChange={(e) => onChange(e.target.checked)}
@@ -61,7 +63,7 @@ export const SettingsField = ({
       case 'number':
         return (
           <label>
-            <span>{label}</span>
+            <span>{translatedLabel}</span>
             <input
               type="number"
               value={value ?? ''}
@@ -84,7 +86,7 @@ export const SettingsField = ({
       case 'select':
         return (
           <label>
-            <span>{label}</span>
+            <span>{translatedLabel}</span>
             <FormControl size="small" sx={{ border: 'none' }}>
               <Select
                 value={value ?? ''}
@@ -112,7 +114,7 @@ export const SettingsField = ({
                     value={opt.value}
                     sx={{ fontSize: '12px' }}
                   >
-                    {opt.label}
+                    {i18n.t(opt.label)}
                   </MenuItem>
                 ))}
               </Select>
@@ -123,7 +125,7 @@ export const SettingsField = ({
       case 'color':
         return (
           <label>
-            <span>{label}</span>
+            <span>{translatedLabel}</span>
             <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
               <input
                 type="color"
@@ -160,7 +162,7 @@ export const SettingsField = ({
       default:
         return (
           <label>
-            <span>{label}</span>
+            <span>{translatedLabel}</span>
             <input
               type="text"
               value={value ?? ''}
