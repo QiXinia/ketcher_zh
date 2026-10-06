@@ -15,7 +15,7 @@ export function ButtonsComponents() {
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <IconButton
           iconName="help"
-          title="Help (?)"
+          title={String(i18n.t('topToolbar.helpWithShortcut'))}
           onClick={() => {
             const HELP_LINK = (process.env.HELP_LINK as string) || 'master';
             window.open(

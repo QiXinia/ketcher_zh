@@ -18,6 +18,7 @@ import { Field } from '../../component/form/form/form';
 import { getSelectOptionsFromSchema } from '../../utils';
 import Select from '../../component/form/Select';
 import { sdataCustomSchema } from '../../data/schema/sdata-schema';
+import i18n from '../../../../i18n';
 
 interface SdataFormResult {
   context: string;
@@ -65,7 +66,7 @@ const content = (
           <Field
             name={prop}
             key={`${context}-${fieldName}-${prop}-select`}
-            placeholder="Enter value"
+            placeholder={i18n.t('sdata.enterValuePlaceholder')}
             disabled={isContextEmpty}
           />
         );
@@ -98,7 +99,7 @@ function SDataFieldset({ formState }: Readonly<SDataFieldsetProps>) {
       />
       <Field
         name="fieldName"
-        placeholder="Enter name"
+        placeholder={i18n.t('sdata.enterNamePlaceholder')}
         disabled={isContextEmpty}
       />
       {content(

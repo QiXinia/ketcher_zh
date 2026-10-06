@@ -190,7 +190,8 @@
     "checkStructure": "Check Structure",
     "calculatedValues": "Calculated Values",
     "explicitHydrogens": "Add/Remove explicit hydrogens",
-    "viewer3D": "3D Viewer"
+    "viewer3D": "3D Viewer",
+    "helpWithShortcut": "Help (?)"
   },
   "dialog": {
     "ok": "OK",
@@ -665,7 +666,8 @@
     "title": "Text Editor",
     "fontSize": "Font Size",
     "text": "Text:",
-    "formattingToolbar": "Text formatting toolbar"
+    "formattingToolbar": "Text formatting toolbar",
+    "symbols": "symbols"
   },
   "sgroup": {
     "title": "S-Group Properties",
@@ -825,7 +827,9 @@
     "fieldValue": "Field value",
     "data": "Data",
     "specifyFieldValue": "Please, specify field value",
-    "specifyFieldName": "Please, specify field name"
+    "specifyFieldName": "Please, specify field name",
+    "enterValuePlaceholder": "Enter value",
+    "enterNamePlaceholder": "Enter name"
   },
   "fragmentSelection": {
     "cycleTooltip": "Fragment Selection Tool cannot be used on bonds that participate in a cycle.",
@@ -955,5 +959,9 @@
     "meltingTemp": "Melting Temp. (°C)",
     "unipositiveIons": "[Unipositive Ions]",
     "oligonucleotides": "[Oligonucleotides]"
+  },
+  "template": {
+    "placeholder": "template",
+    "selectedAttachmentPoints": "Selected attachment points"
   }
 }

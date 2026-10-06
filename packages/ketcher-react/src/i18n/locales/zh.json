@@ -190,7 +190,8 @@
     "checkStructure": "检查结构",
     "calculatedValues": "计算值",
     "explicitHydrogens": "添加/移除显式氢原子",
-    "viewer3D": "3D 查看器"
+    "viewer3D": "3D 查看器",
+    "helpWithShortcut": "帮助 (?)"
   },
   "dialog": {
     "ok": "确定",
@@ -665,7 +666,8 @@
     "title": "文本编辑器",
     "fontSize": "字号",
     "text": "文本：",
-    "formattingToolbar": "文本格式工具栏"
+    "formattingToolbar": "文本格式工具栏",
+    "symbols": "符号"
   },
   "sgroup": {
     "title": "S-基团属性",
@@ -825,7 +827,9 @@
     "fieldValue": "字段值",
     "data": "数据",
     "specifyFieldValue": "请指定字段值",
-    "specifyFieldName": "请指定字段名"
+    "specifyFieldName": "请指定字段名",
+    "enterValuePlaceholder": "请输入值",
+    "enterNamePlaceholder": "请输入名称"
   },
   "fragmentSelection": {
     "cycleTooltip": "片段选择工具不能用于参与成环的键。",
@@ -955,5 +959,9 @@
     "meltingTemp": "解链温度 (°C)",
     "unipositiveIons": "[一价阳离子]",
     "oligonucleotides": "[寡核苷酸]"
+  },
+  "template": {
+    "placeholder": "模板",
+    "selectedAttachmentPoints": "已选择的连接点"
   }
 }
