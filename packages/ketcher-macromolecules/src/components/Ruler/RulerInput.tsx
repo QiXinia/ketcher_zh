@@ -1,6 +1,7 @@
 import { ChangeEvent, KeyboardEvent, memo, useRef, useState } from 'react';
 import clsx from 'clsx';
 import { LayoutMode } from 'ketcher-core';
+import { i18n } from 'ketcher-react';
 
 import useTranslateAlongXAxis from './useTranslateAlongXAxis';
 
@@ -72,7 +73,7 @@ const RulerInput = ({
         styles.rulerInput,
         isDragging && styles.rulerInputDragging,
       )}
-      title="Number of monomers in a line"
+      title={String(i18n.t('ruler.monomersInLine'))}
       type="text"
       inputMode="numeric"
       pattern="[0-9]*"

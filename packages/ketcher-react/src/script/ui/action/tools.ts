@@ -429,7 +429,9 @@ const monomerWizardDisallowedBondTypes: Set<string> = new Set(
 export default bondTypes.reduce<Record<string, ToolActionEntry>>(
   (res, type, i) => {
     res[`bond-${type}`] = {
-      title: type ? getBondDisplayTitle(type) : bondTypeNames[i],
+      title: type
+        ? getBondDisplayTitle(type)
+        : bondTypeNames[i] || i18n.t('bondProperties.type'),
       shortcut: bondCuts[type],
       action: {
         tool: 'bond',

@@ -37,6 +37,7 @@ exports[`Input component should be rendered correctly should render slider accor
 exports[`Input component should be rendered correctly should render textarea if no schema provided and type is textarea 1`] = `
 <DocumentFragment>
   <textarea
+    class="input genericInput textArea"
     name="Name"
     type="textarea"
   >

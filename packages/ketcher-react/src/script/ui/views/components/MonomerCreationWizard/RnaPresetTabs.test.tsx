@@ -504,19 +504,13 @@ describe('RnaPresetTabs - applyHighlights function', () => {
     );
 
     fireEvent.click(screen.getByTestId('nucleotide-base-tab'));
-    expect(
-      screen.getByText('Select all atoms that form the base.'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('选择组成碱基的所有原子。')).toBeInTheDocument();
 
     fireEvent.click(screen.getByTestId('nucleotide-sugar-tab'));
-    expect(
-      screen.getByText('Select all atoms that form the sugar.'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('选择组成糖的所有原子。')).toBeInTheDocument();
 
     fireEvent.click(screen.getByTestId('nucleotide-phosphate-tab'));
-    expect(
-      screen.getByText('Select all atoms that form the phosphate.'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('选择组成磷酸的所有原子。')).toBeInTheDocument();
   });
 
   it('should render phosphate position picker in phosphate tab and call selected value handler', () => {

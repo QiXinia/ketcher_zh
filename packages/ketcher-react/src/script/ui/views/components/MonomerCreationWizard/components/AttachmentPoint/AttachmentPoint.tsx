@@ -5,6 +5,7 @@ import { useAttachmentPointSelectsData } from '../../hooks/useAttachmentPointSel
 import AttachmentPointControls from '../AttachmentPointControls/AttachmentPointControls';
 import type Editor from '../../../../../../editor';
 import { Icon } from '../../../../../../../components';
+import i18n from '../../../../../../../i18n';
 import { useEffect, useRef, useState } from 'react';
 
 type Props = {
@@ -121,7 +122,7 @@ const AttachmentPoint = ({
         <button
           className={styles.removeButton}
           onClick={handleRemove}
-          aria-label="Remove attachment point"
+          aria-label={i18n.t('monomerWizard.removeAttachmentPoint')}
           data-testid={`attachment-point-delete-button-${name}`}
         >
           <Icon name="deleteMenu" />

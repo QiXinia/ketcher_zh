@@ -104,7 +104,8 @@ export const SequenceItemContextMenu = ({
   const menuItems = [
     {
       name: SequenceItemContextMenuNames.title,
-      title: menuProps?.title,
+      title:
+        menuProps?.title || String(i18n.t('macromolecules.sequenceMenuTitle')),
       isMenuTitle: true,
       disabled: true,
       hidden: ({

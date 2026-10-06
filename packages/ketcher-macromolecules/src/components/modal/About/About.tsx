@@ -20,6 +20,7 @@ import { About as AboutStyled } from './About.styles';
 import { useIndigoVersionToRedux } from 'src/hooks/useIndigoVersionToRedux';
 import { selectAppMeta } from 'state/common/editorSlice';
 import { useAppDispatch, useAppSelector } from 'src/hooks/stateHooks';
+import { i18n } from 'ketcher-react';
 
 const FEEDBACK_URL = 'http://lifescience.opensource.epam.com/ketcher/#feedback';
 const OVERVIEW_URL =
@@ -68,11 +69,11 @@ export function About({
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  Version {version}
+                  {i18n.t('about.version')} {version}
                 </a>
               </dt>
               <dd data-testid="build-time">
-                Build at <time>{formattedDate}</time>
+                {i18n.t('about.buildAt')} <time>{formattedDate}</time>
               </dd>
               <div className="infoLinks">
                 <dt>
@@ -81,7 +82,7 @@ export function About({
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    Feedback
+                    {i18n.t('about.feedback')}
                   </a>
                 </dt>
                 <dt>
@@ -101,9 +102,11 @@ export function About({
               </div>
               <div data-testid="build-indigo-version">
                 {indigoVersion ? (
-                  <dd>Version {indigoVersion}</dd>
+                  <dd>
+                    {i18n.t('about.version')} {indigoVersion}
+                  </dd>
                 ) : (
-                  <p>Standalone</p>
+                  <p>{i18n.t('about.standalone')}</p>
                 )}
               </div>
             </dl>
@@ -114,7 +117,7 @@ export function About({
               className="okButton"
               data-testid="ok-button"
             >
-              Ok
+              {i18n.t('about.ok')}
             </button>
           </div>
         </AboutStyled>

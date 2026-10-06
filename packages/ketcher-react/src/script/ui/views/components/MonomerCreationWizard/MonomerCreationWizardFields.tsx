@@ -36,6 +36,7 @@ import accordionClasses from '../../../../../components/Accordion/Accordion.modu
 import ModificationTypeDropdown from './components/ModificationTypeDropdown/ModificationTypeDropdown';
 import { Autocomplete, TextField } from '@mui/material';
 import { getMonomerPropertyVisibility } from './MonomerCreationWizardFields.utils';
+import i18n from '../../../../../i18n';
 
 interface IMonomerCreationWizardFieldsProps {
   wizardState: WizardState;
@@ -154,12 +155,12 @@ const MonomerCreationWizardFields = (
         className={clsx(styles.attributesFields, selectStyles.selectContainer)}
       >
         <AttributeField
-          title="Code"
+          title={i18n.t('monomerWizard.code')}
           control={
             <input
               type="text"
               className={clsx(styles.input, errors.symbol && styles.inputError)}
-              placeholder="e.g. PEG-2"
+              placeholder={i18n.t('monomerWizard.examplePeg2')}
               data-testid="symbol-input"
               value={symbol}
               onChange={(event: ChangeEvent<HTMLInputElement>) =>
@@ -172,12 +173,12 @@ const MonomerCreationWizardFields = (
           disabled={!type}
         />
         <AttributeField
-          title="Name"
+          title={i18n.t('monomerWizard.name')}
           control={
             <input
               type="text"
               className={clsx(styles.input, errors.name && styles.inputError)}
-              placeholder="e.g. Diethylene Glycol"
+              placeholder={i18n.t('monomerWizard.exampleDiethyleneGlycol')}
               value={name}
               data-testid="name-input"
               onChange={(event: ChangeEvent<HTMLInputElement>) =>
@@ -190,7 +191,7 @@ const MonomerCreationWizardFields = (
         />
         {props.showNaturalAnalogue !== false && displayNaturalAnalogue && (
           <AttributeField
-            title="Natural analogue"
+            title={i18n.t('monomerWizard.naturalAnalogue')}
             control={
               <NaturalAnaloguePicker
                 monomerType={type}
@@ -218,10 +219,12 @@ const MonomerCreationWizardFields = (
           </div>
         )}
         <div className={styles.attachmentPointsHeader}>
-          <p className={styles.attachmentPointsTitle}>Attachment points</p>
+          <p className={styles.attachmentPointsTitle}>
+            {i18n.t('monomerWizard.attachmentPoints')}
+          </p>
           <span
             className={styles.attachmentPointInfoIcon}
-            title="To add new attachment points, right-click and mark atoms as leaving groups or connection points."
+            title={i18n.t('monomerWizard.addAttachmentPoints')}
             data-testid="attachment-point-info-icon"
           >
             <Icon name="about" />
@@ -301,7 +304,7 @@ const MonomerCreationWizardFields = (
                     <IconButton
                       iconName="delete"
                       className={styles.deleteModificationTypeButton}
-                      title="Delete modification type"
+                      title={i18n.t('monomerWizard.deleteModificationType')}
                       onClick={() =>
                         deleteModificationType(modificationType.id)
                       }

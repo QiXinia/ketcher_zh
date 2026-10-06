@@ -15,6 +15,7 @@
  ***************************************************************************/
 
 import { mapOf } from './schema-helper';
+import i18n from '../../../../i18n';
 
 const radioButtonsSchema = {
   enum: ['Absolute', 'Relative', 'Attached'],
@@ -22,14 +23,18 @@ const radioButtonsSchema = {
 };
 
 const contextSchema = {
-  title: 'Context',
+  get title() {
+    return i18n.t('sdata.context');
+  },
   enum: ['Fragment', 'Multifragment', 'Bond', 'Atom', 'Group'],
   default: 'Fragment',
 };
 
 const sData = {
   Fragment: {
-    title: 'Fragment',
+    get title() {
+      return i18n.t('sdata.fragment');
+    },
     type: 'Object',
     oneOf: [
       {
@@ -39,12 +44,16 @@ const sData = {
         properties: {
           type: { enum: ['DAT'] },
           fieldName: {
-            title: 'Field name',
+            get title() {
+              return i18n.t('sdata.fieldName');
+            },
             enum: ['MDLBG_FRAGMENT_STEREO'],
             default: 'MDLBG_FRAGMENT_STEREO',
           },
           fieldValue: {
-            title: 'Field value',
+            get title() {
+              return i18n.t('sdata.fieldValue');
+            },
             enum: [
               'abs',
               '(+)-enantiomer',
@@ -70,16 +79,22 @@ const sData = {
         properties: {
           type: { enum: ['DAT'] },
           fieldName: {
-            title: 'Field name',
+            get title() {
+              return i18n.t('sdata.fieldName');
+            },
             enum: ['MDLBG_FRAGMENT_COEFFICIENT'],
             default: 'MDLBG_FRAGMENT_COEFFICIENT',
           },
           fieldValue: {
-            title: 'Field value',
+            get title() {
+              return i18n.t('sdata.fieldValue');
+            },
             type: 'string',
             default: '',
             minLength: 1,
-            invalidMessage: 'Please, specify field value',
+            get invalidMessage() {
+              return i18n.t('sdata.specifyFieldValue');
+            },
           },
           radiobuttons: radioButtonsSchema,
         },
@@ -92,16 +107,22 @@ const sData = {
         properties: {
           type: { enum: ['DAT'] },
           fieldName: {
-            title: 'Field name',
+            get title() {
+              return i18n.t('sdata.fieldName');
+            },
             enum: ['MDLBG_FRAGMENT_CHARGE'],
             default: 'MDLBG_FRAGMENT_CHARGE',
           },
           fieldValue: {
-            title: 'Field value',
+            get title() {
+              return i18n.t('sdata.fieldValue');
+            },
             type: 'string',
             default: '',
             minLength: 1,
-            invalidMessage: 'Please, specify field value',
+            get invalidMessage() {
+              return i18n.t('sdata.specifyFieldValue');
+            },
           },
           radiobuttons: radioButtonsSchema,
         },
@@ -114,16 +135,22 @@ const sData = {
         properties: {
           type: { enum: ['DAT'] },
           fieldName: {
-            title: 'Field name',
+            get title() {
+              return i18n.t('sdata.fieldName');
+            },
             enum: ['MDLBG_FRAGMENT_RADICALS'],
             default: 'MDLBG_FRAGMENT_RADICALS',
           },
           fieldValue: {
-            title: 'Field value',
+            get title() {
+              return i18n.t('sdata.fieldValue');
+            },
             type: 'string',
             default: '',
             minLength: 1,
-            invalidMessage: 'Please, specify field value',
+            get invalidMessage() {
+              return i18n.t('sdata.specifyFieldValue');
+            },
           },
           radiobuttons: radioButtonsSchema,
         },
@@ -132,7 +159,9 @@ const sData = {
     ],
   },
   Multifragment: {
-    title: 'Multifragment',
+    get title() {
+      return i18n.t('sdata.multifragment');
+    },
     type: 'Object',
     oneOf: [
       {
@@ -142,12 +171,16 @@ const sData = {
         properties: {
           type: { enum: ['DAT'] },
           fieldName: {
-            title: 'Field name',
+            get title() {
+              return i18n.t('sdata.fieldName');
+            },
             enum: ['KETCHER_MULTIPLE_FRAGMENT'],
             default: 'KETCHER_MULTIPLE_FRAGMENT',
           },
           fieldValue: {
-            title: 'Field value',
+            get title() {
+              return i18n.t('sdata.fieldValue');
+            },
             enum: [
               'aerosol',
               'alloy',
@@ -170,7 +203,9 @@ const sData = {
     ],
   },
   Bond: {
-    title: 'Bond',
+    get title() {
+      return i18n.t('sdata.bond');
+    },
     type: 'Object',
     oneOf: [
       {
@@ -180,12 +215,16 @@ const sData = {
         properties: {
           type: { enum: ['DAT'] },
           fieldName: {
-            title: 'Field name',
+            get title() {
+              return i18n.t('sdata.fieldName');
+            },
             enum: ['MDLBG_STEREO_KEY'],
             default: 'MDLBG_STEREO_KEY',
           },
           fieldValue: {
-            title: 'Field value',
+            get title() {
+              return i18n.t('sdata.fieldValue');
+            },
             enum: [
               'erythro',
               'threo',
@@ -211,12 +250,16 @@ const sData = {
         properties: {
           type: { enum: ['DAT'] },
           fieldName: {
-            title: 'Field name',
+            get title() {
+              return i18n.t('sdata.fieldName');
+            },
             enum: ['MDLBG_BOND_KEY'],
             default: 'MDLBG_BOND_KEY',
           },
           fieldValue: {
-            title: 'Field value',
+            get title() {
+              return i18n.t('sdata.fieldValue');
+            },
             enum: ['Value=4'],
             default: 'Value=4',
           },
@@ -227,7 +270,9 @@ const sData = {
     ],
   },
   Atom: {
-    title: 'Atom',
+    get title() {
+      return i18n.t('sdata.atom');
+    },
     type: 'Object',
     oneOf: [
       {
@@ -237,12 +282,16 @@ const sData = {
         properties: {
           type: { enum: ['DAT'] },
           fieldName: {
-            title: 'Field name',
+            get title() {
+              return i18n.t('sdata.fieldName');
+            },
             enum: ['MDLBG_STEREO_KEY'],
             default: 'MDLBG_STEREO_KEY',
           },
           fieldValue: {
-            title: 'Field value',
+            get title() {
+              return i18n.t('sdata.fieldValue');
+            },
             enum: [
               'RS',
               'SR',
@@ -274,7 +323,9 @@ const sData = {
     ],
   },
   Group: {
-    title: 'Group',
+    get title() {
+      return i18n.t('sdata.group');
+    },
     type: 'Object',
     oneOf: [
       {
@@ -284,12 +335,16 @@ const sData = {
         properties: {
           type: { enum: ['DAT'] },
           fieldName: {
-            title: 'Field name',
+            get title() {
+              return i18n.t('sdata.fieldName');
+            },
             enum: ['MDLBG_STEREO_KEY'],
             default: 'MDLBG_STEREO_KEY',
           },
           fieldValue: {
-            title: 'Field value',
+            get title() {
+              return i18n.t('sdata.fieldValue');
+            },
             enum: ['cis', 'trans'],
             default: 'cis',
           },
@@ -303,28 +358,40 @@ const sData = {
 
 export const sdataCustomSchema = {
   key: 'Custom',
-  title: 'Data',
+  get title() {
+    return i18n.t('sdata.data');
+  },
   type: 'object',
   properties: {
     type: { enum: ['DAT'] },
     context: {
-      title: 'Context',
+      get title() {
+        return i18n.t('sdata.context');
+      },
       enum: ['Atom', 'Bond', 'Fragment', 'Group', 'Multifragment'],
       default: 'Fragment',
     },
     fieldName: {
-      title: 'Field name',
+      get title() {
+        return i18n.t('sdata.fieldName');
+      },
       type: 'string',
       default: '',
       minLength: 1,
-      invalidMessage: 'Please, specify field name',
+      get invalidMessage() {
+        return i18n.t('sdata.specifyFieldName');
+      },
     },
     fieldValue: {
-      title: 'Field value',
+      get title() {
+        return i18n.t('sdata.fieldValue');
+      },
       type: 'string',
       default: '',
       minLength: 1,
-      invalidMessage: 'Please, specify field value',
+      get invalidMessage() {
+        return i18n.t('sdata.specifyFieldValue');
+      },
     },
     radiobuttons: {
       enum: ['Absolute', 'Relative', 'Attached'],

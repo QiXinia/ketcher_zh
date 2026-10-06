@@ -65,6 +65,7 @@ import { useAppContext } from '../../../../../hooks';
 import Editor from '../../../../editor';
 import { isStructureContinuous } from '../../../../editor/utils/structureContinuity';
 import { KETCHER_ROOT_NODE_CSS_SELECTOR } from '../../../../../constants';
+import i18n from '../../../../../i18n';
 import { createPortal } from 'react-dom';
 import tools from '../../../action/tools';
 import MonomerCreationWizardFields from './MonomerCreationWizardFields';
@@ -1050,7 +1051,7 @@ const MonomerCreationWizardInternal = ({
         children: (
           <div className={styles.typeOption}>
             <Icon name={option.iconName} />
-            {option.label}
+            {i18n.t(option.label)}
           </div>
         ),
       })),
@@ -1923,7 +1924,7 @@ const MonomerCreationWizardInternal = ({
       <div className={styles.leftColumn}>
         <p className={styles.wizardTitle}>
           <Icon name={CREATE_MONOMER_TOOL_NAME} />
-          Create Monomer
+          {i18n.t('monomerWizard.title')}
         </p>
 
         <div className={styles.notificationsArea}>
@@ -1932,7 +1933,7 @@ const MonomerCreationWizardInternal = ({
               <Notification
                 id={id}
                 type={type}
-                message={message}
+                message={i18n.t(message)}
                 key={id}
                 onDismiss={handleNotificationDismiss}
               />
@@ -1950,12 +1951,12 @@ const MonomerCreationWizardInternal = ({
             )}
           >
             <AttributeField
-              title="Type"
+              title={i18n.t('monomerWizard.type')}
               control={
                 <Select
                   className={styles.input}
                   options={monomerTypeSelectOptions}
-                  placeholder="Select monomer type"
+                  placeholder={i18n.t('monomerWizard.selectMonomerType')}
                   data-testid="type-select"
                   value={type}
                   onChange={(value) => {
@@ -1966,7 +1967,9 @@ const MonomerCreationWizardInternal = ({
               }
               required
             />
-            <p className={styles.attributesTitle}>Attributes</p>
+            <p className={styles.attributesTitle}>
+              {i18n.t('monomerWizard.attributes')}
+            </p>
             {isPresetType ? (
               <RnaPresetTabs
                 wizardState={rnaPresetWizardState}
@@ -2029,7 +2032,7 @@ const MonomerCreationWizardInternal = ({
           <div className={styles.dialogOverlay}>
             <Dialog
               className={styles.smallDialog}
-              title="Confirm type change"
+              title={i18n.t('monomerWizard.confirmTypeChange')}
               withDivider={true}
               valid={() => true}
               params={{
@@ -2046,12 +2049,14 @@ const MonomerCreationWizardInternal = ({
                 },
               }}
               buttons={['OK', 'Cancel']}
-              buttonsNameMap={{ OK: 'Yes', Cancel: 'Cancel' }}
+              buttonsNameMap={{
+                OK: i18n.t('dialog.yes'),
+                Cancel: i18n.t('dialog.cancel'),
+              }}
               primaryButtons={['Cancel']}
             >
               <div className={styles.DialogMessage}>
-                Changing the type will result in a loss of inputted data. Do you
-                wish to proceed?
+                {i18n.t('monomerWizard.typeChangeWarning')}
               </div>
             </Dialog>
           </div>,
@@ -2063,7 +2068,7 @@ const MonomerCreationWizardInternal = ({
           <div className={styles.dialogOverlay}>
             <Dialog
               className={styles.smallDialog}
-              title="Non-typical attachment points"
+              title={i18n.t('monomerWizard.nonTypicalAttachmentPoints')}
               withDivider={true}
               valid={() => true}
               params={{
@@ -2108,11 +2113,14 @@ const MonomerCreationWizardInternal = ({
                 onCancel: () => setLeavingGroupDialogMessage(''),
               }}
               buttons={['OK', 'Cancel']}
-              buttonsNameMap={{ OK: 'Yes', Cancel: 'Cancel' }}
+              buttonsNameMap={{
+                OK: i18n.t('dialog.yes'),
+                Cancel: i18n.t('dialog.cancel'),
+              }}
               primaryButtons={['Cancel']}
             >
               <div className={styles.DialogMessage}>
-                {leavingGroupDialogMessage}
+                {i18n.t(leavingGroupDialogMessage)}
               </div>
             </Dialog>
           </div>,

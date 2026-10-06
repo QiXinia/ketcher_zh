@@ -202,7 +202,7 @@ const TextEditorInner = (props: {
         onKeyDown={handleKeyDown}
         role="toolbar"
         tabIndex={0}
-        aria-label="Text formatting toolbar"
+        aria-label={i18n.t('textEditor.formattingToolbar')}
       >
         {buttons.map((button) => {
           return (

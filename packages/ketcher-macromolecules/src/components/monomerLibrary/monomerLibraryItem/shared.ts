@@ -4,6 +4,7 @@ import {
   libraryItemHasR1AttachmentPoint,
   MonomerOrAmbiguousType,
 } from 'ketcher-core';
+import { i18n } from 'ketcher-react';
 
 export const getAutochainErrorMessage = (
   editor: CoreEditor,
@@ -13,14 +14,14 @@ export const getAutochainErrorMessage = (
     editor.getDataForAutochain();
 
   if (selectedMonomers.length > 0 && selectedMonomersWithFreeR2.length !== 1) {
-    return 'Select a monomer or a chain that has one R2 available.';
+    return i18n.t('monomerLibrary.selectMonomerWithR2');
   }
 
   if (
     selectedMonomersWithFreeR2.length === 1 &&
     !libraryItemHasR1AttachmentPoint(libraryItem)
   ) {
-    return 'This monomer cannot be added to a chain using this button, as it lacks R1.';
+    return i18n.t('monomerLibrary.cannotAddLacksR1');
   }
 
   return '';

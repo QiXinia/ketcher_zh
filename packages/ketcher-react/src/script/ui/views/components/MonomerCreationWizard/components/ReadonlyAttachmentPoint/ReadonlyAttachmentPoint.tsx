@@ -4,6 +4,7 @@ import AttachmentPointControls from '../AttachmentPointControls/AttachmentPointC
 import type Editor from '../../../../../../editor';
 import styles from '../AttachmentPoint/AttachmentPoint.module.less';
 import { createReadonlyAttachmentPointSelectData } from '../../hooks/useAttachmentPointSelectsData';
+import i18n from '../../../../../../../i18n';
 
 type Props = {
   name: AttachmentPointName;
@@ -124,7 +125,7 @@ const ReadonlyAttachmentPoint = ({
       className={styles.selects}
       highlight={highlight}
       disabledName
-      nameTooltip="Attachment point numbers of internal attachment points determined by the phosphate position switcher."
+      nameTooltip={i18n.t('monomerWizard.internalApTooltip')}
       disabled={!onLeavingAtomChange}
       ref={containerRef}
     />

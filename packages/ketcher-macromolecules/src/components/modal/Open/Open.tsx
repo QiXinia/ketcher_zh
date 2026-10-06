@@ -32,7 +32,7 @@ import {
   SequenceRenderer,
   Vec2,
 } from 'ketcher-core';
-import { IndigoProvider } from 'ketcher-react';
+import { IndigoProvider, i18n } from 'ketcher-react';
 import { RequiredModalProps } from '../modalContainer';
 import { OpenFileWrapper } from './Open.styles';
 import {
@@ -184,7 +184,7 @@ const addToCanvas = ({
   const deserialisedKet = ketSerializer.deserializeToDrawingEntities(struct);
 
   if (!deserialisedKet) {
-    throw new Error('Error during parsing file');
+    throw new Error(i18n.t('open.errorDuringParsingFile'));
   }
 
   const isSequenceMode = editor.mode.modeName === 'sequence-layout-mode';
@@ -266,11 +266,13 @@ const onOk = async ({
   let fileData = struct;
 
   const showParsingError = (stringError) => {
-    const errorMessage = 'Convert error! ' + stringError;
+    const errorMessage = i18n.t('save.convertError', {
+      error: stringError,
+    });
     dispatch(
       openErrorModal({
         errorMessage,
-        errorTitle: isSeq || isFasta ? 'Unsupported symbols' : '',
+        errorTitle: isSeq || isFasta ? i18n.t('open.unsupportedSymbols') : '',
       }),
     );
   };
@@ -280,7 +282,7 @@ const onOk = async ({
       addToCanvas({ struct, ketSerializer, editor });
       onCloseCallback();
     } catch (e) {
-      showParsingError('Error during file parsing.');
+      showParsingError(i18n.t('open.errorDuringFileParsing'));
     }
     return;
   } else if (
@@ -373,7 +375,7 @@ const Open = ({ isModalOpen, onClose }: RequiredModalProps) => {
       setStructStr(fileContent);
       setCurrentState(MODAL_STATES.textEditor);
     };
-    const onError = () => errorHandler('Error processing file');
+    const onError = () => errorHandler(i18n.t('open.errorProcessingFile'));
 
     setFileName(files[0].name);
     opener?.chosenOpener(files[0]).then(onLoad, onError);
@@ -445,7 +447,7 @@ const Open = ({ isModalOpen, onClose }: RequiredModalProps) => {
           key="openButton"
           disabled={!structStr.trim()}
           clickHandler={openHandler}
-          label="Open as New"
+          label={i18n.t('open.openAsNew')}
           styleType="secondary"
           data-testid="open-as-new-button"
         />
@@ -453,8 +455,8 @@ const Open = ({ isModalOpen, onClose }: RequiredModalProps) => {
           key="copyButton"
           disabled={!structStr.trim()}
           clickHandler={addToCanvasHandler}
-          label="Add to Canvas"
-          title="Structure will be loaded as fragment and added to Clipboard"
+          label={i18n.t('open.addToCanvas')}
+          title={i18n.t('open.structureAsFragment')}
           data-testid="add-to-canvas-button"
         />
       </FooterButtonContainer>
@@ -464,7 +466,7 @@ const Open = ({ isModalOpen, onClose }: RequiredModalProps) => {
   return (
     <OpenModal
       isOpen={isModalOpen}
-      title="Open Structure"
+      title={i18n.t('open.title')}
       onClose={onCloseCallback}
       modalWidth={currentState === MODAL_STATES.textEditor ? '620px' : ''}
       testId="openStructureModal"

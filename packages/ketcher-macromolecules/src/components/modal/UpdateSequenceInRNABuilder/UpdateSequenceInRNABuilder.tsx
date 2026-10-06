@@ -22,6 +22,7 @@ import styled from '@emotion/styled';
 import { selectEditor } from 'state/common';
 import { getCountOfNucleoelements } from 'helpers/countNucleoelents';
 import { resetRnaBuilderAfterSequenceUpdate } from 'components/monomerLibrary/RnaBuilder/RnaEditor/RnaEditorExpanded/helpers';
+import { i18n } from 'ketcher-react';
 
 export interface Props {
   onClose: () => void;
@@ -58,21 +59,22 @@ const UpdateSequenceInRNABuilder = ({ isModalOpen, onClose }: Props) => {
   return (
     <Modal
       isOpen={isModalOpen}
-      title="Update sequence"
+      title={String(i18n.t('rnaBuilder.updateSequence'))}
       onClose={onCloseCallback}
       data-testid="update-sequence-modal"
     >
       <Modal.Content data-testid="update-sequence-modal-body">
         <TextWrapper>
-          You are going to modify {countOfNucleoelements} nucleotides. Are you
-          sure?
+          {String(i18n.t('rnaBuilder.updateSequenceConfirmPrefix'))}
+          {countOfNucleoelements}
+          {String(i18n.t('rnaBuilder.updateSequenceConfirmSuffix'))}
         </TextWrapper>
       </Modal.Content>
       <Modal.Footer>
         <ActionButton
           key="cancel"
           clickHandler={cancelHandler}
-          label="Cancel"
+          label={String(i18n.t('dialog.cancel'))}
           styleType="secondary"
           title=""
           data-testid="update-sequence-cancel-button"
@@ -80,7 +82,7 @@ const UpdateSequenceInRNABuilder = ({ isModalOpen, onClose }: Props) => {
         <ActionButton
           key="update"
           clickHandler={updateHandler}
-          label="Yes"
+          label={String(i18n.t('dialog.yes'))}
           title=""
           data-testid="update-sequence-yes-button"
         />

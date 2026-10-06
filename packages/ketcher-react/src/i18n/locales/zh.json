@@ -190,7 +190,8 @@
     "checkStructure": "检查结构",
     "calculatedValues": "计算值",
     "explicitHydrogens": "添加/移除显式氢原子",
-    "viewer3D": "3D 查看器"
+    "viewer3D": "3D 查看器",
+    "helpWithShortcut": "帮助 (?)"
   },
   "dialog": {
     "ok": "确定",
@@ -209,7 +210,8 @@
     "confirmAction": "请确认此操作",
     "expandWindow": "展开窗口",
     "minimizeWindow": "最小化窗口",
-    "closeWindow": "关闭窗口"
+    "closeWindow": "关闭窗口",
+    "textEdit": "文本编辑"
   },
   "save": {
     "title": "保存结构",
@@ -224,7 +226,11 @@
     "cannotDisplayBinary": "无法显示二进制内容",
     "copyToClipboard": "复制到剪贴板",
     "featureNotAvailable": "您的浏览器不支持此功能",
-    "structureContainsErrors": "结构包含错误，请检查数据..."
+    "structureContainsErrors": "结构包含错误，请检查数据...",
+    "inlineSmilesWarning": "该分子将使用内联 SMILES 导出，加载时将显示为 CHEM 单体。",
+    "helmAliasWarning": "部分单体在 HELM 核心库中没有别名，将使用 Ketcher 别名导出。",
+    "convertError": "转换错误！{{error}}",
+    "structureErrorsFull": "结构包含错误，请检查数据，否则以该格式保存后可能会丢失部分属性甚至整个结构。"
   },
   "open": {
     "title": "打开结构",
@@ -243,7 +249,13 @@
     "selectStructure": "选择结构",
     "structureIndex": "结构 {{index}}",
     "file": "文件：",
-    "errorPrefix": "错误："
+    "errorPrefix": "错误：",
+    "openAsNew": "作为新文件打开",
+    "unsupportedSymbols": "不支持的符号",
+    "errorDuringFileParsing": "文件解析出错。",
+    "errorDuringParsingFile": "解析文件时出错",
+    "browserNotSupportOpen": "您的浏览器不支持在本地打开文件",
+    "failedToReadFile": "读取文件失败："
   },
   "check": {
     "title": "结构检查",
@@ -387,7 +399,17 @@
     "blackAndWhite": "黑白",
     "black": "黑色",
     "pngSvgRendererOption": "适用于 PNG/SVG 图片渲染器的选项",
-    "ignoreChiralFlagTooltip": "从 mol 文件加载时忽略手性标志..."
+    "ignoreChiralFlagTooltip": "从 mol 文件加载时忽略手性标志...",
+    "enabled": "启用",
+    "disabled": "禁用",
+    "imageResLow": "低（72 DPI）",
+    "imageResHigh": "高（600 DPI）",
+    "autoFadeStereoLabels": "自动淡出立体标签",
+    "miewMode": "Miew 模式",
+    "miewTheme": "Miew 主题",
+    "miewAtomLabel": "Miew 原子标签",
+    "none": "无",
+    "exportFailed": "导出失败"
   },
   "extendedTable": {
     "atomGenerics": "原子通配符",
@@ -486,7 +508,67 @@
     "selectPhosphateAtoms": "选择组成磷酸的所有原子。",
     "examplePEG": "例如 PEG-2",
     "exampleDiethyleneGlycol": "例如 二乙二醇",
-    "removeAttachmentPoint": "移除连接点"
+    "removeAttachmentPoint": "移除连接点",
+    "title": "创建单体",
+    "typeLabels": {
+      "aminoAcid": "氨基酸",
+      "sugar": "糖",
+      "base": "碱基",
+      "phosphate": "磷酸",
+      "nucleotideMonomer": "核苷酸（单体）",
+      "nucleotidePreset": "核苷酸（预设）",
+      "chem": "CHEM",
+      "preset": "预设"
+    },
+    "notifications": {
+      "defaultAttachmentPoints": "连接点默认以氢作为离去基团。",
+      "emptyMandatoryFields": "必须填写所有必填项。",
+      "invalidSymbol": "单体代码只能包含大小写字母、数字、连字符 (-)、下划线 (_) 和星号 (*)。",
+      "symbolExists": "该代码在肽、RNA 或 CHEM 单体中必须唯一。",
+      "editingIsNotAllowed": "不允许编辑该结构。",
+      "noAttachmentPoints": "单体必须至少包含一个连接点。",
+      "incorrectAttachmentPointsOrder": "连接点编号必须按顺序排列，但允许跳过 R1 和 R2。",
+      "attachmentPointsNotUnique": "同一编号只能分配给一个连接点。",
+      "creationSuccessful": "单体已成功添加到库中。",
+      "creationRNASuccessful": "预设已成功添加到库中。",
+      "incontinuousStructure": "所有单体必须具有连续的结构。",
+      "notUniqueModificationTypes": "在一个天然类似物中，只能有一个氨基酸使用相同的修饰类型。",
+      "modificationTypeExists": "在一个天然类似物中，只能有一个氨基酸使用相同的修饰类型。",
+      "notMinimalViableStructure": "最小的单体结构是由单键连接的两个原子。",
+      "impureStructure": "单体结构不能包含 S-基团、R-基团、特殊原子或任何其他查询属性。",
+      "invalidHELMAlias": "HELM 别名只能包含大小写字母、数字、下划线 (_)、星号 (*)、方括号 ([])、圆括号 (())、点号 (.) 和连字符 (-)，且不能包含空格。",
+      "notUniqueHELMAlias": "HELM 别名在肽或 RNA 单体中必须唯一。",
+      "invalidBILNAlias": "BILN 别名只能包含大小写字母、数字、连字符 (-)、下划线 (_) 和星号 (*)。",
+      "notUniqueBILNAlias": "BILN 别名在肽和 CHEM 单体中必须唯一。",
+      "invalidRnaPresetStructure": "RNA 预设组件的结构存在问题，请调整该结构。",
+      "rnaPresetAtomsOutsideComponents": "部分原子不属于任何核苷酸组件（糖、碱基或磷酸）。",
+      "rnaPresetAtomsInMultipleComponents": "部分原子同时归属于多个核苷酸组件。",
+      "rnaPresetMissingComponents": "预设必须至少包含两个组件，且其中之一必须是糖。",
+      "rnaPresetInvalidSugarConnectionBonds": "糖只能与碱基形成一个单键，并与磷酸形成一个单键。",
+      "rnaPresetUnexpectedBasePhosphateBond": "磷酸与碱基之间不能存在化学键。",
+      "rnaPresetInvalidSugarBaseConnectionAttachmentPoints": "糖与碱基之间的化学键必须建立在糖的 R3 与碱基的 R1 之间。",
+      "rnaPresetInvalidSugarPhosphateConnectionAttachmentPoints": "糖与磷酸之间的化学键必须建立在一个单体的 R2 与另一个单体的 R1 之间。",
+      "notUniquePresetCode": "预设代码在所有预设中必须唯一。",
+      "invalidPresetCode": "预设代码只能包含大小写字母、数字、连字符 (-)、下划线 (_) 和星号 (*)。",
+      "invalidName": "单体名称只能包含大小写字母、数字、连字符 (-)、下划线 (_)、星号 (*) 和空格。",
+      "invalidPhosphatePositionAttachmentPoints": "3′ 位需要磷酸 R1 与糖 R2 相连；5′ 位需要磷酸 R2 与糖 R1 相连。",
+      "phosphatePositionNotSelected": "必须选择磷酸的位置（5' 或 3'）。",
+      "editAllPresetWarning": "",
+      "editAllPresetError": ""
+    },
+    "validation": {
+      "aminoAcid": "氨基酸单体的 R1 通常以氢、R2 通常以羟基作为离去基团。是否按当前连接点继续？",
+      "sugar": "糖单体的 R1、R2 通常以氢、R3 通常以羟基作为离去基团。是否按当前连接点继续？",
+      "base": "碱基单体的 R1 通常以氢作为离去基团。是否按当前连接点继续？",
+      "phosphate": "磷酸单体的 R1、R2 通常以羟基作为离去基团。是否按当前连接点继续？",
+      "nucleotide": "核苷酸单体的 R1 通常以氢、R2 通常以羟基作为离去基团。是否按当前连接点继续？"
+    },
+    "typeChangeWarning": "更改类型将导致已输入的数据丢失。是否继续？",
+    "fivePrimeLeft": "5' 端（左）",
+    "threePrimeRight": "3' 端（右）",
+    "examplePeg2": "例如 PEG-2",
+    "internalApTooltip": "内部连接点的编号由磷酸位置切换开关决定。",
+    "selectAnalogue": "选择类似物"
   },
   "atomProperties": {
     "title": "原子属性",
@@ -565,7 +647,8 @@
     "noChange": "无变化",
     "madeBroken": "生成/断裂",
     "orderChanges": "键级变化",
-    "madeBrokenAndChanges": "生成/断裂且变化"
+    "madeBrokenAndChanges": "生成/断裂且变化",
+    "bond": "键"
   },
   "rgroup": {
     "title": "R-基团",
@@ -583,10 +666,24 @@
     "title": "文本编辑器",
     "fontSize": "字号",
     "text": "文本：",
-    "formattingToolbar": "文本格式工具栏"
+    "formattingToolbar": "文本格式工具栏",
+    "symbols": "符号"
   },
   "sgroup": {
-    "title": "S-基团属性"
+    "title": "S-基团属性",
+    "sgroup": "S-基团",
+    "multipleGroup": "多重基团",
+    "repeatCount": "重复次数",
+    "sruPolymer": "SRU 聚合物",
+    "polymerLabel": "聚合物标签",
+    "repeatPattern": "重复模式",
+    "copolymer": "共聚物",
+    "subtype": "子类型",
+    "superatom": "超原子",
+    "name": "名称",
+    "queryComponent": "查询组分",
+    "nucleotideComponent": "核苷酸组分",
+    "component": "组分"
   },
   "enhancedStereo": {
     "title": "增强立体化学",
@@ -627,7 +724,13 @@
     "connect": "连接",
     "duplicateAndEdit": "复制并编辑...",
     "deletePreset": "删除预设",
-    "calculateProperties": "计算属性"
+    "calculateProperties": "计算属性",
+    "deleteRnaPreset": "删除 RNA 预设",
+    "failedLoadLibrary": "单体库加载失败",
+    "sequenceMenuTitle": "序列",
+    "deleteRnaPresetAbout": "您即将删除",
+    "deleteRnaPresetName": "“{{name}}”RNA 预设。",
+    "deleteRnaPresetUndo": "此操作无法撤销。"
   },
   "monomerLibrary": {
     "searchByName": "按名称搜索...",
@@ -644,14 +747,19 @@
     "phosphateOnRight": "磷酸在右侧",
     "selectPhosphatePosition": "选择磷酸位置",
     "switchPhosphateLeft": "切换到左侧",
-    "switchPhosphateRight": "切换到右侧"
+    "switchPhosphateRight": "切换到右侧",
+    "selectMonomerWithR2": "请选择一个具有可用 R2 的单体或链。",
+    "cannotAddLacksR1": "该单体缺少 R1，无法使用此按钮添加到链中。",
+    "favoritesMonomers": "单体",
+    "favoritesPresets": "预设"
   },
   "common": {
     "default": "默认",
     "error": "错误",
     "warning": "警告",
     "success": "成功",
-    "loading": "加载中..."
+    "loading": "加载中...",
+    "alreadyInUse": "已在使用中"
   },
   "periodicTable": {
     "single": "单个",
@@ -688,5 +796,172 @@
     "S": "硫",
     "Cl": "氯",
     "Ar": "氩"
+  },
+  "monomerPreview": {
+    "alternatives": "可选项",
+    "mixed": "混合",
+    "anyAminoAcid": "任意氨基酸",
+    "anyBase": "任意碱基"
+  },
+  "saveWarnings": {
+    "smartsQueryProps": "结构包含 SMARTS 不支持的原子与键查询属性，这些查询属性不会反映在保存的文件中。",
+    "smilesGenericAtoms": "结构包含泛原子，将以任意原子（*）的形式保存。",
+    "arrowReplaced": "{{format}} 格式不支持所绘制的元素：反应{{arrowMode}}箭头将被替换为普通反应箭头",
+    "arrowsLost": "{{format}} 格式不支持所绘制的元素：反应箭头将丢失。",
+    "noRgroupFragments": "在 {{format}} 中，结构将在不包含 R 基团片段的情况下保存",
+    "noRgroupMembers": "在 {{format}} 中，结构将在不包含 R 基团成员的情况下保存",
+    "noSgroups": "在 {{format}} 中，结构将在不包含 S 基团的情况下保存",
+    "valenceUnsupported": "在 {{format}} 中不支持化合价",
+    "enhancedStereoLost": "结构包含增强立体化学特征，部分信息将会丢失。",
+    "noFunctionalGroups": "在 {{format}} 中，结构将在不包含官能团的情况下保存。",
+    "cmlFunctionalGroupsLost": "结构包含官能团，在 {{format}} 中部分信息将会丢失。"
+  },
+  "sdata": {
+    "context": "上下文",
+    "fragment": "片段",
+    "multifragment": "多片段",
+    "bond": "键",
+    "atom": "原子",
+    "group": "基团",
+    "fieldName": "字段名",
+    "fieldValue": "字段值",
+    "data": "数据",
+    "specifyFieldValue": "请指定字段值",
+    "specifyFieldName": "请指定字段名",
+    "enterValuePlaceholder": "请输入值",
+    "enterNamePlaceholder": "请输入名称"
+  },
+  "fragmentSelection": {
+    "cycleTooltip": "片段选择工具不能用于参与成环的键。",
+    "componentTooltip": "此方向的结构片段已被标记为核苷酸组分。"
+  },
+  "generics": {
+    "isDisabled": "{{label}} 已禁用",
+    "items": {
+      "*": "任意原子（含氢）",
+      "A": "除氢外的任意原子",
+      "ABC": "碳环",
+      "ABH": "碳环或氢",
+      "ACH": "无环基团或氢",
+      "ACY": "无环基团",
+      "AEH": "烯基或氢",
+      "AEL": "烯基",
+      "AH": "任意原子（含氢）",
+      "AHC": "杂无环基团",
+      "AHH": "杂环或氢",
+      "ALH": "烷基或氢",
+      "ALK": "烷基",
+      "AOH": "烷氧基或氢",
+      "AOX": "烷氧基",
+      "ARH": "任意芳基或氢",
+      "ARY": "任意芳基",
+      "AYH": "炔基或氢",
+      "AYL": "炔基",
+      "CAH": "任意环烷基或氢",
+      "CAL": "任意环烷基",
+      "CBC": "碳环衍生物",
+      "CBH": "碳环衍生物或氢",
+      "CEH": "任意环烯基或氢",
+      "CEL": "任意环烯基",
+      "CHC": "杂环基团",
+      "CHH": "杂环基团或氢",
+      "CXH": "不含碳原子的环状基团或氢",
+      "CXX": "不含碳原子的环状基团",
+      "CYC": "环状基团",
+      "CYH": "环状基团或氢",
+      "D": "氘（重氢）",
+      "G": "任意基团",
+      "G*": "带环闭合的任意基团",
+      "GH": "任意基团或氢",
+      "GH*": "带环闭合的任意基团或氢",
+      "H+": "质子",
+      "HAH": "杂芳基或氢",
+      "HAR": "杂芳基",
+      "M": "任意金属",
+      "MH": "任意金属或氢",
+      "Pol": "聚合物珠",
+      "Q": "任意杂原子（除碳、氢外的任意原子）",
+      "QH": "除碳外的任意原子",
+      "R": "伪原子",
+      "T": "氚（超重氢）",
+      "X": "任意卤素",
+      "XH": "任意卤素或氢"
+    }
+  },
+  "coreErrors": {
+    "helmAliasFormat": "HELM 别名只能包含大小写字母、数字、下划线（_）、星号（*）、方括号（[]）、圆括号（()）、点号（.）和连字符（-），且不能包含空格。",
+    "bilnAliasFormat": "BILN 别名只能包含大小写字母、数字、连字符（-）、下划线（_）和星号（*）。",
+    "helmAliasLength": "HELM 别名长度不能超过 23 个字符。",
+    "idtAliasSlash": "斜杠（/）只能出现在 IDT 别名的第一个或最后一个字符位置。",
+    "idtAliasLength": "IDT 别名中不含斜杠（/）的字符数最多为 10 个。",
+    "monomerGroupTemplateNameLength": "单体分组模板名称不能超过 200 个字符。",
+    "disallowedModificationType": "修饰类型为未知、歧义或分子的单体无法添加到单体库。",
+    "macroSmiles": "大分子模式下不支持 SMILES 格式",
+    "macroRxn": "大分子模式下不支持 RXN 格式",
+    "macroSmarts": "大分子模式下不支持 SMARTS 格式",
+    "macroCml": "大分子模式下不支持 CML 格式",
+    "macroSdf": "大分子模式下不支持 SDF 格式",
+    "macroRdf": "大分子模式下不支持 RDF 格式",
+    "macroCdxml": "大分子模式下不支持 CDXML 格式",
+    "macroCdx": "大分子模式下不支持 CDX 格式",
+    "macroLayout": "大分子模式下不支持重新布局",
+    "macroAromatize": "大分子模式下不支持芳构化",
+    "macroDearomatize": "大分子模式下不支持去芳构化",
+    "macroCalculate": "大分子模式下不支持计算",
+    "macroRecognize": "大分子模式下不支持识别",
+    "cannotExportImage": "无法导出图片",
+    "errorParsingFile": "解析文件时出错",
+    "fileFormatInvalid": "文件格式无效",
+    "rgFileFormatInvalid": "RGFile 文件格式无效",
+    "unexpectedEndOfFile": "文件意外结束",
+    "localStorageUnavailable": "当前环境不支持本地存储（localStorage）",
+    "tooManyAttachmentPoints": "最多只能分配 8 个连接点",
+    "sgroupNotEmpty": "S-基团不为空！",
+    "sgroupDeclarationIncomplete": "S-基团声明不完整。",
+    "sgroupBraceInvalid": "括号配对错误，S-基团属性无效！",
+    "ringBondCountInvalid": "环键数无效",
+    "substitutionCountInvalid": "取代基数无效",
+    "unsaturatedAtomInvalid": "不饱和原子的值无效"
+  },
+  "image": {
+    "unsupportedType": "不支持的图片类型",
+    "minSize": "图片尺寸至少应为 16×16 像素",
+    "cannotLoad": "无法加载图片"
+  },
+  "hotkeys": {
+    "copyInIE": "您尝试复制的结构包含简单对象或/和文本对象。在 Internet Explorer 中复制简单对象或文本对象，请尝试“复制为 KET”按钮。"
+  },
+  "layoutMode": {
+    "switchSequence": "切换到序列布局模式",
+    "switchSnake": "切换到蛇形布局模式",
+    "switchFlex": "切换到自由布局模式"
+  },
+  "ruler": {
+    "monomersInLine": "每行单体数量"
+  },
+  "rnaBuilder": {
+    "updateSequence": "更新序列",
+    "resetAll": "全部重置",
+    "updateSequenceConfirmPrefix": "您即将修改 ",
+    "updateSequenceConfirmSuffix": " 个核苷酸。确定吗？",
+    "filter": "筛选",
+    "phosphate5": "5'-磷酸",
+    "phosphate3": "3'-磷酸",
+    "noPhosphateGroup": "无磷酸基团"
+  },
+  "macromoleculeProperties": {
+    "noData": "暂无数据",
+    "selectPeptide": "请选择单体、链或链的一部分",
+    "selectNucleotide": "请选择核苷酸/核苷、链，或包含核苷酸/核苷的链的一部分",
+    "isoelectricPoint": "等电点",
+    "extinctionCoef": "消光系数 (1/M·cm)",
+    "hydrophobicity": "疏水性",
+    "meltingTemp": "解链温度 (°C)",
+    "unipositiveIons": "[一价阳离子]",
+    "oligonucleotides": "[寡核苷酸]"
+  },
+  "template": {
+    "placeholder": "模板",
+    "selectedAttachmentPoints": "已选择的连接点"
   }
 }

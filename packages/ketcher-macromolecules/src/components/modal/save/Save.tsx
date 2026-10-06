@@ -22,7 +22,7 @@ import { TextArea } from 'components/shared/TextArea';
 import { TextInputField } from 'components/shared/textInputField';
 import { getPropertiesByFormat, SupportedFormats } from 'helpers/formats';
 import { ActionButton } from 'components/shared/actionButton';
-import { IconButton, IndigoProvider } from 'ketcher-react';
+import { IconButton, IndigoProvider, i18n } from 'ketcher-react';
 import {
   ChemicalMimeType,
   KetSerializer,
@@ -128,9 +128,7 @@ export const Save = ({
     }
     if (fileFormat === 'helm') {
       if (editor.drawingEntitiesManager.molecules.length > 0) {
-        editor.events.error.dispatch(
-          'The molecule will be exported using inline SMILES, and on load will appear as a CHEM monomer',
-        );
+        editor.events.error.dispatch(i18n.t('save.inlineSmilesWarning'));
       }
       if (
         !isHelmCompatible(
@@ -138,9 +136,7 @@ export const Save = ({
           editor.monomersLibrary,
         )
       ) {
-        editor.events.error.dispatch(
-          'Some of the monomers do not have aliases in the HELM Core Library - they are exported using Ketcher aliases.',
-        );
+        editor.events.error.dispatch(i18n.t('save.helmAliasWarning'));
       }
     }
 
@@ -171,7 +167,7 @@ export const Save = ({
       } else {
         stringError = typeof error === 'string' ? error : JSON.stringify(error);
       }
-      const errorMessage = 'Convert error! ' + stringError;
+      const errorMessage = i18n.t('save.convertError', { error: stringError });
       dispatch(openErrorModal(errorMessage));
       KetcherLogger.error(errorMessage);
       setCurrentFileFormat('ket');
@@ -225,7 +221,7 @@ export const Save = ({
       }
     } catch (e) {
       KetcherLogger.error('copyAs.js::copyAs', e);
-      dispatch(openErrorModal('This feature is not available in your browser'));
+      dispatch(openErrorModal(i18n.t('save.featureNotAvailable')));
     }
   };
 
@@ -242,7 +238,7 @@ export const Save = ({
 
   return (
     <StyledModal
-      title="save structure"
+      title={i18n.t('save.title')}
       isOpen={isModalOpen}
       onClose={onClose}
       testId="save-structure-dialog"
@@ -279,7 +275,7 @@ export const Save = ({
               <IconButton
                 onClick={handleCopy}
                 iconName="copy"
-                title="Copy to clipboard"
+                title={i18n.t('save.copyToClipboard')}
                 testId="copy-to-clipboard"
               />
               {isLoading && (
@@ -294,14 +290,14 @@ export const Save = ({
 
       <Modal.Footer>
         <ActionButton
-          label="Cancel"
+          label={i18n.t('dialog.cancel')}
           styleType="secondary"
           clickHandler={onClose}
           data-testid="cancel-button"
         />
 
         <ActionButton
-          label="Save"
+          label={i18n.t('dialog.save')}
           clickHandler={handleSave}
           disabled={!currentFileName}
           data-testid="save-button"

@@ -14,6 +14,8 @@
  * limitations under the License.
  ***************************************************************************/
 
+import { i18n } from 'ketcher-react';
+
 export type FileOpener = typeof throughFileReader;
 
 export function fileOpener() {
@@ -21,7 +23,7 @@ export function fileOpener() {
     if (global.FileReader) {
       resolve(throughFileReader);
     } else {
-      reject(new Error('Your browser does not support opening files locally'));
+      reject(new Error(i18n.t('open.browserNotSupportOpen')));
     }
   });
 }
@@ -39,7 +41,7 @@ function throughFileReader(file: File) {
     };
 
     rd.onerror = (event) => {
-      reject(new Error(`Failed to read file: ${event.type}`));
+      reject(new Error(`${i18n.t('open.failedToReadFile')} ${event.type}`));
     };
 
     rd.readAsText(file, 'UTF-8');

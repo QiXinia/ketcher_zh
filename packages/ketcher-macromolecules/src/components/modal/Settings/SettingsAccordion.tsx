@@ -18,7 +18,7 @@ import { Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
 import type { SettingsFormValue } from 'ketcher-core';
 import { FIELD_GROUPS } from './fieldGroups';
 import { SettingsFields } from './SettingsFields';
-import { Icon } from 'ketcher-react';
+import { Icon, i18n } from 'ketcher-react';
 import {
   AccordionHeader,
   GroupLabel,
@@ -51,7 +51,7 @@ export const SettingsAccordion = ({
           key={group.id}
           expanded={expandedGroups.includes(group.id)}
           onChange={() => onGroupToggle(group.id)}
-          data-testid={`${group.title}-accordion`}
+          data-testid={`${group.id}-accordion`}
         >
           <AccordionSummary
             aria-controls={`${group.id}-content`}
@@ -60,7 +60,7 @@ export const SettingsAccordion = ({
             <AccordionHeader>
               <GroupLabel>
                 <Icon name="elements-group" />
-                <span>{group.title}</span>
+                <span>{i18n.t(group.title)}</span>
               </GroupLabel>
               {hasGroupChanged(group) && <ChangeIndicator />}
             </AccordionHeader>

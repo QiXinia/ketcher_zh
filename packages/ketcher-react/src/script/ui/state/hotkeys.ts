@@ -49,6 +49,7 @@ import {
 } from './abbreviationLookup';
 import { isArrowKey, moveSelectedItems } from './moveSelectedItems';
 import { handleHotkeyOverItem } from './handleHotkeysOverItem';
+import i18n from '../../../i18n';
 
 let keydownListener: ((event: KeyboardEvent) => void) | null = null;
 
@@ -463,10 +464,7 @@ function isAbleToCopy(editor: Editor): boolean {
     struct.simpleObjects.size || struct.texts.size,
   );
   if (simpleObjectOrText && isIE && errorHandler) {
-    errorHandler(
-      'The structure you are trying to copy contains Simple object or/and Text object.' +
-        'To copy Simple object or Text object in Internet Explorer try "Copy as KET" button',
-    );
+    errorHandler(i18n.t('hotkeys.copyInIE'));
     return false;
   }
 

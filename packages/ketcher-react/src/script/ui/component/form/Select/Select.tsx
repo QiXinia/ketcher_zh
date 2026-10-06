@@ -22,6 +22,7 @@ import type { ReactNode } from 'react';
 import clsx from 'clsx';
 import styles from './Select.module.less';
 import { Icon } from 'components';
+import i18n from '../../../../../i18n';
 
 export interface Option {
   value: string;
@@ -113,7 +114,9 @@ const Select = ({
             key={option.value}
             disableRipple={true}
             disabled={option.disabled}
-            title={option.markedAsUsed ? 'Already in use' : undefined}
+            title={
+              option.markedAsUsed ? i18n.t('common.alreadyInUse') : undefined
+            }
             className={clsx({
               [`dropdown-${formName}_${name}`]: formName,
               [styles.usedOption]: option.markedAsUsed,

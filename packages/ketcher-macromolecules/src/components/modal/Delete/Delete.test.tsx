@@ -74,7 +74,7 @@ describe('Delete component', () => {
         },
       }),
     );
-    const cancelButton = screen.getByTitle('Cancel');
+    const cancelButton = screen.getByTitle('取消');
     fireEvent.click(cancelButton);
     expect(mockProps.onClose).toHaveBeenCalled();
   });
@@ -96,7 +96,7 @@ describe('Delete component', () => {
         },
       }),
     );
-    const deleteButton = screen.getByTitle('Delete');
+    const deleteButton = screen.getByTitle('删除');
     fireEvent.click(deleteButton);
     expect(mockProps.onClose).toHaveBeenCalled();
   });

@@ -12,6 +12,7 @@ import styles from './AttachmentPointEditPopup.module.less';
 import selectStyles from '../../../component/form/Select/Select.module.less';
 import type { Editor } from '../../../../editor';
 import assert from 'assert';
+import i18n from '../../../../../i18n';
 
 type Props = {
   data: AttachmentPointClickData;
@@ -127,7 +128,9 @@ const AttachmentPointEditPopup = ({
       ref={popupRef}
       data-testid="attachment-point-edit-popup"
     >
-      <p className={styles.title}>Edit connection point</p>
+      <p className={styles.title}>
+        {i18n.t('contextMenu.editConnectionPoint')}
+      </p>
       <AttachmentPointControls
         data={selectsData}
         onNameChange={handleNameChange}

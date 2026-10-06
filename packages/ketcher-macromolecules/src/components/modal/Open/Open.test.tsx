@@ -69,7 +69,7 @@ describe('Open component', () => {
     } as any);
     const mockTypedText = 'CCCCC/CC/C:CC.C(C)CCCCCCCCCC';
     render(withThemeAndStoreProvider(<Open {...mockProps} />));
-    const clipboardButton = screen.getByText('Paste from clipboard');
+    const clipboardButton = screen.getByText('从剪贴板粘贴');
     fireEvent.click(clipboardButton);
 
     const clipboardTextarea = screen.getByRole('textbox');
@@ -85,7 +85,7 @@ describe('Open component', () => {
     };
 
     render(withThemeAndStoreProvider(<Open {...mockProps} />));
-    const clipboardButton = screen.getByText('Paste from clipboard');
+    const clipboardButton = screen.getByText('从剪贴板粘贴');
     fireEvent.click(clipboardButton);
 
     const openButton = screen.getByTestId('open-as-new-button');
@@ -102,7 +102,7 @@ describe('Open component', () => {
     };
 
     render(withThemeAndStoreProvider(<Open {...mockProps} />));
-    const clipboardButton = screen.getByText('Paste from clipboard');
+    const clipboardButton = screen.getByText('从剪贴板粘贴');
     fireEvent.click(clipboardButton);
 
     const clipboardTextarea = screen.getByRole('textbox');
@@ -122,7 +122,7 @@ describe('Open component', () => {
     };
 
     render(withThemeAndStoreProvider(<Open {...mockProps} />));
-    const clipboardButton = screen.getByText('Paste from clipboard');
+    const clipboardButton = screen.getByText('从剪贴板粘贴');
     fireEvent.click(clipboardButton);
 
     const clipboardTextarea = screen.getByRole('textbox');
