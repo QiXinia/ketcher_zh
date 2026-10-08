@@ -18,14 +18,14 @@ import { BaseOperation } from '../BaseOperation';
 import { OperationType } from '../OperationType';
 import type { ReStruct } from '../../../render';
 
-interface TextUpdateData {
+export interface TextUpdateOperationData {
   id: number;
   content: string;
   previousContent?: string;
 }
 
 export class TextUpdate extends BaseOperation {
-  readonly data: TextUpdateData;
+  readonly data: TextUpdateOperationData;
 
   constructor(id: number, content: string) {
     super(OperationType.TEXT_UPDATE);

@@ -94,6 +94,15 @@ export function identifyStructFormat(
     return SupportedFormat.inChI;
   }
 
+  // HELM and single-line FASTA headers must be recognized before the generic
+  // single-line SMILES fallback, in both editor modes.
+  if (/^(?:PEPTIDE|RNA|CHEM)\d+\{/.test(sanitizedString)) {
+    return SupportedFormat.helm;
+  }
+  if (sanitizedString.startsWith('>')) {
+    return SupportedFormat.fasta;
+  }
+
   if (sanitizedString.indexOf('\n') === -1 && !isMacromolecules) {
     // TODO: smiles regexp
     return SupportedFormat.smiles;
@@ -101,10 +110,6 @@ export function identifyStructFormat(
 
   if (sanitizedString.indexOf('<CDXML') !== -1) {
     return SupportedFormat.cdxml;
-  }
-
-  if (sanitizedString.startsWith('>')) {
-    return SupportedFormat.fasta;
   }
 
   const isSequence = /^[a-zA-Z\s]*$/.test(sanitizedString);

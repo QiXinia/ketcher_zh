@@ -62,6 +62,10 @@ const buttons: Array<{ command: TextCommand; name: IconName }> = [
     name: 'text-italic',
   },
   {
+    command: TextCommand.Underline,
+    name: 'text-underline',
+  },
+  {
     command: TextCommand.Superscript,
     name: 'text-superscript',
   },
@@ -74,6 +78,7 @@ const buttons: Array<{ command: TextCommand; name: IconName }> = [
 const textCommandToFormat: Record<string, TextFormatType> = {
   [TextCommand.Bold]: 'bold',
   [TextCommand.Italic]: 'italic',
+  [TextCommand.Underline]: 'underline',
   [TextCommand.Subscript]: 'subscript',
   [TextCommand.Superscript]: 'superscript',
 };
@@ -82,6 +87,7 @@ const editorTheme = {
   text: {
     bold: classes.textBold,
     italic: classes.textItalic,
+    underline: classes.textUnderline,
     subscript: classes.textSubscript,
     superscript: classes.textSuperscript,
   },
@@ -135,6 +141,7 @@ const TextEditorInner = (props: {
           const formats = new Set<string>();
           if (selection.hasFormat('bold')) formats.add(TextCommand.Bold);
           if (selection.hasFormat('italic')) formats.add(TextCommand.Italic);
+          if (selection.hasFormat('underline')) formats.add(TextCommand.Underline);
           if (selection.hasFormat('subscript'))
             formats.add(TextCommand.Subscript);
           if (selection.hasFormat('superscript'))

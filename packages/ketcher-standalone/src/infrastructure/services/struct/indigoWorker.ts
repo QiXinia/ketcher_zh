@@ -31,7 +31,6 @@ import {
   GenerateInchIKeyCommandData,
   InputMessage,
   LayoutCommandData,
-  OutputMessage,
   ExplicitHydrogensCommandData,
   CalculateMacromoleculePropertiesCommandData,
 } from './indigoWorker.types';
@@ -43,6 +42,9 @@ import indigoModuleFn from '_indigo-ketcher-import-alias_';
 const normalizeError = (error: unknown): Error => {
   if (error instanceof Error) return error;
   if (typeof error === 'string') return new Error(error);
+  if (error && typeof error === 'object' && 'message' in error) {
+    return new Error(String(error.message));
+  }
 
   try {
     return new Error(JSON.stringify(error));
@@ -61,38 +63,33 @@ type HandlerType = (
   indigoOptions: IndigoOptions,
 ) => string;
 
-const module = indigoModuleFn();
+const indigoModule = indigoModuleFn();
 
-function handle(
+function handleCommand(
+  requestId: number | undefined,
   handler: HandlerType,
   options?: CommandOptions,
   messageType?: Command,
   inputData?: string,
 ) {
+  // Catch initialization and option failures as well as chemistry failures.
+  // Every outcome must echo the request ID to settle exactly one caller.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  module.then((indigo: any) => {
+  indigoModule.then((indigo: any) => {
     const indigoOptions = new indigo.MapStringString();
-    setOptions(indigoOptions, options ?? {});
-    let msg: OutputMessage<string>;
+    let payload;
     try {
-      const payload = handler(indigo, indigoOptions);
-      msg = {
-        type: messageType,
-        payload,
-        hasError: false,
-        inputData,
-      };
-    } catch (error) {
-      const errorMessage = normalizeError(error).message;
-      msg = {
-        type: messageType,
-        hasError: true,
-        error: errorMessage,
-        inputData,
-      };
+      setOptions(indigoOptions, options ?? {});
+      payload = handler(indigo, indigoOptions);
+    } finally {
+      indigoOptions.delete?.();
     }
-
-    self.postMessage(msg);
+    self.postMessage({ type: messageType, requestId, payload, hasError: false, inputData });
+  }).catch((error: unknown) => {
+    self.postMessage({
+      type: messageType, requestId, hasError: true,
+      error: normalizeError(error).message, inputData,
+    });
   });
 }
 
@@ -105,6 +102,8 @@ function setOptions(indigoOptions: IndigoOptions, options: CommandOptions) {
 
 self.onmessage = (e: MessageEvent<InputMessage<CommandData>>) => {
   const message = e.data;
+  const handle = (...args: [HandlerType, CommandOptions?, Command?, string?]) =>
+    handleCommand(message.requestId, ...args);
 
   switch (message.type) {
     case Command.GenerateImageAsBase64: {
@@ -297,6 +296,6 @@ self.onmessage = (e: MessageEvent<InputMessage<CommandData>>) => {
     }
 
     default:
-      throw Error('Unsupported enum type');
+      self.postMessage({ requestId: message.requestId, type: message.type, hasError: true, error: 'Unsupported command' });
   }
 };

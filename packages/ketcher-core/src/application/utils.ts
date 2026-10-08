@@ -59,6 +59,7 @@ export async function parseAndAddMacromoleculesOnCanvas(
   struct: string,
   structService: StructService,
   mergeWithLatestHistoryCommand = false,
+  replace = false,
 ) {
   const editor = provideEditorInstance();
   const ketSerializer = new KetSerializer();
@@ -75,6 +76,9 @@ export async function parseAndAddMacromoleculesOnCanvas(
 
   const deserialisedKet = ketSerializer.deserializeToDrawingEntities(ketStruct);
   assert(deserialisedKet);
+  // Convert and deserialize completely before replacing the current document.
+  // Invalid input must preserve both canvas contents and undo history.
+  if (replace) deleteAllEntitiesOnCanvas();
   const { command: modelChanges } =
     deserialisedKet.drawingEntitiesManager.mergeInto(
       editor.drawingEntitiesManager,
@@ -82,7 +86,7 @@ export async function parseAndAddMacromoleculesOnCanvas(
 
   EditorHistory.getInstance(editor).update(
     modelChanges,
-    mergeWithLatestHistoryCommand,
+    replace || mergeWithLatestHistoryCommand,
   );
   editor.renderersContainer.update(modelChanges);
 }

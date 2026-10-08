@@ -24,6 +24,7 @@ import {
 
 const IS_BOLD = 1;
 const IS_ITALIC = 2;
+const IS_UNDERLINE = 8;
 const IS_SUBSCRIPT = 32;
 const IS_SUPERSCRIPT = 64;
 
@@ -37,6 +38,7 @@ interface KETFontStyleOverrides {
   color?: string;
   bold?: boolean;
   italic?: boolean;
+  underline?: boolean;
   superscript?: boolean;
   subscript?: boolean;
 }
@@ -47,6 +49,7 @@ interface KETTextPart extends KETFontStyleOverrides {
 
 interface KETParagraph extends KETFontStyleOverrides {
   alignment?: string;
+  lineSpacing?: number;
   indent?: number | { first_line?: number; left?: number; right?: number };
   parts: KETTextPart[];
 }
@@ -94,6 +97,7 @@ function convertKetV2ToInternal(ketText: KETTextV2): {
             let format = 0;
             if (part.bold) format |= IS_BOLD;
             if (part.italic) format |= IS_ITALIC;
+            if (part.underline) format |= IS_UNDERLINE;
             if (part.subscript) format |= IS_SUBSCRIPT;
             if (part.superscript) format |= IS_SUPERSCRIPT;
 
@@ -137,6 +141,7 @@ function convertKetV2ToInternal(ketText: KETTextV2): {
         if (para.alignment) {
           paragraphNode.format = para.alignment;
         }
+        if (para.lineSpacing !== undefined) paragraphNode.lineSpacing = para.lineSpacing;
 
         return paragraphNode;
       }),

@@ -14,72 +14,35 @@
  * limitations under the License.
  ***************************************************************************/
 
-import type { SdfItem, StructAssociatedData } from './sdf.types';
+import type { SdfItem } from './sdf.types';
+import { parseSdfRecords, serializeSdfRecord } from './sdfRecords';
+import type { SdfParseOptions } from './sdfRecords';
 
 import { MolSerializer } from '../mol/molSerializer';
 import type { Serializer } from '../serializers.types';
 import type { MolSerializerOptions } from '../mol';
 
-const DelimeterRegex = /^[^]+?\$\$\$\$$/gm;
 export class SdfSerializer implements Serializer<Array<SdfItem>> {
   private readonly molSerializerOptions?: Partial<MolSerializerOptions>;
+  private readonly sdfParseOptions?: SdfParseOptions;
 
-  constructor(options?: Partial<MolSerializerOptions>) {
+  constructor(options?: Partial<MolSerializerOptions>, sdfParseOptions?: SdfParseOptions) {
     this.molSerializerOptions = options;
+    this.sdfParseOptions = sdfParseOptions;
   }
 
   deserialize(content: string): Array<SdfItem> {
-    const result: Array<SdfItem> = [];
     const molSerializer = new MolSerializer(this.molSerializerOptions);
-    let m: any = DelimeterRegex.exec(content);
-    while (m !== null) {
-      const chunk = m[0].replace(/\r/g, '').trim(); // TODO: normalize newline?
-      const end = chunk.indexOf('M  END');
-      if (end !== -1) {
-        const propChunks: any = chunk
-          .substr(end + 7)
-          .trim()
-          .split(/^$\n?/m);
-
-        const struct = molSerializer.deserialize(chunk.substring(0, end + 6));
-        const props = propChunks.reduce(
-          (acc: StructAssociatedData, pc: string) => {
-            const m = /^> [ \d]*<(\S+)>/.exec(pc);
-            if (m) {
-              const field = m[1];
-              const valueArr = pc.split('\n').slice(1, -1);
-              let value = '';
-              if (valueArr.length > 1) {
-                value = valueArr.join(',');
-              } else {
-                value = pc.split('\n')[1].trim();
-              }
-
-              acc[field] = Number.isFinite(value) ? +value : value.toString(); // eslint-disable-line
-            }
-            return acc;
-          },
-          {} as StructAssociatedData,
-        );
-
-        result.push({ struct, props });
-      }
-      m = DelimeterRegex.exec(content);
-    }
-    return result;
+    return parseSdfRecords(content, this.sdfParseOptions).map(({ molfile, props }) => ({
+      struct: molSerializer.deserialize(molfile), props,
+    }));
   }
 
   serialize(sdfItems: Array<SdfItem>): string {
     const molSerializer = new MolSerializer(this.molSerializerOptions);
-    return sdfItems.reduce((res, item) => {
-      res += molSerializer.serialize(item.struct);
-
-      Object.keys(item.props).forEach((prop) => {
-        res += `> <${prop}>\n`;
-        res += `${item.props[prop]}\n\n`;
-      });
-
-      return `${res}$$$$\n`;
-    }, '');
+    return sdfItems.map((item) => serializeSdfRecord({
+      molfile: molSerializer.serialize(item.struct),
+      props: Object.fromEntries(Object.entries(item.props).map(([key, value]) => [key, String(value)])),
+    })).join('');
   }
 }

@@ -26,6 +26,7 @@ export enum KetcherAsyncEvents {
 export const runAsyncAction = async <T = any>(
   action: () => Promise<T>,
   eventEmitter: EventEmitter,
+  rejectOnFailure = false,
 ): Promise<T | undefined> => {
   eventEmitter.emit(KetcherAsyncEvents.LOADING);
   try {
@@ -35,6 +36,9 @@ export const runAsyncAction = async <T = any>(
   } catch (e) {
     KetcherLogger.error('runAsyncAction.ts::runAsyncAction', e);
     eventEmitter.emit(KetcherAsyncEvents.FAILURE);
+    // Public mutation APIs must allow callers to distinguish failure from a
+    // successful void result. Legacy UI actions retain event-only handling.
+    if (rejectOnFailure) throw e;
     return undefined;
   }
 };

@@ -31,6 +31,7 @@ interface KETFontStyleOverrides {
   color?: string;
   bold?: boolean;
   italic?: boolean;
+  underline?: boolean;
   superscript?: boolean;
   subscript?: boolean;
 }
@@ -41,6 +42,7 @@ interface KETTextPart extends KETFontStyleOverrides {
 
 interface KETParagraph extends KETFontStyleOverrides {
   alignment?: string;
+  lineSpacing?: number;
   indent?: KETIndent;
   parts: KETTextPart[];
 }
@@ -70,12 +72,15 @@ interface LexicalTextChild {
 }
 
 interface LexicalParagraph {
+  format?: string | number;
   alignment?: string;
+  lineSpacing?: number;
   indent?: KETIndent;
   font?: KETFont;
   color?: string;
   bold?: boolean;
   italic?: boolean;
+  underline?: boolean;
   superscript?: boolean;
   subscript?: boolean;
   children?: LexicalTextChild[];
@@ -83,6 +88,7 @@ interface LexicalParagraph {
 
 const IS_BOLD = 1;
 const IS_ITALIC = 2;
+const IS_UNDERLINE = 8;
 const IS_SUBSCRIPT = 32;
 const IS_SUPERSCRIPT = 64;
 
@@ -98,6 +104,7 @@ function applyFontStyleOverrides(
 
   if (format & IS_BOLD) target.bold = true;
   if (format & IS_ITALIC) target.italic = true;
+  if (format & IS_UNDERLINE) target.underline = true;
   if (format & IS_SUPERSCRIPT) target.superscript = true;
   if (format & IS_SUBSCRIPT) target.subscript = true;
 
@@ -172,13 +179,21 @@ export function textToKet(textNode) {
     ketText.paragraphs = (root.children || []).map(
       (paragraph: LexicalParagraph) => {
         const paraObj: KETParagraph = { parts: [] };
-        if (paragraph.alignment !== undefined)
-          paraObj.alignment = paragraph.alignment;
+        const paragraphFormat = paragraph.format;
+        const alignment = paragraph.alignment ?? (
+          typeof paragraphFormat === 'string' &&
+          ['left', 'center', 'right'].includes(paragraphFormat)
+            ? paragraphFormat
+            : undefined
+        );
+        if (alignment !== undefined) paraObj.alignment = alignment;
+        if (paragraph.lineSpacing !== undefined) paraObj.lineSpacing = paragraph.lineSpacing;
         if (paragraph.indent !== undefined) paraObj.indent = paragraph.indent;
         if (paragraph.font !== undefined) paraObj.font = paragraph.font;
         if (paragraph.color !== undefined) paraObj.color = paragraph.color;
         if (paragraph.bold !== undefined) paraObj.bold = paragraph.bold;
         if (paragraph.italic !== undefined) paraObj.italic = paragraph.italic;
+        if (paragraph.underline !== undefined) paraObj.underline = paragraph.underline;
         if (paragraph.superscript !== undefined)
           paraObj.superscript = paragraph.superscript;
         if (paragraph.subscript !== undefined)

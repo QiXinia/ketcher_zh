@@ -177,6 +177,7 @@ export interface CalculateMacromoleculePropertiesCommandData
     WithStruct {}
 
 interface OutputMessageBase {
+  requestId?: number;
   type?: Command;
   hasError?: boolean;
 }
@@ -198,6 +199,7 @@ export type OutputMessage<T> =
   | OutputMessageWithoutError<T>;
 
 export interface InputMessage<T> {
+  requestId?: number;
   type: Command;
   data: T;
 }

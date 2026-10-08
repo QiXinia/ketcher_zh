@@ -20,5 +20,6 @@ export * from './sgroup';
 export * from './simpleobject';
 export * from './template';
 export * from './text';
+export * from './textFormatting';
 export * from './utils';
 export * from './highlight';

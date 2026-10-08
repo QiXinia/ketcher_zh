@@ -30,6 +30,9 @@ export enum ChemicalMimeType {
   UNKNOWN = 'chemical/x-unknown',
   SDF = 'chemical/x-sdf',
   FASTA = 'chemical/x-fasta',
+  RNA_FASTA = 'chemical/x-rna-fasta',
+  DNA_FASTA = 'chemical/x-dna-fasta',
+  PEPTIDE_FASTA = 'chemical/x-peptide-fasta',
   SEQUENCE = 'chemical/x-sequence',
   PeptideSequenceThreeLetter = 'chemical/x-peptide-sequence-3-letter',
   RNA = 'chemical/x-rna-sequence',
@@ -180,6 +183,8 @@ export interface GenerateImageOptions extends StructServiceOptions {
 }
 
 export interface StructService {
+  /** True when local worker requests are correlated by an explicit request id. */
+  readonly supportsRequestIds?: boolean;
   addKetcherId: (id: string) => void;
   info: () => Promise<InfoResult>;
   convert: (

@@ -129,6 +129,7 @@ import TemplateLibIcon from '../../../assets/icons/files/template-lib.svg';
 import TextBold from '../../../assets/icons/files/text-bold.svg';
 import TextIcon from '../../../assets/icons/files/text.svg';
 import TextItalic from '../../../assets/icons/files/text-italic.svg';
+import TextUnderline from '../../../assets/icons/files/text-underline.svg';
 import TextSubscript from '../../../assets/icons/files/text-subscript.svg';
 import TextSuperscript from '../../../assets/icons/files/text-superscript.svg';
 import TransformFlipHIcon from '../../../assets/icons/files/transform-flip-h.svg';
@@ -433,6 +434,7 @@ export const iconNameToIcon = {
   [IMAGE_KEY]: AddImageIcon,
   'text-bold': TextBold,
   'text-italic': TextItalic,
+  'text-underline': TextUnderline,
   'text-subscript': TextSubscript,
   'text-superscript': TextSuperscript,
   'transform-flip-h': TransformFlipHIcon,

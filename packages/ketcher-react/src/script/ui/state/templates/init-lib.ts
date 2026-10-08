@@ -51,7 +51,7 @@ const deserializeSdfTemplates = (
     ignoreChiralFlag: SettingsManager.ignoreChiralFlag,
   };
 
-  const sdfSerializer = new SdfSerializer(options);
+  const sdfSerializer = new SdfSerializer(options, { allowDuplicateFields: true });
   const tmpls = sdfSerializer.deserialize(templatesRawData);
   const prefetch = prefetchRender(tmpls, baseUrl + '/templates/', cacheEl);
 

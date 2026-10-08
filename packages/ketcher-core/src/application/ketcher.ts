@@ -57,6 +57,8 @@ import {
   parseAndAddMacromoleculesOnCanvas,
   prepareStructToRender,
 } from './utils';
+import { fromTextCreation } from './editor/actions';
+import { Vec2 } from 'domain/entities/vec2';
 import { type EditorSelection, EditorType } from './editor/editor.types';
 import {
   type ExportImageParams,
@@ -68,6 +70,7 @@ import {
 } from 'application/ketcher.types';
 import { isNumber, uniqueId } from 'lodash';
 import { ChemicalMimeType } from 'domain/services/struct/structService.types';
+import { SequenceType } from 'domain/entities/monomer-chains/types';
 import type { ISettingsService, Settings } from 'application/settings';
 import { getStructure } from 'application/getStructure';
 
@@ -75,6 +78,11 @@ type SetMoleculeOptions = {
   position?: { x: number; y: number };
   needZoom?: boolean;
   preserveCanvasPosition?: boolean;
+};
+
+type AddTextOptions = {
+  width?: number;
+  height?: number;
 };
 
 const allowedApiSettings = {
@@ -324,6 +332,37 @@ export class Ketcher {
     );
   }
 
+  /**
+   * Add a Lexical text object through the editor action pipeline.
+   *
+   * The public setKet API is useful for document replacement, but it clears
+   * the editor history.  Reaction conditions and component numbers are small
+   * drawing edits, so expose the same operation that the native text tool
+   * uses and let Editor.update() record it for undo/redo.
+   */
+  addText(
+    content: string,
+    position: { x: number; y: number },
+    options: AddTextOptions = {},
+  ): number {
+    if (!content || !position || !Number.isFinite(position.x) || !Number.isFinite(position.y)) {
+      throw new Error('Text content and position are required');
+    }
+    const width = Number.isFinite(options.width) && (options.width as number) > 0 ? (options.width as number) : 2;
+    const height = Number.isFinite(options.height) && (options.height as number) > 0 ? (options.height as number) : 0.7;
+    const topLeft = new Vec2(position.x, position.y);
+    const pos = [
+      topLeft,
+      new Vec2(position.x, position.y + height),
+      new Vec2(position.x + width, position.y + height),
+      new Vec2(position.x + width, position.y),
+    ];
+    const action = fromTextCreation(this.editor.render.ctab, content, topLeft, pos);
+    this.editor.update(action);
+    const ids = [...this.editor.struct().texts.keys()];
+    return ids[ids.length - 1] ?? -1;
+  }
+
   getFasta(): Promise<string> {
     return getStructure(
       this.id,
@@ -332,6 +371,12 @@ export class Ketcher {
       SupportedFormat.fasta,
       provideEditorInstance()?.drawingEntitiesManager,
     );
+  }
+
+  async getHelm(): Promise<string> {
+    return (await this.indigo.convert(await this.getKet(), {
+      outputFormat: ChemicalMimeType.HELM,
+    })).struct;
   }
 
   async getSequence(
@@ -524,14 +569,17 @@ export class Ketcher {
     options?: SetMoleculeOptions,
   ): Promise<void | undefined> {
     const macromoleculesEditor = provideEditorInstance();
-    if (macromoleculesEditor?.isSequenceEditInRNABuilderMode) return;
+    if (macromoleculesEditor?.isSequenceEditInRNABuilderMode) {
+      throw new Error('Finish RNA Builder sequence editing before replacing the document');
+    }
 
     await runAsyncAction<void>(async () => {
       assert(typeof structStr === 'string');
 
       if (window.isPolymerEditorTurnedOn) {
-        deleteAllEntitiesOnCanvas();
-        await parseAndAddMacromoleculesOnCanvas(structStr, this.structService);
+        await parseAndAddMacromoleculesOnCanvas(
+          structStr, this.structService, false, true,
+        );
 
         if (options?.needZoom !== false) {
           macromoleculesEditor?.zoomToStructuresIfNeeded();
@@ -568,22 +616,38 @@ export class Ketcher {
           this.editor.centerStruct();
         }
       }
-    }, this.eventBus);
+    }, this.eventBus, true);
   }
 
   async setHelm(helmStr: string): Promise<void | undefined> {
-    await runAsyncAction<void>(async () => {
-      assert(typeof helmStr === 'string');
-      const struct: Struct = await prepareStructToRender(
-        helmStr,
-        this.structService,
-        this,
-      );
-      struct.rescale();
-      this.editor.struct(struct);
-      this.editor.zoomAccordingContent(struct);
-      this.editor.centerStruct();
-    }, this.eventBus);
+    assert(typeof helmStr === 'string');
+    // HELM is not SMILES, even when represented by a single line. Explicit
+    // conversion also supplies the standalone editor's monomer library.
+    const result = await this.indigo.convert(helmStr, {
+      inputFormat: ChemicalMimeType.HELM,
+      outputFormat: ChemicalMimeType.KET,
+    });
+    await this.setMolecule(result.struct, { needZoom: true });
+  }
+
+  async setFasta(
+    fastaStr: string,
+    sequenceType: 'PEPTIDE' | 'RNA' | 'DNA' = 'PEPTIDE',
+  ): Promise<void> {
+    assert(typeof fastaStr === 'string');
+    if (!Object.values(SequenceType).includes(sequenceType as SequenceType)) {
+      throw new Error('FASTA sequence type must be PEPTIDE, RNA or DNA');
+    }
+    const fastaInputFormat = {
+      PEPTIDE: ChemicalMimeType.PEPTIDE_FASTA,
+      RNA: ChemicalMimeType.RNA_FASTA,
+      DNA: ChemicalMimeType.DNA_FASTA,
+    }[sequenceType];
+    const result = await this.indigo.convert(fastaStr, {
+      inputFormat: fastaInputFormat,
+      outputFormat: ChemicalMimeType.KET,
+    });
+    await this.setMolecule(result.struct, { needZoom: true });
   }
 
   async addFragment(

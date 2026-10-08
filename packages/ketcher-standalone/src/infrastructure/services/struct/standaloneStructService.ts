@@ -35,7 +35,6 @@ import {
   OutputMessage,
   OutputMessageWrapper,
   SupportedFormat,
-  WorkerEvent,
 } from './indigoWorker.types';
 import {
   AromatizeData,
@@ -58,7 +57,6 @@ import {
   ExplicitHydrogensData,
   ExplicitHydrogensResult,
   GenerateImageOptions,
-  EventEmitter,
   getLabelRenderModeForIndigo,
   InfoResult,
   LayoutData,
@@ -137,7 +135,10 @@ function convertMimeTypeToOutputFormat(
       format = SupportedFormat.SDF;
       break;
     }
-    case ChemicalMimeType.FASTA: {
+    case ChemicalMimeType.FASTA:
+    case ChemicalMimeType.RNA_FASTA:
+    case ChemicalMimeType.DNA_FASTA:
+    case ChemicalMimeType.PEPTIDE_FASTA: {
       format = SupportedFormat.FASTA;
       break;
     }
@@ -194,26 +195,6 @@ function mapWarningGroup(property: string) {
   return property.toLowerCase();
 }
 
-const messageTypeToEventMapping: {
-  [key in Command]: WorkerEvent;
-} = {
-  [Command.Info]: WorkerEvent.Info,
-  [Command.Convert]: WorkerEvent.Convert,
-  [Command.Layout]: WorkerEvent.Layout,
-  [Command.Clean]: WorkerEvent.Clean,
-  [Command.Aromatize]: WorkerEvent.Aromatize,
-  [Command.Dearomatize]: WorkerEvent.Dearomatize,
-  [Command.CalculateCip]: WorkerEvent.CalculateCip,
-  [Command.Automap]: WorkerEvent.Automap,
-  [Command.Check]: WorkerEvent.Check,
-  [Command.Calculate]: WorkerEvent.Calculate,
-  [Command.GenerateImageAsBase64]: WorkerEvent.GenerateImageAsBase64,
-  [Command.GetInChIKey]: WorkerEvent.GetInChIKey,
-  [Command.ExplicitHydrogens]: WorkerEvent.ExplicitHydrogens,
-  [Command.CalculateMacromoleculeProperties]:
-    WorkerEvent.CalculateMacromoleculeProperties,
-};
-
 // Worker action that resolves with a `{ struct, format: Mol }` payload,
 // shared by every command whose result type is `WithStruct & WithFormat`
 // (Aromatize/Dearomatize/ExplicitHydrogens — all extend the same shape).
@@ -234,14 +215,22 @@ function makeMolResultAction(
 class IndigoService implements StructService {
   private readonly defaultOptions: StructServiceOptions;
   private readonly worker: Worker;
-  private readonly EE: EventEmitter = new EventEmitter();
+  // Responses are correlated by request, including simultaneous conversions
+  // of the same input to different output formats.
+  readonly supportsRequestIds = true;
+  private nextRequestId = 0;
+  private workerFailure: Error | null = null;
+  private readonly pending = new Map<number, {
+    action: (response: OutputMessageWrapper<unknown>) => void;
+    reject: (reason?: unknown) => void;
+  }>();
   private ketcherId: string | null = null;
 
   constructor(defaultOptions: StructServiceOptions) {
     this.defaultOptions = defaultOptions;
     this.worker = getIndigoWorker();
-    this.worker.onmessage = (e: MessageEvent<OutputMessage<string>>) => {
-      if (e.data.type === Command.Info) {
+    this.worker.onmessage = (e: MessageEvent<OutputMessage<unknown>>) => {
+      if (e.data.type === Command.Info && !e.data.hasError) {
         const callbackMethod = process.env.SEPARATE_INDIGO_RENDER
           ? this.callIndigoNoRenderLoadedCallback
           : this.callIndigoLoadedCallback;
@@ -249,12 +238,47 @@ class IndigoService implements StructService {
         callbackMethod();
       }
 
-      const message: OutputMessage<string> = e.data;
-      if (message.type !== undefined) {
-        const event = messageTypeToEventMapping[message.type];
-        this.EE.emit(event, { data: message });
+      const message = e.data;
+      if (message.requestId === undefined) return;
+      const request = this.pending.get(message.requestId);
+      if (!request) return;
+      this.pending.delete(message.requestId);
+      try {
+        request.action({ data: message });
+      } catch (error) {
+        request.reject(error);
       }
     };
+    const failWorker = (event: ErrorEvent | MessageEvent) => {
+      this.workerFailure = new Error(
+        'message' in event && event.message ? event.message : 'Indigo worker failed',
+      );
+      for (const request of this.pending.values()) request.reject(this.workerFailure);
+      this.pending.clear();
+    };
+    this.worker.onerror = failWorker;
+    this.worker.onmessageerror = failWorker;
+  }
+
+  private sendRequest<T, R>(
+    message: { type: Command; data?: T },
+    action: (response: OutputMessageWrapper<R>) => void,
+    reject: (reason?: unknown) => void,
+  ) {
+    if (this.workerFailure) {
+      reject(this.workerFailure);
+      return;
+    }
+    const requestId = ++this.nextRequestId;
+    this.pending.set(requestId, {
+      action: (response) => action(response as OutputMessageWrapper<R>), reject,
+    });
+    try {
+      this.worker.postMessage({ ...message, requestId });
+    } catch (error) {
+      this.pending.delete(requestId);
+      reject(error);
+    }
   }
 
   public addKetcherId(ketcherId: string) {
@@ -296,16 +320,13 @@ class IndigoService implements StructService {
         data: { struct },
       };
 
-      this.EE.once(WorkerEvent.GetInChIKey, action);
-
-      this.worker.postMessage(inputMessage);
+      this.sendRequest(inputMessage, action, reject);
     });
   }
 
   info(): Promise<InfoResult> {
     return new Promise((resolve, reject) => {
       const action = ({ data }: OutputMessageWrapper) => {
-        console.log('info action', data);
         const msg: OutputMessage<string> = data;
         if (!msg.hasError) {
           const result: InfoResult = {
@@ -319,9 +340,7 @@ class IndigoService implements StructService {
         }
       };
 
-      this.EE.once(WorkerEvent.Info, action);
-
-      this.worker.postMessage({ type: Command.Info });
+      this.sendRequest({ type: Command.Info }, action, reject);
     });
   }
 
@@ -338,9 +357,8 @@ class IndigoService implements StructService {
 
     return new Promise((resolve, reject) => {
       const action = ({ data }: OutputMessageWrapper) => {
-        console.log('convert action', data);
         const msg: OutputMessage<string> = data;
-        if (msg.inputData === struct) {
+        {
           if (!msg.hasError) {
             const result: ConvertResult = {
               struct: msg.payload,
@@ -384,9 +402,7 @@ class IndigoService implements StructService {
         data: commandData,
       };
 
-      this.EE.once(WorkerEvent.Convert, action);
-
-      this.worker.postMessage(inputMessage);
+      this.sendRequest(inputMessage, action, reject);
     });
   }
 
@@ -405,7 +421,6 @@ class IndigoService implements StructService {
         format: string;
         original_format: ChemicalMimeType;
       }>) => {
-        console.log('layout action', data);
         const msg: OutputMessage<{
           struct: string;
           format: string;
@@ -454,9 +469,7 @@ class IndigoService implements StructService {
         data: commandData,
       };
 
-      this.EE.once(WorkerEvent.Layout, action);
-
-      this.worker.postMessage(inputMessage);
+      this.sendRequest(inputMessage, action, reject);
     });
   }
 
@@ -490,9 +503,7 @@ class IndigoService implements StructService {
         data: commandData,
       };
 
-      this.EE.once(WorkerEvent.Clean, action);
-
-      this.worker.postMessage(inputMessage);
+      this.sendRequest(inputMessage, action, reject);
     });
   }
 
@@ -517,9 +528,7 @@ class IndigoService implements StructService {
         data: commandData,
       };
 
-      this.EE.once(WorkerEvent.Aromatize, action);
-
-      this.worker.postMessage(inputMessage);
+      this.sendRequest(inputMessage, action, reject);
     });
   }
 
@@ -544,9 +553,7 @@ class IndigoService implements StructService {
         data: commandData,
       };
 
-      this.EE.once(WorkerEvent.Dearomatize, action);
-
-      this.worker.postMessage(inputMessage);
+      this.sendRequest(inputMessage, action, reject);
     });
   }
 
@@ -582,9 +589,7 @@ class IndigoService implements StructService {
         data: commandData,
       };
 
-      this.EE.once(WorkerEvent.CalculateCip, action);
-
-      this.worker.postMessage(inputMessage);
+      this.sendRequest(inputMessage, action, reject);
     });
   }
 
@@ -621,9 +626,7 @@ class IndigoService implements StructService {
         data: commandData,
       };
 
-      this.EE.once(WorkerEvent.Automap, action);
-
-      this.worker.postMessage(inputMessage);
+      this.sendRequest(inputMessage, action, reject);
     });
   }
 
@@ -663,9 +666,7 @@ class IndigoService implements StructService {
         data: commandData,
       };
 
-      this.EE.once(WorkerEvent.Check, action);
-
-      this.worker.postMessage(inputMessage);
+      this.sendRequest(inputMessage, action, reject);
     });
   }
 
@@ -710,9 +711,7 @@ class IndigoService implements StructService {
         data: commandData,
       };
 
-      this.EE.once(WorkerEvent.Calculate, action);
-
-      this.worker.postMessage(inputMessage);
+      this.sendRequest(inputMessage, action, reject);
     });
   }
 
@@ -779,9 +778,7 @@ class IndigoService implements StructService {
         data: commandData,
       };
 
-      this.EE.once(WorkerEvent.GenerateImageAsBase64, action);
-
-      this.worker.postMessage(inputMessage);
+      this.sendRequest(inputMessage, action, reject);
     });
   }
 
@@ -808,9 +805,7 @@ class IndigoService implements StructService {
         data: commandData,
       };
 
-      this.EE.once(WorkerEvent.ExplicitHydrogens, action);
-
-      this.worker.postMessage(inputMessage);
+      this.sendRequest(inputMessage, action, reject);
     });
   }
 
@@ -844,14 +839,18 @@ class IndigoService implements StructService {
         data: commandData,
       };
 
-      this.EE.once(WorkerEvent.CalculateMacromoleculeProperties, action);
-      this.worker.postMessage(inputMessage);
+      this.sendRequest(inputMessage, action, reject);
     });
   }
 
   public destroy() {
+    this.workerFailure = new Error('Indigo service was destroyed');
+    for (const request of this.pending.values()) request.reject(this.workerFailure);
+    this.pending.clear();
     this.worker.terminate();
     this.worker.onmessage = null;
+    this.worker.onerror = null;
+    this.worker.onmessageerror = null;
   }
 }
 

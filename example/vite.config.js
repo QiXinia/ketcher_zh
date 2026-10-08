@@ -220,9 +220,13 @@ export default defineConfig({
     rolldownOptions: {
       output: {
         manualChunks(id) {
+          // Vite receives native Windows paths on Windows. Normalize before
+          // matching so Emotion/MUI stay in one chunk and their generated
+          // init_* bindings cannot be split across incompatible chunks.
+          const normalizedId = id.replaceAll('\\', '/');
           if (
-            id.includes('/node_modules/@emotion/') ||
-            id.includes('/node_modules/@mui/')
+            normalizedId.includes('/node_modules/@emotion/') ||
+            normalizedId.includes('/node_modules/@mui/')
           ) {
             return 'vendor-emotion-mui';
           }

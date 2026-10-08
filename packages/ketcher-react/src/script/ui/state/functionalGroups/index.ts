@@ -75,7 +75,7 @@ export const highlightFG = memoizedDebounce(
 export function initFGTemplates() {
   return async (dispatch) => {
     const provider = FunctionalGroupsProvider.getInstance();
-    const sdfSerializer = new SdfSerializer();
+    const sdfSerializer = new SdfSerializer(undefined, { allowDuplicateFields: true });
     const templates = sdfSerializer.deserialize(templatesRawData);
     const functionalGroups = templates.reduce(
       (acc: Struct[], { struct }) => [...acc, struct],

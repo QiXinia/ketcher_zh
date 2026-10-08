@@ -24,6 +24,7 @@ import {
 export enum TextCommand {
   Bold = 'BOLD',
   Italic = 'ITALIC',
+  Underline = 'UNDERLINE',
   Subscript = 'SUBSCRIPT',
   Superscript = 'SUPERSCRIPT',
   FontSize = 'CUSTOM_FONT_SIZE',

@@ -20,6 +20,7 @@ import type { Struct } from 'domain/entities/struct';
 import type { selectionKeys } from './shared/constants';
 import type { PipelineSubscription, Subscription } from 'subscription';
 import type { IRnaPreset } from './tools/Tool';
+import type { TextFormattingCommand } from './actions/textFormatting';
 
 export type EditorSelection = {
   [key in typeof selectionKeys[number]]?: number[];
@@ -49,6 +50,7 @@ export interface Editor {
   subscribe: (eventName: string, handler: (data?: any) => any) => any;
   unsubscribe: (eventName: string, subscriber: any) => void;
   selection: (arg?: EditorSelection | 'all' | null) => EditorSelection | null;
+  formatSelectedTexts: (command: TextFormattingCommand, value?: string | number) => number;
   undo: () => void;
   redo: () => void;
   clear: () => void;

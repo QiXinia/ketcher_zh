@@ -27,6 +27,7 @@ import type { RaphaelBaseElement } from 'raphael';
 
 export interface SerializedTextNode {
   detail?: number;
+  font?: string;
   format: number;
   mode?: string;
   style: string;
@@ -40,6 +41,7 @@ export interface SerializedParagraphNode {
   direction?: string;
   format?: string | number;
   indent?: number;
+  lineSpacing?: number;
   type: string;
   version?: number;
 }
@@ -59,6 +61,7 @@ export interface SerializedEditorState {
 
 const IS_BOLD = 1;
 const IS_ITALIC = 2;
+const IS_UNDERLINE = 8;
 const IS_SUBSCRIPT = 32;
 const IS_SUPERSCRIPT = 64;
 
@@ -246,7 +249,33 @@ class ReText extends ReObject {
       this.paths.push(row);
 
       const { p0, p1 } = this.getRelBox([row]);
-      shiftY += Math.abs(Vec2.diff(p0, p1).y);
+      const rowHeight = Math.abs(Vec2.diff(p0, p1).y);
+      const lineSpacing = Number(paragraph.lineSpacing);
+      shiftY +=
+        rowHeight *
+        (Number.isFinite(lineSpacing) && lineSpacing > 0 ? lineSpacing : 1);
+    });
+
+    // Lexical stores paragraph alignment on the paragraph `format` field.
+    // Align rows against the widest rendered row so multi-line labels keep a
+    // stable left/center/right edge without changing their serialized bounds.
+    const maxRowWidth = Math.max(
+      ...this.paths.map((row) => this.getRowWidth(row)),
+      0,
+    );
+    paragraphs.forEach((paragraph, index) => {
+      const row = this.paths[index];
+      if (!row) return;
+      const alignment =
+        typeof paragraph.format === 'string' ? paragraph.format : 'left';
+      const rowWidth = this.getRowWidth(row);
+      const offsetX =
+        alignment === 'center'
+          ? (maxRowWidth - rowWidth) / 2
+          : alignment === 'right'
+            ? maxRowWidth - rowWidth
+            : 0;
+      if (offsetX) row.forEach((path) => path.translateAbs(offsetX, 0));
     });
 
     this.item.setPos(this.getReferencePoints());
@@ -267,6 +296,10 @@ class ReText extends ReObject {
     const styles: Record<string, any> = {};
     const format = textNode.format || 0;
 
+    if (textNode.font) {
+      styles['font-family'] = textNode.font;
+    }
+
     // Parse font-size from style string
     let customFontSize: number | null = null;
     if (textNode.style) {
@@ -285,6 +318,10 @@ class ReText extends ReObject {
 
     if (format & IS_ITALIC) {
       styles['font-style'] = 'italic';
+    }
+
+    if (format & IS_UNDERLINE) {
+      styles['text-decoration'] = 'underline';
     }
 
     const fontsz = customFontSize ?? options.fontszInPx;

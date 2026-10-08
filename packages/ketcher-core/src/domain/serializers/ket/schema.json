@@ -808,6 +808,9 @@
         "italic": {
           "type": "boolean"
         },
+        "underline": {
+          "type": "boolean"
+        },
         "subscript": {
           "type": "boolean"
         },
@@ -835,6 +838,9 @@
         "italic": {
           "type": "boolean"
         },
+        "underline": {
+          "type": "boolean"
+        },
         "subscript": {
           "type": "boolean"
         },
@@ -851,6 +857,11 @@
           "type": "string",
           "enum": ["left", "center", "right"]
         },
+        "lineSpacing": {
+          "type": "number",
+          "minimum": 0.5,
+          "maximum": 4
+        },
         "indent": {
           "$ref": "#/definitions/textIndent"
         },
@@ -864,6 +875,9 @@
           "type": "boolean"
         },
         "italic": {
+          "type": "boolean"
+        },
+        "underline": {
           "type": "boolean"
         },
         "subscript": {
