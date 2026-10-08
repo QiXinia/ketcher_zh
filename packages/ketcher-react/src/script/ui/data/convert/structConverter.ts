@@ -32,7 +32,15 @@ export function couldBeSaved(
   const formatName: string = getPropertiesByFormat(format).name;
 
   if (
-    format !== 'ket' &&
+    [
+      'mol',
+      'molV3000',
+      'molAuto',
+      'rxn',
+      'rxnV3000',
+      'sdf',
+      'sdfV3000',
+    ].includes(format) &&
     Array.from(struct.bonds.values()).some(
       (bond) => bond.type === Bond.PATTERN.TYPE.QUADRUPLE,
     )
