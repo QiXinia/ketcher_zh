@@ -220,10 +220,14 @@ class IndigoService implements StructService {
   readonly supportsRequestIds = true;
   private nextRequestId = 0;
   private workerFailure: Error | null = null;
-  private readonly pending = new Map<number, {
-    action: (response: OutputMessageWrapper<unknown>) => void;
-    reject: (reason?: unknown) => void;
-  }>();
+  private readonly pending = new Map<
+    number,
+    {
+      action: (response: OutputMessageWrapper<unknown>) => void;
+      reject: (reason?: unknown) => void;
+    }
+  >();
+
   private ketcherId: string | null = null;
 
   constructor(defaultOptions: StructServiceOptions) {
@@ -251,9 +255,12 @@ class IndigoService implements StructService {
     };
     const failWorker = (event: ErrorEvent | MessageEvent) => {
       this.workerFailure = new Error(
-        'message' in event && event.message ? event.message : 'Indigo worker failed',
+        'message' in event && event.message
+          ? event.message
+          : 'Indigo worker failed',
       );
-      for (const request of this.pending.values()) request.reject(this.workerFailure);
+      for (const request of this.pending.values())
+        request.reject(this.workerFailure);
       this.pending.clear();
     };
     this.worker.onerror = failWorker;
@@ -271,7 +278,8 @@ class IndigoService implements StructService {
     }
     const requestId = ++this.nextRequestId;
     this.pending.set(requestId, {
-      action: (response) => action(response as OutputMessageWrapper<R>), reject,
+      action: (response) => action(response as OutputMessageWrapper<R>),
+      reject,
     });
     try {
       this.worker.postMessage({ ...message, requestId });
@@ -358,16 +366,14 @@ class IndigoService implements StructService {
     return new Promise((resolve, reject) => {
       const action = ({ data }: OutputMessageWrapper) => {
         const msg: OutputMessage<string> = data;
-        {
-          if (!msg.hasError) {
-            const result: ConvertResult = {
-              struct: msg.payload,
-              format: outputFormat,
-            };
-            resolve(result);
-          } else {
-            reject(new Error(msg.error));
-          }
+        if (!msg.hasError) {
+          const result: ConvertResult = {
+            struct: msg.payload,
+            format: outputFormat,
+          };
+          resolve(result);
+        } else {
+          reject(new Error(msg.error));
         }
       };
       const monomerLibrary = JSON.stringify(
@@ -845,7 +851,8 @@ class IndigoService implements StructService {
 
   public destroy() {
     this.workerFailure = new Error('Indigo service was destroyed');
-    for (const request of this.pending.values()) request.reject(this.workerFailure);
+    for (const request of this.pending.values())
+      request.reject(this.workerFailure);
     this.pending.clear();
     this.worker.terminate();
     this.worker.onmessage = null;

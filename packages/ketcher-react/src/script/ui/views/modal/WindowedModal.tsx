@@ -1,10 +1,10 @@
-import { useRef, FC } from 'react';
+import { useRef, type FC } from 'react';
 import { omit } from 'lodash/fp';
 import clsx from 'clsx';
 import modals from '../../dialog';
 import { useDraggable } from 'src/hooks/useDraggable';
 import { DraggableDialogProvider } from 'src/hooks/useDraggableDialog';
-import { WindowState } from '../../state/modal/windows';
+import type { WindowState } from '../../state/modal/windows';
 import classes from './WindowedModal.module.less';
 import selectClasses from '../../component/form/Select/Select.module.less';
 
@@ -18,7 +18,7 @@ interface WindowedModalProps {
 interface DraggableWindowWrapperProps {
   window: WindowState;
   onBringToFront: () => void;
-  onOk: (result: any) => void;
+  onOk: (result: unknown) => void;
   onCancel: () => void;
   ketcherId?: string;
 }

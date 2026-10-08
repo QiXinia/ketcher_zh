@@ -736,7 +736,10 @@ const serverSettingsSelector = createSelector([getOptions], (options) =>
   options.getServerSettings(),
 );
 
-const mapStateToProps = (state: AppState, ownProps: any) => ({
+const mapStateToProps = (
+  state: AppState,
+  ownProps: { formState?: FormState },
+) => ({
   server: state.options.app.server ? state.server : null,
   struct: state.editor.struct(),
   options: serverSettingsSelector(state),

@@ -345,11 +345,22 @@ export class Ketcher {
     position: { x: number; y: number },
     options: AddTextOptions = {},
   ): number {
-    if (!content || !position || !Number.isFinite(position.x) || !Number.isFinite(position.y)) {
+    if (
+      !content ||
+      !position ||
+      !Number.isFinite(position.x) ||
+      !Number.isFinite(position.y)
+    ) {
       throw new Error('Text content and position are required');
     }
-    const width = Number.isFinite(options.width) && (options.width as number) > 0 ? (options.width as number) : 2;
-    const height = Number.isFinite(options.height) && (options.height as number) > 0 ? (options.height as number) : 0.7;
+    const width =
+      Number.isFinite(options.width) && (options.width as number) > 0
+        ? (options.width as number)
+        : 2;
+    const height =
+      Number.isFinite(options.height) && (options.height as number) > 0
+        ? (options.height as number)
+        : 0.7;
     const topLeft = new Vec2(position.x, position.y);
     const pos = [
       topLeft,
@@ -357,7 +368,12 @@ export class Ketcher {
       new Vec2(position.x + width, position.y + height),
       new Vec2(position.x + width, position.y),
     ];
-    const action = fromTextCreation(this.editor.render.ctab, content, topLeft, pos);
+    const action = fromTextCreation(
+      this.editor.render.ctab,
+      content,
+      topLeft,
+      pos,
+    );
     this.editor.update(action);
     const ids = [...this.editor.struct().texts.keys()];
     return ids[ids.length - 1] ?? -1;
@@ -374,9 +390,11 @@ export class Ketcher {
   }
 
   async getHelm(): Promise<string> {
-    return (await this.indigo.convert(await this.getKet(), {
-      outputFormat: ChemicalMimeType.HELM,
-    })).struct;
+    return (
+      await this.indigo.convert(await this.getKet(), {
+        outputFormat: ChemicalMimeType.HELM,
+      })
+    ).struct;
   }
 
   async getSequence(
@@ -570,53 +588,63 @@ export class Ketcher {
   ): Promise<void | undefined> {
     const macromoleculesEditor = provideEditorInstance();
     if (macromoleculesEditor?.isSequenceEditInRNABuilderMode) {
-      throw new Error('Finish RNA Builder sequence editing before replacing the document');
+      throw new Error(
+        'Finish RNA Builder sequence editing before replacing the document',
+      );
     }
 
-    await runAsyncAction<void>(async () => {
-      assert(typeof structStr === 'string');
+    await runAsyncAction<void>(
+      async () => {
+        assert(typeof structStr === 'string');
 
-      if (window.isPolymerEditorTurnedOn) {
-        await parseAndAddMacromoleculesOnCanvas(
-          structStr, this.structService, false, true,
-        );
+        if (window.isPolymerEditorTurnedOn) {
+          await parseAndAddMacromoleculesOnCanvas(
+            structStr,
+            this.structService,
+            false,
+            true,
+          );
 
-        if (options?.needZoom !== false) {
-          macromoleculesEditor?.zoomToStructuresIfNeeded();
-          macromoleculesEditor.mode.initialize();
+          if (options?.needZoom !== false) {
+            macromoleculesEditor?.zoomToStructuresIfNeeded();
+            macromoleculesEditor.mode.initialize();
+          }
+        } else {
+          const struct: Struct = await prepareStructToRender(
+            structStr,
+            this.structService,
+            this,
+          );
+
+          const preserveCanvasPosition =
+            options?.preserveCanvasPosition === true;
+
+          if (!preserveCanvasPosition) {
+            struct.rescale();
+          }
+
+          const { x, y } = options?.position ?? {};
+
+          // System coordinates for browser and for chemistry files format (mol, ket, etc.) area are different.
+          // It needs to rotate them by 180 degrees in y-axis.
+          this.editor.struct(struct, false, x, isNumber(y) ? -y : y);
+
+          // Restore selection from initiallySelected flags in the loaded structure
+          this.editor.selection(getSelectionFromStruct(this.editor.struct()));
+          // Clean up initiallySelected flags after restoring selection
+          this.editor.struct().disableInitiallySelected();
+
+          if (!preserveCanvasPosition) {
+            this.editor.zoomAccordingContent(struct);
+          }
+          if (x == null && y == null && !preserveCanvasPosition) {
+            this.editor.centerStruct();
+          }
         }
-      } else {
-        const struct: Struct = await prepareStructToRender(
-          structStr,
-          this.structService,
-          this,
-        );
-
-        const preserveCanvasPosition = options?.preserveCanvasPosition === true;
-
-        if (!preserveCanvasPosition) {
-          struct.rescale();
-        }
-
-        const { x, y } = options?.position ?? {};
-
-        // System coordinates for browser and for chemistry files format (mol, ket, etc.) area are different.
-        // It needs to rotate them by 180 degrees in y-axis.
-        this.editor.struct(struct, false, x, isNumber(y) ? -y : y);
-
-        // Restore selection from initiallySelected flags in the loaded structure
-        this.editor.selection(getSelectionFromStruct(this.editor.struct()));
-        // Clean up initiallySelected flags after restoring selection
-        this.editor.struct().disableInitiallySelected();
-
-        if (!preserveCanvasPosition) {
-          this.editor.zoomAccordingContent(struct);
-        }
-        if (x == null && y == null && !preserveCanvasPosition) {
-          this.editor.centerStruct();
-        }
-      }
-    }, this.eventBus, true);
+      },
+      this.eventBus,
+      true,
+    );
   }
 
   async setHelm(helmStr: string): Promise<void | undefined> {

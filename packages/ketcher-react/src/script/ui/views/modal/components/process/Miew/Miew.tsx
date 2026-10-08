@@ -208,7 +208,7 @@ const runCleanupStep = (callback?: () => unknown): void => {
     const result = callback();
 
     if (result && typeof (result as Promise<unknown>).catch === 'function') {
-      void (result as Promise<unknown>).catch(() => undefined);
+      (result as Promise<unknown>).catch(() => undefined);
     }
   } catch {
     // Ignore teardown failures so dialog closing is never blocked.

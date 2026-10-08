@@ -273,8 +273,8 @@ class ReText extends ReObject {
         alignment === 'center'
           ? (maxRowWidth - rowWidth) / 2
           : alignment === 'right'
-            ? maxRowWidth - rowWidth
-            : 0;
+          ? maxRowWidth - rowWidth
+          : 0;
       if (offsetX) row.forEach((path) => path.translateAbs(offsetX, 0));
     });
 

@@ -180,20 +180,22 @@ export function textToKet(textNode) {
       (paragraph: LexicalParagraph) => {
         const paraObj: KETParagraph = { parts: [] };
         const paragraphFormat = paragraph.format;
-        const alignment = paragraph.alignment ?? (
-          typeof paragraphFormat === 'string' &&
+        const alignment =
+          paragraph.alignment ??
+          (typeof paragraphFormat === 'string' &&
           ['left', 'center', 'right'].includes(paragraphFormat)
             ? paragraphFormat
-            : undefined
-        );
+            : undefined);
         if (alignment !== undefined) paraObj.alignment = alignment;
-        if (paragraph.lineSpacing !== undefined) paraObj.lineSpacing = paragraph.lineSpacing;
+        if (paragraph.lineSpacing !== undefined)
+          paraObj.lineSpacing = paragraph.lineSpacing;
         if (paragraph.indent !== undefined) paraObj.indent = paragraph.indent;
         if (paragraph.font !== undefined) paraObj.font = paragraph.font;
         if (paragraph.color !== undefined) paraObj.color = paragraph.color;
         if (paragraph.bold !== undefined) paraObj.bold = paragraph.bold;
         if (paragraph.italic !== undefined) paraObj.italic = paragraph.italic;
-        if (paragraph.underline !== undefined) paraObj.underline = paragraph.underline;
+        if (paragraph.underline !== undefined)
+          paraObj.underline = paragraph.underline;
         if (paragraph.superscript !== undefined)
           paraObj.superscript = paragraph.superscript;
         if (paragraph.subscript !== undefined)

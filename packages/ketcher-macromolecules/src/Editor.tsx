@@ -27,7 +27,7 @@ import { Global, ThemeProvider } from '@emotion/react';
 import { createTheme } from '@mui/material/styles';
 import { merge } from 'lodash';
 import { I18nextProvider } from 'react-i18next';
-import { i18n } from 'ketcher-react';
+import { EditorClassName, i18n } from 'ketcher-react';
 import {
   BaseMonomer,
   CoreEditor,
@@ -69,7 +69,6 @@ import {
 } from 'hooks';
 import { closeErrorTooltip, selectErrorTooltips } from 'state/modal';
 import { ModalContainer } from 'components/modal/modalContainer';
-import { EditorClassName } from 'ketcher-react';
 import { Snackbar } from '@mui/material';
 import {
   StyledIconButton,

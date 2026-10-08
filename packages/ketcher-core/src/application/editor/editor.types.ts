@@ -50,7 +50,10 @@ export interface Editor {
   subscribe: (eventName: string, handler: (data?: any) => any) => any;
   unsubscribe: (eventName: string, subscriber: any) => void;
   selection: (arg?: EditorSelection | 'all' | null) => EditorSelection | null;
-  formatSelectedTexts: (command: TextFormattingCommand, value?: string | number) => number;
+  formatSelectedTexts: (
+    command: TextFormattingCommand,
+    value?: string | number,
+  ) => number;
   undo: () => void;
   redo: () => void;
   clear: () => void;

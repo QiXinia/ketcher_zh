@@ -51,7 +51,11 @@ const FORMAT_MASKS: Partial<Record<TextFormattingCommand, number>> = {
 };
 const PLAIN_FORMAT_MASK = 1 | 2 | 4 | 8 | 16 | 32 | 64 | 128;
 
-function setStyleProperty(style: string | undefined, property: string, value: string): string {
+function setStyleProperty(
+  style: string | undefined,
+  property: string,
+  value: string,
+): string {
   const declarations = new Map<string, string>();
   for (const declaration of String(style || '').split(';')) {
     const separator = declaration.indexOf(':');
@@ -61,7 +65,10 @@ function setStyleProperty(style: string | undefined, property: string, value: st
     if (key && currentValue) declarations.set(key, currentValue);
   }
   declarations.set(property, value);
-  return Array.from(declarations, ([key, currentValue]) => `${key}: ${currentValue}`).join('; ');
+  return Array.from(
+    declarations,
+    ([key, currentValue]) => `${key}: ${currentValue}`,
+  ).join('; ');
 }
 
 function formulaParts(text: string): Array<{ text: string; format: number }> {
@@ -70,7 +77,10 @@ function formulaParts(text: string): Array<{ text: string; format: number }> {
   let mode: 'plain' | 'subscript' | 'superscript' = 'plain';
   const flush = () => {
     if (!buffer) return;
-    parts.push({ text: buffer, format: mode === 'subscript' ? 32 : mode === 'superscript' ? 64 : 0 });
+    parts.push({
+      text: buffer,
+      format: mode === 'subscript' ? 32 : mode === 'superscript' ? 64 : 0,
+    });
     buffer = '';
   };
 
@@ -83,7 +93,8 @@ function formulaParts(text: string): Array<{ text: string; format: number }> {
   };
 
   const isChargeSign = (character: string) => /^[+\-−]$/.test(character);
-  const isFormulaBoundary = (character: string) => !character || /\s|[,;)]/.test(character);
+  const isFormulaBoundary = (character: string) =>
+    !character || /\s|[,;)]/.test(character);
 
   for (let index = 0; index < text.length; index += 1) {
     const character = text[index];
@@ -120,18 +131,27 @@ function formulaParts(text: string): Array<{ text: string; format: number }> {
     }
 
     const isDigit = /\d/.test(character);
-    const isCharge = isChargeSign(character)
-      && /[A-Za-z0-9)\]]/.test(previous)
-      && isFormulaBoundary(next);
+    const isCharge =
+      isChargeSign(character) &&
+      /[A-Za-z0-9)\]]/.test(previous) &&
+      isFormulaBoundary(next);
     const followsFormulaTerm = /[A-Za-z0-9)\]]/.test(previous);
-    const nextMode = isCharge ? 'superscript' : isDigit && followsFormulaTerm ? 'subscript' : 'plain';
+    const nextMode = isCharge
+      ? 'superscript'
+      : isDigit && followsFormulaTerm
+      ? 'subscript'
+      : 'plain';
     append(character, nextMode);
   }
   flush();
   return parts;
 }
 
-function applyFormat(node: LexicalTextNode, command: TextFormattingCommand, value?: string | number): boolean {
+function applyFormat(
+  node: LexicalTextNode,
+  command: TextFormattingCommand,
+  value?: string | number,
+): boolean {
   const oldFormat = Number(node.format || 0);
   if (command === 'plain') {
     node.format = oldFormat & ~PLAIN_FORMAT_MASK;
@@ -139,7 +159,8 @@ function applyFormat(node: LexicalTextNode, command: TextFormattingCommand, valu
     node.style = '';
   } else if (command === 'font-size') {
     const size = Number(value);
-    if (!Number.isFinite(size) || size < 4 || size > 160) throw new Error('字号需在 4 至 160 px 之间');
+    if (!Number.isFinite(size) || size < 4 || size > 160)
+      throw new Error('字号需在 4 至 160 px 之间');
     node.style = setStyleProperty(node.style, 'font-size', `${size}px`);
   } else if (command === 'font-family') {
     const family = String(value || '').trim();
@@ -150,7 +171,8 @@ function applyFormat(node: LexicalTextNode, command: TextFormattingCommand, valu
     if (!text) return false;
     const parts = formulaParts(text);
     if (parts.every((part) => part.format === 0)) return false;
-    const first = parts.shift()!;
+    const first = parts.shift();
+    if (!first) return false;
     node.text = first.text;
     node.format = (oldFormat & ~96) | first.format;
     return true;
@@ -162,7 +184,11 @@ function applyFormat(node: LexicalTextNode, command: TextFormattingCommand, valu
     const hasFormat = (oldFormat & mask) !== 0;
     node.format = hasFormat ? oldFormat & ~mask : oldFormat | mask;
   }
-  return oldFormat !== Number(node.format || 0) || command === 'font-size' || command === 'font-family';
+  return (
+    oldFormat !== Number(node.format || 0) ||
+    command === 'font-size' ||
+    command === 'font-family'
+  );
 }
 
 /** Apply a text formatting command to a Lexical editor state and return it as JSON. */
@@ -181,25 +207,35 @@ export function formatLexicalText(
     throw new Error('当前文本格式无法编辑，请先用 Ketcher 文本工具打开并保存');
   }
 
-  const paragraphs = state.root.children.filter((paragraph) => paragraph.type === 'paragraph');
+  const paragraphs = state.root.children.filter(
+    (paragraph) => paragraph.type === 'paragraph',
+  );
   if (!paragraphs.length) throw new Error('当前文本没有可格式化的段落');
 
   if (command === 'alignment') {
     const alignment = String(value || '');
-    if (!['left', 'center', 'right'].includes(alignment)) throw new Error('不支持的文本对齐方式');
-    paragraphs.forEach((paragraph) => { paragraph.format = alignment; });
+    if (!['left', 'center', 'right'].includes(alignment))
+      throw new Error('不支持的文本对齐方式');
+    paragraphs.forEach((paragraph) => {
+      paragraph.format = alignment;
+    });
     return JSON.stringify(state);
   }
   if (command === 'line-spacing') {
     const lineSpacing = Number(value);
-    if (!Number.isFinite(lineSpacing) || lineSpacing < 0.5 || lineSpacing > 4) throw new Error('行距需在 0.5 至 4 之间');
-    paragraphs.forEach((paragraph) => { paragraph.lineSpacing = lineSpacing; });
+    if (!Number.isFinite(lineSpacing) || lineSpacing < 0.5 || lineSpacing > 4)
+      throw new Error('行距需在 0.5 至 4 之间');
+    paragraphs.forEach((paragraph) => {
+      paragraph.lineSpacing = lineSpacing;
+    });
     return JSON.stringify(state);
   }
 
   let textNodeCount = 0;
   paragraphs.forEach((paragraph) => {
-    const children = Array.isArray(paragraph.children) ? paragraph.children : [];
+    const children = Array.isArray(paragraph.children)
+      ? paragraph.children
+      : [];
     const nextChildren: LexicalTextNode[] = [];
     children.forEach((node) => {
       if (node.type !== 'text' || typeof node.text !== 'string') {

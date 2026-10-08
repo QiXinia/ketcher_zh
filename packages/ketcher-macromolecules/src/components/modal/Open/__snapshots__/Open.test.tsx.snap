@@ -50,7 +50,7 @@ exports[`Open component should render correctly 1`] = `
                 class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-78trlr-MuiButtonBase-root-MuiIconButton-root"
                 data-testid="close-window-button"
                 tabindex="0"
-                title="Close window"
+                title="关闭窗口"
                 type="button"
               >
                 <svg
@@ -110,7 +110,7 @@ exports[`Open component should render correctly 1`] = `
                   <p
                     class="css-9x63nq"
                   >
-                    Paste from clipboard
+                    从剪贴板粘贴
                   </p>
                 </div>
                 <div
@@ -150,13 +150,13 @@ exports[`Open component should render correctly 1`] = `
                       class="css-1b8y5ux"
                     >
                       <span>
-                        or drag file here
+                        或拖拽文件到此处
                       </span>
                     </div>
                     <p
                       class="css-9x63nq"
                     >
-                      Open from file
+                      从文件打开
                     </p>
                   </button>
                 </div>
@@ -210,7 +210,7 @@ exports[`Open component should render correctly 1`] = `
                     <p
                       class="css-1uh9od2"
                     >
-                      Image Recognition service is not available
+                      图像识别服务不可用
                     </p>
                   </button>
                 </div>
