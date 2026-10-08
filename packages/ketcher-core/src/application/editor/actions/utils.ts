@@ -221,10 +221,13 @@ export function atomForNewBond(restruct, id, bond?) {
       (neighbours.length === 1 &&
         prevBondType === bond?.type &&
         (bond?.type === Bond.PATTERN.TYPE.DOUBLE ||
-          bond?.type === Bond.PATTERN.TYPE.TRIPLE)) ||
+          bond?.type === Bond.PATTERN.TYPE.TRIPLE ||
+          bond?.type === Bond.PATTERN.TYPE.QUADRUPLE)) ||
       (prevBondType === Bond.PATTERN.TYPE.SINGLE &&
-        bond?.type === Bond.PATTERN.TYPE.TRIPLE) ||
-      (prevBondType === Bond.PATTERN.TYPE.TRIPLE &&
+        (bond?.type === Bond.PATTERN.TYPE.TRIPLE ||
+          bond?.type === Bond.PATTERN.TYPE.QUADRUPLE)) ||
+      ((prevBondType === Bond.PATTERN.TYPE.TRIPLE ||
+        prevBondType === Bond.PATTERN.TYPE.QUADRUPLE) &&
         bond?.type === Bond.PATTERN.TYPE.SINGLE);
 
     if (shallBe180DegToPrevBond) {

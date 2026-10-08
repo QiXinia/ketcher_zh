@@ -865,6 +865,15 @@ function getBondPath(
         isSnapping,
       );
       break;
+    case Bond.PATTERN.TYPE.QUADRUPLE:
+      path = draw.bondQuadruple(
+        render.paper,
+        hb1,
+        hb2,
+        render.options,
+        isSnapping,
+      );
+      break;
     case Bond.PATTERN.TYPE.AROMATIC: {
       const inAromaticLoop =
         (hb1.loop >= 0 && struct.loops.get(hb1.loop)?.aromatic) ||
@@ -1556,6 +1565,7 @@ function getBondMark(
 
   const s = new Vec2(2, 1).scaled(options.bondSpace);
   if (bond.b.type === Bond.PATTERN.TYPE.TRIPLE) fixed += options.bondSpace;
+  if (bond.b.type === Bond.PATTERN.TYPE.QUADRUPLE) fixed += options.bondSpace * 1.5;
   const p = c.add(new Vec2(n.x * (s.x + fixed), n.y * (s.y + fixed)));
   const path = draw.bondMark(render.paper, p, mark, options);
   tooltip &&

@@ -17,6 +17,7 @@ export enum BondType {
   Any,
   Dative,
   Hydrogen,
+  Quadruple,
 }
 
 export enum BondStereo {

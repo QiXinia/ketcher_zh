@@ -24,6 +24,7 @@ import {
   SingleUpBondPathRenderer,
   SingleUpDownBondPathRenderer,
   TripleBondPathRenderer,
+  QuadrupleBondPathRenderer,
 } from 'application/render/renderers/BondPathRenderer';
 import util from 'application/render/util';
 import { editorEvents } from 'application/editor/editorEvents';
@@ -630,6 +631,10 @@ export class BondRenderer extends BaseRenderer {
 
       case BondType.Triple:
         bondSVGPaths = TripleBondPathRenderer.preparePaths(bondVectors);
+        break;
+
+      case BondType.Quadruple:
+        bondSVGPaths = QuadrupleBondPathRenderer.preparePaths(bondVectors);
         break;
 
       case BondType.Aromatic:

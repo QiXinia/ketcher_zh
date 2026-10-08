@@ -80,6 +80,9 @@ export class Atom extends DrawingEntity {
           case BondType.Triple:
             connectionsAmount += 3;
             break;
+          case BondType.Quadruple:
+            connectionsAmount += 4;
+            break;
           case BondType.Dative:
           case BondType.Hydrogen:
             break;

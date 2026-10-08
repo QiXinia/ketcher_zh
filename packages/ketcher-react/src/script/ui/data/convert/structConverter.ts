@@ -31,6 +31,17 @@ export function couldBeSaved(
   const warnings: Array<string> = [];
   const formatName: string = getPropertiesByFormat(format).name;
 
+  if (
+    format !== 'ket' &&
+    Array.from(struct.bonds.values()).some(
+      (bond) => bond.type === Bond.PATTERN.TYPE.QUADRUPLE,
+    )
+  ) {
+    warnings.push(
+      `The ${formatName} format does not support quadruple bonds. The bond will be downgraded when saved.`,
+    );
+  }
+
   const rxnArrowsSize = struct.rxnArrows.size;
   const hasRxnArrow = struct.hasRxnArrow();
 

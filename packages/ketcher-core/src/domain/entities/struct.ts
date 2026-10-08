@@ -483,6 +483,9 @@ export class Struct {
         case Bond.PATTERN.TYPE.TRIPLE:
           conn += 3;
           break;
+        case Bond.PATTERN.TYPE.QUADRUPLE:
+          conn += 4;
+          break;
         case Bond.PATTERN.TYPE.DATIVE:
         case Bond.PATTERN.TYPE.HYDROGEN:
           break;

@@ -56,6 +56,7 @@ export class Bond extends BaseMicromoleculeEntity {
       ANY: 8,
       DATIVE: 9,
       HYDROGEN: 10,
+      QUADRUPLE: 11,
     },
 
     STEREO: {

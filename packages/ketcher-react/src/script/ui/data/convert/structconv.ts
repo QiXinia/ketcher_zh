@@ -459,6 +459,10 @@ const bondCaptionMap: Record<string, { type: number; stereo: number }> = {
     type: Bond.PATTERN.TYPE.TRIPLE,
     stereo: Bond.PATTERN.STEREO.NONE,
   },
+  quadruple: {
+    type: Bond.PATTERN.TYPE.QUADRUPLE,
+    stereo: Bond.PATTERN.STEREO.NONE,
+  },
   aromatic: {
     type: Bond.PATTERN.TYPE.AROMATIC,
     stereo: Bond.PATTERN.STEREO.NONE,

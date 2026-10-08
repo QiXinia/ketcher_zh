@@ -320,6 +320,7 @@ const plainBondTypes = [
   Bond.PATTERN.TYPE.SINGLE,
   Bond.PATTERN.TYPE.DOUBLE,
   Bond.PATTERN.TYPE.TRIPLE,
+  Bond.PATTERN.TYPE.QUADRUPLE,
 ];
 
 export function bondChangingAction(

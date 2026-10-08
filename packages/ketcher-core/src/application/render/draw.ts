@@ -1379,6 +1379,33 @@ function bondTriple(
     .attr(isSnapping ? options.bondSnappingStyle : {});
 }
 
+function bondQuadruple(
+  paper: RaphaelPaper,
+  halfBond1: HalfBond,
+  halfBond2: HalfBond,
+  options: RenderOptions,
+  isSnapping: boolean,
+  color = '#000',
+) {
+  const a = halfBond1.p;
+  const b = halfBond2.p;
+  const n = halfBond1.norm;
+  const path = [-1.5, -0.5, 0.5, 1.5]
+    .map((offset) => makeStroke(
+      a.addScaled(n, offset * options.bondSpace),
+      b.addScaled(n, offset * options.bondSpace),
+    ))
+    .join('');
+  return paper
+    .path(path)
+    .attr(options.lineattr)
+    .attr({
+      fill: color,
+      stroke: color,
+    })
+    .attr(isSnapping ? options.bondSnappingStyle : {});
+}
+
 function bondAromatic(
   paper: RaphaelPaper,
   paths: string[],
@@ -1787,6 +1814,7 @@ export default {
   bondDouble,
   bondSingleOrDouble,
   bondTriple,
+  bondQuadruple,
   bondAromatic,
   bondAny,
   bondHydrogen,
