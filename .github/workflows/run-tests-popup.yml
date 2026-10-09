@@ -45,7 +45,10 @@ jobs:
 
   popup-part:
     timeout-minutes: 120
-    runs-on: self-hosted-a
+    # Uses a GitHub-hosted runner (Docker is preinstalled) to run the job
+    # container; the previous self-hosted-a label required an unregistered
+    # private runner and stayed queued.
+    runs-on: ubuntu-latest
     needs: build_ketcher
     container: mcr.microsoft.com/playwright:v1.59.1-jammy
     strategy:

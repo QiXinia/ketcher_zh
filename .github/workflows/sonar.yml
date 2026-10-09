@@ -14,7 +14,14 @@ on:
 jobs:
   build:
     name: Sonar
-    runs-on: self-hosted-sonar
+    # Disabled in this fork: the analysis targets EPAM's internal SonarQube
+    # (https://sonar.epam.com) and needs the SONAR_TOKEN / SONAR_HOST_URL
+    # secrets, neither of which are available outside EPAM, and the
+    # self-hosted-sonar runner is not registered. The job is skipped instead
+    # of staying queued. To re-enable, point it at your own Sonar server,
+    # configure the secrets, remove this condition and set a hosted runner.
+    if: false
+    runs-on: ubuntu-latest
     steps:
       - name: Install Unzip
         run: sudo apt-get install -y unzip
