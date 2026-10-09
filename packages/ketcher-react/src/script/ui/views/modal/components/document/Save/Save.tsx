@@ -495,6 +495,7 @@ class SaveDialog extends Component<SaveDialogProps, SaveDialogState> {
         ? [
             {
               caption: i18n.t('save.preview'),
+              testId: 'Preview',
               component: this.renderSaveFile,
               tabIndex: 0,
             },
@@ -502,11 +503,13 @@ class SaveDialog extends Component<SaveDialogProps, SaveDialogState> {
         : [
             {
               caption: i18n.t('save.preview'),
+              testId: 'Preview',
               component: this.renderSaveFile,
               tabIndex: 0,
             },
             {
               caption: i18n.t('save.warnings'),
+              testId: 'Warnings',
               component: this.renderWarnings,
               tabIndex: 1,
             },
