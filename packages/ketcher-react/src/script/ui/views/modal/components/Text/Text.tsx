@@ -141,7 +141,8 @@ const TextEditorInner = (props: {
           const formats = new Set<string>();
           if (selection.hasFormat('bold')) formats.add(TextCommand.Bold);
           if (selection.hasFormat('italic')) formats.add(TextCommand.Italic);
-          if (selection.hasFormat('underline')) formats.add(TextCommand.Underline);
+          if (selection.hasFormat('underline'))
+            formats.add(TextCommand.Underline);
           if (selection.hasFormat('subscript'))
             formats.add(TextCommand.Subscript);
           if (selection.hasFormat('superscript'))

@@ -67,10 +67,10 @@ describe('RotationView', () => {
 
     expect(handleCircle?.getAttribute('fill')).toBe('#B4B9D6');
 
-    handleGroup.dispatchEvent(new Event('mouseenter'));
+    handleGroup.dispatchEvent(new Event('pointerenter'));
     expect(handleCircle?.getAttribute('fill')).toBe('#365CFF');
 
-    handleGroup.dispatchEvent(new Event('mouseleave'));
+    handleGroup.dispatchEvent(new Event('pointerleave'));
     expect(handleCircle?.getAttribute('fill')).toBe('#B4B9D6');
   });
 });

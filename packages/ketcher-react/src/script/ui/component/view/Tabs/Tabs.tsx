@@ -25,6 +25,10 @@ import clsx from 'clsx';
 
 interface TabPanel {
   caption: string;
+  // Stable, language-independent hook for data-testid. When omitted, the
+  // caption is used (legacy behaviour); localized tabs should provide this
+  // to keep E2E selectors stable across languages.
+  testId?: string;
   component?: ComponentType;
   props?: Record<string, unknown>;
   tabIndex?: number;
@@ -90,7 +94,7 @@ class Tabs extends Component<TabsProps, TabsState> {
                 onClick={(ev) => this.changeTab(ev, index)}
                 onKeyDown={(ev) => this.handleKeyDown(ev, index)}
                 tabIndex={0}
-                data-testid={tabPanel.caption + '-tab'}
+                data-testid={(tabPanel.testId ?? tabPanel.caption) + '-tab'}
               >
                 {tabPanel.caption}
               </button>

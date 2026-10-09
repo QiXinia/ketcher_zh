@@ -15,8 +15,11 @@
  ***************************************************************************/
 
 import type { SdfItem } from './sdf.types';
-import { parseSdfRecords, serializeSdfRecord } from './sdfRecords';
-import type { SdfParseOptions } from './sdfRecords';
+import {
+  parseSdfRecords,
+  serializeSdfRecord,
+  type SdfParseOptions,
+} from './sdfRecords';
 
 import { MolSerializer } from '../mol/molSerializer';
 import type { Serializer } from '../serializers.types';
@@ -26,23 +29,38 @@ export class SdfSerializer implements Serializer<Array<SdfItem>> {
   private readonly molSerializerOptions?: Partial<MolSerializerOptions>;
   private readonly sdfParseOptions?: SdfParseOptions;
 
-  constructor(options?: Partial<MolSerializerOptions>, sdfParseOptions?: SdfParseOptions) {
+  constructor(
+    options?: Partial<MolSerializerOptions>,
+    sdfParseOptions?: SdfParseOptions,
+  ) {
     this.molSerializerOptions = options;
     this.sdfParseOptions = sdfParseOptions;
   }
 
   deserialize(content: string): Array<SdfItem> {
     const molSerializer = new MolSerializer(this.molSerializerOptions);
-    return parseSdfRecords(content, this.sdfParseOptions).map(({ molfile, props }) => ({
-      struct: molSerializer.deserialize(molfile), props,
-    }));
+    return parseSdfRecords(content, this.sdfParseOptions).map(
+      ({ molfile, props }) => ({
+        struct: molSerializer.deserialize(molfile),
+        props,
+      }),
+    );
   }
 
   serialize(sdfItems: Array<SdfItem>): string {
     const molSerializer = new MolSerializer(this.molSerializerOptions);
-    return sdfItems.map((item) => serializeSdfRecord({
-      molfile: molSerializer.serialize(item.struct),
-      props: Object.fromEntries(Object.entries(item.props).map(([key, value]) => [key, String(value)])),
-    })).join('');
+    return sdfItems
+      .map((item) =>
+        serializeSdfRecord({
+          molfile: molSerializer.serialize(item.struct),
+          props: Object.fromEntries(
+            Object.entries(item.props).map(([key, value]) => [
+              key,
+              String(value),
+            ]),
+          ),
+        }),
+      )
+      .join('');
   }
 }

@@ -6,6 +6,9 @@ const toolsWithoutTitles = [
   'reaction-mapping-tools',
   'rgroup',
   'shapes',
+  // Empty bond type ('') is a placeholder in the bond-properties schema, not a
+  // selectable toolbar tool, and intentionally has no title
+  'bond-',
 ];
 const isToolWithTitle = (tool) => !toolsWithoutTitles.includes(tool);
 const toolsWithTitles = Object.keys(toolActions).filter(isToolWithTitle);

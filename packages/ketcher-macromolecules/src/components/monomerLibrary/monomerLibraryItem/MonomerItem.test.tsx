@@ -52,7 +52,7 @@ describe('Test Monomer Item component', () => {
       ),
     );
 
-    fireEvent.click(screen.getByLabelText('Toggle favorite'));
+    fireEvent.click(screen.getByLabelText('切换收藏状态'));
 
     expect(onStarClick).toHaveBeenCalledTimes(1);
   });

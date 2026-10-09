@@ -19,7 +19,7 @@ exports[`Save Dialog should be rendered correctly should render opened file form
           class="header withDivider"
         >
           <span>
-            Save Structure
+            保存结构
           </span>
           <div
             class="btnContainer"
@@ -46,7 +46,7 @@ exports[`Save Dialog should be rendered correctly should render opened file form
                 class=""
               >
                 <span>
-                  File name:
+                  文件名：
                 </span>
                 <span
                   class="inputWrapper"
@@ -67,7 +67,7 @@ exports[`Save Dialog should be rendered correctly should render opened file form
                 data-testid="file-format-list"
               >
                 <span>
-                  File format:
+                  文件格式：
                 </span>
                 <span
                   class="inputWrapper"
@@ -130,7 +130,7 @@ exports[`Save Dialog should be rendered correctly should render opened file form
                     tabindex="0"
                     type="button"
                   >
-                    Preview
+                    预览
                   </button>
                 </li>
               </ul>
@@ -144,7 +144,7 @@ exports[`Save Dialog should be rendered correctly should render opened file form
                     readonly=""
                   />
                   <button
-                    class="css-kp5gpq"
+                    class="css-urisxd"
                     data-testid="copy-to-clipboard"
                     title="Copy to clipboard"
                   >
@@ -165,21 +165,21 @@ exports[`Save Dialog should be rendered correctly should render opened file form
             data-testid="save-to-templates-button"
             disabled=""
           >
-            Save to Templates
+            保存到模板
           </button>
           <button
             class="cancel"
             data-testid="cancel-button"
             type="button"
           >
-            Cancel
+            取消
           </button>
           <button
             class="ok"
             data-testid="save-button"
             disabled=""
           >
-            Save
+            保存
           </button>
         </footer>
       </dialog>
@@ -430,7 +430,7 @@ exports[`Save Dialog should be rendered correctly should render opened file form
         class="header withDivider"
       >
         <span>
-          Save Structure
+          保存结构
         </span>
         <div
           class="btnContainer"
@@ -457,7 +457,7 @@ exports[`Save Dialog should be rendered correctly should render opened file form
               class=""
             >
               <span>
-                File name:
+                文件名：
               </span>
               <span
                 class="inputWrapper"
@@ -478,7 +478,7 @@ exports[`Save Dialog should be rendered correctly should render opened file form
               data-testid="file-format-list"
             >
               <span>
-                File format:
+                文件格式：
               </span>
               <span
                 class="inputWrapper"
@@ -541,7 +541,7 @@ exports[`Save Dialog should be rendered correctly should render opened file form
                   tabindex="0"
                   type="button"
                 >
-                  Preview
+                  预览
                 </button>
               </li>
             </ul>
@@ -555,7 +555,7 @@ exports[`Save Dialog should be rendered correctly should render opened file form
                   readonly=""
                 />
                 <button
-                  class="css-kp5gpq"
+                  class="css-urisxd"
                   data-testid="copy-to-clipboard"
                   title="Copy to clipboard"
                 >
@@ -576,21 +576,21 @@ exports[`Save Dialog should be rendered correctly should render opened file form
           data-testid="save-to-templates-button"
           disabled=""
         >
-          Save to Templates
+          保存到模板
         </button>
         <button
           class="cancel"
           data-testid="cancel-button"
           type="button"
         >
-          Cancel
+          取消
         </button>
         <button
           class="ok"
           data-testid="save-button"
           disabled=""
         >
-          Save
+          保存
         </button>
       </footer>
     </dialog>

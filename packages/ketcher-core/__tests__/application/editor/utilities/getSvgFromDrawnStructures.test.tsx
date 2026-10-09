@@ -1,9 +1,9 @@
+import { KetcherLogger } from 'utilities';
+import { getSvgFromDrawnStructures } from '../../../../src/utilities/getSvgFromDrawnStructures';
+
 jest.mock('utilities', () => ({
   KetcherLogger: { error: jest.fn() },
 }));
-
-import { KetcherLogger } from 'utilities';
-import { getSvgFromDrawnStructures } from '../../../../src/utilities/getSvgFromDrawnStructures';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
@@ -57,7 +57,7 @@ describe('getSvgFromDrawnStructures', () => {
     // mock getBoundingClientRect on the drawn-structures element
     const drawn = canvas.getElementsByClassName(
       'drawn-structures',
-    )[0] as Element & { getBoundingClientRect?: () => any };
+    )[0] as Element & { getBoundingClientRect?: () => DOMRect };
     drawn.getBoundingClientRect = () => makeRect(100, 200, 300, 400);
 
     const result = getSvgFromDrawnStructures(canvas, 'preview', 5);
@@ -100,7 +100,7 @@ describe('getSvgFromDrawnStructures', () => {
 
     const drawn = canvas.getElementsByClassName(
       'drawn-structures',
-    )[0] as Element & { getBoundingClientRect?: () => any };
+    )[0] as Element & { getBoundingClientRect?: () => DOMRect };
     drawn.getBoundingClientRect = () => makeRect(100, 200, 300, 400);
 
     // Pass margins object - implementation adds DEFAULT_MARGIN to each component
@@ -136,9 +136,9 @@ describe('getSvgFromDrawnStructures', () => {
 
     const result = getSvgFromDrawnStructures(canvas, 'file');
     expect(result).toBeUndefined();
-    expect((KetcherLogger as any).error).toHaveBeenCalledWith(
-      'Cannot get drawn structures!',
-    );
+    expect(
+      (KetcherLogger as unknown as { error: jest.Mock }).error,
+    ).toHaveBeenCalledWith('Cannot get drawn structures!');
   });
 
   test('returns minimal empty svg for unknown type', () => {
@@ -149,11 +149,14 @@ describe('getSvgFromDrawnStructures', () => {
     canvas.innerHTML = `<g class="drawn-structures"><text>t</text></g>`;
     const drawn = canvas.getElementsByClassName(
       'drawn-structures',
-    )[0] as Element & { getBoundingClientRect?: () => any };
+    )[0] as Element & { getBoundingClientRect?: () => DOMRect };
     drawn.getBoundingClientRect = () => makeRect(0, 0, 1, 1);
 
-    // call with unknown type string casted to any
-    const result = getSvgFromDrawnStructures(canvas, 'unknown' as any);
+    // call with an unsupported type string to exercise the fallback branch
+    const result = getSvgFromDrawnStructures(
+      canvas,
+      'unknown' as 'preview' | 'file',
+    );
     expect(result).toBe("<svg xmlns='http://www.w3.org/2000/svg' />");
   });
 });

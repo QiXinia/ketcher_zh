@@ -15,19 +15,6 @@
  ***************************************************************************/
 
 import {
-  type Editor as KetcherEditor,
-  type FloatingToolsParams,
-  type IKetAttachmentPoint,
-  type IKetTemplateConnection,
-  type IKetMonomerTemplate,
-  type MonomerCreationInitialValues,
-  type MonomerCreationState,
-  type Pool,
-  type ReStruct,
-  type SGroupAttachmentPoint,
-  type RnaPresetComponentKey,
-  type ComponentStructureUpdateData,
-  type BaseMonomer,
   Action,
   Atom,
   AtomLabel,
@@ -85,6 +72,20 @@ import {
   Visel,
   paperPathFromSVGElement,
   fromFragmentDeletion,
+  type TextFormattingCommand,
+  type Editor as KetcherEditor,
+  type FloatingToolsParams,
+  type IKetAttachmentPoint,
+  type IKetTemplateConnection,
+  type IKetMonomerTemplate,
+  type MonomerCreationInitialValues,
+  type MonomerCreationState,
+  type Pool,
+  type ReStruct,
+  type SGroupAttachmentPoint,
+  type RnaPresetComponentKey,
+  type ComponentStructureUpdateData,
+  type BaseMonomer,
 } from 'ketcher-core';
 import {
   DOMSubscription,
@@ -108,7 +109,6 @@ import type {
   ToolConstructorInterface,
   ToolEventHandlerName,
 } from './tool/Tool';
-import type { TextFormattingCommand } from 'ketcher-core';
 import { getSelectionMap, getStructCenter } from './utils/structLayout';
 import assert from 'assert';
 import { isNumber } from 'lodash';
@@ -3241,7 +3241,10 @@ class Editor implements KetcherEditor {
     return this._selection; // eslint-disable-line
   }
 
-  formatSelectedTexts(command: TextFormattingCommand, value?: string | number): number {
+  formatSelectedTexts(
+    command: TextFormattingCommand,
+    value?: string | number,
+  ): number {
     const selectedTextIds = this.selection()?.texts ?? [];
     if (!selectedTextIds.length) throw new Error('请先选择一个或多个文本对象');
 
@@ -3249,7 +3252,12 @@ class Editor implements KetcherEditor {
     for (const id of selectedTextIds) {
       const text = this.struct().texts.get(id);
       if (!text?.content) continue;
-      const action = fromSelectedTextFormatting(this.render.ctab, [id], command, value);
+      const action = fromSelectedTextFormatting(
+        this.render.ctab,
+        [id],
+        command,
+        value,
+      );
       if (!action.isDummy()) {
         this.update(action);
         changedCount += 1;

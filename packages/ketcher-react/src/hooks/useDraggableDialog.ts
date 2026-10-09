@@ -1,4 +1,4 @@
-import { createContext, RefObject, useContext } from 'react';
+import { createContext, useContext, type RefObject } from 'react';
 
 interface DraggableDialogContextValue {
   isDraggable: boolean;

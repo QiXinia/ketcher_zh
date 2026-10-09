@@ -51,12 +51,18 @@ test.describe('Common connection rules: ', () => {
     let sharedContext;
     try {
       sharedContext = await browser.newContext();
+      await sharedContext.addInitScript(() =>
+        window.localStorage.setItem('ketcher-language', 'en'),
+      );
     } catch (error) {
       console.error('Error on creation browser context:', error);
       console.log('Restarting browser...');
       await browser.close();
       browser = await chromium.launch();
       sharedContext = await browser.newContext();
+      await sharedContext.addInitScript(() =>
+        window.localStorage.setItem('ketcher-language', 'en'),
+      );
     }
 
     // Reminder: do not pass page as async

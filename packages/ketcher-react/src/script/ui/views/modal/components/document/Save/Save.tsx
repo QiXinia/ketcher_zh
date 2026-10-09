@@ -495,6 +495,7 @@ class SaveDialog extends Component<SaveDialogProps, SaveDialogState> {
         ? [
             {
               caption: i18n.t('save.preview'),
+              testId: 'Preview',
               component: this.renderSaveFile,
               tabIndex: 0,
             },
@@ -502,11 +503,13 @@ class SaveDialog extends Component<SaveDialogProps, SaveDialogState> {
         : [
             {
               caption: i18n.t('save.preview'),
+              testId: 'Preview',
               component: this.renderSaveFile,
               tabIndex: 0,
             },
             {
               caption: i18n.t('save.warnings'),
+              testId: 'Warnings',
               component: this.renderWarnings,
               tabIndex: 1,
             },
@@ -736,7 +739,10 @@ const serverSettingsSelector = createSelector([getOptions], (options) =>
   options.getServerSettings(),
 );
 
-const mapStateToProps = (state: AppState, ownProps: any) => ({
+const mapStateToProps = (
+  state: AppState,
+  ownProps: { formState?: FormState },
+) => ({
   server: state.options.app.server ? state.server : null,
   struct: state.editor.struct(),
   options: serverSettingsSelector(state),

@@ -141,7 +141,8 @@ function convertKetV2ToInternal(ketText: KETTextV2): {
         if (para.alignment) {
           paragraphNode.format = para.alignment;
         }
-        if (para.lineSpacing !== undefined) paragraphNode.lineSpacing = para.lineSpacing;
+        if (para.lineSpacing !== undefined)
+          paragraphNode.lineSpacing = para.lineSpacing;
 
         return paragraphNode;
       }),
