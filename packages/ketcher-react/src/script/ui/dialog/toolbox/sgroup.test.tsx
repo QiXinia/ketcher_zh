@@ -91,7 +91,7 @@ describe('S-Group DAT type rendering', () => {
         },
       },
     });
-    expect(screen.getByText('S-Group Properties')).toBeInTheDocument();
+    expect(screen.getByText('S-基团属性')).toBeInTheDocument();
   });
 });
 

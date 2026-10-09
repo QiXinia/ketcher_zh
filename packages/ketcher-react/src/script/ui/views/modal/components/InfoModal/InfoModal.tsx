@@ -15,7 +15,6 @@
  ***************************************************************************/
 
 import { connect } from 'react-redux';
-import config from 'src/script/ui/action';
 import { error } from './constants';
 import { Dialog } from '../../../components';
 import { PasteErrorModalBody } from './PasteErrorModalBody';
@@ -23,7 +22,11 @@ import { PasteErrorModalBody } from './PasteErrorModalBody';
 import styles from './InfoModal.module.less';
 
 function ErrorInfoModal(props) {
-  const paste = config.paste.title ?? 'Paste';
+  // The paste-failure modal is dispatched with the stable id 'Paste'
+  // (see openInfoModal('Paste')). It must not be compared against the
+  // localized action title, otherwise the check breaks under non-English
+  // locales.
+  const paste = 'Paste';
   const isPasteError = props.message === paste;
 
   const defaultCutCopyMessage = `This action is unavailable via menu. Instead, use shortcut to ${props.message}.`;
