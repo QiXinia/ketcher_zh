@@ -20,6 +20,7 @@ import type { Struct } from './struct';
 import { Vec2 } from './vec2';
 import {
   type initiallySelectedType,
+  type ObjectAnnotation,
   BaseMicromoleculeEntity,
 } from 'domain/entities/BaseMicromoleculeEntity';
 import type { SGroup } from 'domain/entities/sgroup';
@@ -30,6 +31,10 @@ export interface BondAttributes {
   topology?: number | null;
   customQuery?: string | null;
   stereo?: number;
+  /** ChemDraw-style visual treatment, independent from chemical bond stereo. */
+  display?: BondDisplay;
+  /** Explicit double-bond line placement used by publication drawings. */
+  doubleBondPosition?: DoubleBondPosition;
   xxx?: string;
   type: number;
   end: number;
@@ -37,11 +42,23 @@ export interface BondAttributes {
   cip?: BondCIP | null;
   isPreview?: boolean;
   initiallySelected?: initiallySelectedType;
+  annotations?: ObjectAnnotation[];
   beginSuperatomAttachmentPointNumber?: number;
   endSuperatomAttachmentPointNumber?: number;
   beginSgroup?: SGroup;
   endSgroup?: SGroup;
 }
+
+export type BondDisplay =
+  | 'plain'
+  | 'dotted'
+  | 'dashed'
+  | 'hashed'
+  | 'hashed-wedged'
+  | 'hollow-wedged'
+  | 'bold';
+
+export type DoubleBondPosition = 'auto' | 'left' | 'center' | 'right';
 
 export class Bond extends BaseMicromoleculeEntity {
   static readonly PATTERN = {
@@ -87,6 +104,8 @@ export class Bond extends BaseMicromoleculeEntity {
   static readonly attrlist = {
     type: Bond.PATTERN.TYPE.SINGLE,
     stereo: Bond.PATTERN.STEREO.NONE,
+    display: 'plain' as BondDisplay,
+    doubleBondPosition: 'auto' as DoubleBondPosition,
     topology: Bond.PATTERN.TOPOLOGY.EITHER,
     reactingCenterStatus: Bond.PATTERN.REACTING_CENTER.UNMARKED,
     cip: null,
@@ -98,6 +117,8 @@ export class Bond extends BaseMicromoleculeEntity {
   readonly type: number;
   readonly xxx: string;
   stereo: number;
+  display: BondDisplay;
+  doubleBondPosition: DoubleBondPosition;
   readonly topology: number | null;
   readonly reactingCenterStatus: number | null;
   customQuery: string | null;
@@ -116,12 +137,14 @@ export class Bond extends BaseMicromoleculeEntity {
   endSgroup?: SGroup;
 
   constructor(attributes: BondAttributes) {
-    super(attributes.initiallySelected);
+    super(attributes.initiallySelected, attributes.annotations);
     this.begin = attributes.begin;
     this.end = attributes.end;
     this.type = attributes.type;
     this.xxx = attributes.xxx ?? '';
     this.stereo = Bond.PATTERN.STEREO.NONE;
+    this.display = attributes.display ?? 'plain';
+    this.doubleBondPosition = attributes.doubleBondPosition ?? 'auto';
     this.topology = Bond.PATTERN.TOPOLOGY.EITHER;
     this.customQuery = null;
     this.reactingCenterStatus = 0;
@@ -155,7 +178,7 @@ export class Bond extends BaseMicromoleculeEntity {
   static getAttrHash(bond: Bond) {
     const attrs = {};
     for (const attr in Bond.attrlist) {
-      if (bond[attr] || attr === 'stereo') {
+      if (bond[attr] || attr === 'stereo' || attr === 'display' || attr === 'doubleBondPosition') {
         attrs[attr] = bond[attr];
       }
     }

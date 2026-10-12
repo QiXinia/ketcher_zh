@@ -17,19 +17,21 @@
 import { type Point, Vec2 } from './vec2';
 import {
   type initiallySelectedType,
+  type ObjectAnnotation,
   BaseMicromoleculeEntity,
 } from 'domain/entities/BaseMicromoleculeEntity';
 
 export interface RxnPlusAttributes {
   pp?: Point;
   initiallySelected?: initiallySelectedType;
+  annotations?: ObjectAnnotation[];
 }
 
 export class RxnPlus extends BaseMicromoleculeEntity {
   pp: Vec2;
 
   constructor(attributes?: RxnPlusAttributes) {
-    super(attributes?.initiallySelected);
+    super(attributes?.initiallySelected, attributes?.annotations);
     this.pp = attributes?.pp ? new Vec2(attributes.pp) : new Vec2();
   }
 

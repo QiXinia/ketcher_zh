@@ -40,6 +40,16 @@ import {
   fromBondAddition,
   fromDescriptorsAlign,
   fromMultipleMove,
+  fromFlatten,
+  fromCenterOnPage,
+  fromAlignObjects,
+  fromDistributeObjects,
+  fromJoin,
+  fromSimpleObjectArrow,
+  fromSimpleObjectColor,
+  fromSimpleObjectCurve,
+  fromSimpleObjectBracket,
+  fromSimpleObjectStyle,
   fromSelectedTextFormatting,
   fromNewCanvas,
   fromPaste,
@@ -85,6 +95,12 @@ import {
   Visel,
   paperPathFromSVGElement,
   fromFragmentDeletion,
+} from 'ketcher-core';
+import {
+  SimpleObjectArrow,
+  SimpleObjectFill,
+  SimpleObjectStyle,
+  SimpleObjectBracketType,
 } from 'ketcher-core';
 import {
   DOMSubscription,
@@ -185,10 +201,14 @@ function selectStereoFlagsIfNecessary(
 export interface Selection {
   atoms?: Array<number>;
   bonds?: Array<number>;
+  sgroups?: Array<number>;
+  sgroupData?: Array<number>;
+  frags?: Array<number>;
   enhancedFlags?: Array<number>;
   rxnPluses?: Array<number>;
   rxnArrows?: Array<number>;
   texts?: Array<number>;
+  simpleObjects?: Array<number>;
   rgroupAttachmentPoints?: Array<number>;
   [MULTITAIL_ARROW_KEY]?: Array<number>;
 }
@@ -3239,6 +3259,209 @@ class Editor implements KetcherEditor {
 
     this.render.update(false, null);
     return this._selection; // eslint-disable-line
+  }
+
+  flattenSelectedObjects(): number {
+    const selection = this.selection();
+    if (
+      !Object.values(selection ?? {}).some(
+        (ids) => Array.isArray(ids) && ids.length > 0,
+      )
+    ) {
+      throw new Error('请先选择需要压平的结构或对象');
+    }
+    const action = fromFlatten(this.render.ctab, selection);
+    const changedCount = action.operations.length;
+    if (changedCount) {
+      this.update(action);
+      this.rotateController.rerender();
+    }
+    return changedCount;
+  }
+
+  centerSelectedObjects(): number {
+    const selection = this.selection();
+    if (
+      !Object.values(selection ?? {}).some(
+        (ids) => Array.isArray(ids) && ids.length > 0,
+      )
+    ) {
+      throw new Error('请先选择需要居中的结构或对象');
+    }
+    const viewBoxCenter = new Vec2(
+      this.render.viewBox.minX + this.render.viewBox.width / 2,
+      this.render.viewBox.minY + this.render.viewBox.height / 2,
+    );
+    const pageCenter = Scale.canvasToModel(viewBoxCenter, this.render.options);
+    const action = fromCenterOnPage(this.render.ctab, selection, pageCenter);
+    const changedCount = action.operations.length;
+    if (changedCount) {
+      this.update(action);
+      this.rotateController.rerender();
+    }
+    return changedCount;
+  }
+
+  joinSelectedObjects(): number {
+    const selection = this.selection();
+    const simpleObjects = selection?.simpleObjects ?? [];
+    if (simpleObjects.length < 2) {
+      throw new Error('Join 至少需要选择两条直线曲线');
+    }
+    const action = fromJoin(this.render.ctab, selection);
+    const changedCount = action.operations.length;
+    if (changedCount) {
+      this.update(action);
+      const joinedObjectId = action.operations.at(-1)?.data?.id;
+      this.selection(
+        Number.isInteger(joinedObjectId)
+          ? { simpleObjects: [joinedObjectId] }
+          : null,
+      );
+      this.rotateController.rerender();
+    }
+    return changedCount;
+  }
+
+  alignSelectedObjects(
+    alignment:
+      | 'left'
+      | 'horizontal-center'
+      | 'right'
+      | 'top'
+      | 'vertical-center'
+      | 'bottom',
+  ): number {
+    const selection = this.selection();
+    const action = fromAlignObjects(this.render.ctab, selection, alignment);
+    const changedCount = action.operations.length;
+    if (changedCount) {
+      this.update(action);
+      this.render.update(true, null);
+      this.rotateController.rerender();
+    }
+    return changedCount;
+  }
+
+  distributeSelectedObjects(direction: 'horizontal' | 'vertical'): number {
+    const selection = this.selection();
+    const action = fromDistributeObjects(this.render.ctab, selection, direction);
+    const changedCount = action.operations.length;
+    if (changedCount) {
+      this.update(action);
+      this.render.update(true, null);
+      this.rotateController.rerender();
+    }
+    return changedCount;
+  }
+
+  setSelectedSimpleObjectStyle(style: 'plain' | 'dashed' | 'bold'): number {
+    const ids = this.selection()?.simpleObjects ?? [];
+    if (!ids.length) throw new Error('请先选择一个或多个图形对象');
+    const action = new Action();
+    ids.forEach((id) => {
+      action.mergeWith(fromSimpleObjectStyle(id, style as SimpleObjectStyle));
+    });
+    const inverseAction = action.perform(this.render.ctab);
+    const changedCount = inverseAction.operations.filter(
+      (operation) => !operation.isDummy(this.render.ctab),
+    ).length;
+    if (changedCount) {
+      this.update(inverseAction);
+      // Curve decorations affect the generated path collection (including
+      // secondary paths and fills), so rebuild all simple-object visuals.
+      this.render.update(true, null);
+      this.rotateController.rerender();
+    }
+    return changedCount;
+  }
+
+  setSelectedSimpleObjectColor(color?: string): number {
+    if (color !== undefined && !/^#[\da-f]{3}(?:[\da-f]{3})?$/i.test(color)) {
+      throw new Error('图形对象颜色必须是十六进制颜色')
+    }
+    const ids = this.selection()?.simpleObjects ?? [];
+    if (!ids.length) throw new Error('请先选择一个或多个图形对象');
+    const action = new Action();
+    ids.forEach((id) => action.mergeWith(fromSimpleObjectColor(id, color)));
+    const inverseAction = action.perform(this.render.ctab);
+    const changedCount = inverseAction.operations.filter(
+      (operation) => !operation.isDummy(this.render.ctab),
+    ).length;
+    if (changedCount) {
+      this.update(inverseAction);
+      this.render.update(true, null);
+      this.rotateController.rerender();
+    }
+    return changedCount;
+  }
+
+  setSelectedSimpleObjectArrow(
+    endpoint: 'start' | 'end',
+    arrow: 'none' | 'full' | 'half-left' | 'half-right',
+  ): number {
+    const ids = this.selection()?.simpleObjects ?? [];
+    if (!ids.length) throw new Error('请先选择一个或多个图形对象');
+    const action = new Action();
+    ids.forEach((id) => {
+      action.mergeWith(
+        fromSimpleObjectArrow(id, endpoint, arrow as SimpleObjectArrow),
+      );
+    });
+    const inverseAction = action.perform(this.render.ctab);
+    const changedCount = inverseAction.operations.filter(
+      (operation) => !operation.isDummy(this.render.ctab),
+    ).length;
+    if (changedCount) {
+      this.update(inverseAction);
+      this.rotateController.rerender();
+    }
+    return changedCount;
+  }
+
+  setSelectedSimpleObjectCurveProperty(
+    property: 'doubled' | 'closed' | 'fill' | 'faded',
+    value: boolean | 'none' | 'solid' | 'shaded',
+  ): number {
+    const ids = this.selection()?.simpleObjects ?? [];
+    if (!ids.length) throw new Error('请先选择一个或多个图形对象');
+    const action = new Action();
+    ids.forEach((id) => {
+      action.mergeWith(
+        fromSimpleObjectCurve(
+          id,
+          property,
+          property === 'fill' ? (value as SimpleObjectFill) : Boolean(value),
+        ),
+      );
+    });
+    const inverseAction = action.perform(this.render.ctab);
+    const changedCount = inverseAction.operations.filter(
+      (operation) => !operation.isDummy(this.render.ctab),
+    ).length;
+    if (changedCount) {
+      this.update(inverseAction);
+      // Curve decorations change the generated path collection, so rebuild
+      // all simple-object visuals after recording the undo action.
+      this.render.update(true, null);
+    }
+    return changedCount;
+  }
+
+  setSelectedSimpleObjectBracketType(bracketType: 'bracket' | 'parenthesis' | 'brace'): number {
+    const ids = this.selection()?.simpleObjects ?? [];
+    if (!ids.length) throw new Error('请先选择一个或多个图形对象');
+    const action = new Action();
+    ids.forEach((id) => action.mergeWith(fromSimpleObjectBracket(id, bracketType as SimpleObjectBracketType)));
+    const inverseAction = action.perform(this.render.ctab);
+    const changedCount = inverseAction.operations.filter(
+      (operation) => !operation.isDummy(this.render.ctab),
+    ).length;
+    if (changedCount) {
+      this.update(inverseAction);
+      this.render.update(true, null);
+    }
+    return changedCount;
   }
 
   formatSelectedTexts(command: TextFormattingCommand, value?: string | number): number {

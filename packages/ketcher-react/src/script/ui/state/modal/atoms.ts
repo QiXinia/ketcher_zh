@@ -40,6 +40,16 @@ export function updateSelectedAtoms({
             unchangedAtom,
             userChangedAtom,
           );
+          if (
+            'queryProperties' in userChangedAtom &&
+            userChangedAtom.queryProperties
+          ) {
+            const changedWithQuery = userChangedAtom as AtomPropertiesInContextMenu;
+            (atomWithChangedProperties as AtomPropertiesInContextMenu).queryProperties = {
+              ...(unchangedAtom as Atom).queryProperties,
+              ...(changedWithQuery.queryProperties ?? {}),
+            };
+          }
           action.mergeWith(
             fromAtomsAttrs(struct, atomId, atomWithChangedProperties, false),
           );

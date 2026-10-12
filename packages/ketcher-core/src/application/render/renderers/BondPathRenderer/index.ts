@@ -5,5 +5,7 @@ export { default as DoubleBondPathRenderer } from './DoubleBondPathRenderer';
 export { default as DoubleCisTransBondPathRenderer } from './DoubleCisTransBondPathRenderer';
 export { default as TripleBondPathRenderer } from './TripleBondPathRenderer';
 export { default as QuadrupleBondPathRenderer } from './QuadrupleBondPathRenderer';
+export { default as HashedBondPathRenderer } from './HashedBondPathRenderer';
+export { default as HollowWedgeBondPathRenderer } from './HollowWedgeBondPathRenderer';
 export { default as SingleDoubleBondPathRenderer } from './SingleDoubleBondPathRenderer';
 export { default as SingleUpDownBondPathRenderer } from './SingleUpDownBondPathRenderer';

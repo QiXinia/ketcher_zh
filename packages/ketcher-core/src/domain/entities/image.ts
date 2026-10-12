@@ -14,7 +14,10 @@
  * limitations under the License.
  ***************************************************************************/
 
-import { BaseMicromoleculeEntity } from 'domain/entities/BaseMicromoleculeEntity';
+import {
+  BaseMicromoleculeEntity,
+  type ObjectAnnotation,
+} from 'domain/entities/BaseMicromoleculeEntity';
 import { Vec2 } from 'domain/entities/vec2';
 import type { KetFileNode } from 'domain/serializers/serializers.types';
 import { getNodeWithInvertedYCoord } from 'domain/serializers/ket/helpers';
@@ -54,8 +57,9 @@ export class Image extends BaseMicromoleculeEntity {
     public bitmap: string,
     private _center: Vec2,
     private halfSize: Vec2,
+    annotations?: ObjectAnnotation[],
   ) {
-    super();
+    super(undefined, annotations);
   }
 
   getTopLeftPosition(): Vec2 {
@@ -116,6 +120,7 @@ export class Image extends BaseMicromoleculeEntity {
       this.bitmap,
       new Vec2(this._center),
       new Vec2(this.halfSize),
+      this.annotations,
     );
   }
 
@@ -154,6 +159,7 @@ export class Image extends BaseMicromoleculeEntity {
       },
       data: base64Data,
       selected: this.getInitiallySelected(),
+      ...(this.annotations.length ? { annotations: this.annotations } : {}),
     };
   }
 
@@ -167,7 +173,7 @@ export class Image extends BaseMicromoleculeEntity {
     const imageSrc = `data:${ketFileNode.format};base64,${ketFileNode.data}`;
 
     // Should be validated already
-    const image = new Image(imageSrc, center, halfSize);
+    const image = new Image(imageSrc, center, halfSize, ketFileNode.annotations);
     image.setInitiallySelected(ketFileNode.selected);
     return image;
   }

@@ -187,6 +187,7 @@ export default function initEditor(dispatch, getState, ketcherId) {
         .then(() =>
           openDialog(dispatch, 'sgroup', {
             ...fromSgroup(sgroup),
+            fixedType: sgroup.fixedType,
             selectedSruCount: getSelectedSruCount(sgroup.type),
           }),
         )

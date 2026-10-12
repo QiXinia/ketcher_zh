@@ -222,6 +222,17 @@ export function fromPaste(
     const operation = new SimpleObjectAdd(
       simpleObject.pos.map((p) => p.add(offset)),
       simpleObject.mode,
+      false,
+      undefined,
+      simpleObject.style,
+      simpleObject.startArrow,
+      simpleObject.endArrow,
+      simpleObject.doubled,
+      simpleObject.closed,
+      simpleObject.fill,
+      simpleObject.faded,
+      simpleObject.bracketType,
+      simpleObject.color,
     ).perform(restruct);
     action.addOp(operation);
     items.simpleObjects.push(operation.data.id);

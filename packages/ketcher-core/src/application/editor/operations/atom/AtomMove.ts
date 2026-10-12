@@ -58,6 +58,6 @@ export class AtomMove extends BaseOperation {
 
   isDummy() {
     const { d } = this.data;
-    return d.x === 0 && d.y === 0;
+    return d.x === 0 && d.y === 0 && (d.z ?? 0) === 0;
   }
 }

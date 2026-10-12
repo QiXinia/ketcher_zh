@@ -47,6 +47,11 @@ export type RenderOptions = {
   hideImplicitHydrogen: boolean;
   hideTerminalLabels: boolean;
   carbonExplicitly: boolean;
+  showAtomNumbers?: boolean;
+  showTerminalCarbonLabels?: boolean;
+  showQueryIndicators?: boolean;
+  showStereochemistry?: boolean;
+  showEnhancedStereochemistry?: boolean;
   showCharge: boolean;
   showHydrogenLabels: string;
   showValence: boolean;

@@ -25,6 +25,8 @@ import {
   SingleUpDownBondPathRenderer,
   TripleBondPathRenderer,
   QuadrupleBondPathRenderer,
+  HashedBondPathRenderer,
+  HollowWedgeBondPathRenderer,
 } from 'application/render/renderers/BondPathRenderer';
 import util from 'application/render/util';
 import { editorEvents } from 'application/editor/editorEvents';
@@ -608,8 +610,18 @@ export class BondRenderer extends BaseRenderer {
           bondSVGPaths = SingleDownBondPathRenderer.preparePaths(bondVectors);
         } else if (this.bond.stereo === BondStereo.Either) {
           bondSVGPaths = SingleUpDownBondPathRenderer.preparePaths(bondVectors);
+        } else if (this.bond.display === 'hashed') {
+          bondSVGPaths = HashedBondPathRenderer.preparePaths(bondVectors);
+        } else if (this.bond.display === 'hashed-wedged') {
+          bondSVGPaths = SingleDownBondPathRenderer.preparePaths(bondVectors);
+        } else if (this.bond.display === 'hollow-wedged') {
+          bondSVGPaths = HollowWedgeBondPathRenderer.preparePaths(bondVectors);
         } else {
-          bondSVGPaths = SingleBondPathRenderer.preparePaths(bondVectors);
+          bondSVGPaths = SingleBondPathRenderer.preparePaths(
+            bondVectors,
+            undefined,
+            this.bond.display,
+          );
         }
         break;
 
@@ -618,13 +630,20 @@ export class BondRenderer extends BaseRenderer {
           bondSVGPaths =
             DoubleCisTransBondPathRenderer.preparePaths(bondVectors);
         } else {
+          const explicitShift = this.bond.doubleBondPosition === 'left'
+            ? -1
+            : this.bond.doubleBondPosition === 'right'
+              ? 1
+              : this.bond.doubleBondPosition === 'center'
+                ? 0
+                : this.getDoubleBondShift(
+                    viewModel,
+                    bondVectors.firstHalfEdge,
+                    bondVectors.secondHalfEdge,
+                  );
           bondSVGPaths = DoubleBondPathRenderer.preparePaths(
             bondVectors,
-            this.getDoubleBondShift(
-              viewModel,
-              bondVectors.firstHalfEdge,
-              bondVectors.secondHalfEdge,
-            ),
+            explicitShift,
           );
         }
         break;

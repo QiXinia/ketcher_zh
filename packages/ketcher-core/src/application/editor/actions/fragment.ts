@@ -41,7 +41,11 @@ import { fromAtomsFragmentAttr } from './atom';
 import { getRelSGroupsBySelection } from './utils';
 import { IMAGE_KEY, MULTITAIL_ARROW_KEY } from 'domain/constants';
 
-export function fromMultipleMove(restruct, lists, d: Vec2) {
+/**
+ * Build the move action without executing it.  Layout commands such as
+ * align/distribute need to combine several object moves into one undo step.
+ */
+export function fromMultipleMoveAction(restruct, lists, d: Vec2) {
   d = new Vec2(d);
 
   const action = new Action();
@@ -153,7 +157,11 @@ export function fromMultipleMove(restruct, lists, d: Vec2) {
     });
   }
 
-  return action.perform(restruct);
+  return action;
+}
+
+export function fromMultipleMove(restruct, lists, d: Vec2) {
+  return fromMultipleMoveAction(restruct, lists, d).perform(restruct);
 }
 
 export function fromStereoFlagUpdate(restruct, frid, flag = null) {

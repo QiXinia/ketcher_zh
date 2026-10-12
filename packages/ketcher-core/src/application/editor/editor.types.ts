@@ -21,6 +21,7 @@ import type { selectionKeys } from './shared/constants';
 import type { PipelineSubscription, Subscription } from 'subscription';
 import type { IRnaPreset } from './tools/Tool';
 import type { TextFormattingCommand } from './actions/textFormatting';
+import type { ObjectAlignment, ObjectDistribution } from './actions/objectAlignment';
 
 export type EditorSelection = {
   [key in typeof selectionKeys[number]]?: number[];
@@ -51,6 +52,22 @@ export interface Editor {
   unsubscribe: (eventName: string, subscriber: any) => void;
   selection: (arg?: EditorSelection | 'all' | null) => EditorSelection | null;
   formatSelectedTexts: (command: TextFormattingCommand, value?: string | number) => number;
+  flattenSelectedObjects: () => number;
+  centerSelectedObjects: () => number;
+  joinSelectedObjects: () => number;
+  alignSelectedObjects: (alignment: ObjectAlignment) => number;
+  distributeSelectedObjects: (direction: ObjectDistribution) => number;
+  setSelectedSimpleObjectStyle: (style: 'plain' | 'dashed' | 'bold') => number;
+  setSelectedSimpleObjectColor: (color?: string) => number;
+  setSelectedSimpleObjectArrow: (
+    endpoint: 'start' | 'end',
+    arrow: 'none' | 'full' | 'half-left' | 'half-right',
+  ) => number;
+  setSelectedSimpleObjectCurveProperty: (
+    property: 'doubled' | 'closed' | 'fill' | 'faded',
+    value: boolean | 'none' | 'solid' | 'shaded',
+  ) => number;
+  setSelectedSimpleObjectBracketType: (bracketType: 'bracket' | 'parenthesis' | 'brace') => number;
   undo: () => void;
   redo: () => void;
   clear: () => void;

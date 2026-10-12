@@ -14,8 +14,12 @@
  * limitations under the License.
  ***************************************************************************/
 
-import { Box2Abs } from 'domain/entities/box2Abs';
-import { SimpleObjectMode } from 'domain/entities/simpleObject';
+import {
+  SimpleObjectArrow,
+  SimpleObjectFill,
+  SimpleObjectMode,
+  SimpleObjectBracketType,
+} from 'domain/entities/simpleObject';
 import { Vec2 } from 'domain/entities/vec2';
 
 import { LayerMap } from './generalEnumTypes';
@@ -24,7 +28,7 @@ import type ReStruct from './restruct';
 import type { Render } from '../raphaelRender';
 import { Scale } from 'domain/helpers';
 import draw from '../draw';
-import util from '../util';
+import { getArrowHeadDimensions } from '../draw';
 import { toFixed } from 'utilities';
 
 interface MinDistanceWithReferencePoint {
@@ -124,6 +128,20 @@ class ReSimpleObject extends ReObject {
         dist = point.calculateDistanceToLine([pos[0], pos[1]]);
         break;
       }
+      case SimpleObjectMode.polyline: {
+        dist = Math.min(...pos.slice(1).map((end, index) =>
+          point.calculateDistanceToLine([pos[index], end]),
+        ));
+        break;
+      }
+      case SimpleObjectMode.bezier: {
+        dist = bezierDistance(point, pos);
+        break;
+      }
+      case SimpleObjectMode.bracket: {
+        dist = bracketDistance(point, pos);
+        break;
+      }
 
       default: {
         throw new Error('Unsupported shape type');
@@ -188,6 +206,18 @@ class ReSimpleObject extends ReObject {
         this.item.pos.forEach((i) => refPoints.push(new Vec2(i.x, i.y, 0)));
         break;
       }
+      case SimpleObjectMode.polyline: {
+        this.item.pos.forEach((i) => refPoints.push(new Vec2(i.x, i.y, 0)));
+        break;
+      }
+      case SimpleObjectMode.bezier: {
+        this.item.pos.forEach((i) => refPoints.push(new Vec2(i.x, i.y, 0)));
+        break;
+      }
+      case SimpleObjectMode.bracket: {
+        this.item.pos.forEach((i) => refPoints.push(new Vec2(i.x, i.y, 0)));
+        break;
+      }
 
       default: {
         throw new Error('Unsupported shape type');
@@ -225,6 +255,18 @@ class ReSimpleObject extends ReObject {
         break;
       }
       case SimpleObjectMode.line: {
+        this.item.pos.forEach((i) => refPoints.push(new Vec2(i.x, i.y, 0)));
+        break;
+      }
+      case SimpleObjectMode.polyline: {
+        this.item.pos.forEach((i) => refPoints.push(new Vec2(i.x, i.y, 0)));
+        break;
+      }
+      case SimpleObjectMode.bezier: {
+        this.item.pos.forEach((i) => refPoints.push(new Vec2(i.x, i.y, 0)));
+        break;
+      }
+      case SimpleObjectMode.bracket: {
         this.item.pos.forEach((i) => refPoints.push(new Vec2(i.x, i.y, 0)));
         break;
       }
@@ -392,6 +434,29 @@ class ReSimpleObject extends ReObject {
         });
         break;
       }
+      case SimpleObjectMode.polyline: {
+        paths.push({
+          path: draw.polyline(render.paper, point).attr(render.options.hoverStyle),
+          stylesApplied: true,
+        });
+        break;
+      }
+      case SimpleObjectMode.bezier: {
+        paths.push({
+          path: generatePath(this.item.mode, render.paper, point, this.item.closed)
+            .attr(render.options.hoverStyle),
+          stylesApplied: true,
+        });
+        break;
+      }
+      case SimpleObjectMode.bracket: {
+        paths.push({
+          path: generatePath(this.item.mode, render.paper, point, false, this.item.bracketType)
+            .attr(render.options.hoverStyle),
+          stylesApplied: true,
+        });
+        break;
+      }
       default: {
         throw new Error('Unsupported shape type');
       }
@@ -422,7 +487,7 @@ class ReSimpleObject extends ReObject {
     this.selectionSet = restruct.render.paper.set();
     this.selectionPointsSet = restruct.render.paper.set();
     this.selectionSet.push(
-      generatePath(this.item.mode, paper, pos).attr(
+      generatePath(this.item.mode, paper, pos, false, this.item.bracketType).attr(
         styles.selectionStyleSimpleObject,
       ),
     );
@@ -456,28 +521,219 @@ class ReSimpleObject extends ReObject {
       return Scale.modelToCanvas(p, options) || new Vec2();
     });
 
-    const path = generatePath(this.item.mode, render.paper, pos);
+    const paths = [
+      ...generateCurvePaths(this.item, render.paper, pos, options),
+      ...generateArrowPaths(
+        this.item.mode,
+        render.paper,
+        pos,
+        options,
+        this.item.startArrow,
+        this.item.endArrow,
+      ),
+    ];
 
-    const offset = options.offset;
-    if (offset != null) path.translateAbs(offset.x, offset.y);
+    paths.forEach((path, index) => {
+      applySimpleObjectStyle(path, this.item.style);
+      if (this.item.color) path.attr({ stroke: this.item.color });
+      if (index < (this.item.doubled ? 2 : 1)) {
+        applySimpleObjectDecoration(path, this.item, options, index > 0);
+      }
+      if (this.item.faded) {
+        path.attr({ 'stroke-opacity': 0.35, 'fill-opacity': 0.35 });
+      }
 
-    this.visel.add(path, Box2Abs.fromRelBox(util.relBox(path.getBBox())));
+      const offset = options.offset;
+      if (offset != null) path.translateAbs(offset.x, offset.y);
+
+      restruct.addReObjectPath(LayerMap.data, this.visel, path, null, true);
+    });
   }
 }
 
-function generatePath(mode: SimpleObjectMode, paper, pos: [Vec2, Vec2]): any {
+function generateCurvePaths(item: any, paper: any, pos: Vec2[], options: any): any[] {
+  const mainPath = generatePath(
+    item.mode,
+    paper,
+    pos,
+    item.closed,
+  );
+  const paths = [mainPath];
+  if (
+    item.doubled &&
+    (item.mode === SimpleObjectMode.line ||
+      item.mode === SimpleObjectMode.polyline ||
+      item.mode === SimpleObjectMode.bezier) &&
+    pos.length > 1
+  ) {
+    const direction = directionFrom(pos[0], pos[1]);
+    if (direction) {
+      const gap = Math.max(2, options.microModeScale / 7);
+      const normal = new Vec2(-direction.y * gap, direction.x * gap);
+      paths.push(
+        generatePath(
+          item.mode,
+          paper,
+          pos.map((point) => new Vec2(point.x + normal.x, point.y + normal.y)),
+          item.closed,
+        ),
+      );
+    }
+  }
+  return paths;
+}
+
+function generateArrowPaths(
+  mode: SimpleObjectMode,
+  paper: any,
+  pos: Vec2[],
+  options: any,
+  startArrow?: SimpleObjectArrow,
+  endArrow?: SimpleObjectArrow,
+): any[] {
+  if (
+    (mode !== SimpleObjectMode.line &&
+      mode !== SimpleObjectMode.polyline &&
+      mode !== SimpleObjectMode.bezier) ||
+    pos.length < 2
+  ) {
+    return [];
+  }
+
+  const paths: any[] = [];
+  const start = createArrowPath(
+    paper,
+    pos[0],
+    directionFrom(pos[1], pos[0]),
+    startArrow,
+    options,
+  );
+  const end = createArrowPath(
+    paper,
+    pos[pos.length - 1],
+    directionFrom(pos[pos.length - 2], pos[pos.length - 1]),
+    endArrow,
+    options,
+  );
+  if (start) paths.push(start);
+  if (end) paths.push(end);
+  return paths;
+}
+
+function directionFrom(from: Vec2, to: Vec2): Vec2 | null {
+  const dx = to.x - from.x;
+  const dy = to.y - from.y;
+  const length = Math.hypot(dx, dy);
+  return length === 0 ? null : new Vec2(dx / length, dy / length);
+}
+
+function createArrowPath(
+  paper: any,
+  tip: Vec2,
+  direction: Vec2 | null,
+  arrow: SimpleObjectArrow | undefined,
+  options: any,
+): any | null {
+  if (!direction || !arrow || arrow === SimpleObjectArrow.none) return null;
+
+  const { arrowHeadLength, arrowHeadWidth } = getArrowHeadDimensions(options);
+  const normal = new Vec2(-direction.y, direction.x);
+  const base = new Vec2(
+    tip.x - direction.x * arrowHeadLength,
+    tip.y - direction.y * arrowHeadLength,
+  );
+  const side = arrow === SimpleObjectArrow.halfRight ? -1 : 1;
+  const sidePoint = new Vec2(
+    base.x + normal.x * arrowHeadWidth * side,
+    base.y + normal.y * arrowHeadWidth * side,
+  );
+
+  if (arrow === SimpleObjectArrow.full) {
+    const otherPoint = new Vec2(
+      base.x - normal.x * arrowHeadWidth,
+      base.y - normal.y * arrowHeadWidth,
+    );
+    return paper
+      .path(
+        `M${toFixed(tip.x)},${toFixed(tip.y)}` +
+          `L${toFixed(sidePoint.x)},${toFixed(sidePoint.y)}` +
+          `L${toFixed(otherPoint.x)},${toFixed(otherPoint.y)}Z`,
+      )
+      .attr({
+        ...options.lineattr,
+        fill: options.lineattr.stroke,
+        stroke: options.lineattr.stroke,
+        'stroke-width': 0,
+      });
+  }
+
+  return paper
+    .path(
+      `M${toFixed(tip.x)},${toFixed(tip.y)}L${toFixed(
+        sidePoint.x,
+      )},${toFixed(sidePoint.y)}`,
+    )
+    .attr({ ...options.lineattr, fill: 'none' });
+}
+
+function generatePath(
+  mode: SimpleObjectMode,
+  paper,
+  pos: Vec2[],
+  closed = false,
+  bracketType?: SimpleObjectBracketType,
+): any {
   let path: any;
   switch (mode) {
     case SimpleObjectMode.ellipse: {
-      path = draw.ellipse(paper, pos);
+      path = draw.ellipse(paper, pos as [Vec2, Vec2]);
       break;
     }
     case SimpleObjectMode.rectangle: {
-      path = draw.rectangle(paper, pos);
+      path = draw.rectangle(paper, pos as [Vec2, Vec2]);
       break;
     }
     case SimpleObjectMode.line: {
-      path = draw.line(paper, pos);
+      if (closed) {
+        path = paper.path([
+          'M',
+          pos[0].x,
+          pos[0].y,
+          'L',
+          pos[1].x,
+          pos[1].y,
+          'Z',
+        ]);
+      } else {
+        path = draw.line(paper, pos as [Vec2, Vec2]);
+      }
+      break;
+    }
+    case SimpleObjectMode.polyline: {
+      if (closed) {
+        const commands: Array<string | number> = ['M', pos[0].x, pos[0].y];
+        pos.slice(1).forEach((point) => commands.push('L', point.x, point.y));
+        commands.push('Z');
+        path = paper.path(commands);
+      } else {
+        path = draw.polyline(paper, pos);
+      }
+      break;
+    }
+    case SimpleObjectMode.bezier: {
+      const start = pos[0];
+      const control1 = pos[1] || start;
+      const control2 = pos[2] || pos[3] || start;
+      const end = pos[3] || pos[2] || start;
+      path = paper.path([
+        'M', start.x, start.y,
+        'C', control1.x, control1.y, control2.x, control2.y, end.x, end.y,
+        ...(closed ? ['Z'] : []),
+      ]);
+      break;
+    }
+    case SimpleObjectMode.bracket: {
+      path = generateBracketPath(paper, pos, bracketType ?? SimpleObjectBracketType.bracket);
       break;
     }
     default: {
@@ -486,6 +742,99 @@ function generatePath(mode: SimpleObjectMode, paper, pos: [Vec2, Vec2]): any {
   }
 
   return path;
+}
+
+function bracketDistance(point: Vec2, pos: Vec2[]): number {
+  if (pos.length < 2) return Infinity;
+  const left = new Vec2(pos[0].x, pos[1].y);
+  const right = new Vec2(pos[1].x, pos[0].y);
+  return Math.min(
+    point.calculateDistanceToLine([pos[0], new Vec2(pos[0].x, pos[1].y)]),
+    point.calculateDistanceToLine([pos[1], new Vec2(pos[1].x, pos[0].y)]),
+    point.calculateDistanceToLine([pos[0], right]),
+    point.calculateDistanceToLine([left, pos[1]]),
+  );
+}
+
+function generateBracketPath(paper: any, pos: Vec2[], type: SimpleObjectBracketType): any {
+  const left = Math.min(pos[0].x, pos[1].x);
+  const right = Math.max(pos[0].x, pos[1].x);
+  const top = Math.min(pos[0].y, pos[1].y);
+  const bottom = Math.max(pos[0].y, pos[1].y);
+  const width = Math.max(4, (right - left) * 0.08);
+  const mid = (top + bottom) / 2;
+  const brace = type === SimpleObjectBracketType.brace;
+  const parenthesis = type === SimpleObjectBracketType.parenthesis;
+  const leftPath = brace
+    ? `M${left + width},${top} C${left},${top} ${left + width},${mid - width} ${left},${mid} C${left + width},${mid + width} ${left},${bottom} ${left + width},${bottom}`
+    : parenthesis
+      ? `M${left + width},${top} Q${left - width},${mid} ${left + width},${bottom}`
+      : `M${left + width},${top} L${left},${top} L${left},${bottom} L${left + width},${bottom}`;
+  const rightPath = brace
+    ? `M${right - width},${top} C${right},${top} ${right - width},${mid - width} ${right},${mid} C${right - width},${mid + width} ${right},${bottom} ${right - width},${bottom}`
+    : parenthesis
+      ? `M${right - width},${top} Q${right + width},${mid} ${right - width},${bottom}`
+      : `M${right - width},${top} L${right},${top} L${right},${bottom} L${right - width},${bottom}`;
+  return paper.path(`${leftPath}${rightPath}`);
+}
+
+function applySimpleObjectDecoration(
+  path: any,
+  item: any,
+  options: any,
+  isDoubledPath: boolean,
+): void {
+  if (isDoubledPath) {
+    path.attr({ fill: 'none' });
+  } else if (
+    item.closed &&
+    item.fill &&
+    item.fill !== SimpleObjectFill.none &&
+    (item.mode === SimpleObjectMode.line ||
+      item.mode === SimpleObjectMode.polyline ||
+      item.mode === SimpleObjectMode.bezier)
+  ) {
+    const stroke = item.color || options.lineattr.stroke || '#000';
+    path.attr({
+      fill: item.fill === SimpleObjectFill.shaded ? `90-${stroke}-#ffffff` : stroke,
+      'fill-opacity': item.faded ? 0.35 : 0.22,
+    });
+  } else {
+    path.attr({ fill: 'none' });
+  }
+  if (item.faded) {
+    path.attr({ 'stroke-opacity': 0.35 });
+  }
+}
+
+function bezierPoint(points: Vec2[], t: number): Vec2 {
+  const [p0, p1, p2, p3] = points;
+  const mt = 1 - t;
+  return new Vec2(
+    mt ** 3 * p0.x + 3 * mt ** 2 * t * p1.x + 3 * mt * t ** 2 * p2.x + t ** 3 * p3.x,
+    mt ** 3 * p0.y + 3 * mt ** 2 * t * p1.y + 3 * mt * t ** 2 * p2.y + t ** 3 * p3.y,
+  );
+}
+
+function bezierDistance(point: Vec2, points: Vec2[]): number {
+  if (points.length < 4) return Infinity;
+  let min = Infinity;
+  let previous = points[0];
+  for (let index = 1; index <= 32; index += 1) {
+    const current = bezierPoint(points, index / 32);
+    min = Math.min(min, point.calculateDistanceToLine([previous, current]));
+    previous = current;
+  }
+  return min;
+}
+
+function applySimpleObjectStyle(path: any, style?: string): void {
+  if (!path || !style || style === 'plain') return;
+  if (style === 'dashed') {
+    path.attr({ 'stroke-dasharray': '-' });
+  } else if (style === 'bold') {
+    path.attr({ 'stroke-width': 2 });
+  }
 }
 
 export default ReSimpleObject;

@@ -33,7 +33,7 @@ import i18n from '../../../../../../i18n';
 const {
   ringBondCount,
   hCount,
-  substitutionCount,
+  substitutionQueryMode,
   unsaturatedAtom,
   implicitHCount,
 } = atom.properties;
@@ -69,15 +69,6 @@ const atomPropertiesForSubMenu: {
       })) ?? [],
   },
   {
-    title: substitutionCount.title,
-    key: 'substitutionCount',
-    buttons:
-      substitutionCount.enumNames?.map((label, id) => ({
-        label,
-        value: substitutionCount.enum?.[id] as AtomAllAttributeValue,
-      })) ?? [],
-  },
-  {
     title: unsaturatedAtom.title,
     key: 'unsaturatedAtom',
     buttons: [
@@ -103,6 +94,23 @@ const atomPropertiesForSubMenu: {
         value: atom.properties[name].enum?.[id] as AtomAllAttributeValue,
       })) ?? [],
   })),
+];
+
+type SubstitutionChoice = {
+  label: string;
+  mode: 'free-sites' | 'up-to' | 'exactly' | null;
+  count: 0 | 1 | 2 | 3 | 4;
+};
+
+const substitutionChoices: SubstitutionChoice[] = [
+  { label: substitutionQueryMode.enumNames?.[0] ?? 'Unspecified', mode: null, count: 0 },
+  ...(['free-sites', 'up-to', 'exactly'] as const).flatMap((mode, modeIndex) =>
+    ([0, 1, 2, 3, 4] as const).map((count) => ({
+      label: `${substitutionQueryMode.enumNames?.[modeIndex + 1] ?? mode} ${count}`,
+      mode,
+      count,
+    })),
+  ),
 ];
 
 const AtomMenuItems: FC<MenuItemsProps<AtomContextMenuProps>> = (props) => {
@@ -144,7 +152,6 @@ const AtomMenuItems: FC<MenuItemsProps<AtomContextMenuProps>> = (props) => {
           properties.includes(key as AtomQueryPropertiesName)
             ? ({
                 queryProperties: {
-                  ...getPropertyValue('queryProperties'),
                   [key]: value,
                 },
               } as AtomQueryProperties)
@@ -152,6 +159,23 @@ const AtomMenuItems: FC<MenuItemsProps<AtomContextMenuProps>> = (props) => {
         ),
       });
     }
+  };
+
+  const updateSubstitutionQuery = (choice: SubstitutionChoice) => {
+    const atomIds = props.propsFromTrigger?.atomIds;
+    if (!atomIds) return;
+    updateSelectedAtoms({
+      atoms: atomIds,
+      editor,
+      changeAtomPromise: Promise.resolve({
+        substitutionCount: 0,
+        queryProperties: {
+          substitutionQuery: choice.mode
+            ? { mode: choice.mode, count: choice.count }
+            : null,
+        },
+      } as AtomQueryProperties),
+    });
   };
 
   const onlyOneAtomSelected = props.propsFromTrigger?.atomIds?.length === 1;
@@ -274,6 +298,23 @@ const AtomMenuItems: FC<MenuItemsProps<AtomContextMenuProps>> = (props) => {
         style={{ overflow: 'visible' }}
         disabled={disabledForMonomerCreation}
       >
+        <Submenu
+          {...props}
+          label={substitutionQueryMode.title}
+          data-testid={`${substitutionQueryMode.title}-option`}
+          className={styles.sameGroup}
+        >
+          {substitutionChoices.map((choice) => (
+            <Item
+              {...props}
+              key={`${choice.mode ?? 'unspecified'}-${choice.count}`}
+              data-testid={`${choice.label}-option`}
+              onClick={() => updateSubstitutionQuery(choice)}
+            >
+              <span className={styles.contextMenuText}>{choice.label}</span>
+            </Item>
+          ))}
+        </Submenu>
         {atomPropertiesForSubMenu.map(({ title, buttons, key }) => {
           return (
             <Submenu

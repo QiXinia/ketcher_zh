@@ -35,6 +35,7 @@ import { getRelSGroupsBySelection, structSelection } from './utils';
 import { Action } from './action';
 import type { EditorSelection } from '../editor.types';
 import { FlipMonomerOperation } from 'application/editor/operations/monomer/FlipMonomerOperation';
+import { RotateMonomerOperation } from 'application/editor/operations/monomer/RotateMonomerOperation';
 import type { FlipDirection } from '../shared/utils.types';
 import { flipPointByCenter, rotateDelta } from '../shared/utils';
 
@@ -43,12 +44,19 @@ export function fromFlip(
   selection: EditorSelection | null,
   flipDirection: FlipDirection,
   center: Vec2,
+  preserveStereo = false,
 ) {
   const action = new Action();
   const structToFlip = selection ?? structSelection(reStruct.molecule);
 
   action.mergeWith(
-    fromStructureFlip(reStruct, structToFlip, flipDirection, center),
+    fromStructureFlip(
+      reStruct,
+      structToFlip,
+      flipDirection,
+      center,
+      preserveStereo,
+    ),
   );
 
   if (structToFlip.rxnArrows) {
@@ -81,6 +89,19 @@ export function fromFlip(
   }
 
   return action;
+}
+
+/**
+ * Reflect selected objects across one canvas axis without swapping wedge
+ * bond stereo. ChemDraw exposes this as Rotate 180° Horizontal/Vertical.
+ */
+export function fromRotate180(
+  reStruct: ReStruct,
+  selection: EditorSelection | null,
+  direction: FlipDirection,
+  center: Vec2,
+) {
+  return fromFlip(reStruct, selection, direction, center, true);
 }
 
 function fromRxnArrowFlip(
@@ -220,6 +241,7 @@ function fromStructureFlip(
   selection: EditorSelection | null,
   flipDirection: FlipDirection,
   center: Vec2,
+  preserveStereo = false,
 ) {
   const struct = reStruct.molecule;
   const action = new Action();
@@ -244,15 +266,14 @@ function fromStructureFlip(
 
     if (sGroup instanceof MonomerMicromolecule) {
       action.addOp(
-        new FlipMonomerOperation({
-          id: sGroup.id,
-          value: flipDirection,
-        }),
+        preserveStereo
+          ? new RotateMonomerOperation({ id: sGroup.id, value: Math.PI })
+          : new FlipMonomerOperation({ id: sGroup.id, value: flipDirection }),
       );
     }
   });
 
-  if (selection?.bonds) {
+  if (selection?.bonds && !preserveStereo) {
     flipBonds(selection.bonds, struct, action);
   }
 
@@ -341,5 +362,285 @@ export function fromRotate(restruct, selection, center, angle: number) {
     });
   }
 
+  return action.perform(restruct);
+}
+
+/**
+ * Scale selected objects around a fixed model-space point.
+ *
+ * Scaling is represented as a set of move operations so it participates in
+ * the regular editor history and keeps bond geometry derived from atom
+ * positions. The action intentionally follows the same selection semantics
+ * as rotation: a missing selection means the complete structure.
+ */
+export function fromScale(
+  restruct: ReStruct,
+  selection: (EditorSelection & { sgroupData?: number[] }) | null,
+  center: Vec2,
+  factor: number,
+) {
+  if (!Number.isFinite(factor) || factor <= 0) {
+    throw new Error('Scale factor must be a positive finite number');
+  }
+
+  const struct = restruct.molecule;
+  const action = new Action();
+
+  if (!selection) {
+    selection = structSelection(struct);
+  }
+
+  const scaleDelta = (point: Vec2) => point.sub(center).scaled(factor - 1);
+
+  selection.atoms?.forEach((atomId) => {
+    const atom = struct.atoms.get(atomId);
+    if (atom) {
+      action.addOp(new AtomMove(atomId, scaleDelta(atom.pp)));
+    }
+  });
+
+  if (selection.atoms && !selection.sgroupData) {
+    getRelSGroupsBySelection(struct, selection.atoms).forEach((sGroup) => {
+      if (sGroup.pp) {
+        action.addOp(new SGroupDataMove(sGroup.id, scaleDelta(sGroup.pp)));
+      }
+    });
+  }
+
+  selection.rxnPluses?.forEach((plusId) => {
+    const plus = struct.rxnPluses.get(plusId);
+    if (plus) {
+      action.addOp(new RxnPlusMove(plusId, scaleDelta(plus.pp)));
+    }
+  });
+
+  selection.texts?.forEach((textId) => {
+    const text = struct.texts.get(textId);
+    if (text) {
+      action.addOp(new TextMove(textId, scaleDelta(text.position)));
+    }
+  });
+
+  selection.sgroupData?.forEach((dataId) => {
+    const data = struct.sgroups.get(dataId);
+    if (data?.pp) {
+      action.addOp(new SGroupDataMove(dataId, scaleDelta(data.pp)));
+    }
+  });
+
+  selection.enhancedFlags?.forEach((flagId) => {
+    const fragment = struct.frags.get(flagId);
+    if (!fragment) return;
+    const position =
+      fragment.stereoFlagPosition ||
+      Fragment.getDefaultStereoFlagPosition(struct, flagId);
+    if (position) {
+      action.addOp(new EnhancedFlagMove(flagId, scaleDelta(position)));
+    }
+  });
+
+  return action.perform(restruct);
+}
+
+/**
+ * Normalize the selected bond lengths to a target model-space length.
+ *
+ * ChemDraw applies this command to the selected structure.  Ketcher stores
+ * bond geometry as atom coordinates, so the operation is represented as atom
+ * moves and remains fully undoable.  A small constraint iteration keeps
+ * connected chains and rings usable while a single selected bond converges to
+ * the requested length exactly.
+ */
+export function fromFixLengths(
+  restruct: ReStruct,
+  selection: EditorSelection | null,
+  targetLength: number,
+) {
+  if (!Number.isFinite(targetLength) || targetLength <= 0) {
+    throw new Error('Fixed bond length must be a positive finite number');
+  }
+
+  const struct = restruct.molecule;
+  const effectiveSelection = selection ?? structSelection(struct);
+  const selectedAtoms = new Set<number>(effectiveSelection.atoms ?? []);
+  const selectedBonds = new Set<number>(effectiveSelection.bonds ?? []);
+
+  // A bond-only selection still defines the atoms that may move.  When atoms
+  // are selected, constrain only bonds whose two ends are inside that set.
+  selectedBonds.forEach((bondId) => {
+    const bond = struct.bonds.get(bondId);
+    if (bond) {
+      selectedAtoms.add(bond.begin);
+      selectedAtoms.add(bond.end);
+    }
+  });
+
+  const constrainedBonds: Bond[] = [];
+  struct.bonds.forEach((bond, bondId) => {
+    if (selectedBonds.size > 0) {
+      if (selectedBonds.has(bondId)) constrainedBonds.push(bond);
+    } else if (selectedAtoms.has(bond.begin) && selectedAtoms.has(bond.end)) {
+      constrainedBonds.push(bond);
+    }
+  });
+  if (!constrainedBonds.length) {
+    throw new Error('固定键长需要先选择至少一根化学键或一段结构');
+  }
+
+  const positions = new Map<number, Vec2>();
+  selectedAtoms.forEach((atomId) => {
+    const atom = struct.atoms.get(atomId);
+    if (atom) positions.set(atomId, new Vec2(atom.pp));
+  });
+
+  const movable = (atomId: number) => positions.has(atomId);
+  for (let iteration = 0; iteration < 24; iteration += 1) {
+    let maxError = 0;
+    constrainedBonds.forEach((bond) => {
+      const begin = positions.get(bond.begin);
+      const end = positions.get(bond.end);
+      if (!begin || !end) return;
+      const difference = end.sub(begin);
+      const currentLength = difference.length();
+      const direction =
+        currentLength > 1e-9
+          ? difference.scaled(1 / currentLength)
+          : new Vec2(1, 0);
+      const correction = targetLength - currentLength;
+      maxError = Math.max(maxError, Math.abs(correction));
+      const beginMovable = movable(bond.begin);
+      const endMovable = movable(bond.end);
+      if (beginMovable && endMovable) {
+        positions.set(bond.begin, begin.add(direction.scaled(-correction / 2)));
+        positions.set(bond.end, end.add(direction.scaled(correction / 2)));
+      } else if (beginMovable) {
+        positions.set(bond.begin, begin.add(direction.scaled(-correction)));
+      } else if (endMovable) {
+        positions.set(bond.end, end.add(direction.scaled(correction)));
+      }
+    });
+    if (maxError < 1e-8) break;
+  }
+
+  const action = new Action();
+  positions.forEach((position, atomId) => {
+    const atom = struct.atoms.get(atomId);
+    if (atom) action.addOp(new AtomMove(atomId, position.sub(atom.pp)));
+  });
+  return action.perform(restruct);
+}
+
+/**
+ * Set the first selected local bond angle to a target angle in radians.
+ * The first adjacent bond is kept fixed and the other connected branch is
+ * rotated around the shared atom, matching ChemDraw's local Fixed Angles
+ * behavior for chains.  Ring constraints intentionally use the same bounded
+ * branch traversal instead of moving the reference bond.
+ */
+export function fromFixAngles(
+  restruct: ReStruct,
+  selection: EditorSelection | null,
+  targetAngle: number,
+) {
+  if (
+    !Number.isFinite(targetAngle) ||
+    targetAngle <= 0 ||
+    targetAngle >= Math.PI
+  ) {
+    throw new Error('Fixed bond angle must be between 0 and 180 degrees');
+  }
+
+  const struct = restruct.molecule;
+  const effectiveSelection = selection ?? structSelection(struct);
+  const selectedAtoms = new Set<number>(effectiveSelection.atoms ?? []);
+  const selectedBonds = new Set<number>(effectiveSelection.bonds ?? []);
+  selectedBonds.forEach((bondId) => {
+    const bond = struct.bonds.get(bondId);
+    if (bond) {
+      selectedAtoms.add(bond.begin);
+      selectedAtoms.add(bond.end);
+    }
+  });
+
+  const candidateBonds: Array<[number, Bond]> = [];
+  struct.bonds.forEach((bond, bondId) => {
+    if (selectedBonds.size > 0) {
+      if (selectedBonds.has(bondId)) candidateBonds.push([bondId, bond]);
+    } else if (selectedAtoms.has(bond.begin) && selectedAtoms.has(bond.end)) {
+      candidateBonds.push([bondId, bond]);
+    }
+  });
+  const bondsByAtom = new Map<number, Array<[number, Bond]>>();
+  candidateBonds.forEach(([bondId, bond]) => {
+    const begin = bondsByAtom.get(bond.begin) ?? [];
+    begin.push([bondId, bond]);
+    bondsByAtom.set(bond.begin, begin);
+    const end = bondsByAtom.get(bond.end) ?? [];
+    end.push([bondId, bond]);
+    bondsByAtom.set(bond.end, end);
+  });
+
+  let centerId: number | undefined;
+  let referenceBond: Bond | undefined;
+  let rotatingBond: Bond | undefined;
+  for (const [atomId, bonds] of bondsByAtom) {
+    if (bonds.length >= 2) {
+      centerId = atomId;
+      referenceBond = bonds[0][1];
+      rotatingBond = bonds[1][1];
+      break;
+    }
+  }
+  if (centerId === undefined || !referenceBond || !rotatingBond) {
+    throw new Error('固定键角需要先选择包含相邻两根化学键的结构');
+  }
+
+  const center = struct.atoms.get(centerId)?.pp;
+  if (!center) throw new Error('找不到固定键角的中心原子');
+  const otherAtom = (bond: Bond) =>
+    bond.begin === centerId ? bond.end : bond.begin;
+  const referenceAtomId = otherAtom(referenceBond);
+  const rotatingAtomId = otherAtom(rotatingBond);
+  const referenceAtom = struct.atoms.get(referenceAtomId)?.pp;
+  const rotatingAtom = struct.atoms.get(rotatingAtomId)?.pp;
+  if (!referenceAtom || !rotatingAtom)
+    throw new Error('找不到固定键角的端点原子');
+
+  const referenceVector = referenceAtom.sub(center);
+  const rotatingVector = rotatingAtom.sub(center);
+  const currentSignedAngle = Vec2.angle(referenceVector, rotatingVector);
+  const sign = currentSignedAngle < 0 ? -1 : 1;
+  let delta = sign * targetAngle - currentSignedAngle;
+  while (delta > Math.PI) delta -= 2 * Math.PI;
+  while (delta < -Math.PI) delta += 2 * Math.PI;
+
+  const branch = new Set<number>();
+  const queue = [rotatingAtomId];
+  while (queue.length) {
+    const atomId = queue.shift()!;
+    if (branch.has(atomId) || atomId === centerId || atomId === referenceAtomId)
+      continue;
+    if (selectedAtoms.size > 0 && !selectedAtoms.has(atomId)) continue;
+    branch.add(atomId);
+    struct.bonds.forEach((bond) => {
+      if (bond.begin !== atomId && bond.end !== atomId) return;
+      const next = bond.begin === atomId ? bond.end : bond.begin;
+      if (next !== centerId && next !== referenceAtomId && !branch.has(next))
+        queue.push(next);
+    });
+  }
+  if (!branch.size) throw new Error('固定键角没有可调整的结构分支');
+
+  const action = new Action();
+  branch.forEach((atomId) => {
+    const atom = struct.atoms.get(atomId);
+    if (atom)
+      action.addOp(
+        new AtomMove(
+          atomId,
+          atom.pp.sub(center).rotate(delta).sub(atom.pp.sub(center)),
+        ),
+      );
+  });
   return action.perform(restruct);
 }

@@ -254,6 +254,11 @@ const SettingsDialog = (props: Props) => {
     content: (
       <fieldset>
         <Field name="carbonExplicitly" data-testid="carbon-explicitly" />
+        <Field name="showAtomNumbers" data-testid="show-atom-numbers" />
+        <Field name="showTerminalCarbonLabels" data-testid="show-terminal-carbon-labels" />
+        <Field name="showQueryIndicators" data-testid="show-query-indicators" />
+        <Field name="showStereochemistry" data-testid="show-stereochemistry" />
+        <Field name="showEnhancedStereochemistry" data-testid="show-enhanced-stereochemistry" />
         <Field name="showCharge" data-testid="show-charge" />
         <Field name="showValence" data-testid="show-valence" />
         <Field

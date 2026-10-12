@@ -182,6 +182,36 @@ export class KetSerializer implements Serializer<Struct> {
       else if (nodes[i].$ref) parseNode(ket[nodes[i].$ref], resultingStruct);
     });
     resultingStruct.name = ket.header?.moleculeName ?? '';
+    resultingStruct.annotations = Array.isArray(ket.header?.annotations)
+      ? ket.header.annotations
+          .filter(
+            (annotation) =>
+              typeof annotation?.keyword === 'string' &&
+              typeof annotation?.content === 'string',
+          )
+          .map((annotation) => ({
+            keyword: annotation.keyword,
+            content: annotation.content,
+          }))
+      : [];
+    resultingStruct.properties = Array.isArray(ket.header?.properties)
+      ? ket.header.properties
+          .filter(
+            (property) =>
+              typeof property?.name === 'string' &&
+              typeof property?.value === 'string' &&
+              typeof property?.type === 'string' &&
+              typeof property?.rule === 'string' &&
+              typeof property?.status === 'string',
+          )
+          .map((property) => ({
+            name: property.name,
+            value: property.value,
+            type: property.type,
+            rule: property.rule,
+            status: property.status,
+          }))
+      : [];
 
     return resultingStruct;
   }

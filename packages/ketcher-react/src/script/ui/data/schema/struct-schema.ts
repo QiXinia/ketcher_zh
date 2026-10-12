@@ -51,6 +51,7 @@ type ExtendedSchemaProperty = Record<string, unknown>;
 
 interface AtomProperties extends Record<string, SchemaProperty> {
   alias: SchemaProperty;
+  abnormalValence: SchemaProperty;
   aromaticity: SchemaProperty;
   atomList: SchemaProperty;
   atomType: SchemaProperty;
@@ -65,6 +66,7 @@ interface AtomProperties extends Record<string, SchemaProperty> {
   implicitHCount: SchemaProperty;
   invRet: SchemaProperty;
   isotope: SchemaProperty;
+  isotopicAbundance: SchemaProperty;
   label: SchemaProperty;
   notList: SchemaProperty;
   pseudo: SchemaProperty;
@@ -73,6 +75,10 @@ interface AtomProperties extends Record<string, SchemaProperty> {
   ringMembership: SchemaProperty;
   ringSize: SchemaProperty;
   substitutionCount: SchemaProperty;
+  substitutionQueryMode: SchemaProperty;
+  substitutionQueryCount: SchemaProperty;
+  unsaturation: SchemaProperty;
+  translation: SchemaProperty;
   unsaturatedAtom: SchemaProperty;
 }
 
@@ -149,6 +155,26 @@ export const atom: StructSchema<AtomProperties> = {
       'atomProperties.leadingTrailingSpacesNotAllowed',
       'Leading and trailing spaces are not allowed',
     ) as unknown as SchemaProperty,
+    abnormalValence: localizedEnumNames(
+      localizedProperty(
+        {
+          enum: [false, true],
+          default: false,
+        } as ExtendedSchemaProperty,
+        'atomProperties.abnormalValence',
+        'Abnormal valence',
+      ),
+      [
+        {
+          key: 'atomProperties.abnormalValenceNotAllowed',
+          defaultValue: 'Not allowed',
+        },
+        {
+          key: 'atomProperties.abnormalValenceAllowed',
+          defaultValue: 'Allowed',
+        },
+      ],
+    ) as unknown as SchemaProperty,
     charge: localizedInvalidMessage(
       localizedProperty(
         {
@@ -198,6 +224,39 @@ export const atom: StructSchema<AtomProperties> = {
       ),
       'atomProperties.invalidIsotopeValue',
       'Invalid isotope value',
+    ) as unknown as SchemaProperty,
+    isotopicAbundance: localizedEnumNames(
+      localizedProperty(
+        {
+          enum: [0, 1, 2, 3, 4, 5],
+          default: 0,
+        } as ExtendedSchemaProperty,
+        'atomProperties.isotopicAbundance',
+        'Isotopic abundance',
+      ),
+      [
+        {
+          key: 'atomProperties.isotopicAbundanceUnspecified',
+          defaultValue: 'Unspecified',
+        },
+        { key: 'atomProperties.isotopicAbundanceAny', defaultValue: 'Any' },
+        {
+          key: 'atomProperties.isotopicAbundanceNatural',
+          defaultValue: 'Natural',
+        },
+        {
+          key: 'atomProperties.isotopicAbundanceEnriched',
+          defaultValue: 'Enriched',
+        },
+        {
+          key: 'atomProperties.isotopicAbundanceDeficient',
+          defaultValue: 'Deficient',
+        },
+        {
+          key: 'atomProperties.isotopicAbundanceNonnatural',
+          defaultValue: 'Nonnatural',
+        },
+      ],
     ) as unknown as SchemaProperty,
     radical: localizedEnumNames(
       localizedProperty(
@@ -299,6 +358,33 @@ export const atom: StructSchema<AtomProperties> = {
         { key: '', defaultValue: '9' },
       ],
     ) as unknown as SchemaProperty,
+    substitutionQueryMode: localizedEnumNames(
+      localizedProperty(
+        {
+          enum: [null, 'free-sites', 'up-to', 'exactly'],
+          default: null,
+        } as ExtendedSchemaProperty,
+        'atomProperties.substitutionQueryMode',
+        'Substituents',
+      ),
+      [
+        { key: 'atomProperties.substitutionUnspecified', defaultValue: 'Unspecified' },
+        { key: 'atomProperties.substitutionFreeSites', defaultValue: 'Free Sites' },
+        { key: 'atomProperties.substitutionUpTo', defaultValue: 'Up To' },
+        { key: 'atomProperties.substitutionExactly', defaultValue: 'Exactly' },
+      ],
+    ) as unknown as SchemaProperty,
+    substitutionQueryCount: localizedEnumNames(
+      localizedProperty(
+        {
+          enum: [0, 1, 2, 3, 4],
+          default: 0,
+        } as ExtendedSchemaProperty,
+        'atomProperties.substitutionQueryCount',
+        'Substituents count',
+      ),
+      [0, 1, 2, 3, 4].map((value) => ({ key: '', defaultValue: String(value) })),
+    ) as unknown as SchemaProperty,
     unsaturatedAtom: localizedProperty(
       {
         type: 'boolean',
@@ -306,6 +392,38 @@ export const atom: StructSchema<AtomProperties> = {
       } as ExtendedSchemaProperty,
       'atomProperties.unsaturated',
       'Unsaturated',
+    ) as unknown as SchemaProperty,
+    unsaturation: localizedEnumNames(
+      localizedProperty(
+        {
+          enum: [null, 'must-be-absent', 'must-be-present'],
+          default: null,
+        } as ExtendedSchemaProperty,
+        'atomProperties.unsaturation',
+        'Unsaturation',
+      ),
+      [
+        { key: 'atomProperties.unsaturationUnspecified', defaultValue: 'Unspecified' },
+        { key: 'atomProperties.unsaturationAbsent', defaultValue: 'Must be absent' },
+        { key: 'atomProperties.unsaturationPresent', defaultValue: 'Must be present' },
+      ],
+    ) as unknown as SchemaProperty,
+    translation: localizedEnumNames(
+      localizedProperty(
+        {
+          enum: [null, 'equal', 'broad', 'narrow', 'any'],
+          default: null,
+        } as ExtendedSchemaProperty,
+        'atomProperties.translation',
+        'Translation',
+      ),
+      [
+        { key: 'atomProperties.translationUnspecified', defaultValue: 'Unspecified' },
+        { key: 'atomProperties.translationEqual', defaultValue: 'Equal' },
+        { key: 'atomProperties.translationBroad', defaultValue: 'Broad' },
+        { key: 'atomProperties.translationNarrow', defaultValue: 'Narrow' },
+        { key: 'atomProperties.translationAny', defaultValue: 'Any' },
+      ],
     ) as unknown as SchemaProperty,
     aromaticity: localizedEnumNames(
       localizedProperty(
@@ -599,6 +717,41 @@ export const bond: StructSchema = {
         { key: 'bondProperties.dative', defaultValue: 'Dative' },
       ],
     ) as unknown as SchemaProperty,
+    display: localizedEnumNames(
+      localizedProperty(
+        {
+          enum: ['plain', 'dotted', 'dashed', 'hashed', 'hashed-wedged', 'hollow-wedged', 'bold'],
+          default: 'plain',
+        } as ExtendedSchemaProperty,
+        'bondProperties.display',
+        'Display',
+      ),
+      [
+        { key: 'bondProperties.plain', defaultValue: 'Plain' },
+        { key: 'bondProperties.dotted', defaultValue: 'Dotted' },
+        { key: 'bondProperties.dashed', defaultValue: 'Dashed' },
+        { key: 'bondProperties.hashed', defaultValue: 'Hashed' },
+        { key: 'bondProperties.hashedWedge', defaultValue: 'Hashed wedge' },
+        { key: 'bondProperties.hollowWedge', defaultValue: 'Hollow wedge' },
+        { key: 'bondProperties.bold', defaultValue: 'Bold' },
+      ],
+    ) as unknown as SchemaProperty,
+    doubleBondPosition: localizedEnumNames(
+      localizedProperty(
+        {
+          enum: ['auto', 'left', 'center', 'right'],
+          default: 'auto',
+        } as ExtendedSchemaProperty,
+        'bondProperties.doubleBondPosition',
+        'Double bond position',
+      ),
+      [
+        { key: 'bondProperties.automatic', defaultValue: 'Automatic' },
+        { key: 'bondProperties.left', defaultValue: 'Left' },
+        { key: 'bondProperties.center', defaultValue: 'Center' },
+        { key: 'bondProperties.right', defaultValue: 'Right' },
+      ],
+    ) as unknown as SchemaProperty,
     topology: localizedEnumNames(
       localizedProperty(
         {
@@ -687,6 +840,24 @@ const sgroup: Omit<StructSchema, 'properties'> & {
           minimum: 1,
           maximum: 200,
         },
+        bracketStyle: {
+          title: 'Bracket style',
+          enum: ['brackets', 'parentheses', 'braces'],
+          enumNames: ['Brackets', 'Parentheses', 'Braces'],
+          default: 'brackets',
+        },
+        bracketUsage: {
+          title: 'Bracket Usage',
+          enum: ['unspecified', 'parameterizable', 'anypolymer', 'component', 'copolymer', 'alternating', 'block', 'random', 'crosslink', 'generic', 'graft', 'mer', 'mixture-ordered', 'mixture-unordered', 'modification', 'monomer', 'multiple-group', 'sru'],
+          enumNames: ['Unspecified', 'Parameterizable (#/#-#/MW)', 'Anypolymer (anyp)', 'Component (c)', 'Copolymer (co)', 'Copolymer, alternating (alt)', 'Copolymer, block (blk)', 'Copolymer, random (ran)', 'Crosslink (xl)', 'Generic ()', 'Graft (grf)', 'Mer (mer)', 'Mixture, ordered (f)', 'Mixture, unordered (mix)', 'Modification (mod)', 'Monomer (mon)', 'Multiple Group (#)', 'SRU (n)'],
+          default: 'unspecified',
+        },
+        flipType: {
+          title: 'Flip Type',
+          enum: ['unspecified', 'no-flip', 'flip'],
+          enumNames: ['Unspecified', 'No Flip', 'Flip'],
+          default: 'unspecified',
+        },
       },
       required: ['mul'],
     },
@@ -711,6 +882,24 @@ const sgroup: Omit<StructSchema, 'properties'> & {
           enumNames: ['Head-to-tail', 'Head-to-head', 'Either unknown'],
           default: 'ht',
         },
+        bracketStyle: {
+          title: 'Bracket style',
+          enum: ['brackets', 'parentheses', 'braces'],
+          enumNames: ['Brackets', 'Parentheses', 'Braces'],
+          default: 'brackets',
+        },
+        bracketUsage: {
+          title: 'Bracket Usage',
+          enum: ['unspecified', 'parameterizable', 'anypolymer', 'component', 'copolymer', 'alternating', 'block', 'random', 'crosslink', 'generic', 'graft', 'mer', 'mixture-ordered', 'mixture-unordered', 'modification', 'monomer', 'multiple-group', 'sru'],
+          enumNames: ['Unspecified', 'Parameterizable (#/#-#/MW)', 'Anypolymer (anyp)', 'Component (c)', 'Copolymer (co)', 'Copolymer, alternating (alt)', 'Copolymer, block (blk)', 'Copolymer, random (ran)', 'Crosslink (xl)', 'Generic ()', 'Graft (grf)', 'Mer (mer)', 'Mixture, ordered (f)', 'Mixture, unordered (mix)', 'Modification (mod)', 'Monomer (mon)', 'Multiple Group (#)', 'SRU (n)'],
+          default: 'unspecified',
+        },
+        flipType: {
+          title: 'Flip Type',
+          enum: ['unspecified', 'no-flip', 'flip'],
+          enumNames: ['Unspecified', 'No Flip', 'Flip'],
+          default: 'unspecified',
+        },
       },
       required: ['subscript', 'connectivity'],
     },
@@ -731,6 +920,24 @@ const sgroup: Omit<StructSchema, 'properties'> & {
           enumNames: ['Head-to-tail', 'Head-to-head', 'Either unknown'],
           default: 'ht',
         },
+        bracketStyle: {
+          title: 'Bracket style',
+          enum: ['brackets', 'parentheses', 'braces'],
+          enumNames: ['Brackets', 'Parentheses', 'Braces'],
+          default: 'brackets',
+        },
+        bracketUsage: {
+          title: 'Bracket Usage',
+          enum: ['unspecified', 'parameterizable', 'anypolymer', 'component', 'copolymer', 'alternating', 'block', 'random', 'crosslink', 'generic', 'graft', 'mer', 'mixture-ordered', 'mixture-unordered', 'modification', 'monomer', 'multiple-group', 'sru'],
+          enumNames: ['Unspecified', 'Parameterizable (#/#-#/MW)', 'Anypolymer (anyp)', 'Component (c)', 'Copolymer (co)', 'Copolymer, alternating (alt)', 'Copolymer, block (blk)', 'Copolymer, random (ran)', 'Crosslink (xl)', 'Generic ()', 'Graft (grf)', 'Mer (mer)', 'Mixture, ordered (f)', 'Mixture, unordered (mix)', 'Modification (mod)', 'Monomer (mon)', 'Multiple Group (#)', 'SRU (n)'],
+          default: 'unspecified',
+        },
+        flipType: {
+          title: 'Flip Type',
+          enum: ['unspecified', 'no-flip', 'flip'],
+          enumNames: ['Unspecified', 'No Flip', 'Flip'],
+          default: 'unspecified',
+        },
       },
       required: ['connectivity'],
     },
@@ -746,6 +953,24 @@ const sgroup: Omit<StructSchema, 'properties'> & {
           default: '',
           minLength: 1,
           invalidMessage: 'Please, provide a name for the superatom',
+        },
+        bracketStyle: {
+          title: 'Bracket style',
+          enum: ['brackets', 'parentheses', 'braces'],
+          enumNames: ['Brackets', 'Parentheses', 'Braces'],
+          default: 'brackets',
+        },
+        bracketUsage: {
+          title: 'Bracket Usage',
+          enum: ['unspecified', 'parameterizable', 'anypolymer', 'component', 'copolymer', 'alternating', 'block', 'random', 'crosslink', 'generic', 'graft', 'mer', 'mixture-ordered', 'mixture-unordered', 'modification', 'monomer', 'multiple-group', 'sru'],
+          enumNames: ['Unspecified', 'Parameterizable (#/#-#/MW)', 'Anypolymer (anyp)', 'Component (c)', 'Copolymer (co)', 'Copolymer, alternating (alt)', 'Copolymer, block (blk)', 'Copolymer, random (ran)', 'Crosslink (xl)', 'Generic ()', 'Graft (grf)', 'Mer (mer)', 'Mixture, ordered (f)', 'Mixture, unordered (mix)', 'Modification (mod)', 'Monomer (mon)', 'Multiple Group (#)', 'SRU (n)'],
+          default: 'unspecified',
+        },
+        flipType: {
+          title: 'Flip Type',
+          enum: ['unspecified', 'no-flip', 'flip'],
+          enumNames: ['Unspecified', 'No Flip', 'Flip'],
+          default: 'unspecified',
         },
       },
       required: ['name'],

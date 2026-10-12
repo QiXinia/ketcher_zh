@@ -15,7 +15,16 @@
  ***************************************************************************/
 
 import { Atom, AttachmentPoints } from 'domain/entities/atom';
-import { SGroup } from 'domain/entities/sgroup';
+import { Highlight } from 'domain/entities/highlight';
+import {
+  DEFAULT_SGROUP_BRACKET_STYLE,
+  DEFAULT_SGROUP_BRACKET_USAGE,
+  DEFAULT_SGROUP_FLIP_TYPE,
+  SGroup,
+  type SGroupBracketStyle,
+  type SGroupBracketUsage,
+  type SGroupFlipType,
+} from 'domain/entities/sgroup';
 import { Struct } from 'domain/entities/struct';
 import { SGroupAttachmentPoint } from 'domain/entities/sGroupAttachmentPoint';
 import { RGroupAttachmentPoint } from 'domain/entities/rgroupAttachmentPoint';
@@ -68,12 +77,51 @@ export function moleculeToStruct(ketItem: any): Struct {
     });
   }
 
+  if (Array.isArray(ketItem.coloredHighlights)) {
+    addColoredHighlightsToStruct(struct, ketItem.coloredHighlights);
+  }
+
   struct.initHalfBonds();
   struct.initNeighbors();
   struct.markFragments(ketItem.properties);
   struct.bindSGroupsToFunctionalGroups();
 
   return struct;
+}
+
+function addColoredHighlightsToStruct(struct: Struct, serializedHighlights) {
+  const atomIds = Array.from(struct.atoms.keys());
+  const bondIds = Array.from(struct.bonds.keys());
+  const attachmentPointIds = Array.from(struct.rgroupAttachmentPoints.keys());
+  const mapIndexesToIds = (indexes, ids: number[]) =>
+    (Array.isArray(indexes) ? indexes : []).flatMap((index) =>
+      Number.isInteger(index) && index >= 0 && index < ids.length
+        ? [ids[index]]
+        : [],
+    );
+
+  serializedHighlights.forEach((serializedHighlight) => {
+    if (!serializedHighlight || typeof serializedHighlight.color !== 'string') {
+      return;
+    }
+
+    const highlight = new Highlight({
+      atoms: mapIndexesToIds(serializedHighlight.atoms, atomIds),
+      bonds: mapIndexesToIds(serializedHighlight.bonds, bondIds),
+      rgroupAttachmentPoints: mapIndexesToIds(
+        serializedHighlight.rgroupAttachmentPoints,
+        attachmentPointIds,
+      ),
+      color: serializedHighlight.color,
+    });
+    if (
+      highlight.atoms.length ||
+      highlight.bonds.length ||
+      highlight.rgroupAttachmentPoints.length
+    ) {
+      struct.highlights.add(highlight);
+    }
+  });
 }
 
 export function rglabelToStruct(source) {
@@ -129,6 +177,40 @@ type KetAttachmentPoint = {
 export function sgroupToStruct(source) {
   const sgroup = new SGroup(source.type);
   ifDef(sgroup, 'atoms', source.atoms);
+  ifDef(
+    sgroup.data,
+    'bracketStyle',
+    isSGroupBracketStyle(source.bracketStyle)
+      ? source.bracketStyle
+      : DEFAULT_SGROUP_BRACKET_STYLE,
+  );
+  ifDef(
+    sgroup.data,
+    'bracketUsage',
+    isSGroupBracketUsage(source.bracketUsage)
+      ? source.bracketUsage
+      : DEFAULT_SGROUP_BRACKET_USAGE,
+  );
+  ifDef(
+    sgroup.data,
+    'flipType',
+    isSGroupFlipType(source.flipType)
+      ? source.flipType
+      : DEFAULT_SGROUP_FLIP_TYPE,
+  );
+  sgroup.annotations = Array.isArray(source.annotations)
+    ? source.annotations
+        .filter(
+          (annotation) =>
+            annotation &&
+            typeof annotation.keyword === 'string' &&
+            typeof annotation.content === 'string',
+        )
+        .map((annotation) => ({
+          keyword: annotation.keyword,
+          content: annotation.content,
+        }))
+    : [];
   switch (source.type) {
     case 'MUL': {
       ifDef(sgroup.data, 'mul', source.mul);
@@ -177,6 +259,37 @@ export function sgroupToStruct(source) {
       break;
   }
   return sgroup;
+}
+
+function isSGroupBracketStyle(value: unknown): value is SGroupBracketStyle {
+  return value === 'brackets' || value === 'parentheses' || value === 'braces';
+}
+
+function isSGroupBracketUsage(value: unknown): value is SGroupBracketUsage {
+  return [
+    'unspecified',
+    'parameterizable',
+    'anypolymer',
+    'component',
+    'copolymer',
+    'alternating',
+    'block',
+    'random',
+    'crosslink',
+    'generic',
+    'graft',
+    'mer',
+    'mixture-ordered',
+    'mixture-unordered',
+    'modification',
+    'monomer',
+    'multiple-group',
+    'sru',
+  ].includes(value as SGroupBracketUsage);
+}
+
+function isSGroupFlipType(value: unknown): value is SGroupFlipType {
+  return value === 'unspecified' || value === 'no-flip' || value === 'flip';
 }
 
 function sgroupAttachmentPointToStruct(

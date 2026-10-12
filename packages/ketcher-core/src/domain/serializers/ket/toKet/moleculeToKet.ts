@@ -63,6 +63,10 @@ export function moleculeToKet(struct: Struct, monomer?: BaseMonomer): any {
     );
   }
 
+  if (struct.highlights.size !== 0) {
+    body.coloredHighlights = highlightsToKet(struct);
+  }
+
   const fragment = struct.frags.get(0);
   if (fragment) {
     ifDef(body, 'stereoFlagPosition', fragment.stereoFlagPosition, null);
@@ -74,6 +78,35 @@ export function moleculeToKet(struct: Struct, monomer?: BaseMonomer): any {
     type: 'molecule',
     ...body,
   };
+}
+
+function highlightsToKet(struct: Struct) {
+  const atomIndexById = createEntityIndex(struct.atoms.keys());
+  const bondIndexById = createEntityIndex(struct.bonds.keys());
+  const attachmentPointIndexById = createEntityIndex(
+    struct.rgroupAttachmentPoints.keys(),
+  );
+  const mapIdsToIndexes = (ids: number[], indexes: Map<number, number>) =>
+    ids.flatMap((id) => {
+      const index = indexes.get(id);
+      return index === undefined ? [] : [index];
+    });
+
+  return Array.from(struct.highlights.values()).map((highlight) => ({
+    atoms: mapIdsToIndexes(highlight.atoms, atomIndexById),
+    bonds: mapIdsToIndexes(highlight.bonds, bondIndexById),
+    rgroupAttachmentPoints: mapIdsToIndexes(
+      highlight.rgroupAttachmentPoints,
+      attachmentPointIndexById,
+    ),
+    color: highlight.color,
+  }));
+}
+
+function createEntityIndex(ids: Iterable<number>): Map<number, number> {
+  const indexById = new Map<number, number>();
+  Array.from(ids).forEach((id, index) => indexById.set(id, index));
+  return indexById;
 }
 
 function atomToKet(source, monomer?: BaseMonomer) {
@@ -106,10 +139,13 @@ function atomToKet(source, monomer?: BaseMonomer) {
   ifDef(result, 'charge', source.charge);
   ifDef(result, 'explicitValence', source.explicitValence, -1);
   ifDef(result, 'isotope', source.isotope);
+  ifDef(result, 'isotopicAbundance', source.isotopicAbundance, 0);
+  ifDef(result, 'abnormalValence', source.abnormalValence, false);
   ifDef(result, 'radical', source.radical, 0);
   ifDef(result, 'attachmentPoints', source.attachmentPoints, 0);
   ifDef(result, 'cip', source.cip, '');
   ifDef(result, 'selected', source.getInitiallySelected());
+  ifDef(result, 'annotations', source.annotations, []);
   // stereo
   ifDef(result, 'stereoLabel', source.stereoLabel, null);
   ifDef(result, 'stereoParity', source.stereoCare, 0);
@@ -166,7 +202,10 @@ function bondToKet(source) {
     ifDef(result, 'center', source.reactingCenterStatus, 0);
     ifDef(result, 'cip', source.cip, '');
   }
+  ifDef(result, 'display', source.display, 'plain');
+  ifDef(result, 'doubleBondPosition', source.doubleBondPosition, 'auto');
   ifDef(result, 'selected', source.getInitiallySelected());
+  ifDef(result, 'annotations', source.annotations, []);
   return result;
 }
 
@@ -175,6 +214,11 @@ function sgroupToKet(struct: Struct, source: SGroup) {
 
   ifDef(result, 'type', source.type);
   ifDef(result, 'atoms', source.atoms);
+  // Square brackets are the KET default; only persist an alternate visual style.
+  ifDef(result, 'bracketStyle', source.data.bracketStyle, 'brackets');
+  ifDef(result, 'bracketUsage', source.data.bracketUsage, 'unspecified');
+  ifDef(result, 'flipType', source.data.flipType, 'unspecified');
+  ifDef(result, 'annotations', source.annotations, []);
 
   switch (source.type) {
     case 'MUL': {

@@ -33,6 +33,9 @@ export function atomToStruct(source) {
     'ringSize',
     'chirality',
     'customQuery',
+    'substitutionQuery',
+    'unsaturation',
+    'translation',
   ];
   if (source.type === 'atom-list') {
     params.label = 'L#';
@@ -57,6 +60,8 @@ export function atomToStruct(source) {
   ifDef(params, 'charge', source.charge);
   ifDef(params, 'explicitValence', source.explicitValence);
   ifDef(params, 'isotope', source.isotope);
+  ifDef(params, 'isotopicAbundance', source.isotopicAbundance);
+  ifDef(params, 'abnormalValence', source.abnormalValence);
   ifDef(params, 'radical', source.radical);
   ifDef(params, 'cip', source.cip);
   ifDef(params, 'attachmentPoints', source.attachmentPoints);
@@ -88,6 +93,7 @@ export function atomToStruct(source) {
   ifDef(params, 'exactChangeFlag', Number(Boolean(source.exactChangeFlag)));
   // implicit hydrogens
   ifDef(params, 'implicitHCount', source.implicitHCount);
+  ifDef(params, 'annotations', source.annotations);
 
   const newAtom = new Atom(params as AtomAttributes);
   newAtom.setInitiallySelected(source.selected);
@@ -116,11 +122,14 @@ export function bondToStruct(source, atomOffset = 0) {
   ifDef(params, 'topology', source.topology);
   ifDef(params, 'reactingCenterStatus', source.center);
   ifDef(params, 'stereo', source.stereo);
+  ifDef(params, 'display', source.display);
+  ifDef(params, 'doubleBondPosition', source.doubleBondPosition);
   ifDef(params, 'cip', source.cip);
   ifDef(params, 'customQuery', source.customQuery);
   ifDef(params, 'begin', source.atoms[0] + atomOffset);
   ifDef(params, 'end', source.atoms[1] + atomOffset);
   ifDef(params, 'initiallySelected', source.selected);
+  ifDef(params, 'annotations', source.annotations);
 
   const newBond = new Bond(params as BondAttributes);
   newBond.setInitiallySelected(source.selected);

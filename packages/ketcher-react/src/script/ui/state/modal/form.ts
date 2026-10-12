@@ -20,6 +20,7 @@ import { getDefaultOptions } from '../../data/schema/options-schema';
 import { sdataCustomSchema } from '../../data/schema/sdata-schema';
 import { SUPERATOM_CLASS } from 'ketcher-core';
 import type { AnyAction } from 'redux';
+import type { MoleculeErrorLocations } from '../server/checkLocations';
 
 export type ModalFormErrors = Record<string, unknown>;
 
@@ -30,6 +31,7 @@ export interface ModalFormState<TResult = Record<string, unknown>> {
   valid?: boolean;
   result?: TResult;
   moleculeErrors?: MoleculeErrors;
+  moleculeErrorLocations?: MoleculeErrorLocations;
 }
 
 export type ModalFormsState = Record<string, ModalFormState>;
@@ -54,9 +56,14 @@ export const formsState: ModalFormsState = {
       hCount: 0,
       invRet: 0,
       isotope: null,
+      isotopicAbundance: 0,
       radical: 0,
       ringBondCount: 0,
       substitutionCount: 0,
+      substitutionQueryMode: null,
+      substitutionQueryCount: 0,
+      unsaturation: null,
+      translation: null,
       aromaticity: null,
       implicitHCount: null,
       ringMembership: null,
@@ -86,6 +93,8 @@ export const formsState: ModalFormsState = {
     valid: true,
     result: {
       type: 'single',
+      display: 'plain',
+      doubleBondPosition: 'auto',
       topology: 0,
       center: 0,
       customQuery: null,
@@ -94,6 +103,7 @@ export const formsState: ModalFormsState = {
   check: {
     errors: {},
     moleculeErrors: {},
+    moleculeErrorLocations: {},
   },
   labelEdit: {
     errors: {},
@@ -153,10 +163,13 @@ export function updateFormState<TData extends Partial<ModalFormState>>(
   };
 }
 
-export function checkErrors(errors: MoleculeErrors): UpdateFormAction {
+export function checkErrors(
+  errors: MoleculeErrors,
+  locations: MoleculeErrorLocations = {},
+): UpdateFormAction {
   return {
     type: 'UPDATE_FORM',
-    data: { moleculeErrors: errors },
+    data: { moleculeErrors: errors, moleculeErrorLocations: locations },
   };
 }
 

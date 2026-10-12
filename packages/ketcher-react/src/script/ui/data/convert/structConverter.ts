@@ -19,6 +19,7 @@ import {
   type Struct,
   type SupportedFormat,
   Bond,
+  IsotopicAbundance,
   RxnArrowMode,
   StereoFlag,
   getPropertiesByFormat,
@@ -50,6 +51,71 @@ export function couldBeSaved(
     );
   }
 
+  if (
+    format !== 'ket' &&
+    Array.from(struct.atoms.values()).some(
+      (atom) =>
+        atom.isotopicAbundance !== IsotopicAbundance.Unspecified,
+    )
+  ) {
+    warnings.push(
+      `The ${formatName} format does not preserve isotopic abundance query properties.`,
+    );
+  }
+
+  if (
+    format !== 'ket' &&
+    Array.from(struct.atoms.values()).some((atom) => atom.abnormalValence)
+  ) {
+    warnings.push(
+      `The ${formatName} format does not preserve ChemDraw abnormal-valence permissions.`,
+    );
+  }
+
+  if (
+    format !== 'ket' &&
+    Array.from(struct.atoms.values()).some(
+      (atom) => atom.queryProperties.substitutionQuery,
+    )
+  ) {
+    warnings.push(
+      `The ${formatName} format does not preserve ChemDraw Substituents mode and count.`,
+    );
+  }
+
+  if (
+    format !== 'ket' &&
+    Array.from(struct.atoms.values()).some(
+      (atom) => atom.implicitHCount !== null,
+    )
+  ) {
+    warnings.push(
+      `The ${formatName} format does not preserve ChemDraw implicit-hydrogen query constraints.`,
+    );
+  }
+
+  if (
+    format !== 'ket' &&
+    Array.from(struct.atoms.values()).some(
+      (atom) => atom.queryProperties.unsaturation,
+    )
+  ) {
+    warnings.push(
+      `The ${formatName} format does not preserve ChemDraw Unsaturation query predicates.`,
+    );
+  }
+
+  if (
+    format !== 'ket' &&
+    Array.from(struct.atoms.values()).some(
+      (atom) => atom.queryProperties.translation,
+    )
+  ) {
+    warnings.push(
+      `The ${formatName} format does not preserve ChemDraw Translation query predicates.`,
+    );
+  }
+
   const rxnArrowsSize = struct.rxnArrows.size;
   const hasRxnArrow = struct.hasRxnArrow();
 
@@ -73,6 +139,21 @@ export function couldBeSaved(
     if (bondsHaveUnsupportedProperties || atomsHaveUnsupportedProperties) {
       warnings.push(
         `Structure contains query properties of atoms and bonds that are not supported in the SMARTS. Query properties will not be reflected in the file saved.`,
+      );
+    }
+    if (arrayOfAtoms.some((atom) => atom.queryProperties.substitutionQuery)) {
+      warnings.push(
+        `ChemDraw Substituents modes may differ in SMARTS matching semantics.`,
+      );
+    }
+    if (arrayOfAtoms.some((atom) => atom.queryProperties.unsaturation)) {
+      warnings.push(
+        `ChemDraw Unsaturation predicates are KET extensions and may differ in SMARTS matching semantics.`,
+      );
+    }
+    if (arrayOfAtoms.some((atom) => atom.queryProperties.translation)) {
+      warnings.push(
+        `ChemDraw Translation predicates are KET extensions and may differ in SMARTS matching semantics.`,
       );
     }
   }

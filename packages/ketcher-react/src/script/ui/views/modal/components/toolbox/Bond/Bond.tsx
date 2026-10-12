@@ -32,6 +32,8 @@ import i18n from '../../../../../../../i18n';
 
 interface BondSettings {
   type: string;
+  display: string;
+  doubleBondPosition: string;
   topology: number | null;
   center: number | null;
   customQuery: string;
@@ -49,6 +51,8 @@ const Bond = (props: Props) => {
   const [isCustomQuery, setIsCustomQuery] = useState(Boolean(rest.customQuery));
   const previousSettings = useRef<BondSettings>({
     type: 'single',
+    display: 'plain',
+    doubleBondPosition: 'auto',
     topology: 0,
     center: 0,
     customQuery: '',
@@ -82,9 +86,18 @@ const Bond = (props: Props) => {
 
     setIsCustomQuery(value);
     if (value) {
-      const { type, topology, center, customQuery } = formState;
+      const {
+        type,
+        display,
+        doubleBondPosition,
+        topology,
+        center,
+        customQuery,
+      } = formState;
       previousSettings.current = {
         type,
+        display,
+        doubleBondPosition,
         topology,
         center,
         customQuery,
@@ -92,11 +105,13 @@ const Bond = (props: Props) => {
     }
     updateFormState(
       value
-        ? {
-            type: '',
-            topology: null,
-            center: null,
-            customQuery: getBondCustomQuery(formState),
+          ? {
+              type: '',
+              display: formState.display,
+              doubleBondPosition: formState.doubleBondPosition,
+              topology: null,
+              center: null,
+              customQuery: getBondCustomQuery(formState),
           }
         : previousSettings.current,
     );
@@ -126,6 +141,20 @@ const Bond = (props: Props) => {
           disabled={isCustomQuery}
           formName="bond-properties"
           data-testid="type"
+        />
+        <Field
+          name="display"
+          component={Select}
+          options={getSelectOptionsFromSchema(bondProps.display)}
+          formName="bond-properties"
+          data-testid="display"
+        />
+        <Field
+          name="doubleBondPosition"
+          component={Select}
+          options={getSelectOptionsFromSchema(bondProps.doubleBondPosition)}
+          formName="bond-properties"
+          data-testid="double-bond-position"
         />
         <Field
           name="topology"

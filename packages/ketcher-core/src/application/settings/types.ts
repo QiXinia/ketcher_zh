@@ -39,6 +39,11 @@ export interface Settings {
 
   // Atoms
   readonly carbonExplicitly: boolean;
+  readonly showAtomNumbers: boolean;
+  readonly showTerminalCarbonLabels: boolean;
+  readonly showQueryIndicators: boolean;
+  readonly showStereochemistry: boolean;
+  readonly showEnhancedStereochemistry: boolean;
   readonly showCharge: boolean;
   readonly showValence: boolean;
   readonly showHydrogenLabels:

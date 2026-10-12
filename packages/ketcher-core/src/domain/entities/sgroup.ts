@@ -28,12 +28,45 @@ import type { ReSGroup } from 'application/render';
 import { SgContexts } from 'application/editor/shared/constants';
 import assert from 'assert';
 import { isNumber } from 'lodash';
+import type { ObjectAnnotation } from 'domain/entities/BaseMicromoleculeEntity';
 
 export enum SUPERATOM_CLASS {
   SUGAR = 'SUGAR',
   BASE = 'BASE',
   PHOSPHATE = 'PHOSPHATE',
 }
+
+/** The visual delimiters used when an S-group is rendered expanded. */
+export type SGroupBracketStyle = 'brackets' | 'parentheses' | 'braces';
+
+export const DEFAULT_SGROUP_BRACKET_STYLE: SGroupBracketStyle = 'brackets';
+
+/** ChemDraw-compatible polymer/bracket semantics. These values are kept as
+ * KET extensions because CTfile does not have a portable field for them. */
+export type SGroupBracketUsage =
+  | 'unspecified'
+  | 'parameterizable'
+  | 'anypolymer'
+  | 'component'
+  | 'copolymer'
+  | 'alternating'
+  | 'block'
+  | 'random'
+  | 'crosslink'
+  | 'generic'
+  | 'graft'
+  | 'mer'
+  | 'mixture-ordered'
+  | 'mixture-unordered'
+  | 'modification'
+  | 'monomer'
+  | 'multiple-group'
+  | 'sru';
+
+export type SGroupFlipType = 'unspecified' | 'no-flip' | 'flip';
+
+export const DEFAULT_SGROUP_BRACKET_USAGE: SGroupBracketUsage = 'unspecified';
+export const DEFAULT_SGROUP_FLIP_TYPE: SGroupFlipType = 'unspecified';
 
 export class SGroupBracketParams {
   readonly c: Vec2;
@@ -93,6 +126,7 @@ export class SGroup {
   pp: Vec2 | null;
   data: any;
   dataArea: any;
+  annotations: ObjectAnnotation[];
   functionalGroup: FunctionalGroup | undefined;
   private readonly attachmentPoints: SGroupAttachmentPoint[];
 
@@ -136,7 +170,11 @@ export class SGroup {
       units: '',
       query: '',
       queryOp: '',
+      bracketStyle: DEFAULT_SGROUP_BRACKET_STYLE,
+      bracketUsage: DEFAULT_SGROUP_BRACKET_USAGE,
+      flipType: DEFAULT_SGROUP_FLIP_TYPE,
     };
+    this.annotations = [];
   }
 
   // TODO: these methods should be overridden
@@ -457,6 +495,7 @@ export class SGroup {
     cp.bonds = null;
     cp.allAtoms = sgroup.allAtoms;
     cp.data.expanded = sgroup.data.expanded;
+    cp.annotations = sgroup.annotations.map((annotation) => ({ ...annotation }));
     cp.addAttachmentPoints(sgroup.cloneAttachmentPoints(aidMap));
     return cp;
   }
@@ -518,7 +557,7 @@ export class SGroup {
       return mol.atoms.get(aid);
     };
 
-    sGroup.bracketDirection = new Vec2(1, 0);
+    sGroup.bracketDirection = SGroup.getBracketDirection(sGroup);
 
     atoms.forEach((aid) => {
       const atom = getAtom(aid);
@@ -554,6 +593,16 @@ export class SGroup {
     sGroup.bracketBox = braketBox;
   }
 
+  /**
+   * Return the model-space direction used by the bracket pair. ChemDraw's
+   * `Flip Type = Flip` reverses the delimiter opening direction while keeping
+   * the repeat-unit coordinates unchanged; unspecified and no-flip use the
+   * historical inward-facing orientation.
+   */
+  static getBracketDirection(sGroup: SGroup): Vec2 {
+    return sGroup.data.flipType === 'flip' ? new Vec2(-1, 0) : new Vec2(1, 0);
+  }
+
   static getBracketParameters(
     mol,
     crossBondsPerAtom: { [key: number]: Array<Bond> },
@@ -563,6 +612,7 @@ export class SGroup {
     n,
   ): Array<any> {
     const brackets: Array<any> = [];
+    const flipBrackets = d?.x < 0;
     const crossBondsPerAtomValues = Object.values(crossBondsPerAtom);
     const crossBonds = crossBondsPerAtomValues.flat();
     if (crossBonds.length < 2) {
@@ -570,8 +620,12 @@ export class SGroup {
         d = d || new Vec2(1, 0);
         n = n || d.rotateSC(1, 0);
         const bracketWidth = Math.min(0.25, bb.sz().x * 0.3);
-        const cl = Vec2.lc2(d, bb.p0.x, n, 0.5 * (bb.p0.y + bb.p1.y));
-        const cr = Vec2.lc2(d, bb.p1.x, n, 0.5 * (bb.p0.y + bb.p1.y));
+        // `bb` is axis-aligned; keep its physical x/y coordinates when the
+        // bracket opening is flipped instead of treating them as signed basis
+        // coefficients (which would mirror the group around the origin).
+        const centerY = 0.5 * (bb.p0.y + bb.p1.y);
+        const cl = new Vec2(bb.p0.x, centerY);
+        const cr = new Vec2(bb.p1.x, centerY);
         const bracketHeight = bb.sz().y;
 
         brackets.push(
@@ -593,16 +647,18 @@ export class SGroup {
 
         const bracketWidth = 0.25;
         const bracketHeight = 1.5;
+        const leftDirection = flipBrackets ? dr : dl;
+        const rightDirection = flipBrackets ? dl : dr;
         brackets.push(
           new SGroupBracketParams(
-            cl0.addScaled(dl, 0),
-            dl,
+            cl0,
+            leftDirection,
             bracketWidth,
             bracketHeight,
           ),
           new SGroupBracketParams(
-            cr0.addScaled(dr, 0),
-            dr,
+            cr0,
+            rightDirection,
             bracketWidth,
             bracketHeight,
           ),
@@ -613,10 +669,17 @@ export class SGroup {
         for (const crossBondId of crossBonds) {
           const b = mol.bonds.get(crossBondId);
           const c = b.getCenter(mol);
-          const d = atomSet.has(b.begin)
+          const bondDirection = atomSet.has(b.begin)
             ? b.getDir(mol)
             : b.getDir(mol).negated();
-          brackets.push(new SGroupBracketParams(c, d, 0.2, 1.0));
+          brackets.push(
+            new SGroupBracketParams(
+              c,
+              flipBrackets ? bondDirection.negated() : bondDirection,
+              0.2,
+              1.0,
+            ),
+          );
         }
       })();
     }

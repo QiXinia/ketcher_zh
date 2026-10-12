@@ -331,7 +331,7 @@ class IndigoService implements StructService {
         if (!msg.hasError) {
           const result: InfoResult = {
             indigoVersion: msg.payload,
-            imagoVersions: [],
+            imagoVersions: (globalThis as any).chemwikiRecognition?.versions() || [],
             isAvailable: true,
           };
           resolve(result);
@@ -716,6 +716,10 @@ class IndigoService implements StructService {
   }
 
   recognize(_blob: Blob, _version: string): Promise<RecognizeResult> {
+    // Same-origin ChemWiki Direct API keeps the native preview/apply dialog
+    // while all iframes share the parent page's model Worker and settings.
+    const bridge = (globalThis as any).chemwikiRecognition;
+    if (bridge?.host()) return bridge.recognize(_blob);
     return Promise.reject(new Error('Not supported in standalone mode'));
   }
 

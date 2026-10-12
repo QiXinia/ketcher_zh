@@ -28,10 +28,13 @@ import type { Tool } from './Tool';
 class RGroupAtomTool implements Tool {
   private readonly editor: Editor;
 
-  constructor(editor) {
+  private readonly presetRGroup?: number;
+
+  constructor(editor, options?: { presetRGroup?: number }) {
     // TODO: map atoms with labels
     editor.selection(null);
     this.editor = editor;
+    this.presetRGroup = options?.presetRGroup;
   }
 
   mousemove(event) {
@@ -98,6 +101,7 @@ class RGroupAtomTool implements Tool {
         this.editor,
         null,
         CoordinateTransformation.pageToModel(event, rnd),
+        this.presetRGroup,
       );
       return true;
     } else if (ci.map === 'atoms') {
@@ -109,18 +113,44 @@ class RGroupAtomTool implements Tool {
         return;
       }
 
-      propsDialog(this.editor, ci.id, null);
+      propsDialog(this.editor, ci.id, null, this.presetRGroup);
       return true;
     }
     return true;
   }
 }
 
-function propsDialog(editor, id, pos) {
+function propsDialog(editor, id, pos, presetRGroup?: number) {
   const struct = editor.render.ctab.molecule;
   const atom = id || id === 0 ? struct.atoms.get(id) : null;
   const rglabel = atom ? atom.rglabel : 0;
   const label = atom ? atom.label : 'R#';
+
+  if (presetRGroup && (id === undefined || id === null)) {
+    editor.update(
+      fromAtomAddition(editor.render.ctab, pos, {
+        ...Atom.attrlist,
+        label: 'R#',
+        rglabel: 1 << (presetRGroup - 1),
+      }),
+    );
+    return;
+  }
+
+  if (presetRGroup && id !== undefined && id !== null) {
+    const atom = struct.atoms.get(id);
+    if (atom) {
+      editor.update(
+        fromAtomsAttrs(editor.render.ctab, id, {
+          label: 'R#',
+          rglabel: 1 << (presetRGroup - 1),
+          aam: atom.aam,
+          attachmentPoints: atom.attachmentPoints,
+        }, false),
+      );
+    }
+    return;
+  }
 
   const res = editor.event.elementEdit.dispatch({
     label: 'R#',

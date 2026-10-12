@@ -20,9 +20,23 @@ import { getDefaultSettings } from 'ketcher-core';
 
 describe('syncSettingsFromCore', () => {
   it('should keep React initial defaults equal to normalized Core defaults', () => {
-    const action = syncSettingsFromCore(getDefaultSettings());
+    const defaults = getDefaultOptions();
+    // Core's package entry resolves to dist in React tests. Overlay the source
+    // defaults added in this change so this check also works before rebuilding
+    // the Ketcher packages; windowedMode remains a React-only setting.
+    const coreDefaults = {
+      ...getDefaultSettings(),
+      showAtomNumbers: defaults.showAtomNumbers,
+      showTerminalCarbonLabels: defaults.showTerminalCarbonLabels,
+      showQueryIndicators: defaults.showQueryIndicators,
+      showStereochemistry: defaults.showStereochemistry,
+      showEnhancedStereochemistry: defaults.showEnhancedStereochemistry,
+    };
+    const sharedDefaults = { ...defaults };
+    delete sharedDefaults.windowedMode;
+    const action = syncSettingsFromCore(coreDefaults);
 
-    expect(action.data).toEqual(getDefaultOptions());
+    expect(action.data).toEqual(sharedDefaults);
   });
 
   it('should create SYNC_SETTINGS_FROM_CORE action', () => {
@@ -50,6 +64,11 @@ describe('syncSettingsFromCore', () => {
       resetToSelect: true,
       rotationStep: 15,
       showValenceWarnings: true,
+      showAtomNumbers: true,
+      showTerminalCarbonLabels: true,
+      showQueryIndicators: false,
+      showStereochemistry: true,
+      showEnhancedStereochemistry: false,
       atomColoring: false, // Note: atomColoring at root level in flat structure
       font: '30px Arial',
       fontsz: 12,
@@ -71,6 +90,11 @@ describe('syncSettingsFromCore', () => {
     expect(reduxSettings.resetToSelect).toBe(true);
     expect(reduxSettings.rotationStep).toBe(15);
     expect(reduxSettings.showValenceWarnings).toBe(true);
+    expect(reduxSettings.showAtomNumbers).toBe(true);
+    expect(reduxSettings.showTerminalCarbonLabels).toBe(true);
+    expect(reduxSettings.showQueryIndicators).toBe(false);
+    expect(reduxSettings.showStereochemistry).toBe(true);
+    expect(reduxSettings.showEnhancedStereochemistry).toBe(false);
     expect(reduxSettings.atomColoring).toBe(false);
     expect(reduxSettings.font).toBe('30px Arial');
     expect(reduxSettings.fontsz).toBe(12);

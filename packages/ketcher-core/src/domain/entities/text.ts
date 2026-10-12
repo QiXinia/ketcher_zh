@@ -17,6 +17,7 @@
 import { type Point, Vec2 } from './vec2';
 import {
   type initiallySelectedType,
+  type ObjectAnnotation,
   BaseMicromoleculeEntity,
 } from 'domain/entities/BaseMicromoleculeEntity';
 
@@ -41,6 +42,7 @@ export interface TextAttributes {
   position: Point;
   pos: Array<Point>;
   initiallySelected?: initiallySelectedType;
+  annotations?: ObjectAnnotation[];
 }
 
 function preparePositions(positions?: Array<Point>) {
@@ -60,7 +62,7 @@ export class Text extends BaseMicromoleculeEntity {
   pos: Array<Vec2>;
 
   constructor(attributes?: TextAttributes) {
-    super(attributes?.initiallySelected);
+    super(attributes?.initiallySelected, attributes?.annotations);
     this.pos = preparePositions(attributes?.pos);
     this.content = attributes?.content ?? '';
     this.position = attributes?.position
