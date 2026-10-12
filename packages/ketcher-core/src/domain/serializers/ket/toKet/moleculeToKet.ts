@@ -67,6 +67,10 @@ export function moleculeToKet(struct: Struct, monomer?: BaseMonomer): any {
     body.coloredHighlights = highlightsToKet(struct);
   }
 
+  if (struct.ringFills.size !== 0) {
+    body.ringFills = ringFillsToKet(struct);
+  }
+
   const fragment = struct.frags.get(0);
   if (fragment) {
     ifDef(body, 'stereoFlagPosition', fragment.stereoFlagPosition, null);
@@ -78,6 +82,21 @@ export function moleculeToKet(struct: Struct, monomer?: BaseMonomer): any {
     type: 'molecule',
     ...body,
   };
+}
+
+function ringFillsToKet(struct: Struct) {
+  const atomIndexById = createEntityIndex(struct.atoms.keys());
+  const bondIndexById = createEntityIndex(struct.bonds.keys());
+  const mapIdsToIndexes = (ids: number[], indexes: Map<number, number>) =>
+    ids.flatMap((id) => {
+      const index = indexes.get(id);
+      return index === undefined ? [] : [index];
+    });
+  return Array.from(struct.ringFills.values()).map((fill) => ({
+    atoms: mapIdsToIndexes(fill.atoms, atomIndexById),
+    bonds: mapIdsToIndexes(fill.bonds, bondIndexById),
+    color: fill.color,
+  }));
 }
 
 function highlightsToKet(struct: Struct) {

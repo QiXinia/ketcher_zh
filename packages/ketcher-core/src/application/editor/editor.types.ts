@@ -68,6 +68,8 @@ export interface Editor {
     value: boolean | 'none' | 'solid' | 'shaded',
   ) => number;
   setSelectedSimpleObjectBracketType: (bracketType: 'bracket' | 'parenthesis' | 'brace') => number;
+  setSelectedRingFillColor: (color?: string) => number;
+  clearRingFills: () => number;
   undo: () => void;
   redo: () => void;
   clear: () => void;

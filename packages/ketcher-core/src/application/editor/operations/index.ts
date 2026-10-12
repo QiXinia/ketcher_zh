@@ -41,3 +41,4 @@ export * from './Text';
 export * from './monomer';
 export * from './modes';
 export * from './monomerCreation';
+export * from './RingFillSet';

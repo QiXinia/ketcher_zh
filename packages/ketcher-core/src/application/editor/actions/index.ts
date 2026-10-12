@@ -27,4 +27,5 @@ export * from './text';
 export * from './textFormatting';
 export * from './utils';
 export * from './highlight';
+export * from './ringFill';
 export * from './layoutMoleculesInCircle';

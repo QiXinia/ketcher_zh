@@ -95,6 +95,8 @@ import {
   Visel,
   paperPathFromSVGElement,
   fromFragmentDeletion,
+  fromSelectedRingFill,
+  fromRingFillClear,
 } from 'ketcher-core';
 import {
   SimpleObjectArrow,
@@ -3460,6 +3462,34 @@ class Editor implements KetcherEditor {
     if (changedCount) {
       this.update(inverseAction);
       this.render.update(true, null);
+    }
+    return changedCount;
+  }
+
+  setSelectedRingFillColor(color?: string): number {
+    const result = fromSelectedRingFill(this.render.ctab, this.selection(), color);
+    const inverseAction = result.action.perform(this.render.ctab);
+    const changedCount = inverseAction.operations.filter(
+      (operation) => !operation.isDummy(this.render.ctab),
+    ).length;
+    if (changedCount) {
+      this.update(inverseAction);
+      this.render.update(true, null);
+      this.rotateController.rerender();
+    }
+    return result.ringCount;
+  }
+
+  clearRingFills(): number {
+    const action = fromRingFillClear(this.render.ctab);
+    const inverseAction = action.perform(this.render.ctab);
+    const changedCount = inverseAction.operations.filter(
+      (operation) => !operation.isDummy(this.render.ctab),
+    ).length;
+    if (changedCount) {
+      this.update(inverseAction);
+      this.render.update(true, null);
+      this.rotateController.rerender();
     }
     return changedCount;
   }

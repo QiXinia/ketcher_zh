@@ -553,6 +553,19 @@
             "additionalProperties": false
           }
         },
+        "ringFills": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["atoms", "bonds", "color"],
+            "properties": {
+              "atoms": { "type": "array", "uniqueItems": true, "items": { "type": "integer", "minimum": 0 } },
+              "bonds": { "type": "array", "uniqueItems": true, "items": { "type": "integer", "minimum": 0 } },
+              "color": { "type": "string", "minLength": 1 }
+            },
+            "additionalProperties": false
+          }
+        },
         "selection": {
           "$ref": "#/definitions/subset"
         },

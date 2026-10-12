@@ -30,6 +30,7 @@ import {
   AtomAttr,
   ImageUpsert,
   MultitailArrowUpsert,
+  RingFillSet,
 } from '../operations';
 import { fromRGroupAttrs, fromUpdateIfThen } from './rgroup';
 
@@ -42,6 +43,7 @@ import { fromSgroupAddition } from './sgroup';
 import { fromRGroupAttachmentPointAddition } from './rgroupAttachmentPoint';
 import { MonomerMicromolecule } from 'domain/entities/monomerMicromolecule';
 import type { Image } from 'domain/entities/image';
+import { RingFill } from 'domain/entities/ringFill';
 
 type CreatedItems = {
   atoms: number[];
@@ -70,6 +72,7 @@ export function fromPaste(
   const action = new Action();
 
   const aidMap = new Map();
+  const bidMap = new Map<number, number>();
   const fridMap = new Map();
 
   const pasteItems = {
@@ -141,7 +144,7 @@ export function fromPaste(
     );
   });
 
-  pstruct.bonds.forEach((bond) => {
+  pstruct.bonds.forEach((bond, bid) => {
     const operation = new BondAdd(
       aidMap.get(bond.begin),
       aidMap.get(bond.end),
@@ -149,6 +152,8 @@ export function fromPaste(
       false,
     ).perform(restruct) as BondAdd;
     action.addOp(operation);
+
+    bidMap.set(bid, operation.data.bid as number);
 
     pasteItems.bonds.push(operation.data.bid as number);
     items.bonds.push(operation.data.bid as number);
@@ -194,6 +199,16 @@ export function fromPaste(
     sgAction.operations.forEach((oper) => {
       action.addOp(oper);
     });
+  });
+
+  pstruct.ringFills.forEach((fill: RingFill) => {
+    if (!fill.atoms.every((id) => aidMap.has(id)) ||
+        !fill.bonds.every((id) => bidMap.has(id))) return;
+    action.addOp(new RingFillSet(new RingFill({
+      atoms: fill.atoms.map((id) => aidMap.get(id)),
+      bonds: fill.bonds.map((id) => bidMap.get(id)!),
+      color: fill.color,
+    })).perform(restruct));
   });
 
   pasteItems.atoms.forEach((aid) => {

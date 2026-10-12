@@ -16,6 +16,7 @@
 
 import { Atom, AttachmentPoints } from 'domain/entities/atom';
 import { Highlight } from 'domain/entities/highlight';
+import { RingFill, isRingTopology } from 'domain/entities/ringFill';
 import {
   DEFAULT_SGROUP_BRACKET_STYLE,
   DEFAULT_SGROUP_BRACKET_USAGE,
@@ -80,6 +81,9 @@ export function moleculeToStruct(ketItem: any): Struct {
   if (Array.isArray(ketItem.coloredHighlights)) {
     addColoredHighlightsToStruct(struct, ketItem.coloredHighlights);
   }
+  if (Array.isArray(ketItem.ringFills)) {
+    addRingFillsToStruct(struct, ketItem.ringFills);
+  }
 
   struct.initHalfBonds();
   struct.initNeighbors();
@@ -87,6 +91,29 @@ export function moleculeToStruct(ketItem: any): Struct {
   struct.bindSGroupsToFunctionalGroups();
 
   return struct;
+}
+
+function addRingFillsToStruct(struct: Struct, serializedFills) {
+  const atomIds = Array.from(struct.atoms.keys());
+  const bondIds = Array.from(struct.bonds.keys());
+  const mapIndexesToIds = (indexes, ids: number[]) =>
+    (Array.isArray(indexes) ? indexes : []).flatMap((index) =>
+      Number.isInteger(index) && index >= 0 && index < ids.length
+        ? [ids[index]]
+        : [],
+    );
+  serializedFills.forEach((serializedFill) => {
+    if (!serializedFill || typeof serializedFill.color !== 'string' ||
+        !/^#[\da-f]{6}$/i.test(serializedFill.color)) return;
+    const fill = new RingFill({
+      atoms: mapIndexesToIds(serializedFill.atoms, atomIds),
+      bonds: mapIndexesToIds(serializedFill.bonds, bondIds),
+      color: serializedFill.color,
+    });
+    if (isRingTopology(struct, fill)) {
+      struct.ringFills.add(fill);
+    }
+  });
 }
 
 function addColoredHighlightsToStruct(struct: Struct, serializedHighlights) {
