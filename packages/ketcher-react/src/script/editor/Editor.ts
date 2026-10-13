@@ -101,6 +101,7 @@ import {
   captureNicknameFragment,
   type NicknameDraft,
   type NicknameDefinition,
+  prepareNicknamePreview,
   fromSelectedRingFusion,
   type RingFusionKind,
   fromSelectedAtomSprout,
@@ -3589,6 +3590,10 @@ class Editor implements KetcherEditor {
 
   importNicknameLibrary(source: string): number {
     return importNicknameLibrary(source);
+  }
+
+  prepareNicknamePreview(ket: string): string {
+    return prepareNicknamePreview(ket);
   }
 
   sproutOnSelectedAtom(kind: AtomSproutKind): number {

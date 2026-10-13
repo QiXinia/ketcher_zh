@@ -87,6 +87,7 @@ export interface Editor {
   getNicknames: () => NicknameDefinition[];
   exportNicknameLibrary: () => string;
   importNicknameLibrary: (source: string) => number;
+  prepareNicknamePreview: (ket: string) => string;
   saveNickname: (
     ket: string,
     name: string,

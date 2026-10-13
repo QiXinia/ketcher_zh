@@ -43,6 +43,19 @@ function checkFragment(struct: Struct): void {
   }
 }
 
+/** Expand an isolated copy for depiction/calculation; never update the
+ * library's contracted SUP or the editor's document/history. */
+export function prepareNicknamePreview(ket: string): string {
+  if (ket.length > 1024 * 1024) throw new Error('昵称片段数据过大');
+  const serializer = new KetSerializer();
+  const fragment = serializer.deserializeMicromolecules(ket);
+  checkFragment(fragment);
+  fragment.sgroups.forEach(group => {
+    if (group.type === 'SUP') group.data.expanded = true;
+  });
+  return serializer.serializeMicromolecules(fragment);
+}
+
 export function captureNicknameFragment(
   source: Struct,
   selectedAtomIds: number[],

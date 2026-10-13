@@ -5,9 +5,11 @@ import { Struct } from '../../entities/struct';
 import { SGroup } from '../../entities/sgroup';
 import { Vec2 } from '../../entities/vec2';
 import { KetSerializer } from '../../serializers/ket/ketSerializer';
+import { createFusionRing } from '../../../application/editor/actions/ringFusion';
 import {
   captureNicknameFragment,
   createNicknameDefinition,
+  prepareNicknamePreview,
   type NicknameDefinition,
 } from '../nicknames';
 
@@ -49,6 +51,53 @@ function makeStructure() {
 }
 
 describe('chemical nickname fragments', () => {
+  it('expands preview copies while preserving the stored nickname and atom/bond attributes', () => {
+    const draft = captureNicknameFragment(makeStructure(), [1, 2]);
+    const definition = createNicknameDefinition(draft.ket, 'MyCO', 1);
+    const original = JSON.stringify(definition);
+    const serializer = new KetSerializer();
+    const expanded = serializer.deserializeMicromolecules(prepareNicknamePreview(definition.ket));
+    expect([...expanded.sgroups.values()].filter(group => group.type === 'SUP').every(group => group.isExpanded())).toBe(true);
+    expect(expanded.atoms.get(0)!.isotope).toBe(13);
+    expect(expanded.atoms.get(1)!.charge).toBe(-1);
+    expect(expanded.bonds.size).toBe(1);
+    expect([...expanded.sgroups.values()][0].getAttachmentAtomId()).toBe(1);
+    expect(JSON.stringify(definition)).toBe(original);
+    expect([...serializer.deserializeMicromolecules(definition.ket).sgroups.values()][0].isExpanded()).toBe(false);
+    expect(() => prepareNicknamePreview(serializer.serializeMicromolecules(new Struct()))).toThrow(/选择/);
+  });
+
+  it('calculates the documented benzene formula and depicts an expanded nickname with real Indigo WASM', async () => {
+    const factory = jest.requireActual('indigo-ketcher');
+    const indigo = await factory();
+    const options = new indigo.MapStringString();
+    const selected = new indigo.VectorInt();
+    try {
+      const ring = createFusionRing('benzene');
+      ring.prepareLoopStructure();
+      ring.markFragments();
+      ring.setImplicitHydrogen();
+      const ket = new KetSerializer().serializeMicromolecules(ring);
+      const nickname = createNicknameDefinition(ket, 'MyBenzene', 0);
+      const source = prepareNicknamePreview(nickname.ket);
+      const properties = JSON.parse(indigo.calculate(source, options, selected));
+      expect(properties['gross-formula'].replace(/\s/g, '')).toBe('C6H6');
+      options.set('gross-formula-add-isotopes', 'true');
+      const isotopic = createNicknameDefinition(captureNicknameFragment(makeStructure(), [1, 2]).ket, 'MyIsoCO', 0);
+      const isotopicProperties = JSON.parse(indigo.calculate(prepareNicknamePreview(isotopic.ket), options, selected));
+      expect(isotopicProperties['gross-formula']).toMatch(/13C/);
+      expect(isotopicProperties['gross-formula']).toMatch(/H3/);
+      expect(isotopicProperties['gross-formula']).toMatch(/O/);
+      options.set('render-output-format', 'svg');
+      const svg = Buffer.from(indigo.render(source, options), 'base64').toString('utf8');
+      expect(svg).toMatch(/<svg\b/);
+      expect(svg).toMatch(/<path\b/);
+    } finally {
+      selected.delete();
+      options.delete();
+    }
+  }, 30000);
+
   it('copies internal bonds, remaps attachment IDs and leaves the source unchanged', () => {
     const source = makeStructure();
     const serializer = new KetSerializer();
