@@ -33,6 +33,15 @@ export function couldBeSaved(
   const formatName: string = getPropertiesByFormat(format).name;
 
   if (
+    !['ket', 'svg', 'png'].includes(format) &&
+    Array.from(struct.bonds.values()).some(
+      (bond) => bond.showQueryIndicator === false || bond.showReactionIndicator === false,
+    )
+  ) {
+    warnings.push(`The ${formatName} format does not preserve bond query/reaction indicator visibility. Save as KET to retain these display settings.`);
+  }
+
+  if (
     [
       'mol',
       'molV3000',

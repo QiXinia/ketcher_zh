@@ -579,6 +579,8 @@
     "type": "Type",
     "topology": "Topology",
     "reactingCenter": "Reacting Center",
+    "showQueryIndicator": "Show query indicator",
+    "showReactionIndicator": "Show reaction indicator",
     "single": "Single",
     "singleUp": "Single Up",
     "singleDown": "Single Down",

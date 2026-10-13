@@ -124,6 +124,8 @@ export function bondToStruct(source, atomOffset = 0) {
   ifDef(params, 'stereo', source.stereo);
   ifDef(params, 'display', source.display);
   ifDef(params, 'doubleBondPosition', source.doubleBondPosition);
+  ifDef(params, 'showQueryIndicator', source.showQueryIndicator);
+  ifDef(params, 'showReactionIndicator', source.showReactionIndicator);
   ifDef(params, 'cip', source.cip);
   ifDef(params, 'customQuery', source.customQuery);
   ifDef(params, 'begin', source.atoms[0] + atomOffset);

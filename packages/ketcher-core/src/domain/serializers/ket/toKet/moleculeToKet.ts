@@ -223,6 +223,8 @@ function bondToKet(source) {
   }
   ifDef(result, 'display', source.display, 'plain');
   ifDef(result, 'doubleBondPosition', source.doubleBondPosition, 'auto');
+  ifDef(result, 'showQueryIndicator', source.showQueryIndicator, true);
+  ifDef(result, 'showReactionIndicator', source.showReactionIndicator, true);
   ifDef(result, 'selected', source.getInitiallySelected());
   ifDef(result, 'annotations', source.annotations, []);
   return result;

@@ -579,6 +579,8 @@
     "type": "类型",
     "topology": "拓扑",
     "reactingCenter": "反应中心",
+    "showQueryIndicator": "显示查询标记",
+    "showReactionIndicator": "显示反应标记",
     "single": "单键",
     "singleUp": "上楔单键",
     "singleDown": "下楔单键",

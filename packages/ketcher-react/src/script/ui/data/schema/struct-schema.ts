@@ -752,6 +752,14 @@ export const bond: StructSchema = {
         { key: 'bondProperties.right', defaultValue: 'Right' },
       ],
     ) as unknown as SchemaProperty,
+    showQueryIndicator: localizedProperty(
+      { type: 'boolean', default: true } as ExtendedSchemaProperty,
+      'bondProperties.showQueryIndicator', 'Show query indicator',
+    ) as unknown as SchemaProperty,
+    showReactionIndicator: localizedProperty(
+      { type: 'boolean', default: true } as ExtendedSchemaProperty,
+      'bondProperties.showReactionIndicator', 'Show reaction indicator',
+    ) as unknown as SchemaProperty,
     topology: localizedEnumNames(
       localizedProperty(
         {

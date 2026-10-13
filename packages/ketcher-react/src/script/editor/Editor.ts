@@ -39,6 +39,7 @@ import {
   fillNaturalAnalogueForPhosphateAndSugar,
   fromAtomsAttrs,
   fromBondAddition,
+  fromSelectedBondIndicatorVisibility,
   fromDescriptorsAlign,
   fromMultipleMove,
   fromFlatten,
@@ -3390,6 +3391,18 @@ class Editor implements KetcherEditor {
       this.rotateController.rerender();
     }
     return changedCount;
+  }
+
+  setSelectedBondIndicatorVisibility(indicator: 'query' | 'reaction', visible: boolean): number {
+    const inverse = fromSelectedBondIndicatorVisibility(
+      this.render.ctab, this.selection()?.bonds ?? [], indicator, visible,
+    );
+    if (inverse.operations.length) {
+      this.update(inverse);
+      this.render.update(true, null);
+      this.rotateController.rerender();
+    }
+    return inverse.operations.length;
   }
 
   setSelectedSimpleObjectStyle(style: 'plain' | 'dashed' | 'bold'): number {

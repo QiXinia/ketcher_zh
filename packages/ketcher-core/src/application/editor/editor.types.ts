@@ -65,6 +65,7 @@ export interface Editor {
   joinSelectedObjects: () => number;
   alignSelectedObjects: (alignment: ObjectAlignment) => number;
   distributeSelectedObjects: (direction: ObjectDistribution) => number;
+  setSelectedBondIndicatorVisibility: (indicator: 'query' | 'reaction', visible: boolean) => number;
   setSelectedSimpleObjectStyle: (style: 'plain' | 'dashed' | 'bold') => number;
   setSelectedSimpleObjectColor: (color?: string) => number;
   setSelectedSimpleObjectCurveSettings: (settings: {

@@ -734,7 +734,12 @@ export class BondRenderer extends BaseRenderer {
   }
 
   private appendTopologyMark(bondFromStruct: StructBond) {
-    if (!this.rootElement) {
+    this.rootElement?.select(`#${this.topologyElementId}`).remove();
+    if (
+      !this.rootElement ||
+      bondFromStruct.showQueryIndicator === false ||
+      this.editorSettings.showQueryIndicators === false
+    ) {
       return;
     }
 
@@ -825,7 +830,8 @@ export class BondRenderer extends BaseRenderer {
   }
 
   private appendReactingCenterMark(bondFromStruct: StructBond) {
-    if (!this.rootElement) {
+    this.rootElement?.select(`#${this.reactingCenterElementId}`).remove();
+    if (!this.rootElement || bondFromStruct.showReactionIndicator === false) {
       return;
     }
 

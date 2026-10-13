@@ -350,6 +350,8 @@
           "type": "integer",
           "enum": [0, 1]
         },
+        "showQueryIndicator": { "type": "boolean" },
+        "showReactionIndicator": { "type": "boolean" },
         "cip": {
           "type": "string",
           "enum": ["Z", "E"]

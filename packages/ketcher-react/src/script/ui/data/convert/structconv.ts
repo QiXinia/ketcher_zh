@@ -456,6 +456,8 @@ export function fromBond(sbond?: Bond) {
     type: isCustomQuery ? '' : fromBondType(type, stereo),
     display: sbond.display,
     doubleBondPosition: sbond.doubleBondPosition,
+    showQueryIndicator: sbond.showQueryIndicator ?? true,
+    showReactionIndicator: sbond.showReactionIndicator ?? true,
     topology: sbond.topology,
     center: sbond.reactingCenterStatus,
     customQuery: !isCustomQuery ? '' : sbond.customQuery!.toString(),
@@ -468,6 +470,8 @@ export function toBond(bond: ReturnType<typeof fromBond>) {
   return {
     display: bond.display,
     doubleBondPosition: bond.doubleBondPosition,
+    showQueryIndicator: bond.showQueryIndicator,
+    showReactionIndicator: bond.showReactionIndicator,
     topology: bond.topology,
     reactingCenterStatus: bond.center,
     customQuery: !isCustomQuery ? null : bond.customQuery,
