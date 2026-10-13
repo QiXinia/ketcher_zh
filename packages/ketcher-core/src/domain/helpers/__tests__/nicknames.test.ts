@@ -18,13 +18,15 @@ jest.mock('ketcher-core', () => ({
   KetSerializer: jest.requireActual('../../serializers/ket/ketSerializer')
     .KetSerializer,
 }));
-const { getNicknames, saveNickname, deleteNickname, getNicknameTemplate } =
+const { getNicknames, saveNickname, deleteNickname, getNicknameTemplate, exportNicknameLibrary, importNicknameLibrary } =
   jest.requireActual(
     '../../../../../ketcher-react/src/script/editor/nicknameLibrary',
   ) as {
     getNicknames: () => NicknameDefinition[];
     saveNickname: typeof createNicknameDefinition;
     deleteNickname: (name: string) => void;
+    exportNicknameLibrary: () => string;
+    importNicknameLibrary: (source: string) => number;
     getNicknameTemplate: (name: string) => {
       aid: number;
       props: { group: string };
@@ -131,6 +133,7 @@ describe('chemical nickname fragments', () => {
 describe('persistent nickname library', () => {
   let storage: Map<string, string>;
   let failWrites: boolean;
+  let writes: number;
   const originalStorage = Object.getOwnPropertyDescriptor(
     globalThis,
     'localStorage',
@@ -139,12 +142,14 @@ describe('persistent nickname library', () => {
   beforeEach(() => {
     storage = new Map();
     failWrites = false;
+    writes = 0;
     Object.defineProperty(globalThis, 'localStorage', {
       configurable: true,
       value: {
         getItem: (key: string) => storage.get(key) ?? null,
         setItem: (key: string, value: string) => {
           if (failWrites) throw new Error('storage quota');
+          writes++;
           storage.set(key, value);
         },
       },
@@ -200,5 +205,81 @@ describe('persistent nickname library', () => {
     );
     expect(() => getNicknames()).toThrow(/连接原子/);
     expect(() => getNicknameTemplate('Broken')).toThrow(/连接原子/);
+  });
+
+  const exchange = (items: unknown[], version = 1) => JSON.stringify({ format: 'chemwiki-nicknames/v1', version, items });
+  const entry = (name: string) => {
+    const draft = captureNicknameFragment(makeStructure(), [1, 2]);
+    return { name, ket: draft.ket, attachmentAtomId: 1 };
+  };
+
+  it('exports canonical chemistry and restores it alongside an existing nickname in one write', () => {
+    const first = entry('MyCO');
+    saveNickname(first.ket, first.name, first.attachmentAtomId);
+    const backup = exportNicknameLibrary();
+    const data = JSON.parse(backup);
+    expect(data.format).toBe('chemwiki-nicknames/v1');
+    expect(data.version).toBe(1);
+    expect(data.items[0].attachmentAtomId).toBe(1);
+    storage.clear();
+    const other = entry('Other');
+    saveNickname(other.ket, other.name, other.attachmentAtomId);
+    const beforeWrites = writes;
+    expect(importNicknameLibrary('\uFEFF' + backup)).toBe(1);
+    expect(writes).toBe(beforeWrites + 1);
+    expect(getNicknames().map(item => item.name)).toEqual(['MyCO', 'Other']);
+    const template = getNicknameTemplate('MyCO');
+    expect(template.aid).toBe(1);
+    expect(template.struct.atoms.get(0)!.isotope).toBe(13);
+    expect(template.struct.atoms.get(1)!.charge).toBe(-1);
+    expect(template.struct.bonds.size).toBe(1);
+    expect(template.struct.sgroups.get(0)!.data.name).toBe('MyCO');
+  });
+
+  it('refuses duplicate names within a file or against existing names without partial imports', () => {
+    const existing = entry('Existing');
+    saveNickname(existing.ket, existing.name, 1);
+    const before = storage.get('ketcher-nicknames:v1');
+    for (const items of [[entry('New'), entry('existing')], [entry('New'), entry('new')]]) {
+      expect(() => importNicknameLibrary(exchange(items))).toThrow(/重复|已存在/);
+      expect(storage.get('ketcher-nicknames:v1')).toBe(before);
+    }
+  });
+
+  it('validates all fragments before any write and recomputes untrusted entry counts', () => {
+    const before = storage.get('ketcher-nicknames:v1');
+    expect(() => importNicknameLibrary(exchange([entry('Good'), { ...entry('Bad'), attachmentAtomId: 99 }]))).toThrow(/连接原子/);
+    expect(storage.get('ketcher-nicknames:v1')).toBe(before);
+    expect(writes).toBe(0);
+    expect(importNicknameLibrary(exchange([{ ...entry('Good'), atomCount: 999, bondCount: 999 }]))).toBe(1);
+    expect(getNicknames()[0]).toMatchObject({ atomCount: 2, bondCount: 1 });
+  });
+
+  it('rejects unsupported formats, malformed entries, versions and oversized UTF-8 files', () => {
+    for (const source of ['{broken', '{}', 'null', exchange([], 2), exchange([null]),
+      exchange(Array.from({ length: 201 }, (_, index) => entry('N' + index)))]) {
+      expect(() => importNicknameLibrary(source)).toThrow();
+      expect(writes).toBe(0);
+    }
+    expect(() => importNicknameLibrary(' '.repeat(10 * 1024 * 1024 + 1))).toThrow(/10 MiB/);
+    expect(() => importNicknameLibrary('❤'.repeat(Math.floor(10 * 1024 * 1024 / 3) + 1))).toThrow(/10 MiB/);
+    expect(writes).toBe(0);
+  });
+
+  it('preserves the library after quota or existing-data errors and treats an empty import as a no-op', () => {
+    const existing = entry('Existing');
+    saveNickname(existing.ket, existing.name, 1);
+    const before = storage.get('ketcher-nicknames:v1');
+    const beforeWrites = writes;
+    expect(importNicknameLibrary(exchange([]))).toBe(0);
+    expect(writes).toBe(beforeWrites);
+    failWrites = true;
+    expect(() => importNicknameLibrary(exchange([entry('New')]))).toThrow(/quota/);
+    expect(storage.get('ketcher-nicknames:v1')).toBe(before);
+    failWrites = false;
+    storage.set('ketcher-nicknames:v1', '{broken');
+    expect(() => importNicknameLibrary(exchange([entry('New')]))).toThrow();
+    expect(() => exportNicknameLibrary()).toThrow();
+    expect(storage.get('ketcher-nicknames:v1')).toBe('{broken');
   });
 });

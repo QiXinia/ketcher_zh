@@ -85,6 +85,8 @@ export interface Editor {
   moveChemicalHotspot: (direction: HotspotDirection) => boolean;
   captureNicknameFragment: () => NicknameDraft;
   getNicknames: () => NicknameDefinition[];
+  exportNicknameLibrary: () => string;
+  importNicknameLibrary: (source: string) => number;
   saveNickname: (
     ket: string,
     name: string,

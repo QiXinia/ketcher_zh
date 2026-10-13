@@ -149,6 +149,8 @@ import {
   saveNickname,
   deleteNickname,
   getNicknameTemplate,
+  exportNicknameLibrary,
+  importNicknameLibrary,
 } from './nicknameLibrary';
 
 const SCALE = provideEditorSettings().microModeScale;
@@ -3579,6 +3581,14 @@ class Editor implements KetcherEditor {
 
   getNicknames(): NicknameDefinition[] {
     return getNicknames();
+  }
+
+  exportNicknameLibrary(): string {
+    return exportNicknameLibrary();
+  }
+
+  importNicknameLibrary(source: string): number {
+    return importNicknameLibrary(source);
   }
 
   sproutOnSelectedAtom(kind: AtomSproutKind): number {

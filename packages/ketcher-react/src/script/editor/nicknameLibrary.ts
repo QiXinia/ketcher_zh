@@ -6,6 +6,8 @@ import {
 import type { NicknameDefinition } from 'ketcher-core';
 
 const STORAGE_KEY = 'ketcher-nicknames:v1';
+const EXCHANGE_FORMAT = 'chemwiki-nicknames/v1';
+const MAX_EXCHANGE_BYTES = 10 * 1024 * 1024;
 
 /** Validate before writing: never overwrite a corrupt library. Library edits
  * are preferences and do not enter the chemical document's undo history. */
@@ -18,21 +20,27 @@ export function getNicknames(): NicknameDefinition[] {
   } catch {
     throw new Error('昵称库数据无效，请先备份并修复浏览器中的昵称库');
   }
+  return validateItems(data);
+}
+
+function validateItems(data: unknown): NicknameDefinition[] {
+  const document = data as { version?: unknown; items?: unknown[] } | null;
   if (
-    data?.version !== 1 ||
-    !Array.isArray(data.items) ||
-    data.items.length > 200
+    document?.version !== 1 ||
+    !Array.isArray(document.items) ||
+    document.items.length > 200
   )
     throw new Error('昵称库数据无效，请先备份并修复浏览器中的昵称库');
   const names = new Set<string>();
-  return data.items
+  return document.items
     .map((item) => {
-      if (typeof item?.name !== 'string' || typeof item?.ket !== 'string')
+      const record = item as Partial<NicknameDefinition> | null;
+      if (typeof record?.name !== 'string' || typeof record?.ket !== 'string')
         throw new Error('昵称库条目无效');
       const entry = createNicknameDefinition(
-        item.ket,
-        item.name,
-        item.attachmentAtomId,
+        record.ket,
+        record.name,
+        record.attachmentAtomId!,
       );
       if (names.has(entry.name.toLowerCase()))
         throw new Error('昵称库中存在重复名称');
@@ -42,6 +50,36 @@ export function getNicknames(): NicknameDefinition[] {
     .sort((left, right) =>
       left.name.localeCompare(right.name, undefined, { sensitivity: 'base' }),
     );
+}
+
+function checkExchangeSize(source: string): void {
+  if (source.length > MAX_EXCHANGE_BYTES || new TextEncoder().encode(source).length > MAX_EXCHANGE_BYTES)
+    throw new Error('昵称库文件不能超过 10 MiB');
+}
+
+export function exportNicknameLibrary(): string {
+  const source = `${JSON.stringify({ format: EXCHANGE_FORMAT, version: 1, items: getNicknames() }, null, 2)}\n`;
+  checkExchangeSize(source);
+  return source;
+}
+
+/** Merge in one storage write after validating every entry. Name conflicts,
+ * damaged fragments and quota errors never partially replace the library. */
+export function importNicknameLibrary(source: string): number {
+  checkExchangeSize(source);
+  let data;
+  try { data = JSON.parse(source.replace(/^\uFEFF/, '')); }
+  catch { throw new Error('昵称库文件不是有效的 JSON'); }
+  if (data?.format !== EXCHANGE_FORMAT) throw new Error('请选择 ChemWiki 导出的昵称库 JSON 文件');
+  const incoming = validateItems(data);
+  const existing = getNicknames();
+  const names = new Set(existing.map(item => item.name.toLowerCase()));
+  const conflict = incoming.find(item => names.has(item.name.toLowerCase()));
+  if (conflict) throw new Error(`昵称 ${conflict.name} 已存在，导入未写入，请先重命名或删除重复昵称`);
+  if (existing.length + incoming.length > 200) throw new Error('自定义昵称库最多保存 200 个片段');
+  if (!incoming.length) return 0;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: 1, items: [...existing, ...incoming] }));
+  return incoming.length;
 }
 
 export function saveNickname(
