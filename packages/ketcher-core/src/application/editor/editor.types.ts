@@ -82,6 +82,8 @@ export interface Editor {
   sproutOnSelectedAtom: (kind: AtomSproutKind) => number;
   captureAtomLabelSprout: () => { atomId: number; sourceKet: string };
   sproutAtomLabel: (label: string, draft: { atomId: number; sourceKet: string }) => number;
+  captureAtomLabelEdit: () => { atomId: number; sourceKet: string; label: string };
+  editAtomLabel: (label: string, draft: { atomId: number; sourceKet: string }) => number;
   getChemicalHotspot: () => ChemicalHotspot | null;
   selectChemicalHotspot: () => boolean;
   moveChemicalHotspot: (direction: HotspotDirection) => boolean;

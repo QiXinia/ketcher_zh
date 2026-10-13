@@ -31,4 +31,5 @@ export * from './ringFill';
 export * from './ringFusion';
 export * from './atomSprout';
 export * from './atomLabelSprout';
+export * from './atomLabelEdit';
 export * from './layoutMoleculesInCircle';

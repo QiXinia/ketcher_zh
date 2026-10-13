@@ -106,6 +106,7 @@ import {
   type RingFusionKind,
   fromSelectedAtomSprout,
   fromSelectedAtomLabelSprout,
+  fromSelectedAtomLabelEdit,
   validateAtomSproutTarget,
   parseAtomSproutLabel,
   FunctionalGroupsProvider,
@@ -3620,23 +3621,43 @@ class Editor implements KetcherEditor {
         draft.sourceKet !== new KetSerializer().serializeMicromolecules(this.struct())) {
       throw new Error('化学文档已变化，请关闭窗口并重新选择生长原子');
     }
+    return this.finishAtomSprout(fromSelectedAtomLabelSprout(this.render.ctab, [draft.atomId], label, this.resolveAtomLabelNickname(label)));
+  }
+
+  captureAtomLabelEdit(): AtomLabelSproutDraft & { label: string } {
+    const draft = this.captureAtomLabelSprout();
+    const atom = this.struct().atoms.get(draft.atomId)!;
+    const magnitude = Math.abs(atom.charge ?? 0);
+    const charge = magnitude ? `${magnitude > 1 ? magnitude : ''}${atom.charge! < 0 ? '-' : '+'}` : '';
+    const radical = ['', ':', '.', '^^'][atom.radical] || '';
+    return { ...draft, label: `${atom.isotope ?? ''}${atom.label}${radical}${charge}` };
+  }
+
+  editAtomLabel(label: string, draft: AtomLabelSproutDraft): number {
+    if (!draft || !Number.isInteger(draft.atomId) ||
+        draft.sourceKet !== new KetSerializer().serializeMicromolecules(this.struct())) {
+      throw new Error('化学文档已变化，请关闭窗口并重新选择标签原子');
+    }
+    return this.finishAtomSprout(fromSelectedAtomLabelEdit(this.render.ctab, [draft.atomId], label, this.resolveAtomLabelNickname(label)));
+  }
+
+  private resolveAtomLabelNickname(label: string): { struct: Struct; attachmentAtomId: number } | undefined {
     const attributes = parseAtomSproutLabel(label);
-    let nickname: { struct: Struct; attachmentAtomId: number } | undefined;
     if (attributes.pseudo) {
       const custom = getNicknames().find(item => item.name.toLowerCase() === attributes.label.toLowerCase());
       if (custom) {
         const template = getNicknameTemplate(custom.name);
-        nickname = { struct: template.struct, attachmentAtomId: template.aid };
+        return { struct: template.struct, attachmentAtomId: template.aid };
       } else {
         const fragment = FunctionalGroupsProvider.getInstance().getFunctionalGroupsList()
           .find(item => !SGroup.isSaltOrSolvent(item.name) && item.name.toLowerCase() === attributes.label.toLowerCase());
         if (fragment) {
           const group = [...fragment.sgroups.values()].find(group => group.type === 'SUP');
-          nickname = { struct: fragment, attachmentAtomId: group?.getAttachmentAtomId() ?? [...fragment.atoms.keys()][0] };
+          return { struct: fragment, attachmentAtomId: group?.getAttachmentAtomId() ?? [...fragment.atoms.keys()][0] };
         }
       }
     }
-    return this.finishAtomSprout(fromSelectedAtomLabelSprout(this.render.ctab, [draft.atomId], label, nickname));
+    return undefined;
   }
 
   private finishAtomSprout(result: ReturnType<typeof fromSelectedAtomSprout>): number {

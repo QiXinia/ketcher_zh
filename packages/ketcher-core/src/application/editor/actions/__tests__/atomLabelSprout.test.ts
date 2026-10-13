@@ -9,8 +9,10 @@ import { KetSerializer } from 'domain/serializers/ket/ketSerializer';
 import { createNicknameDefinition } from 'domain/helpers/nicknames';
 import { parseAtomSproutLabel } from 'domain/helpers/atomSproutLabel';
 import { FunctionalGroupsProvider } from 'domain/helpers/functionalGroupsProvider';
+import { SGroupAttachmentPoint } from 'domain/entities/sGroupAttachmentPoint';
 import ReStruct from 'application/render/restruct/restruct';
 import { fromSelectedAtomLabelSprout } from '../atomLabelSprout';
+import { fromSelectedAtomLabelEdit } from '../atomLabelEdit';
 import { validateAtomSproutTarget } from '../atomSprout';
 import { atomForNewBond } from '../utils';
 
@@ -60,7 +62,7 @@ function editorFixture() {
   const f = fixture();
   const custom = nickname();
   const context = { validateAtomSproutTarget, KetSerializer, parseAtomSproutLabel, FunctionalGroupsProvider, SGroup: require('domain/entities/sgroup').SGroup,
-    fromSelectedAtomLabelSprout, getNicknames: () => [custom.definition],
+    fromSelectedAtomLabelSprout, fromSelectedAtomLabelEdit, getNicknames: () => [custom.definition],
     getNicknameTemplate: () => ({ struct: custom.struct, aid: 0 }), SelectTool: class {} };
   const Editor = new Function(...Object.keys(context), `${editorJS}; return LabelEditor`)(...Object.values(context));
   const editor = new Editor();
@@ -199,5 +201,144 @@ describe('custom atom label sprouting', () => {
       }
       expect(f.history).toHaveLength(1);
     }
+  });
+});
+
+describe('atom label editing and nickname replacement', () => {
+  it.each(['15N+', 'LiteralTag'])('replaces %s at the captured atom without sprouting, with complete undo/redo', label => {
+    const f = editorFixture();
+    const before = serialize(f.struct);
+    const draft = f.editor.captureAtomLabelEdit();
+    expect(draft.label).toBe('13C');
+    expect(f.history).toHaveLength(0);
+    f.editor.selection({ atoms: [1] });
+    f.editor.editAtomLabel(label, draft);
+    expect(f.struct.atoms.size).toBe(2);
+    expect(f.struct.bonds.size).toBe(1);
+    expect(f.struct.atoms.get(0)).toMatchObject(label === '15N+'
+      ? { label: 'N', isotope: 15, charge: 1, aam: 4 }
+      : { label, isotope: null, charge: null, aam: 4 });
+    expect(f.struct.atoms.get(1)?.label).toBe('C');
+    expect(f.history).toHaveLength(1);
+    const expected = graph(f.struct);
+    const redo = f.history[0].perform(f.restruct);
+    expect(serialize(f.struct)).toBe(before);
+    redo.perform(f.restruct);
+    expect(graph(f.struct)).toEqual(expected);
+  });
+
+  it.each([1, 6])('replaces a nickname on either wedge orientation (%s), preserving anchor, mapping, bonds and the library', stereo => {
+    const f = fixture();
+    f.struct.atoms.get(0)!.isotope = null;
+    f.struct.bonds.get(0)!.stereo = stereo;
+    const before = serialize(f.struct);
+    const fragment = nickname();
+    const library = serialize(fragment.struct);
+    const external = { ...f.struct.bonds.get(0)! };
+    const anchor = new Vec2(f.struct.atoms.get(0)!.pp);
+    const result = fromSelectedAtomLabelEdit(f.restruct, [0], 'MyO', fragment);
+    expect(f.struct.atoms.size).toBe(3);
+    expect(f.struct.bonds.size).toBe(2);
+    expect(f.struct.atoms.get(0)).toMatchObject({ isotope: 13, aam: 4, pp: anchor });
+    expect(f.struct.bonds.get(0)).toMatchObject(external);
+    expect([...f.struct.sgroups.values()][0].getAttachmentAtomId()).toBe(0);
+    expect([...f.struct.sgroups.values()][0].data).toMatchObject({ name: 'MyO', expanded: false });
+    expect(serialize(fragment.struct)).toBe(library);
+    const expected = graph(f.struct);
+    const reopened = new KetSerializer().deserializeMicromolecules(serialize(f.struct));
+    expect(reopened.atoms.size).toBe(3);
+    expect([...reopened.atoms.values()].find(a => a.aam === 4)?.isotope).toBe(13);
+    expect([...reopened.bonds.values()].filter(b => b.stereo === stereo)).toHaveLength(1);
+    const redo = result.inverseAction.perform(f.restruct);
+    expect(serialize(f.struct)).toBe(before);
+    redo.perform(f.restruct);
+    expect(graph(f.struct)).toEqual(expected);
+  });
+
+  it('replaces isolated and single-atom nicknames without adding a connecting bond', () => {
+    const isolated = new Struct();
+    isolated.atoms.add(new Atom({ label: 'C', pp: new Vec2() }));
+    const f = fixture(isolated);
+    const single = new Struct();
+    single.atoms.add(new Atom({ label: 'O', charge: -1, pp: new Vec2() }));
+    fixture(single);
+    const definition = createNicknameDefinition(serialize(single), 'SingleO', 0);
+    const before = serialize(f.struct);
+    const result = fromSelectedAtomLabelEdit(f.restruct, [0], 'SingleO', {
+      struct: new KetSerializer().deserializeMicromolecules(definition.ket), attachmentAtomId: 0,
+    });
+    expect(f.struct.atoms.size).toBe(1);
+    expect(f.struct.bonds.size).toBe(0);
+    expect(f.struct.atoms.get(0)).toMatchObject({ label: 'O', charge: -1 });
+    const redo = result.inverseAction.perform(f.restruct);
+    expect(serialize(f.struct)).toBe(before);
+    redo.perform(f.restruct);
+    expect(f.struct.sgroups.size).toBe(1);
+  });
+
+  it('resolves saved/native labels and elements while rejecting stale capture with no new history', () => {
+    for (const label of ['myo', 'NativeO', 'O']) {
+      const f = editorFixture();
+      f.struct.atoms.get(0)!.isotope = null;
+      const native = nickname('NativeO');
+      native.struct.name = 'NativeO';
+      FunctionalGroupsProvider.getInstance().setFunctionalGroupsList([native.struct]);
+      f.editor.editAtomLabel(label, f.editor.captureAtomLabelEdit());
+      expect(f.struct.atoms.size).toBe(label === 'O' ? 2 : 3);
+      expect(f.struct.sgroups.size).toBe(label === 'O' ? 0 : 1);
+      const before = serialize(f.struct);
+      expect(() => f.editor.editAtomLabel('N', { atomId: 0, sourceKet: 'stale' })).toThrow(/文档已变化/);
+      expect(serialize(f.struct)).toBe(before);
+      expect(f.history).toHaveLength(1);
+    }
+  });
+
+  it('rejects isotope loss, multiple bonds, mapping conflicts and invalid attachment points before mutation', () => {
+    const scenarios = [
+      (f: ReturnType<typeof fixture>) => { f.struct.atoms.get(0)!.isotope = 13; },
+      (f: ReturnType<typeof fixture>) => { f.struct.bonds.get(0)!.type = 2; },
+      (f: ReturnType<typeof fixture>) => { f.struct.atoms.get(0)!.charge = 1; },
+      (f: ReturnType<typeof fixture>) => { f.struct.atoms.get(0)!.abnormalValence = true; },
+      (f: ReturnType<typeof fixture>) => { f.struct.atoms.get(1)!.aam = 4; },
+      (f: ReturnType<typeof fixture>) => {
+        const id = f.struct.atoms.add(new Atom({ label: 'C', pp: new Vec2(0, 1) }));
+        f.struct.bonds.add(new Bond({ begin: 0, end: id, type: 1 }));
+      },
+    ];
+    for (const configure of scenarios) {
+      const f = fixture();
+      f.struct.atoms.get(0)!.isotope = null;
+      configure(f);
+      const configured = fixture(f.struct);
+      const before = serialize(f.struct);
+      expect(() => fromSelectedAtomLabelEdit(configured.restruct, [0], 'MyO', nickname())).toThrow();
+      expect(serialize(f.struct)).toBe(before);
+    }
+    const f = fixture();
+    f.struct.atoms.get(0)!.isotope = null;
+    const before = serialize(f.struct);
+    expect(() => fromSelectedAtomLabelEdit(f.restruct, [0], 'MyO', { ...nickname(), attachmentAtomId: 99 })).toThrow();
+    expect(serialize(f.struct)).toBe(before);
+  });
+
+  it('rejects multiple attachment points and blocked placement without modifying the source or stored fragment', () => {
+    const f = fixture();
+    f.struct.atoms.get(0)!.isotope = null;
+    const multiple = nickname();
+    [...multiple.struct.sgroups.values()][0].addAttachmentPoint(new SGroupAttachmentPoint(1, undefined, '2'));
+    const before = serialize(f.struct);
+    const stored = serialize(multiple.struct);
+    expect(() => fromSelectedAtomLabelEdit(f.restruct, [0], 'MyO', multiple)).toThrow(/单一连接点/);
+    expect(serialize(f.struct)).toBe(before);
+    expect(serialize(multiple.struct)).toBe(stored);
+    const direction = atomForNewBond(f.restruct, 0, { type: 1 }).pos;
+    const base = Math.atan2(direction.y, direction.x);
+    for (const offset of [0, Math.PI / 6, -Math.PI / 6, Math.PI / 3, -Math.PI / 3, Math.PI / 2, -Math.PI / 2, Math.PI]) {
+      f.struct.atoms.add(new Atom({ label: 'C', pp: new Vec2(Math.cos(base + offset), Math.sin(base + offset)) }));
+    }
+    const blocked = fixture(f.struct);
+    const blockedBefore = serialize(f.struct);
+    expect(() => fromSelectedAtomLabelEdit(blocked.restruct, [0], 'MyO', nickname())).toThrow(/重叠/);
+    expect(serialize(f.struct)).toBe(blockedBefore);
   });
 });
