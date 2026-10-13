@@ -103,6 +103,8 @@ import {
   type NicknameDefinition,
   fromSelectedRingFusion,
   type RingFusionKind,
+  fromSelectedAtomSprout,
+  type AtomSproutKind,
 } from 'ketcher-core';
 import {
   SimpleObjectArrow,
@@ -3569,6 +3571,18 @@ class Editor implements KetcherEditor {
 
   getNicknames(): NicknameDefinition[] {
     return getNicknames();
+  }
+
+  sproutOnSelectedAtom(kind: AtomSproutKind): number {
+    const selection = this.selection();
+    if (selection?.bonds?.length) throw new Error('请只选择一个原子来生长片段');
+    const result = fromSelectedAtomSprout(this.render.ctab, selection?.atoms ?? [], kind);
+    this.update(result.inverseAction);
+    this.render.update(true, null);
+    // Keep the new hotspot selected for successive chain-growth keystrokes.
+    this.selection({ atoms: [result.targetAtomId] });
+    this.rotateController.rerender();
+    return result.atoms.length;
   }
 
   saveNickname(

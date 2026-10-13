@@ -29,4 +29,5 @@ export * from './utils';
 export * from './highlight';
 export * from './ringFill';
 export * from './ringFusion';
+export * from './atomSprout';
 export * from './layoutMoleculesInCircle';

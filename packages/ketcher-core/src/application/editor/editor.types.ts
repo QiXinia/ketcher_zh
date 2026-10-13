@@ -23,6 +23,7 @@ import type { IRnaPreset } from './tools/Tool';
 import type { TextFormattingCommand } from './actions/textFormatting';
 import type { ObjectAlignment, ObjectDistribution } from './actions/objectAlignment';
 import type { RingFusionKind } from './actions/ringFusion';
+import type { AtomSproutKind } from './actions/atomSprout';
 import type {
   NicknameDraft,
   NicknameDefinition,
@@ -77,6 +78,7 @@ export interface Editor {
   adjustSelectedAtomCharge: (delta: -1 | 1) => number;
   setSelectedAtomAttachmentPoint: () => number;
   fuseRingOnSelectedBond: (kind: RingFusionKind) => number;
+  sproutOnSelectedAtom: (kind: AtomSproutKind) => number;
   captureNicknameFragment: () => NicknameDraft;
   getNicknames: () => NicknameDefinition[];
   saveNickname: (
