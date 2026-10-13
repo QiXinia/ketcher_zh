@@ -24,6 +24,7 @@ import type { TextFormattingCommand } from './actions/textFormatting';
 import type { ObjectAlignment, ObjectDistribution } from './actions/objectAlignment';
 import type { RingFusionKind } from './actions/ringFusion';
 import type { AtomSproutKind } from './actions/atomSprout';
+import type { ChemicalHotspot, HotspotDirection } from './hotspot';
 import type {
   NicknameDraft,
   NicknameDefinition,
@@ -79,6 +80,9 @@ export interface Editor {
   setSelectedAtomAttachmentPoint: () => number;
   fuseRingOnSelectedBond: (kind: RingFusionKind) => number;
   sproutOnSelectedAtom: (kind: AtomSproutKind) => number;
+  getChemicalHotspot: () => ChemicalHotspot | null;
+  selectChemicalHotspot: () => boolean;
+  moveChemicalHotspot: (direction: HotspotDirection) => boolean;
   captureNicknameFragment: () => NicknameDraft;
   getNicknames: () => NicknameDefinition[];
   saveNickname: (

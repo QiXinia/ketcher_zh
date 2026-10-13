@@ -105,6 +105,10 @@ import {
   type RingFusionKind,
   fromSelectedAtomSprout,
   type AtomSproutKind,
+  type ChemicalHotspot,
+  type HotspotDirection,
+  validateChemicalHotspot,
+  nextChemicalHotspot,
 } from 'ketcher-core';
 import {
   SimpleObjectArrow,
@@ -122,6 +126,7 @@ import closest from './shared/closest';
 import { type ChangeEventData, customOnChangeHandler } from './utils';
 import { isEqual } from 'lodash/fp';
 import { toolsMap } from './tool';
+import SelectTool from './tool/select/select';
 import { Highlighter } from './highlighter';
 import { setFunctionalGroupsTooltip } from './utils/functionalGroupsTooltip';
 import type { ContextMenuInfo } from '../ui/views/components/ContextMenu/contextMenu.types';
@@ -520,6 +525,9 @@ class Editor implements KetcherEditor {
 
     KetcherLogger.log('Editor.struct(), start', value, needToCenterStruct);
 
+    // New documents can reuse atom IDs; a previous document's hover is stale
+    // even if that numerical ID happens to exist in the replacement structure.
+    if (this._tool) this.hover(null);
     this.selection(null);
     const struct = value ?? new Struct();
 
@@ -3581,8 +3589,47 @@ class Editor implements KetcherEditor {
     this.render.update(true, null);
     // Keep the new hotspot selected for successive chain-growth keystrokes.
     this.selection({ atoms: [result.targetAtomId] });
+    if (this._tool instanceof SelectTool) this.hover({ map: 'atoms', id: result.targetAtomId });
     this.rotateController.rerender();
     return result.atoms.length;
+  }
+
+  private isChemicalHotspotVisible(target: ChemicalHotspot): boolean {
+    const ctab = this.render.ctab;
+    if (target.map === 'atoms') return ctab.visibleAtoms.has(target.id);
+    const bond = ctab.molecule.bonds.get(target.id);
+    return !!bond && ctab.visibleBonds.has(target.id)
+      && ctab.visibleAtoms.has(bond.begin) && ctab.visibleAtoms.has(bond.end);
+  }
+
+  getChemicalHotspot(): ChemicalHotspot | null {
+    // Drawing tools also use ci for previews. Only selection-tool hovers
+    // represent ChemDraw hotspots; dragging/merging must keep their own input.
+    if (!(this._tool instanceof SelectTool) || this._tool.isMouseDown
+      || this._tool.isSelectionRunning()) return null;
+    const target = validateChemicalHotspot(this.struct(), (this._tool as Tool).ci);
+    return target && this.isChemicalHotspotVisible(target) ? target : null;
+  }
+
+  selectChemicalHotspot(): boolean {
+    const target = this.getChemicalHotspot();
+    if (!target) return false;
+    this.selection({ [target.map]: [target.id] });
+    return true;
+  }
+
+  moveChemicalHotspot(direction: HotspotDirection): boolean {
+    if (!(this._tool instanceof SelectTool) || this._tool.isMouseDown
+      || this._tool.isSelectionRunning()) return false;
+    const selected = this.selection();
+    let target = this.getChemicalHotspot();
+    if (!target && selected?.bonds?.length === 1) target = { map: 'bonds', id: selected.bonds[0] };
+    else if (!target && selected?.atoms?.length === 1 && !selected.bonds?.length) target = { map: 'atoms', id: selected.atoms[0] };
+    else if (!target && selected && Object.values(selected).some(ids => ids?.length)) return false;
+    const next = nextChemicalHotspot(this.struct(), target, direction, spot => this.isChemicalHotspotVisible(spot));
+    if (!next) return false;
+    this.hover(next);
+    return true;
   }
 
   saveNickname(
