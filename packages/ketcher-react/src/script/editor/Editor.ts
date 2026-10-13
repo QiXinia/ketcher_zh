@@ -107,6 +107,10 @@ import {
   fromSelectedAtomSprout,
   fromSelectedAtomLabelSprout,
   fromSelectedAtomLabelEdit,
+  captureStructureLabel,
+  fromContractStructureLabel,
+  fromSelectedStructureLabelState,
+  type StructureLabelDraft,
   validateAtomSproutTarget,
   parseAtomSproutLabel,
   FunctionalGroupsProvider,
@@ -3572,6 +3576,28 @@ class Editor implements KetcherEditor {
       this.struct(),
       this.explicitSelected().atoms,
     );
+  }
+
+  captureContractLabel(): StructureLabelDraft {
+    return captureStructureLabel(this.struct(), this.selection());
+  }
+
+  contractStructureLabel(label: string, draft: StructureLabelDraft): number {
+    const result = fromContractStructureLabel(this.render.ctab, label, draft);
+    if (result.changed) this.update(result.inverseAction);
+    this.render.update(true, null);
+    this.selection({ sgroups: [result.groupId] });
+    this.rotateController.rerender();
+    return result.changed ? 1 : 0;
+  }
+
+  setSelectedStructureLabelsExpanded(expanded: boolean): number {
+    const result = fromSelectedStructureLabelState(this.render.ctab, this.selection(), expanded);
+    if (result.changedCount) this.update(result.inverseAction);
+    this.render.update(true, null);
+    this.selection({ sgroups: result.groupIds });
+    this.rotateController.rerender();
+    return result.changedCount;
   }
 
   fuseRingOnSelectedBond(kind: RingFusionKind): number {

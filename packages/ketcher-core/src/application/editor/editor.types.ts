@@ -25,6 +25,7 @@ import type { ObjectAlignment, ObjectDistribution } from './actions/objectAlignm
 import type { RingFusionKind } from './actions/ringFusion';
 import type { AtomSproutKind } from './actions/atomSprout';
 import type { ChemicalHotspot, HotspotDirection } from './hotspot';
+import type { StructureLabelDraft } from './actions/structureLabels';
 import type {
   NicknameDraft,
   NicknameDefinition,
@@ -84,6 +85,9 @@ export interface Editor {
   sproutAtomLabel: (label: string, draft: { atomId: number; sourceKet: string }) => number;
   captureAtomLabelEdit: () => { atomId: number; sourceKet: string; label: string };
   editAtomLabel: (label: string, draft: { atomId: number; sourceKet: string }) => number;
+  captureContractLabel: () => StructureLabelDraft;
+  contractStructureLabel: (label: string, draft: StructureLabelDraft) => number;
+  setSelectedStructureLabelsExpanded: (expanded: boolean) => number;
   getChemicalHotspot: () => ChemicalHotspot | null;
   selectChemicalHotspot: () => boolean;
   moveChemicalHotspot: (direction: HotspotDirection) => boolean;
