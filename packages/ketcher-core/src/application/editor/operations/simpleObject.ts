@@ -43,6 +43,8 @@ interface SimpleObjectAddData {
   closed: boolean;
   fill: SimpleObjectFill;
   faded: boolean;
+  lineWidth: number;
+  doubleLineSpacing: number;
   color?: string;
   bracketType: SimpleObjectBracketType;
 }
@@ -63,6 +65,8 @@ export class SimpleObjectAdd extends Base {
     faded = false,
     bracketType: SimpleObjectBracketType = SimpleObjectBracketType.bracket,
     color?: string,
+    lineWidth = 1,
+    doubleLineSpacing = 1,
   ) {
     super(OperationType.SIMPLE_OBJECT_ADD);
     this.data = {
@@ -77,6 +81,8 @@ export class SimpleObjectAdd extends Base {
       closed,
       fill,
       faded,
+      lineWidth,
+      doubleLineSpacing,
       color,
       bracketType,
     };
@@ -93,6 +99,8 @@ export class SimpleObjectAdd extends Base {
       closed: this.data.closed,
       fill: this.data.fill,
       faded: this.data.faded,
+      lineWidth: this.data.lineWidth,
+      doubleLineSpacing: this.data.doubleLineSpacing,
       color: this.data.color,
       bracketType: this.data.bracketType,
     });
@@ -137,6 +145,8 @@ interface SimpleObjectDeleteData {
   closed?: boolean;
   fill?: SimpleObjectFill;
   faded?: boolean;
+  lineWidth?: number;
+  doubleLineSpacing?: number;
   color?: string;
   bracketType?: SimpleObjectBracketType;
 }
@@ -159,6 +169,8 @@ export class SimpleObjectDelete extends Base {
       closed: false,
       fill: SimpleObjectFill.none,
       faded: false,
+      lineWidth: 1,
+      doubleLineSpacing: 1,
       color: undefined,
       bracketType: SimpleObjectBracketType.bracket,
     };
@@ -179,6 +191,8 @@ export class SimpleObjectDelete extends Base {
     this.data.closed = item.closed ?? false;
     this.data.fill = item.fill ?? SimpleObjectFill.none;
     this.data.faded = item.faded ?? false;
+    this.data.lineWidth = item.lineWidth ?? 1;
+    this.data.doubleLineSpacing = item.doubleLineSpacing ?? 1;
     this.data.color = item.color;
     this.data.bracketType = item.bracketType ?? SimpleObjectBracketType.bracket;
     this.performed = true;
@@ -205,6 +219,8 @@ export class SimpleObjectDelete extends Base {
       this.data.faded,
       this.data.bracketType,
       this.data.color,
+      this.data.lineWidth,
+      this.data.doubleLineSpacing,
     );
   }
 }
@@ -376,8 +392,14 @@ export class SimpleObjectArrowSet extends Base {
   }
 }
 
-type SimpleObjectCurveProperty = 'doubled' | 'closed' | 'fill' | 'faded';
-type SimpleObjectCurveValue = boolean | SimpleObjectFill;
+export type SimpleObjectCurveProperty =
+  | 'doubled'
+  | 'closed'
+  | 'fill'
+  | 'faded'
+  | 'lineWidth'
+  | 'doubleLineSpacing';
+export type SimpleObjectCurveValue = boolean | SimpleObjectFill | number;
 
 interface SimpleObjectCurveData {
   id: number;
@@ -400,7 +422,11 @@ export class SimpleObjectCurveSet extends Base {
       property,
       value,
       previousValue:
-        property === 'fill' ? SimpleObjectFill.none : false,
+        property === 'fill'
+          ? SimpleObjectFill.none
+          : property === 'lineWidth' || property === 'doubleLineSpacing'
+            ? 1
+            : false,
     };
   }
 

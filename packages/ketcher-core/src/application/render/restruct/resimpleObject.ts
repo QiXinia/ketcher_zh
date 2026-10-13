@@ -535,6 +535,12 @@ class ReSimpleObject extends ReObject {
 
     paths.forEach((path, index) => {
       applySimpleObjectStyle(path, this.item.style);
+      // Scale the final style width, including Bold and half-arrow strokes.
+      // Solid arrowheads deliberately keep their zero-width outline.
+      if (this.item.lineWidth != null && this.item.lineWidth !== 1) {
+        const width = Number(path.attr('stroke-width') ?? options.lineattr['stroke-width'] ?? 1);
+        path.attr({ 'stroke-width': width * this.item.lineWidth });
+      }
       if (this.item.color) path.attr({ stroke: this.item.color });
       if (index < (this.item.doubled ? 2 : 1)) {
         applySimpleObjectDecoration(path, this.item, options, index > 0);
@@ -568,7 +574,7 @@ function generateCurvePaths(item: any, paper: any, pos: Vec2[], options: any): a
   ) {
     const direction = directionFrom(pos[0], pos[1]);
     if (direction) {
-      const gap = Math.max(2, options.microModeScale / 7);
+      const gap = Math.max(2, options.microModeScale / 7) * (item.doubleLineSpacing ?? 1);
       const normal = new Vec2(-direction.y * gap, direction.x * gap);
       paths.push(
         generatePath(
@@ -837,7 +843,7 @@ function applySimpleObjectStyle(path: any, style?: string): void {
   if (style === 'dashed') {
     path.attr({ 'stroke-dasharray': '-' });
   } else if (style === 'bold') {
-    path.attr({ 'stroke-width': 2 });
+    if (Number(path.attr('stroke-width')) !== 0) path.attr({ 'stroke-width': 2 });
   }
 }
 

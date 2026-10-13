@@ -91,6 +91,10 @@ export interface SimpleObjectAttributes {
   closed?: boolean;
   fill?: SimpleObjectFill;
   faded?: boolean;
+  /** Relative to the editor's normal curve stroke width. */
+  lineWidth?: number;
+  /** Relative to the editor's normal doubled-curve spacing. */
+  doubleLineSpacing?: number;
   color?: string;
   bracketType?: SimpleObjectBracketType;
   bracketUsage?: SimpleObjectBracketUsage;
@@ -111,6 +115,8 @@ export class SimpleObject extends BaseMicromoleculeEntity {
   closed: boolean;
   fill: SimpleObjectFill;
   faded: boolean;
+  lineWidth: number;
+  doubleLineSpacing: number;
   color?: string;
   bracketType: SimpleObjectBracketType;
   bracketUsage: SimpleObjectBracketUsage;
@@ -136,6 +142,8 @@ export class SimpleObject extends BaseMicromoleculeEntity {
     this.closed = attributes?.closed ?? false;
     this.fill = attributes?.fill ?? SimpleObjectFill.none;
     this.faded = attributes?.faded ?? false;
+    this.lineWidth = attributes?.lineWidth ?? 1;
+    this.doubleLineSpacing = attributes?.doubleLineSpacing ?? 1;
     this.color = attributes?.color;
     this.bracketType = attributes?.bracketType ?? SimpleObjectBracketType.bracket;
     this.bracketUsage = attributes?.bracketUsage ?? SimpleObjectBracketUsage.unspecified;

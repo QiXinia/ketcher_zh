@@ -3413,6 +3413,40 @@ class Editor implements KetcherEditor {
     return changedCount;
   }
 
+  setSelectedSimpleObjectCurveSettings(settings: {
+    lineWidth?: number;
+    doubleLineSpacing?: number;
+  }): number {
+    // Validate the complete request before recording any operation.
+    const properties = ['lineWidth', 'doubleLineSpacing'] as const;
+    properties.forEach((property) => {
+      const value = settings[property];
+      if (value !== undefined && (!Number.isFinite(value) || value < 0.25 || value > 8)) {
+        throw new Error('曲线线宽和双线间距倍率必须在 0.25 到 8 之间');
+      }
+    });
+    const ids = (this.selection()?.simpleObjects ?? []).filter((id) => {
+      const mode = this.render.ctab.molecule.simpleObjects.get(id)?.mode;
+      return mode === 'line' || mode === 'polyline' || mode === 'bezier';
+    });
+    if (!ids.length) throw new Error('请先选择直线、折线或贝塞尔曲线');
+    const action = new Action();
+    ids.forEach((id) => properties.forEach((property) => {
+      const value = settings[property];
+      if (value !== undefined) action.mergeWith(fromSimpleObjectCurve(id, property, value));
+    }));
+    const inverseAction = action.perform(this.render.ctab);
+    const changedCount = inverseAction.operations.filter(
+      (operation) => !operation.isDummy(this.render.ctab),
+    ).length;
+    if (changedCount) {
+      this.update(inverseAction);
+      this.render.update(true, null);
+      this.rotateController.rerender();
+    }
+    return changedCount;
+  }
+
   setSelectedSimpleObjectColor(color?: string): number {
     if (color !== undefined && !/^#[\da-f]{3}(?:[\da-f]{3})?$/i.test(color)) {
       throw new Error('图形对象颜色必须是十六进制颜色')

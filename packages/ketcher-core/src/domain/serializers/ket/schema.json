@@ -889,6 +889,16 @@
             "faded": {
               "type": "boolean"
             },
+            "lineWidth": {
+              "type": "number",
+              "minimum": 0.25,
+              "maximum": 8
+            },
+            "doubleLineSpacing": {
+              "type": "number",
+              "minimum": 0.25,
+              "maximum": 8
+            },
             "color": {
               "type": "string",
               "pattern": "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$"

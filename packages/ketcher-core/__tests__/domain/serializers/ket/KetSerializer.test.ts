@@ -193,6 +193,8 @@ describe('deserialize (ToStruct)', () => {
               closed: true,
               fill: 'shaded',
               faded: true,
+              lineWidth: 2.5,
+              doubleLineSpacing: 0.5,
               pos: [{ x: 1, y: 2 }, { x: 4, y: 2 }, { x: 3, y: 4 }],
             },
           },
@@ -211,7 +213,26 @@ describe('deserialize (ToStruct)', () => {
       closed: true,
       fill: 'shaded',
       faded: true,
+      lineWidth: 2.5,
+      doubleLineSpacing: 0.5,
     });
+  });
+  it('defaults legacy curve dimensions and rejects out-of-range KET dimensions', () => {
+    const source = { ket_version: '2.0.0', root: { nodes: [{ type: 'simpleObject', data: {
+      mode: 'line', pos: [{ x: 0, y: 0 }, { x: 1, y: 0 }],
+    } }] } };
+    const struct = ket.deserializeMicromolecules(JSON.stringify(source));
+    expect(struct.simpleObjects.get(0)).toMatchObject({ lineWidth: 1, doubleLineSpacing: 1 });
+    expect(JSON.parse(ket.serializeMicromolecules(struct)).root.nodes[0].data).not.toHaveProperty('lineWidth');
+    expect(JSON.parse(ket.serializeMicromolecules(struct)).root.nodes[0].data).not.toHaveProperty('doubleLineSpacing');
+    for (const property of ['lineWidth', 'doubleLineSpacing']) {
+      for (const value of [0, 8.01, -1]) {
+        const invalid = JSON.parse(JSON.stringify(source));
+        invalid.root.nodes[0].data[property] = value;
+        expect(validate.validate(invalid)).toBe(false);
+        expect(() => ket.deserializeMicromolecules(JSON.stringify(invalid))).toThrow('Cannot deserialize input JSON.');
+      }
+    }
   });
   it('round-trips independent bracket object geometry and shape', () => {
     const source = JSON.stringify({

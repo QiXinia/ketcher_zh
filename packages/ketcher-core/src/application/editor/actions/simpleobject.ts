@@ -26,10 +26,13 @@ import {
 } from '../operations';
 import {
   SimpleObjectArrow,
-  SimpleObjectFill,
   SimpleObjectStyle,
   SimpleObjectBracketType,
 } from 'domain/entities/simpleObject';
+import type {
+  SimpleObjectCurveProperty,
+  SimpleObjectCurveValue,
+} from '../operations/simpleObject';
 
 import { Action } from './action';
 
@@ -85,9 +88,15 @@ export function fromSimpleObjectArrow(
 
 export function fromSimpleObjectCurve(
   id: number,
-  property: 'doubled' | 'closed' | 'fill' | 'faded',
-  value: boolean | SimpleObjectFill,
+  property: SimpleObjectCurveProperty,
+  value: SimpleObjectCurveValue,
 ) {
+  if (
+    (property === 'lineWidth' || property === 'doubleLineSpacing') &&
+    (typeof value !== 'number' || !Number.isFinite(value) || value < 0.25 || value > 8)
+  ) {
+    throw new Error('曲线线宽和双线间距倍率必须在 0.25 到 8 之间');
+  }
   const action = new Action();
   action.addOp(new SimpleObjectCurveSet(id, property, value));
   return action;

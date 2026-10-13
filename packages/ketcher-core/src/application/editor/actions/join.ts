@@ -29,6 +29,8 @@ type JoinLine = {
   closed?: boolean;
   fill?: SimpleObjectFill;
   faded?: boolean;
+  lineWidth?: number;
+  doubleLineSpacing?: number;
   color?: string;
   bracketType?: SimpleObjectBracketType;
 };
@@ -119,6 +121,8 @@ export function fromJoin(restruct: ReStruct, selection: JoinSelection | null) {
       closed: item!.closed,
       fill: item!.fill,
       faded: item!.faded,
+      lineWidth: item!.lineWidth,
+      doubleLineSpacing: item!.doubleLineSpacing,
       color: item!.color,
       bracketType: item!.bracketType,
     }));
@@ -156,6 +160,8 @@ export function fromJoin(restruct: ReStruct, selection: JoinSelection | null) {
       lines[0].faded,
       lines[0].bracketType,
       lines[0].color,
+      lines[0].lineWidth,
+      lines[0].doubleLineSpacing,
     ),
   );
   return action.perform(restruct);

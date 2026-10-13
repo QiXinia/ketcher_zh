@@ -67,6 +67,10 @@ export interface Editor {
   distributeSelectedObjects: (direction: ObjectDistribution) => number;
   setSelectedSimpleObjectStyle: (style: 'plain' | 'dashed' | 'bold') => number;
   setSelectedSimpleObjectColor: (color?: string) => number;
+  setSelectedSimpleObjectCurveSettings: (settings: {
+    lineWidth?: number;
+    doubleLineSpacing?: number;
+  }) => number;
   setSelectedSimpleObjectArrow: (
     endpoint: 'start' | 'end',
     arrow: 'none' | 'full' | 'half-left' | 'half-right',

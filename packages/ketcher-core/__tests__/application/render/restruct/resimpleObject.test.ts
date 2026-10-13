@@ -3,6 +3,23 @@ import type { RenderOptions } from 'application/render/render.types';
 import ReSimpleObject from 'application/render/restruct/resimpleObject';
 import { SimpleObjectBracketType, SimpleObjectMode, Struct, Vec2 } from 'domain/entities';
 
+it('scales curve stroke and doubled spacing while preserving solid arrowheads', () => {
+  const option = { microModeScale: 20, width: 100, height: 100 } as RenderOptions;
+  const render = new Render(document as unknown as HTMLElement, option);
+  const paths: any[] = [];
+  const restruct = { render, addReObjectPath: (_layer, _visel, path) => paths.push(path) } as unknown as ReStruct;
+  new ReSimpleObject({
+    mode: SimpleObjectMode.line, pos: [new Vec2(0, 0), new Vec2(4, 0)],
+    style: 'bold', lineWidth: 2.5, doubled: true, doubleLineSpacing: 0.5,
+    endArrow: 'full',
+  }).show(restruct, render.options);
+  expect(paths).toHaveLength(3);
+  expect(paths[0].attr('stroke-width')).toBe(5);
+  expect(paths[1].attr('stroke-width')).toBe(5);
+  expect(paths[2].attr('stroke-width')).toBe(0);
+  expect(paths[1].getBBox().y - paths[0].getBBox().y).toBeCloseTo(20 / 14, 3);
+});
+
 const ellipse = {
   mode: SimpleObjectMode.ellipse,
   pos: [
