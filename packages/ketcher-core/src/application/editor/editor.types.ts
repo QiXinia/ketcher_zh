@@ -69,6 +69,8 @@ export interface Editor {
   ) => number;
   setSelectedSimpleObjectBracketType: (bracketType: 'bracket' | 'parenthesis' | 'brace') => number;
   setSelectedRingFillColor: (color?: string) => number;
+  adjustSelectedAtomCharge: (delta: -1 | 1) => number;
+  setSelectedAtomAttachmentPoint: () => number;
   clearRingFills: () => number;
   undo: () => void;
   redo: () => void;

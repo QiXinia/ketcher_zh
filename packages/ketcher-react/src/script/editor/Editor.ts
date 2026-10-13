@@ -30,6 +30,7 @@ import {
   type BaseMonomer,
   Action,
   Atom,
+  AttachmentPoints,
   AtomLabel,
   AttachmentPointName,
   Bond,
@@ -3478,6 +3479,62 @@ class Editor implements KetcherEditor {
       this.rotateController.rerender();
     }
     return result.ringCount;
+  }
+
+  /** Apply ChemDraw-style charge hotkeys to the selected atoms. */
+  adjustSelectedAtomCharge(delta: -1 | 1): number {
+    if (delta !== -1 && delta !== 1) {
+      throw new Error('原子电荷增量必须为 +1 或 -1');
+    }
+    const atomIds = this.selection()?.atoms ?? [];
+    if (!atomIds.length) throw new Error('请先选择一个或多个原子');
+    const action = new Action();
+    let changedCount = 0;
+    atomIds.forEach((atomId) => {
+      const atom = this.struct().atoms.get(atomId);
+      if (!atom || atom.atomList || atom.rglabel) return;
+      action.mergeWith(
+        fromAtomsAttrs(
+          this.render.ctab,
+          atomId,
+          { charge: (atom.charge ?? 0) + delta },
+          null,
+        ),
+      );
+      changedCount += 1;
+    });
+    if (changedCount) {
+      // fromAtomsAttrs already performs the edit and returns its undo action.
+      this.update(action);
+      this.render.update(true, null);
+    }
+    return changedCount;
+  }
+
+  /** Add ChemDraw's attachment-point marker to selected atoms. */
+  setSelectedAtomAttachmentPoint(): number {
+    const atomIds = this.selection()?.atoms ?? [];
+    if (!atomIds.length) throw new Error('请先选择一个或多个原子');
+    const action = new Action();
+    let changedCount = 0;
+    atomIds.forEach((atomId) => {
+      const atom = this.struct().atoms.get(atomId);
+      if (!atom || atom.isRGroupAttachmentPointEditDisabled || atom.attachmentPoints) return;
+      action.mergeWith(
+        fromAtomsAttrs(
+          this.render.ctab,
+          atomId,
+          { attachmentPoints: AttachmentPoints.FirstSideOnly },
+          null,
+        ),
+      );
+      changedCount += 1;
+    });
+    if (changedCount) {
+      this.update(action);
+      this.render.update(true, null);
+    }
+    return changedCount;
   }
 
   clearRingFills(): number {
