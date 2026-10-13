@@ -39,6 +39,8 @@ const graph = (struct: Struct) => ({
   bonds: [...struct.bonds.entries()].sort(([a], [b]) => a - b).map(([id, bond]) => ({
     id, begin: bond.begin, end: bond.end, type: bond.type, stereo: bond.stereo,
     display: bond.display, doubleBondPosition: bond.doubleBondPosition,
+    topology: bond.topology, reactingCenterStatus: bond.reactingCenterStatus,
+    customQuery: bond.customQuery,
   })),
 });
 
@@ -111,6 +113,75 @@ describe('selection-level ChemDraw ring fusion', () => {
     expect(struct.bonds.get(0)!.display).toBe('bold');
   });
 
+  const ringKinds: RingFusionKind[] = [3, 4, 5, 6, 7, 8, 'benzene', 'cyclopentadiene', 'chair-left', 'chair-right'];
+  const queryKinds = [
+    { type: Bond.PATTERN.TYPE.SINGLE_OR_DOUBLE },
+    { type: Bond.PATTERN.TYPE.SINGLE_OR_AROMATIC },
+    { type: Bond.PATTERN.TYPE.DOUBLE_OR_AROMATIC },
+    { type: Bond.PATTERN.TYPE.ANY },
+    { type: Bond.PATTERN.TYPE.ANY, customQuery: '-,=' },
+  ];
+  it.each(ringKinds.flatMap(kind => queryKinds.map(query => ({ kind, ...query }))))(
+    'fuses $kind on query $type / $customQuery with history and KET predicates intact', ({ kind, type, customQuery }) => {
+      const restruct = makeReStruct();
+      const struct = restruct.molecule;
+      struct.bonds.set(0, new Bond({ begin: 0, end: 1, type, customQuery, display: 'dashed',
+        topology: customQuery ? null : Bond.PATTERN.TOPOLOGY.RING,
+        reactingCenterStatus: customQuery ? null : Bond.PATTERN.REACTING_CENTER.ORDER_CHANGED }));
+      Object.assign(struct.atoms.get(0)!, { label: 'N', isotope: 15, charge: 1, aam: 42 });
+      struct.setImplicitHydrogen();
+      const attrs = Bond.getAttrHash(struct.bonds.get(0)!);
+      const before = serialize(restruct.molecule);
+      const [undo, added] = fromSelectedRingFusion(restruct, [0], kind);
+      expect(added.atoms).toHaveLength(createFusionRing(kind).atoms.size - 2);
+      expect(Bond.getAttrHash(struct.bonds.get(0)!)).toEqual(attrs);
+      expect(added.bonds.every(id => !struct.bonds.get(id)!.customQuery)).toBe(true);
+      const fused = graph(struct);
+      const restored = new KetSerializer().deserializeMicromolecules(serialize(struct));
+      expect(Bond.getAttrHash(restored.bonds.get(0)!)).toEqual(attrs);
+      expect(restored.atoms.get(0)).toMatchObject({ label: 'N', isotope: 15, charge: 1, aam: 42 });
+      const redo = undo.perform(restruct);
+      expect(serialize(struct)).toBe(before);
+      redo.perform(restruct);
+      expect(graph(struct)).toEqual(fused);
+    });
+
+  it('keeps aromatic annulation chemically valid for all ten ring templates using real Indigo WASM', async () => {
+    const indigo = await jest.requireActual('indigo-ketcher')();
+    const options = new indigo.MapStringString();
+    const selected = new indigo.VectorInt();
+    try {
+      for (const kind of ringKinds) {
+        const source = createFusionRing('benzene');
+        source.bonds.forEach(edge => Object.assign(edge, { type: Bond.PATTERN.TYPE.AROMATIC }));
+        const restruct = makeReStruct(source);
+        const before = serialize(source);
+        const originalBonds = [...source.bonds.values()].map(Bond.getAttrHash);
+        const [undo, added] = fromSelectedRingFusion(restruct, [0], kind);
+        originalBonds.forEach((attrs, id) => expect(Bond.getAttrHash(source.bonds.get(id)!)).toEqual(attrs));
+        const size = createFusionRing(kind).atoms.size;
+        expect(source.atoms.size).toBe(size + 4);
+        expect(source.bonds.size).toBe(size + 5);
+        expect(added.bonds.every(id => source.bonds.get(id)!.type === 4)).toBe(kind === 'benzene');
+        const ket = serialize(source);
+        const formula = JSON.parse(indigo.calculate(ket, options, selected))['gross-formula'].replace(/\s/g, '');
+        // Naphthalene C10H8; indene C9H8; saturated annulation C(n+4)H(2n).
+        expect(formula).toBe(kind === 'benzene' ? 'C10H8' : kind === 'cyclopentadiene' ? 'C9H8' : `C${size + 4}H${2 * size}`);
+        expect(JSON.parse(indigo.check(ket, 'valence;ambiguous_h', options))).toEqual({});
+        const fused = graph(source);
+        const restored = new KetSerializer().deserializeMicromolecules(ket);
+        expect(graph(restored).bonds).toEqual(fused.bonds);
+        const redo = undo.perform(restruct);
+        expect(serialize(source)).toBe(before);
+        redo.perform(restruct);
+        expect(graph(source)).toEqual(fused);
+      }
+    } finally {
+      selected.delete();
+      options.delete();
+    }
+  }, 30000);
+
   it('chooses the vacant side of an existing cycle, including atom and loop ID zero', () => {
     const restruct = makeReStruct(createFusionRing(6));
     const original = new Set(restruct.molecule.atoms.keys());
@@ -143,9 +214,13 @@ describe('selection-level ChemDraw ring fusion', () => {
       expect(serialize(restruct.molecule)).toBe(before);
     }
     expect(() => fromSelectedRingFusion(restruct, [0], 'invalid' as RingFusionKind)).toThrow(/不支持/);
-    restruct.molecule.bonds.get(0)!.type = 3;
-    expect(() => fromSelectedRingFusion(restruct, [0], 6)).toThrow(/单键或双键/);
-    restruct.molecule.bonds.get(0)!.type = 1;
+    for (const type of [3, 9, 10, 11]) {
+      Object.assign(restruct.molecule.bonds.get(0)!, { type });
+      const unsupported = serialize(restruct.molecule);
+      expect(() => fromSelectedRingFusion(restruct, [0], 6)).toThrow(/单键、双键/);
+      expect(serialize(restruct.molecule)).toBe(unsupported);
+    }
+    Object.assign(restruct.molecule.bonds.get(0)!, { type: 1 });
     restruct.molecule.atoms.get(0)!.sgs.add(9);
     expect(() => fromSelectedRingFusion(restruct, [0], 6)).toThrow(/S-group/);
     restruct.molecule.atoms.get(0)!.sgs.clear();

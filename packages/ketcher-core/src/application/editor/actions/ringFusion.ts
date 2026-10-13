@@ -51,11 +51,35 @@ export function fromSelectedRingFusion(
   const begin = bond && struct.atoms.get(bond.begin);
   const end = bond && struct.atoms.get(bond.end);
   if (!bond || !begin || !end) throw new Error('所选键已失效');
-  if (![Bond.PATTERN.TYPE.SINGLE, Bond.PATTERN.TYPE.DOUBLE].includes(bond.type)) {
-    throw new Error('稠合环需要普通单键或双键');
+  // Query bonds keep their existing predicate on the shared edge. Do not
+  // infer a concrete bond order or propagate that predicate to new edges.
+  const fusableBondTypes = [
+    Bond.PATTERN.TYPE.SINGLE,
+    Bond.PATTERN.TYPE.DOUBLE,
+    Bond.PATTERN.TYPE.AROMATIC,
+    Bond.PATTERN.TYPE.SINGLE_OR_DOUBLE,
+    Bond.PATTERN.TYPE.SINGLE_OR_AROMATIC,
+    Bond.PATTERN.TYPE.DOUBLE_OR_AROMATIC,
+    Bond.PATTERN.TYPE.ANY,
+  ];
+  if (!fusableBondTypes.includes(bond.type)) {
+    throw new Error('稠合环需要单键、双键、芳香键或查询键');
   }
   if (begin.sgs.size || end.sgs.size) throw new Error('请先解除连接原子所在的 S-group，再稠合环');
   if (Vec2.dist(begin.pp, end.pp) < 0.01) throw new Error('所选键的长度过小，请先整理结构');
+
+  if (bond.type === Bond.PATTERN.TYPE.AROMATIC && !bond.customQuery) {
+    // Fusing benzene onto an aromatic edge extends the aromatic system.
+    // Keeping the Kekule template here would overbond the fused carbons.
+    // Cyclopentadiene contributes one additional double bond (indene),
+    // while the saturated templates contribute only single bonds.
+    ring.bonds.forEach((edge, id) => {
+      const type = kind === 'benzene' ? Bond.PATTERN.TYPE.AROMATIC
+        : kind === 'cyclopentadiene' && id === 3 ? Bond.PATTERN.TYPE.DOUBLE
+          : Bond.PATTERN.TYPE.SINGLE;
+      ring.bonds.set(id, new Bond({ ...edge, type }));
+    });
+  }
 
   // Prefer the less crowded side. Preflight both placements so nearby atoms
   // cannot silently merge with the carbon skeleton or receive its attributes.
