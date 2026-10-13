@@ -136,6 +136,12 @@ function planSprout(source: Atom, degree: number, order: number, aromatic: boole
 /** Mutates with native operations and returns one inverse Action for history. */
 export function fromSelectedAtomSprout(restruct: ReStruct, atomIds: readonly number[], kind: AtomSproutKind) {
   if (!kinds.includes(kind)) throw new Error('不支持的原子生长类型');
+  const { sourceId, struct, source } = validateAtomSproutTarget(restruct, atomIds);
+  return sproutFromAtom(restruct, sourceId, struct, source, kind);
+}
+
+/** Shared preflight for fixed fragments and user-entered labels. */
+export function validateAtomSproutTarget(restruct: ReStruct, atomIds: readonly number[]) {
   if (atomIds.length !== 1 || !Number.isInteger(atomIds[0])) throw new Error('请只选择一个原子来生长片段');
   const sourceId = atomIds[0];
   const struct = restruct.molecule;
@@ -145,6 +151,10 @@ export function fromSelectedAtomSprout(restruct: ReStruct, atomIds: readonly num
   if (source.atomList || source.rglabel || source.label === 'R#' || source.customQuery) {
     throw new Error('查询原子和 R-group 连接原子不能直接生长片段');
   }
+  return { sourceId, struct, source };
+}
+
+function sproutFromAtom(restruct: ReStruct, sourceId: number, struct: Struct, source: Atom, kind: AtomSproutKind) {
   const neighbors = struct.atomGetNeighbors(sourceId);
   const bonds = neighbors.map(neighbor => struct.bonds.get(neighbor.bid)!);
   const order = bonds.reduce((sum, bond) => sum + (bond.type === Bond.PATTERN.TYPE.AROMATIC ? 1.5 : bond.type), 0);

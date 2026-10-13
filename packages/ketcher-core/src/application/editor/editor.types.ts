@@ -80,6 +80,8 @@ export interface Editor {
   setSelectedAtomAttachmentPoint: () => number;
   fuseRingOnSelectedBond: (kind: RingFusionKind) => number;
   sproutOnSelectedAtom: (kind: AtomSproutKind) => number;
+  captureAtomLabelSprout: () => { atomId: number; sourceKet: string };
+  sproutAtomLabel: (label: string, draft: { atomId: number; sourceKet: string }) => number;
   getChemicalHotspot: () => ChemicalHotspot | null;
   selectChemicalHotspot: () => boolean;
   moveChemicalHotspot: (direction: HotspotDirection) => boolean;

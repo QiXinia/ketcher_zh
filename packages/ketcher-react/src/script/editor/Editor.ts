@@ -105,6 +105,11 @@ import {
   fromSelectedRingFusion,
   type RingFusionKind,
   fromSelectedAtomSprout,
+  fromSelectedAtomLabelSprout,
+  validateAtomSproutTarget,
+  parseAtomSproutLabel,
+  FunctionalGroupsProvider,
+  type AtomLabelSproutDraft,
   type AtomSproutKind,
   type ChemicalHotspot,
   type HotspotDirection,
@@ -3600,6 +3605,41 @@ class Editor implements KetcherEditor {
     const selection = this.selection();
     if (selection?.bonds?.length) throw new Error('请只选择一个原子来生长片段');
     const result = fromSelectedAtomSprout(this.render.ctab, selection?.atoms ?? [], kind);
+    return this.finishAtomSprout(result);
+  }
+
+  captureAtomLabelSprout(): AtomLabelSproutDraft {
+    const selection = this.selection();
+    if (selection?.bonds?.length) throw new Error('请只选择一个原子来生长标签');
+    const { sourceId } = validateAtomSproutTarget(this.render.ctab, selection?.atoms ?? []);
+    return { atomId: sourceId, sourceKet: new KetSerializer().serializeMicromolecules(this.struct()) };
+  }
+
+  sproutAtomLabel(label: string, draft: AtomLabelSproutDraft): number {
+    if (!draft || !Number.isInteger(draft.atomId) ||
+        draft.sourceKet !== new KetSerializer().serializeMicromolecules(this.struct())) {
+      throw new Error('化学文档已变化，请关闭窗口并重新选择生长原子');
+    }
+    const attributes = parseAtomSproutLabel(label);
+    let nickname: { struct: Struct; attachmentAtomId: number } | undefined;
+    if (attributes.pseudo) {
+      const custom = getNicknames().find(item => item.name.toLowerCase() === attributes.label.toLowerCase());
+      if (custom) {
+        const template = getNicknameTemplate(custom.name);
+        nickname = { struct: template.struct, attachmentAtomId: template.aid };
+      } else {
+        const fragment = FunctionalGroupsProvider.getInstance().getFunctionalGroupsList()
+          .find(item => !SGroup.isSaltOrSolvent(item.name) && item.name.toLowerCase() === attributes.label.toLowerCase());
+        if (fragment) {
+          const group = [...fragment.sgroups.values()].find(group => group.type === 'SUP');
+          nickname = { struct: fragment, attachmentAtomId: group?.getAttachmentAtomId() ?? [...fragment.atoms.keys()][0] };
+        }
+      }
+    }
+    return this.finishAtomSprout(fromSelectedAtomLabelSprout(this.render.ctab, [draft.atomId], label, nickname));
+  }
+
+  private finishAtomSprout(result: ReturnType<typeof fromSelectedAtomSprout>): number {
     this.update(result.inverseAction);
     this.render.update(true, null);
     // Keep the new hotspot selected for successive chain-growth keystrokes.
