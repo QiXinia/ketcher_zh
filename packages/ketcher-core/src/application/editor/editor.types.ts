@@ -22,6 +22,10 @@ import type { PipelineSubscription, Subscription } from 'subscription';
 import type { IRnaPreset } from './tools/Tool';
 import type { TextFormattingCommand } from './actions/textFormatting';
 import type { ObjectAlignment, ObjectDistribution } from './actions/objectAlignment';
+import type {
+  NicknameDraft,
+  NicknameDefinition,
+} from 'domain/helpers/nicknames';
 
 export type EditorSelection = {
   [key in typeof selectionKeys[number]]?: number[];
@@ -71,6 +75,15 @@ export interface Editor {
   setSelectedRingFillColor: (color?: string) => number;
   adjustSelectedAtomCharge: (delta: -1 | 1) => number;
   setSelectedAtomAttachmentPoint: () => number;
+  captureNicknameFragment: () => NicknameDraft;
+  getNicknames: () => NicknameDefinition[];
+  saveNickname: (
+    ket: string,
+    name: string,
+    attachmentAtomId: number,
+  ) => NicknameDefinition;
+  deleteNickname: (name: string) => void;
+  activateNickname: (name: string) => void;
   clearRingFills: () => number;
   undo: () => void;
   redo: () => void;

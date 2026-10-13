@@ -98,6 +98,9 @@ import {
   fromFragmentDeletion,
   fromSelectedRingFill,
   fromRingFillClear,
+  captureNicknameFragment,
+  type NicknameDraft,
+  type NicknameDefinition,
 } from 'ketcher-core';
 import {
   SimpleObjectArrow,
@@ -132,6 +135,12 @@ import { getSelectionMap, getStructCenter } from './utils/structLayout';
 import assert from 'assert';
 import { isNumber } from 'lodash';
 import paperjs from 'paper';
+import {
+  getNicknames,
+  saveNickname,
+  deleteNickname,
+  getNicknameTemplate,
+} from './nicknameLibrary';
 
 const SCALE = provideEditorSettings().microModeScale;
 const HISTORY_SIZE = 32; // put me to options
@@ -3535,6 +3544,33 @@ class Editor implements KetcherEditor {
       this.render.update(true, null);
     }
     return changedCount;
+  }
+
+  captureNicknameFragment(): NicknameDraft {
+    return captureNicknameFragment(
+      this.struct(),
+      this.explicitSelected().atoms,
+    );
+  }
+
+  getNicknames(): NicknameDefinition[] {
+    return getNicknames();
+  }
+
+  saveNickname(
+    ket: string,
+    name: string,
+    attachmentAtomId: number,
+  ): NicknameDefinition {
+    return saveNickname(ket, name, attachmentAtomId);
+  }
+
+  deleteNickname(name: string): void {
+    deleteNickname(name);
+  }
+
+  activateNickname(name: string): void {
+    this.tool('template', getNicknameTemplate(name));
   }
 
   clearRingFills(): number {
