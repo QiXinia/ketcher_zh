@@ -166,6 +166,20 @@ describe('deserialize (ToStruct)', () => {
     expect(serialized.root.nodes[0].data.startArrow).toBe('half-left');
     expect(serialized.root.nodes[0].data.endArrow).toBe('full');
   });
+  it('accepts multi-segment Bezier paths and rejects incomplete segments', () => {
+    const valid = { ket_version: '2.0.0', root: { nodes: [{ type: 'simpleObject', data: { mode: 'bezier', pos: [
+      { x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 1 }, { x: 3, y: 0 },
+      { x: 4, y: -1 }, { x: 5, y: 0 }, { x: 6, y: 0 },
+    ] } }] } };
+    expect(validate.validate(valid)).toBe(true);
+    const struct = ket.deserializeMicromolecules(JSON.stringify(valid));
+    expect(struct.simpleObjects.get(0)?.pos).toHaveLength(7);
+    const incomplete = JSON.parse(JSON.stringify(valid));
+    incomplete.root.nodes[0].data.pos.pop();
+    expect(validate.validate(incomplete)).toBe(false);
+    expect(() => ket.deserializeMicromolecules(JSON.stringify(incomplete))).toThrow('Cannot deserialize input JSON.');
+  });
+
   it('round-trips composable simple-object curve decorations', () => {
     const source = JSON.stringify({
       ket_version: '1.0.0',
