@@ -101,6 +101,8 @@ import {
   captureNicknameFragment,
   type NicknameDraft,
   type NicknameDefinition,
+  fromSelectedRingFusion,
+  type RingFusionKind,
 } from 'ketcher-core';
 import {
   SimpleObjectArrow,
@@ -3551,6 +3553,18 @@ class Editor implements KetcherEditor {
       this.struct(),
       this.explicitSelected().atoms,
     );
+  }
+
+  fuseRingOnSelectedBond(kind: RingFusionKind): number {
+    const [inverseAction, added] = fromSelectedRingFusion(
+      this.render.ctab,
+      this.selection()?.bonds ?? [],
+      kind,
+    );
+    this.update(inverseAction);
+    this.render.update(true, null);
+    this.rotateController.rerender();
+    return added.atoms.length;
   }
 
   getNicknames(): NicknameDefinition[] {

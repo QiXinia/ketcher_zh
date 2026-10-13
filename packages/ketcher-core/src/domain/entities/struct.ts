@@ -1384,7 +1384,7 @@ export class Struct {
 
   getBondFragment(bid: number) {
     const aid = this.bonds.get(bid)?.begin;
-    return aid && this.atoms.get(aid)?.fragment;
+    return aid === undefined ? undefined : this.atoms.get(aid)?.fragment;
   }
 
   bindSGroupsToFunctionalGroups() {

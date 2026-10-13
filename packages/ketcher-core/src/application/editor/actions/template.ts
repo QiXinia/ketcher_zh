@@ -327,12 +327,16 @@ function placeTemplateAtoms(
   scale,
   action,
   pasteItems,
+  preserveTargetAtomAttributes = false,
+  mergeNearbyAtoms = true,
 ) {
   tmpl.atoms.forEach((atom, id) => {
     const attrs = Atom.getAttrHash(atom) as Record<string, unknown>;
     attrs.fragment = frid;
     if (id === tmplBond.begin || id === tmplBond.end) {
-      action.mergeWith(fromAtomsAttrs(restruct, atomsMap.get(id), attrs, true));
+      if (!preserveTargetAtomAttributes) {
+        action.mergeWith(fromAtomsAttrs(restruct, atomsMap.get(id), attrs, true));
+      }
       return;
     }
 
@@ -340,7 +344,7 @@ function placeTemplateAtoms(
       .rotate(angle)
       .scaled(scale)
       .add(struct.atoms.get(bond.begin).pp);
-    const mergeA = closest.atom(restruct, v, null, 0.1);
+    const mergeA = mergeNearbyAtoms ? closest.atom(restruct, v, null, 0.1) : null;
 
     if (mergeA === null) {
       const operation = new AtomAdd(attrs, v).perform(restruct) as AtomAdd;
@@ -350,7 +354,9 @@ function placeTemplateAtoms(
     } else {
       atomsMap.set(id, mergeA.id);
 
-      action.mergeWith(fromAtomsAttrs(restruct, atomsMap.get(id), attrs, true));
+      if (!preserveTargetAtomAttributes) {
+        action.mergeWith(fromAtomsAttrs(restruct, atomsMap.get(id), attrs, true));
+      }
       // TODO [RB] need to merge fragments?
     }
   });
@@ -369,6 +375,7 @@ function placeTemplateBonds(
   isPreview,
   action,
   pasteItems,
+  preserveExistingBondAttributes = false,
 ) {
   const isFusingBenzeneBySpecialRules = fusingBondType !== null;
 
@@ -423,7 +430,13 @@ function placeTemplateBonds(
       pasteItems.bonds.push(newBondId);
     } else {
       const commonBond = bond.type > tmplBond.type ? bond : tmplBond;
-      action.mergeWith(fromBondsAttrs(restruct, existId, commonBond, true));
+      if (preserveExistingBondAttributes) {
+        // A selection-level fusion keeps display, stereo and query attributes.
+        // Only the chemically required order of the shared edge may change.
+        action.addOp(new BondAttr(existId, 'type', commonBond.type).perform(restruct));
+      } else {
+        action.mergeWith(fromBondsAttrs(restruct, existId, commonBond, true));
+      }
 
       if (isFusingBenzeneBySpecialRules && fusingBondType) {
         action.addOp(
@@ -506,6 +519,8 @@ function fromTemplateOnBond(restruct, template, bid, flip, isPreview = false) {
     scale,
     action,
     pasteItems,
+    template.preserveTargetAtomAttributes,
+    template.mergeNearbyAtoms,
   );
 
   // When a template of "Benzene" molecule is attached it
@@ -526,6 +541,7 @@ function fromTemplateOnBond(restruct, template, bid, flip, isPreview = false) {
     isPreview,
     action,
     pasteItems,
+    template.preserveExistingBondAttributes,
   );
 
   applyTemplatePostProcessing(restruct, bond, pasteItems, action);

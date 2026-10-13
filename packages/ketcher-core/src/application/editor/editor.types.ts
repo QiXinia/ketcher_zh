@@ -22,6 +22,7 @@ import type { PipelineSubscription, Subscription } from 'subscription';
 import type { IRnaPreset } from './tools/Tool';
 import type { TextFormattingCommand } from './actions/textFormatting';
 import type { ObjectAlignment, ObjectDistribution } from './actions/objectAlignment';
+import type { RingFusionKind } from './actions/ringFusion';
 import type {
   NicknameDraft,
   NicknameDefinition,
@@ -75,6 +76,7 @@ export interface Editor {
   setSelectedRingFillColor: (color?: string) => number;
   adjustSelectedAtomCharge: (delta: -1 | 1) => number;
   setSelectedAtomAttachmentPoint: () => number;
+  fuseRingOnSelectedBond: (kind: RingFusionKind) => number;
   captureNicknameFragment: () => NicknameDraft;
   getNicknames: () => NicknameDefinition[];
   saveNickname: (
