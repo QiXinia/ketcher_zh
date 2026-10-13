@@ -23,6 +23,26 @@ describe('SettingsService', () => {
   });
 
   describe('initialization', () => {
+    it('persists the ring sprout preference and restores the default on reset', async () => {
+      expect(service.getSettings().sproutRingsInsteadOfSpiro).toBe(false);
+      SettingsService.resetInstance();
+      service = await SettingsService.getInstance({ storage });
+      const listener = jest.fn();
+      service.subscribe(listener);
+      await service.updateSettings({ sproutRingsInsteadOfSpiro: true });
+      expect(listener).toHaveBeenCalledWith(expect.objectContaining({ sproutRingsInsteadOfSpiro: true }));
+      SettingsService.resetInstance();
+      service = await SettingsService.getInstance({ storage });
+      expect(service.getSettings().sproutRingsInsteadOfSpiro).toBe(true);
+      await service.resetToDefaults();
+      expect(service.getSettings().sproutRingsInsteadOfSpiro).toBe(false);
+    });
+
+    it('rejects a non-boolean ring sprout preference without changing settings', async () => {
+      await expect(service.updateSettings({ sproutRingsInsteadOfSpiro: 'true' } as any)).rejects.toThrow();
+      expect(service.getSettings().sproutRingsInsteadOfSpiro).toBe(false);
+    });
+
     it('should initialize with defaults when storage is empty', async () => {
       const settings = service.getSettings();
       const defaults = getDefaultSettings();

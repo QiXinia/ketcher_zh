@@ -13,6 +13,7 @@ export interface Settings {
   // Editor settings
   readonly resetToSelect: boolean | 'paste';
   readonly rotationStep: number;
+  readonly sproutRingsInsteadOfSpiro: boolean;
 
   // General render settings
   readonly showValenceWarnings: boolean;

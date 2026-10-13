@@ -12,6 +12,7 @@ export const DEFAULT_SETTINGS: Settings = {
   // Editor settings
   resetToSelect: 'paste', // true, 'paste', or false
   rotationStep: 15, // degrees
+  sproutRingsInsteadOfSpiro: false,
 
   // General render settings
   showValenceWarnings: true,
@@ -143,6 +144,7 @@ export const SCHEMA = {
   type: 'object',
   properties: {
     // Editor settings
+    sproutRingsInsteadOfSpiro: { type: 'boolean' },
     resetToSelect: {
       enum: [true, 'paste', false],
     },

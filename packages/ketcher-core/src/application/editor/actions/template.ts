@@ -19,7 +19,7 @@ import { Bond } from 'domain/entities/bond';
 import type { SGroup } from 'domain/entities/sgroup';
 import type { Struct } from 'domain/entities/struct';
 import { Vec2 } from 'domain/entities/vec2';
-import { AtomAdd, BondAdd, BondAttr, CalcImplicitH } from '../operations';
+import { AtomAdd, AtomAttr, BondAdd, BondAttr, CalcImplicitH } from '../operations';
 import { atomForNewBond, atomGetAttr } from './utils';
 import { fromAtomsAttrs, mergeSgroups } from './atom';
 import { fromBondsAttrs, fromBondAddition } from './bond';
@@ -134,9 +134,19 @@ export function fromTemplateOnAtom(
 
   if (extraBond) {
     // create extra bond after click on atom
+    const bondsBefore = new Set(struct.bonds.keys());
     const extraRes = extraBondAction(restruct, aid, angle);
     action = extraRes.action;
     aid1 = extraRes.aid1;
+
+    if (isPreview) {
+      new AtomAttr(aid1, 'isPreview', true).perform(restruct);
+      struct.bonds.forEach((_, bid) => {
+        if (!bondsBefore.has(bid)) {
+          new BondAttr(bid, 'isPreview', true).perform(restruct);
+        }
+      });
+    }
 
     atom = struct.atoms.get(aid1);
     delta =
@@ -165,10 +175,17 @@ export function fromTemplateOnAtom(
     attrs.fragment = frid;
 
     if (id === template.aid) {
-      action.mergeWith(fromAtomsAttrs(restruct, aid1, attrs, true));
+      // A shared ring atom is the existing chemical entity, including its
+      // isotope, charge, mapping and label. Only a new attachment atom takes
+      // the ring template's attributes.
+      if (extraBond || !template.ringTool) {
+        if (extraBond) attrs.isPreview = isPreview;
+        action.mergeWith(fromAtomsAttrs(restruct, aid1, attrs, true));
+      }
       map.set(id, aid1);
       pasteItems.atoms.push(aid1);
     } else {
+      attrs.isPreview = isPreview;
       const v = Vec2.diff(a.pp, xy0).rotate(delta).add(atom.pp);
 
       const operation = new AtomAdd(attrs, v.get_xy0()).perform(
