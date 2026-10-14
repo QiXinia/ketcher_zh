@@ -6,15 +6,17 @@ import {
   selectErrorModalText,
   selectErrorModalTitle,
 } from 'state/modal';
-import { i18n, translateErrorMessage } from 'ketcher-react';
+import {
+  i18n,
+  translateErrorMessage,
+  translateErrorTitle,
+} from 'ketcher-react';
 import { ErrorTextWrapper } from './Error.styles';
 
 export const ErrorModal = () => {
   const dispatch = useAppDispatch();
   const errorMessage = useAppSelector(selectErrorModalText);
-  const errorTitle =
-    useAppSelector(selectErrorModalTitle) ||
-    String(i18n.t('infoModal.errorMessage'));
+  const errorTitle = translateErrorTitle(useAppSelector(selectErrorModalTitle));
   const isModalOpen = errorMessage !== '';
   const onClose = () => {
     dispatch(closeErrorModal());

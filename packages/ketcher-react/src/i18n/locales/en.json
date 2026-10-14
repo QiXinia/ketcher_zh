@@ -452,6 +452,8 @@
   "infoModal": {
     "errorMessage": "Error Message",
     "close": "Close",
+    "monomerLibraryConversionFailed": "Monomer library conversion failed",
+    "monomerLibraryUpdateFailed": "Monomer library update failed",
     "pasteError": "Your browser doesn't allow pasting clipboard content via button. Please use shortcut instead.",
     "forPaste": "for paste",
     "unavailableViaMenu": "This action is unavailable via menu. Instead, use shortcut to {{action}}."
@@ -958,6 +960,8 @@
     "sgroupNotEmpty": "S-Group not empty!",
     "sgroupDeclarationIncomplete": "S-group declaration incomplete.",
     "sgroupBraceInvalid": "Brace balance broken. S-group properies invalid!",
+    "mergeFragmentsUnavailable": "It is impossible to merge fragments. Attachment point to establish bonds are not available.",
+    "monomerLibraryLoadFailed": "Failed to load monomers library",
     "ringBondCountInvalid": "Ring bond count invalid",
     "substitutionCountInvalid": "Substitution count invalid",
     "unsaturatedAtomInvalid": "Unsaturated atom invalid value"

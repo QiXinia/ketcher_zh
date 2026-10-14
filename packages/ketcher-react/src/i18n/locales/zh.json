@@ -452,6 +452,8 @@
   "infoModal": {
     "errorMessage": "错误信息",
     "close": "关闭",
+    "monomerLibraryConversionFailed": "单体库转换失败",
+    "monomerLibraryUpdateFailed": "单体库更新失败",
     "pasteError": "您的浏览器不允许通过按钮粘贴剪贴板内容。请使用快捷键代替。",
     "forPaste": "用于粘贴",
     "unavailableViaMenu": "此操作无法通过菜单执行。请使用快捷键 {{action}}。"
@@ -958,6 +960,8 @@
     "sgroupNotEmpty": "S-基团不为空！",
     "sgroupDeclarationIncomplete": "S-基团声明不完整。",
     "sgroupBraceInvalid": "括号配对错误，S-基团属性无效！",
+    "mergeFragmentsUnavailable": "无法合并片段，因为没有可用于建立连接的连接点。",
+    "monomerLibraryLoadFailed": "加载单体库失败",
     "ringBondCountInvalid": "环键数无效",
     "substitutionCountInvalid": "取代基数无效",
     "unsaturatedAtomInvalid": "不饱和原子的值无效"
