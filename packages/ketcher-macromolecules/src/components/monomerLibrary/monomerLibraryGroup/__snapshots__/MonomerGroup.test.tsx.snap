@@ -36,7 +36,7 @@ exports[`Monomer Group should apply correct style if selected 1`] = `
     </svg>
   </div>
   <button
-    aria-label="Toggle favorite"
+    aria-label="切换收藏状态"
     class="star "
     type="button"
   >
@@ -96,7 +96,7 @@ exports[`Monomer Group should render correct with title prop 1`] = `
               </svg>
             </div>
             <button
-              aria-label="Toggle favorite"
+              aria-label="切换收藏状态"
               class="star "
               type="button"
             >
@@ -138,7 +138,7 @@ exports[`Monomer Group should render correct with title prop 1`] = `
               </svg>
             </div>
             <button
-              aria-label="Toggle favorite"
+              aria-label="切换收藏状态"
               class="star "
               type="button"
             >
@@ -180,7 +180,7 @@ exports[`Monomer Group should render correct with title prop 1`] = `
               </svg>
             </div>
             <button
-              aria-label="Toggle favorite"
+              aria-label="切换收藏状态"
               class="star "
               type="button"
             >
@@ -222,7 +222,7 @@ exports[`Monomer Group should render correct with title prop 1`] = `
               </svg>
             </div>
             <button
-              aria-label="Toggle favorite"
+              aria-label="切换收藏状态"
               class="star "
               type="button"
             >
@@ -264,7 +264,7 @@ exports[`Monomer Group should render correct with title prop 1`] = `
               </svg>
             </div>
             <button
-              aria-label="Toggle favorite"
+              aria-label="切换收藏状态"
               class="star "
               type="button"
             >
@@ -322,7 +322,7 @@ exports[`Monomer Group should render correct with title prop 1`] = `
             </svg>
           </div>
           <button
-            aria-label="Toggle favorite"
+            aria-label="切换收藏状态"
             class="star "
             type="button"
           >
@@ -364,7 +364,7 @@ exports[`Monomer Group should render correct with title prop 1`] = `
             </svg>
           </div>
           <button
-            aria-label="Toggle favorite"
+            aria-label="切换收藏状态"
             class="star "
             type="button"
           >
@@ -406,7 +406,7 @@ exports[`Monomer Group should render correct with title prop 1`] = `
             </svg>
           </div>
           <button
-            aria-label="Toggle favorite"
+            aria-label="切换收藏状态"
             class="star "
             type="button"
           >
@@ -448,7 +448,7 @@ exports[`Monomer Group should render correct with title prop 1`] = `
             </svg>
           </div>
           <button
-            aria-label="Toggle favorite"
+            aria-label="切换收藏状态"
             class="star "
             type="button"
           >
@@ -490,7 +490,7 @@ exports[`Monomer Group should render correct with title prop 1`] = `
             </svg>
           </div>
           <button
-            aria-label="Toggle favorite"
+            aria-label="切换收藏状态"
             class="star "
             type="button"
           >
@@ -600,7 +600,7 @@ exports[`Monomer Group should render correct without title prop 1`] = `
               </svg>
             </div>
             <button
-              aria-label="Toggle favorite"
+              aria-label="切换收藏状态"
               class="star "
               type="button"
             >
@@ -642,7 +642,7 @@ exports[`Monomer Group should render correct without title prop 1`] = `
               </svg>
             </div>
             <button
-              aria-label="Toggle favorite"
+              aria-label="切换收藏状态"
               class="star "
               type="button"
             >
@@ -684,7 +684,7 @@ exports[`Monomer Group should render correct without title prop 1`] = `
               </svg>
             </div>
             <button
-              aria-label="Toggle favorite"
+              aria-label="切换收藏状态"
               class="star "
               type="button"
             >
@@ -726,7 +726,7 @@ exports[`Monomer Group should render correct without title prop 1`] = `
               </svg>
             </div>
             <button
-              aria-label="Toggle favorite"
+              aria-label="切换收藏状态"
               class="star "
               type="button"
             >
@@ -768,7 +768,7 @@ exports[`Monomer Group should render correct without title prop 1`] = `
               </svg>
             </div>
             <button
-              aria-label="Toggle favorite"
+              aria-label="切换收藏状态"
               class="star "
               type="button"
             >
@@ -821,7 +821,7 @@ exports[`Monomer Group should render correct without title prop 1`] = `
             </svg>
           </div>
           <button
-            aria-label="Toggle favorite"
+            aria-label="切换收藏状态"
             class="star "
             type="button"
           >
@@ -863,7 +863,7 @@ exports[`Monomer Group should render correct without title prop 1`] = `
             </svg>
           </div>
           <button
-            aria-label="Toggle favorite"
+            aria-label="切换收藏状态"
             class="star "
             type="button"
           >
@@ -905,7 +905,7 @@ exports[`Monomer Group should render correct without title prop 1`] = `
             </svg>
           </div>
           <button
-            aria-label="Toggle favorite"
+            aria-label="切换收藏状态"
             class="star "
             type="button"
           >
@@ -947,7 +947,7 @@ exports[`Monomer Group should render correct without title prop 1`] = `
             </svg>
           </div>
           <button
-            aria-label="Toggle favorite"
+            aria-label="切换收藏状态"
             class="star "
             type="button"
           >
@@ -989,7 +989,7 @@ exports[`Monomer Group should render correct without title prop 1`] = `
             </svg>
           </div>
           <button
-            aria-label="Toggle favorite"
+            aria-label="切换收藏状态"
             class="star "
             type="button"
           >

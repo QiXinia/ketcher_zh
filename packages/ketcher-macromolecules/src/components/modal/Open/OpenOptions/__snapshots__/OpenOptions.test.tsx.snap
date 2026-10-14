@@ -37,7 +37,7 @@ exports[`OpenOptions component should render correctly 1`] = `
           <p
             class="css-9x63nq"
           >
-            Paste from clipboard
+            从剪贴板粘贴
           </p>
         </div>
         <div
@@ -77,13 +77,13 @@ exports[`OpenOptions component should render correctly 1`] = `
               class="css-1b8y5ux"
             >
               <span>
-                or drag file here
+                或拖拽文件到此处
               </span>
             </div>
             <p
               class="css-9x63nq"
             >
-              Open from file
+              从文件打开
             </p>
           </button>
         </div>
@@ -137,7 +137,7 @@ exports[`OpenOptions component should render correctly 1`] = `
             <p
               class="css-1uh9od2"
             >
-              Image Recognition service is not available
+              图像识别服务不可用
             </p>
           </button>
         </div>
@@ -177,7 +177,7 @@ exports[`OpenOptions component should render correctly 1`] = `
         <p
           class="css-9x63nq"
         >
-          Paste from clipboard
+          从剪贴板粘贴
         </p>
       </div>
       <div
@@ -217,13 +217,13 @@ exports[`OpenOptions component should render correctly 1`] = `
             class="css-1b8y5ux"
           >
             <span>
-              or drag file here
+              或拖拽文件到此处
             </span>
           </div>
           <p
             class="css-9x63nq"
           >
-            Open from file
+            从文件打开
           </p>
         </button>
       </div>
@@ -277,7 +277,7 @@ exports[`OpenOptions component should render correctly 1`] = `
           <p
             class="css-1uh9od2"
           >
-            Image Recognition service is not available
+            图像识别服务不可用
           </p>
         </button>
       </div>

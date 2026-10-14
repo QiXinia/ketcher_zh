@@ -49,7 +49,7 @@ exports[`Monomer List should render correct with groups 1`] = `
                 </svg>
               </div>
               <button
-                aria-label="Toggle favorite"
+                aria-label="切换收藏状态"
                 class="star "
                 type="button"
               >
@@ -106,7 +106,7 @@ exports[`Monomer List should render correct with groups 1`] = `
               </svg>
             </div>
             <button
-              aria-label="Toggle favorite"
+              aria-label="切换收藏状态"
               class="star "
               type="button"
             >
@@ -220,7 +220,7 @@ exports[`Monomer List should render correct without groups 1`] = `
                 </svg>
               </div>
               <button
-                aria-label="Toggle favorite"
+                aria-label="切换收藏状态"
                 class="star "
                 type="button"
               >
@@ -277,7 +277,7 @@ exports[`Monomer List should render correct without groups 1`] = `
               </svg>
             </div>
             <button
-              aria-label="Toggle favorite"
+              aria-label="切换收藏状态"
               class="star "
               type="button"
             >

@@ -73,9 +73,9 @@ const saveSchema = {
       maxLength: 128,
       pattern: '^[^.<>:?"*\\\\|\\/][^<>:?"*\\\\|\\/]*$',
       invalidMessage: (res) => {
-        if (!res) return 'Filename should contain at least one character';
-        if (res.length > 128) return 'Filename is too long';
-        return "A filename cannot contain characters: \\ / : * ? \" < > | and cannot start with '.'";
+        if (!res) return i18n.t('save.filenameEmpty');
+        if (res.length > 128) return i18n.t('save.filenameTooLong');
+        return i18n.t('save.filenameInvalidChars');
       },
     },
     format: {
@@ -207,7 +207,7 @@ const ImageContent = ({
 const BinaryContent = ({ classes, textAreaRef }: BinaryContentProps) => (
   <div className={classes.previewBackground}>
     <textarea
-      value="Can not display binary content"
+      value={i18n.t('save.cannotDisplayBinary')}
       className={classes.previewArea}
       readOnly
       ref={textAreaRef}
@@ -233,7 +233,7 @@ const PreviewContent = ({
     <IconButton
       onClick={handleCopy}
       iconName="copy"
-      title="Copy to clipboard"
+      title={i18n.t('save.copyToClipboard')}
       testId="copy-to-clipboard"
     />
   </div>
@@ -439,9 +439,7 @@ class SaveDialog extends Component<SaveDialogProps, SaveDialogState> {
   getWarnings = (format: SupportedFormat | OutputFormatType): string[] => {
     const { struct, moleculeErrors } = this.props;
     const warnings: string[] = [];
-    const structWarning =
-      'Structure contains errors, please check the data, otherwise you ' +
-      'can lose some properties or the whole structure after saving in this format.';
+    const structWarning = i18n.t('save.structureErrorsFull');
     if (!this.isImageFormat(format)) {
       const saveWarning = structFormat.couldBeSaved(struct, format);
       const isStructInvalid = this.showStructWarningMessage(format);
@@ -561,9 +559,7 @@ class SaveDialog extends Component<SaveDialogProps, SaveDialogState> {
       }
     } catch (e) {
       KetcherLogger.error('copyAs.js::copyAs', e);
-      this.props.editor.errorHandler(
-        'This feature is not available in your browser',
-      );
+      this.props.editor.errorHandler(i18n.t('save.featureNotAvailable'));
     }
   };
 

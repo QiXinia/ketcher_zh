@@ -15,7 +15,7 @@ exports[`InfoModal should be rendered correctly should render Paste shortcut mes
           class="header"
         >
           <div>
-            Error Message
+            错误信息
           </div>
           <div
             class="btnContainer"
@@ -40,7 +40,7 @@ exports[`InfoModal should be rendered correctly should render Paste shortcut mes
               data-testid="error-message-body"
             >
               <div>
-                Your browser doesn't allow pasting clipboard content via button. Please use shortcut instead.
+                您的浏览器不允许通过按钮粘贴剪贴板内容。请使用快捷键代替。
               </div>
               <div
                 class="shortcutsBlock"
@@ -55,7 +55,7 @@ exports[`InfoModal should be rendered correctly should render Paste shortcut mes
                     CTRL/Cmd + V
                   </div>
                   <div>
-                    for paste
+                    用于粘贴
                   </div>
                 </div>
               </div>
@@ -69,7 +69,7 @@ exports[`InfoModal should be rendered correctly should render Paste shortcut mes
             class="ok"
             data-testid="info-modal-close"
           >
-            Close
+            关闭
           </button>
         </footer>
       </dialog>
@@ -86,7 +86,7 @@ exports[`InfoModal should be rendered correctly should render Paste shortcut mes
         class="header"
       >
         <div>
-          Error Message
+          错误信息
         </div>
         <div
           class="btnContainer"
@@ -111,7 +111,7 @@ exports[`InfoModal should be rendered correctly should render Paste shortcut mes
             data-testid="error-message-body"
           >
             <div>
-              Your browser doesn't allow pasting clipboard content via button. Please use shortcut instead.
+              您的浏览器不允许通过按钮粘贴剪贴板内容。请使用快捷键代替。
             </div>
             <div
               class="shortcutsBlock"
@@ -126,7 +126,7 @@ exports[`InfoModal should be rendered correctly should render Paste shortcut mes
                   CTRL/Cmd + V
                 </div>
                 <div>
-                  for paste
+                  用于粘贴
                 </div>
               </div>
             </div>
@@ -140,7 +140,7 @@ exports[`InfoModal should be rendered correctly should render Paste shortcut mes
           class="ok"
           data-testid="info-modal-close"
         >
-          Close
+          关闭
         </button>
       </footer>
     </dialog>
@@ -221,7 +221,7 @@ exports[`InfoModal should be rendered correctly should render default error mess
           class="header"
         >
           <div>
-            Error Message
+            错误信息
           </div>
           <div
             class="btnContainer"
@@ -241,7 +241,7 @@ exports[`InfoModal should be rendered correctly should render default error mess
           data-testid="info-modal-body"
         >
           <div>
-            This action is unavailable via menu. Instead, use shortcut to Cut.
+            此操作无法通过菜单执行。请使用快捷键 Cut。
           </div>
         </div>
         <footer
@@ -251,7 +251,7 @@ exports[`InfoModal should be rendered correctly should render default error mess
             class="ok"
             data-testid="info-modal-close"
           >
-            Close
+            关闭
           </button>
         </footer>
       </dialog>
@@ -268,7 +268,7 @@ exports[`InfoModal should be rendered correctly should render default error mess
         class="header"
       >
         <div>
-          Error Message
+          错误信息
         </div>
         <div
           class="btnContainer"
@@ -288,7 +288,7 @@ exports[`InfoModal should be rendered correctly should render default error mess
         data-testid="info-modal-body"
       >
         <div>
-          This action is unavailable via menu. Instead, use shortcut to Cut.
+          此操作无法通过菜单执行。请使用快捷键 Cut。
         </div>
       </div>
       <footer
@@ -298,7 +298,7 @@ exports[`InfoModal should be rendered correctly should render default error mess
           class="ok"
           data-testid="info-modal-close"
         >
-          Close
+          关闭
         </button>
       </footer>
     </dialog>

@@ -1,8 +1,4 @@
-import {
-  BILN_ALIAS_FORMAT_ERROR_MESSAGE,
-  HELM_ALIAS_FORMAT_ERROR_MESSAGE,
-  KetMonomerClass,
-} from 'ketcher-core';
+import { KetMonomerClass } from 'ketcher-core';
 
 import type {
   MonomerTypeSelectItem,
@@ -13,85 +9,93 @@ import type {
 export const MonomerTypeSelectConfig: MonomerTypeSelectItem[] = [
   {
     value: KetMonomerClass.AminoAcid,
-    label: 'Amino acid',
+    label: 'monomerWizard.typeLabels.aminoAcid',
     iconName: 'peptide',
   },
-  { value: KetMonomerClass.Sugar, label: 'Sugar', iconName: 'sugar' },
-  { value: KetMonomerClass.Base, label: 'Base', iconName: 'base' },
+  {
+    value: KetMonomerClass.Sugar,
+    label: 'monomerWizard.typeLabels.sugar',
+    iconName: 'sugar',
+  },
+  {
+    value: KetMonomerClass.Base,
+    label: 'monomerWizard.typeLabels.base',
+    iconName: 'base',
+  },
   {
     value: KetMonomerClass.Phosphate,
-    label: 'Phosphate',
+    label: 'monomerWizard.typeLabels.phosphate',
     iconName: 'phosphate',
   },
   {
     value: KetMonomerClass.RNA,
-    label: 'Nucleotide (monomer)',
+    label: 'monomerWizard.typeLabels.nucleotideMonomer',
     iconName: 'nucleotide',
   },
-  { value: 'rnaPreset', label: 'Nucleotide (preset)', iconName: 'preset' },
-  { value: KetMonomerClass.CHEM, label: 'CHEM', iconName: 'chem' },
+  {
+    value: 'rnaPreset',
+    label: 'monomerWizard.typeLabels.nucleotidePreset',
+    iconName: 'preset',
+  },
+  {
+    value: KetMonomerClass.CHEM,
+    label: 'monomerWizard.typeLabels.chem',
+    iconName: 'chem',
+  },
 ];
 
 export const MAX_MODIFICATION_TYPES = 5;
 
 export const NotificationMessages: WizardNotificationMessageMap = {
   defaultAttachmentPoints:
-    'Attachment points are set by default with hydrogens as leaving groups.',
-  emptyMandatoryFields: 'Mandatory fields must be filled.',
-  invalidSymbol:
-    'The monomer code must consist only of uppercase and lowercase letters, numbers, hyphens (-), underscores (_), and asterisks (*).',
-  symbolExists:
-    'The code must be unique amongst peptide, RNA, or CHEM monomers.',
-  editingIsNotAllowed: 'Editing of the structure is not allowed.',
-  noAttachmentPoints: 'The monomer must have at least one attachment point.',
+    'monomerWizard.notifications.defaultAttachmentPoints',
+  emptyMandatoryFields: 'monomerWizard.notifications.emptyMandatoryFields',
+  invalidSymbol: 'monomerWizard.notifications.invalidSymbol',
+  symbolExists: 'monomerWizard.notifications.symbolExists',
+  editingIsNotAllowed: 'monomerWizard.notifications.editingIsNotAllowed',
+  noAttachmentPoints: 'monomerWizard.notifications.noAttachmentPoints',
   incorrectAttachmentPointsOrder:
-    'Attachment point numbers must be in order, but R1 and R2 may be skipped.',
+    'monomerWizard.notifications.incorrectAttachmentPointsOrder',
   attachmentPointsNotUnique:
-    'Only one attachment point can have the same number.',
-  creationSuccessful: 'The monomer was successfully added to the library.',
-  creationRNASuccessful: 'The preset was successfully added to the library.',
-  incontinuousStructure: 'All monomers must have a continuous structure.',
+    'monomerWizard.notifications.attachmentPointsNotUnique',
+  creationSuccessful: 'monomerWizard.notifications.creationSuccessful',
+  creationRNASuccessful: 'monomerWizard.notifications.creationRNASuccessful',
+  incontinuousStructure: 'monomerWizard.notifications.incontinuousStructure',
   notUniqueModificationTypes:
-    'Only one amino acid within a natural analogue can have the same modification type.',
-  modificationTypeExists:
-    'Only one amino acid within a natural analogue can have the same modification type.',
+    'monomerWizard.notifications.notUniqueModificationTypes',
+  modificationTypeExists: 'monomerWizard.notifications.modificationTypeExists',
   notMinimalViableStructure:
-    'Minimal monomer structure is two atoms connected via a single bond.',
-  impureStructure:
-    'Monomer structure cannot contain S-groups, R-groups, special atoms, or any other query properties.',
-  invalidHELMAlias: HELM_ALIAS_FORMAT_ERROR_MESSAGE,
-  notUniqueHELMAlias:
-    'The HELM alias must be unique amongst peptide or RNA monomers.',
-  invalidBILNAlias: BILN_ALIAS_FORMAT_ERROR_MESSAGE,
-  notUniqueBILNAlias:
-    'The BILN alias must be unique amongst peptide and CHEM monomers.',
+    'monomerWizard.notifications.notMinimalViableStructure',
+  impureStructure: 'monomerWizard.notifications.impureStructure',
+  invalidHELMAlias: 'monomerWizard.notifications.invalidHELMAlias',
+  notUniqueHELMAlias: 'monomerWizard.notifications.notUniqueHELMAlias',
+  invalidBILNAlias: 'monomerWizard.notifications.invalidBILNAlias',
+  notUniqueBILNAlias: 'monomerWizard.notifications.notUniqueBILNAlias',
   invalidRnaPresetStructure:
-    'Structure of rna preset component contains issues. Please adjust the structure.',
+    'monomerWizard.notifications.invalidRnaPresetStructure',
   rnaPresetAtomsOutsideComponents:
-    'Some atoms do not belong to any nucleotide component (sugar, base, or phosphate).',
+    'monomerWizard.notifications.rnaPresetAtomsOutsideComponents',
   rnaPresetAtomsInMultipleComponents:
-    'Some atoms belong to multiple nucleotide components.',
+    'monomerWizard.notifications.rnaPresetAtomsInMultipleComponents',
   rnaPresetMissingComponents:
-    'Preset must contain at least two components, with sugar being one of them.',
+    'monomerWizard.notifications.rnaPresetMissingComponents',
   rnaPresetInvalidSugarConnectionBonds:
-    'Sugar can only have one single bond with base and one single bond with phosphate.',
+    'monomerWizard.notifications.rnaPresetInvalidSugarConnectionBonds',
   rnaPresetUnexpectedBasePhosphateBond:
-    "Phosphate and base mustn't have a bond.",
+    'monomerWizard.notifications.rnaPresetUnexpectedBasePhosphateBond',
   rnaPresetInvalidSugarBaseConnectionAttachmentPoints:
-    'The bond between sugar and base must be established between R3 of the sugar and R1 of the base.',
+    'monomerWizard.notifications.rnaPresetInvalidSugarBaseConnectionAttachmentPoints',
   rnaPresetInvalidSugarPhosphateConnectionAttachmentPoints:
-    'The bond between sugar and phosphate must be established between R2 of one monomer and R1 of the other.',
-  notUniquePresetCode: 'The preset code must be unique amongst other presets.',
-  invalidPresetCode:
-    'The preset code must consist only of uppercase and lowercase letters, numbers, hyphens (-), underscores (_), and asterisks (*).',
-  invalidName:
-    'The monomer name must consist only of uppercase and lowercase letters, numbers, hyphens (-), underscores (_), asterisks (*), and spaces.',
+    'monomerWizard.notifications.rnaPresetInvalidSugarPhosphateConnectionAttachmentPoints',
+  notUniquePresetCode: 'monomerWizard.notifications.notUniquePresetCode',
+  invalidPresetCode: 'monomerWizard.notifications.invalidPresetCode',
+  invalidName: 'monomerWizard.notifications.invalidName',
   invalidPhosphatePositionAttachmentPoints:
-    '3′ position requires phosphate R1 and sugar R2, 5′ position requires phosphate R2 and sugar R1.',
+    'monomerWizard.notifications.invalidPhosphatePositionAttachmentPoints',
   phosphatePositionNotSelected:
-    "You must choose the position of the phosphate (5' or 3').",
-  editAllPresetWarning: '',
-  editAllPresetError: '',
+    'monomerWizard.notifications.phosphatePositionNotSelected',
+  editAllPresetWarning: 'monomerWizard.notifications.editAllPresetWarning',
+  editAllPresetError: 'monomerWizard.notifications.editAllPresetError',
 };
 
 export const NotificationTypes: WizardNotificationTypeMap = {

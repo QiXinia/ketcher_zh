@@ -190,7 +190,8 @@
     "checkStructure": "Check Structure",
     "calculatedValues": "Calculated Values",
     "explicitHydrogens": "Add/Remove explicit hydrogens",
-    "viewer3D": "3D Viewer"
+    "viewer3D": "3D Viewer",
+    "helpWithShortcut": "Help (?)"
   },
   "dialog": {
     "ok": "OK",
@@ -209,7 +210,8 @@
     "confirmAction": "Confirm your action",
     "expandWindow": "Expand window",
     "minimizeWindow": "Minimize window",
-    "closeWindow": "Close window"
+    "closeWindow": "Close window",
+    "textEdit": "Text Edit"
   },
   "save": {
     "title": "Save Structure",
@@ -224,7 +226,11 @@
     "cannotDisplayBinary": "Can not display binary content",
     "copyToClipboard": "Copy to clipboard",
     "featureNotAvailable": "This feature is not available in your browser",
-    "structureContainsErrors": "Structure contains errors, please check the data..."
+    "structureContainsErrors": "Structure contains errors, please check the data...",
+    "inlineSmilesWarning": "The molecule will be exported using inline SMILES, and on load will appear as a CHEM monomer",
+    "helmAliasWarning": "Some of the monomers do not have aliases in the HELM Core Library - they are exported using Ketcher aliases.",
+    "convertError": "Convert error! {{error}}",
+    "structureErrorsFull": "Structure contains errors, please check the data, otherwise you can lose some properties or the whole structure after saving in this format."
   },
   "open": {
     "title": "Open structure",
@@ -243,7 +249,13 @@
     "selectStructure": "Select structure",
     "structureIndex": "Structure {{index}}",
     "file": "File: ",
-    "errorPrefix": "Error:"
+    "errorPrefix": "Error:",
+    "openAsNew": "Open as New",
+    "unsupportedSymbols": "Unsupported symbols",
+    "errorDuringFileParsing": "Error during file parsing.",
+    "errorDuringParsingFile": "Error during parsing file",
+    "browserNotSupportOpen": "Your browser does not support opening files locally",
+    "failedToReadFile": "Failed to read file:"
   },
   "check": {
     "title": "Structure Check",
@@ -387,7 +399,17 @@
     "blackAndWhite": "Black and White",
     "black": "Black",
     "pngSvgRendererOption": "option applicable to PNG/SVG pictures renderer",
-    "ignoreChiralFlagTooltip": "Ignore chiral flag while loading from molfiles..."
+    "ignoreChiralFlagTooltip": "Ignore chiral flag while loading from molfiles...",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "imageResLow": "low (72 DPI)",
+    "imageResHigh": "high (600 DPI)",
+    "autoFadeStereoLabels": "Auto fade of stereo labels",
+    "miewMode": "Miew mode",
+    "miewTheme": "Miew theme",
+    "miewAtomLabel": "Miew atom label",
+    "none": "None",
+    "exportFailed": "Export failed"
   },
   "extendedTable": {
     "atomGenerics": "Atom Generics",
@@ -486,7 +508,67 @@
     "selectPhosphateAtoms": "Select all atoms that form the phosphate.",
     "examplePEG": "e.g. PEG-2",
     "exampleDiethyleneGlycol": "e.g. Diethylene Glycol",
-    "removeAttachmentPoint": "Remove attachment point"
+    "removeAttachmentPoint": "Remove attachment point",
+    "title": "Create Monomer",
+    "typeLabels": {
+      "aminoAcid": "Amino acid",
+      "sugar": "Sugar",
+      "base": "Base",
+      "phosphate": "Phosphate",
+      "nucleotideMonomer": "Nucleotide (monomer)",
+      "nucleotidePreset": "Nucleotide (preset)",
+      "chem": "CHEM",
+      "preset": "Preset"
+    },
+    "notifications": {
+      "defaultAttachmentPoints": "Attachment points are set by default with hydrogens as leaving groups.",
+      "emptyMandatoryFields": "Mandatory fields must be filled.",
+      "invalidSymbol": "The monomer code must consist only of uppercase and lowercase letters, numbers, hyphens (-), underscores (_), and asterisks (*).",
+      "symbolExists": "The code must be unique amongst peptide, RNA, or CHEM monomers.",
+      "editingIsNotAllowed": "Editing of the structure is not allowed.",
+      "noAttachmentPoints": "The monomer must have at least one attachment point.",
+      "incorrectAttachmentPointsOrder": "Attachment point numbers must be in order, but R1 and R2 may be skipped.",
+      "attachmentPointsNotUnique": "Only one attachment point can have the same number.",
+      "creationSuccessful": "The monomer was successfully added to the library.",
+      "creationRNASuccessful": "The preset was successfully added to the library.",
+      "incontinuousStructure": "All monomers must have a continuous structure.",
+      "notUniqueModificationTypes": "Only one amino acid within a natural analogue can have the same modification type.",
+      "modificationTypeExists": "Only one amino acid within a natural analogue can have the same modification type.",
+      "notMinimalViableStructure": "Minimal monomer structure is two atoms connected via a single bond.",
+      "impureStructure": "Monomer structure cannot contain S-groups, R-groups, special atoms, or any other query properties.",
+      "invalidHELMAlias": "The HELM alias must consist only of uppercase and lowercase letters, numbers, underscores (_), asterisks (*), square brackets ([]), parentheses (()), dots (.), and hyphens (-), spaces prohibited.",
+      "notUniqueHELMAlias": "The HELM alias must be unique amongst peptide or RNA monomers.",
+      "invalidBILNAlias": "The BILN alias must consist only of uppercase and lowercase letters, numbers, hyphens (`-`), underscores (`_`), and asterisks (`*`).",
+      "notUniqueBILNAlias": "The BILN alias must be unique amongst peptide and CHEM monomers.",
+      "invalidRnaPresetStructure": "Structure of rna preset component contains issues. Please adjust the structure.",
+      "rnaPresetAtomsOutsideComponents": "Some atoms do not belong to any nucleotide component (sugar, base, or phosphate).",
+      "rnaPresetAtomsInMultipleComponents": "Some atoms belong to multiple nucleotide components.",
+      "rnaPresetMissingComponents": "Preset must contain at least two components, with sugar being one of them.",
+      "rnaPresetInvalidSugarConnectionBonds": "Sugar can only have one single bond with base and one single bond with phosphate.",
+      "rnaPresetUnexpectedBasePhosphateBond": "Phosphate and base mustn't have a bond.",
+      "rnaPresetInvalidSugarBaseConnectionAttachmentPoints": "The bond between sugar and base must be established between R3 of the sugar and R1 of the base.",
+      "rnaPresetInvalidSugarPhosphateConnectionAttachmentPoints": "The bond between sugar and phosphate must be established between R2 of one monomer and R1 of the other.",
+      "notUniquePresetCode": "The preset code must be unique amongst other presets.",
+      "invalidPresetCode": "The preset code must consist only of uppercase and lowercase letters, numbers, hyphens (-), underscores (_), and asterisks (*).",
+      "invalidName": "The monomer name must consist only of uppercase and lowercase letters, numbers, hyphens (-), underscores (_), asterisks (*), and spaces.",
+      "invalidPhosphatePositionAttachmentPoints": "3′ position requires phosphate R1 and sugar R2, 5′ position requires phosphate R2 and sugar R1.",
+      "phosphatePositionNotSelected": "You must choose the position of the phosphate (5' or 3').",
+      "editAllPresetWarning": "",
+      "editAllPresetError": ""
+    },
+    "validation": {
+      "aminoAcid": "Amino acid monomers typically have a hydrogen as the leaving group for R1, and a hydroxyl as a leaving group for R2. Do you wish to proceed with the current attachment points?",
+      "sugar": "Sugar monomers typically have a hydrogen as the leaving group for R1 and R2, and a hydroxyl as a leaving group for R3. Do you wish to proceed with the current attachment points?",
+      "base": "Base monomers typically have a hydrogen as the leaving group for R1. Do you wish to proceed with the current attachment points?",
+      "phosphate": "Phosphate monomers typically have a hydroxyl as the leaving group for R1 and R2. Do you wish to proceed with the current attachment points?",
+      "nucleotide": "Nucleotide monomers typically have a hydrogen as the leaving group for R1, and a hydroxyl as a leaving group for R2. Do you wish to proceed with the current attachment points?"
+    },
+    "typeChangeWarning": "Changing the type will result in a loss of inputted data. Do you wish to proceed?",
+    "fivePrimeLeft": "5'-left",
+    "threePrimeRight": "3'-right",
+    "examplePeg2": "e.g. PEG-2",
+    "internalApTooltip": "Attachment point numbers of internal attachment points determined by the phosphate position switcher.",
+    "selectAnalogue": "Select an analogue"
   },
   "atomProperties": {
     "title": "Atom Properties",
@@ -565,7 +647,8 @@
     "noChange": "No change",
     "madeBroken": "Made/broken",
     "orderChanges": "Order changes",
-    "madeBrokenAndChanges": "Made/broken and changes"
+    "madeBrokenAndChanges": "Made/broken and changes",
+    "bond": "Bond"
   },
   "rgroup": {
     "title": "R-Group",
@@ -583,10 +666,24 @@
     "title": "Text Editor",
     "fontSize": "Font Size",
     "text": "Text:",
-    "formattingToolbar": "Text formatting toolbar"
+    "formattingToolbar": "Text formatting toolbar",
+    "symbols": "symbols"
   },
   "sgroup": {
-    "title": "S-Group Properties"
+    "title": "S-Group Properties",
+    "sgroup": "S-Group",
+    "multipleGroup": "Multiple group",
+    "repeatCount": "Repeat count",
+    "sruPolymer": "SRU polymer",
+    "polymerLabel": "Polymer label",
+    "repeatPattern": "Repeat Pattern",
+    "copolymer": "Copolymer",
+    "subtype": "Subtype",
+    "superatom": "Superatom",
+    "name": "Name",
+    "queryComponent": "Query component",
+    "nucleotideComponent": "Nucleotide Component",
+    "component": "Component"
   },
   "enhancedStereo": {
     "title": "Enhanced Stereochemistry",
@@ -627,7 +724,13 @@
     "connect": "Connect",
     "duplicateAndEdit": "Duplicate and Edit...",
     "deletePreset": "Delete Preset",
-    "calculateProperties": "Calculate properties"
+    "calculateProperties": "Calculate properties",
+    "deleteRnaPreset": "Delete RNA Preset",
+    "failedLoadLibrary": "Failed to load monomers library",
+    "sequenceMenuTitle": "Sequence",
+    "deleteRnaPresetAbout": "You are about to delete",
+    "deleteRnaPresetName": "\"{{name}}\" RNA preset.",
+    "deleteRnaPresetUndo": "This operation cannot be undone."
   },
   "monomerLibrary": {
     "searchByName": "Search by name...",
@@ -644,14 +747,19 @@
     "phosphateOnRight": "Phosphate on the right",
     "selectPhosphatePosition": "Select phosphate position",
     "switchPhosphateLeft": "Switch to left",
-    "switchPhosphateRight": "Switch to right"
+    "switchPhosphateRight": "Switch to right",
+    "selectMonomerWithR2": "Select a monomer or a chain that has one R2 available.",
+    "cannotAddLacksR1": "This monomer cannot be added to a chain using this button, as it lacks R1.",
+    "favoritesMonomers": "Monomers",
+    "favoritesPresets": "Presets"
   },
   "common": {
     "default": "Default",
     "error": "Error",
     "warning": "Warning",
     "success": "Success",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "alreadyInUse": "Already in use"
   },
   "periodicTable": {
     "single": "Single",
@@ -688,5 +796,172 @@
     "S": "Sulfur",
     "Cl": "Chlorine",
     "Ar": "Argon"
+  },
+  "monomerPreview": {
+    "alternatives": "Alternatives",
+    "mixed": "Mixed",
+    "anyAminoAcid": "Any amino acid",
+    "anyBase": "Any base"
+  },
+  "saveWarnings": {
+    "smartsQueryProps": "Structure contains query properties of atoms and bonds that are not supported in the SMARTS. Query properties will not be reflected in the file saved.",
+    "smilesGenericAtoms": "Structure contains generic atoms. They will be saved as any atom (*).",
+    "arrowReplaced": "The {{format}} format does not support drawn elements: the reaction {{arrowMode}} arrow will be replaced with the reaction arrow",
+    "arrowsLost": "The {{format}} format does not support drawn elements: reaction arrows will be lost.",
+    "noRgroupFragments": "In {{format}} the structure will be saved without R-group fragments",
+    "noRgroupMembers": "In {{format}} the structure will be saved without R-group members",
+    "noSgroups": "In {{format}} the structure will be saved without S-groups",
+    "valenceUnsupported": "In {{format}} valence is not supported",
+    "enhancedStereoLost": "Structure contains enhanced stereochemistry features. Information will be partly lost.",
+    "noFunctionalGroups": "In {{format}} the structure will be saved without functional groups.",
+    "cmlFunctionalGroupsLost": "Structure contains functional groups. In {{format}} information will be partly lost."
+  },
+  "sdata": {
+    "context": "Context",
+    "fragment": "Fragment",
+    "multifragment": "Multifragment",
+    "bond": "Bond",
+    "atom": "Atom",
+    "group": "Group",
+    "fieldName": "Field name",
+    "fieldValue": "Field value",
+    "data": "Data",
+    "specifyFieldValue": "Please, specify field value",
+    "specifyFieldName": "Please, specify field name",
+    "enterValuePlaceholder": "Enter value",
+    "enterNamePlaceholder": "Enter name"
+  },
+  "fragmentSelection": {
+    "cycleTooltip": "Fragment Selection Tool cannot be used on bonds that participate in a cycle.",
+    "componentTooltip": "The structure fragment in this direction is already marked as a nucleotide component."
+  },
+  "generics": {
+    "isDisabled": "{{label}} is disabled",
+    "items": {
+      "*": "Any atom, including hydrogen",
+      "A": "Any atom except hydrogen",
+      "ABC": "Carbocyclic",
+      "ABH": "Carbocyclic of hydrogen",
+      "ACH": "Acyclic group or hydrogen",
+      "ACY": "Acyclic group",
+      "AEH": "Alkenyl or hydrogen",
+      "AEL": "Alkenyl",
+      "AH": "Any atom, including hydrogen",
+      "AHC": "Heteroacyclic",
+      "AHH": "Heterocyclic or hydrogen",
+      "ALH": "Alkyl or hydrogen",
+      "ALK": "Alkyl",
+      "AOH": "Alkoxy or hydrogen",
+      "AOX": "Alkoxy",
+      "ARH": "Any aryl group or hydrogen",
+      "ARY": "Any aryl group",
+      "AYH": "Alkynyl or hydrogen",
+      "AYL": "Alkynyl",
+      "CAH": "Any cycloalkyl group or hydrogen",
+      "CAL": "Any cycloalkyl group",
+      "CBC": "Carbocyclic derivatives",
+      "CBH": "Carbocyclic derivatives or hydrogen",
+      "CEH": "Any cyloalkenyl group or hydrogen",
+      "CEL": "Any cyloalkenyl group",
+      "CHC": "Heterocyclic group",
+      "CHH": "Heterocyclic group or hydrogen",
+      "CXH": "Cyclic group with no Carbon atoms or hydrogen",
+      "CXX": "Cyclic group with no Carbon atoms",
+      "CYC": "Cyclic group",
+      "CYH": "Cyclic group or hydrogen",
+      "D": "Deuterium",
+      "G": "Any group",
+      "G*": "Any group with a ring closure",
+      "GH": "Any group or hydrogen",
+      "GH*": "Any group with a ring closure or hydrogen",
+      "H+": "Proton",
+      "HAH": "Heteroaryl group or hydrogen",
+      "HAR": "Heteroaryl group",
+      "M": "Any metal",
+      "MH": "Any metal or hydrogen",
+      "Pol": "Polymer Bead",
+      "Q": "Any heteroatom (any atom except C or H)",
+      "QH": "Any atom except C",
+      "R": "Pseudoatom",
+      "T": "Tritium",
+      "X": "Any halogen",
+      "XH": "Any halogen or hydrogen"
+    }
+  },
+  "coreErrors": {
+    "helmAliasFormat": "The HELM alias must consist only of uppercase and lowercase letters, numbers, underscores (_), asterisks (*), square brackets ([]), parentheses (()), dots (.), and hyphens (-), spaces prohibited.",
+    "bilnAliasFormat": "The BILN alias must consist only of uppercase and lowercase letters, numbers, hyphens (`-`), underscores (`_`), and asterisks (`*`).",
+    "helmAliasLength": "The HELM alias must be no more than 23 symbols long.",
+    "idtAliasSlash": "The slashes (`/`) can only be the first and last character of an IDT alias.",
+    "idtAliasLength": "The maximum number of characters of an IDT alias without slashes (/) is 10.",
+    "monomerGroupTemplateNameLength": "The monomer group template name must not exceed 200 characters.",
+    "disallowedModificationType": "Monomers with an unknown, ambiguous, or molecule modification type cannot be added to the library.",
+    "macroSmiles": "SMILES format is not available in macro mode",
+    "macroRxn": "RXN format is not available in macro mode",
+    "macroSmarts": "SMARTS format is not available in macro mode",
+    "macroCml": "CML format is not available in macro mode",
+    "macroSdf": "SDF format is not available in macro mode",
+    "macroRdf": "RDF format is not available in macro mode",
+    "macroCdxml": "CDXML format is not available in macro mode",
+    "macroCdx": "CDX format is not available in macro mode",
+    "macroLayout": "Layout is not available in macro mode",
+    "macroAromatize": "Aromatize is not available in macro mode",
+    "macroDearomatize": "Dearomatize is not available in macro mode",
+    "macroCalculate": "Calculate is not available in macro mode",
+    "macroRecognize": "Recognize is not available in macro mode",
+    "cannotExportImage": "Cannot export image",
+    "errorParsingFile": "Error during parsing file",
+    "fileFormatInvalid": "File format invalid",
+    "rgFileFormatInvalid": "RGFile format invalid",
+    "unexpectedEndOfFile": "Unexpected end of file",
+    "localStorageUnavailable": "localStorage is not available",
+    "tooManyAttachmentPoints": "Cannot assign more than 8 attachment points",
+    "sgroupNotEmpty": "S-Group not empty!",
+    "sgroupDeclarationIncomplete": "S-group declaration incomplete.",
+    "sgroupBraceInvalid": "Brace balance broken. S-group properies invalid!",
+    "ringBondCountInvalid": "Ring bond count invalid",
+    "substitutionCountInvalid": "Substitution count invalid",
+    "unsaturatedAtomInvalid": "Unsaturated atom invalid value"
+  },
+  "image": {
+    "unsupportedType": "Unsupported image type",
+    "minSize": "Image should be at least 16x16 pixels",
+    "cannotLoad": "Cannot load image"
+  },
+  "hotkeys": {
+    "copyInIE": "The structure you are trying to copy contains Simple object or/and Text object. To copy Simple object or Text object in Internet Explorer try \"Copy as KET\" button"
+  },
+  "layoutMode": {
+    "switchSequence": "Switch to sequence layout mode",
+    "switchSnake": "Switch to snake layout mode",
+    "switchFlex": "Switch to flex layout mode"
+  },
+  "ruler": {
+    "monomersInLine": "Number of monomers in a line"
+  },
+  "rnaBuilder": {
+    "updateSequence": "Update sequence",
+    "resetAll": "Reset all",
+    "updateSequenceConfirmPrefix": "You are going to modify ",
+    "updateSequenceConfirmSuffix": " nucleotides. Are you sure?",
+    "filter": "Filter",
+    "phosphate5": "5'-phosphate",
+    "phosphate3": "3'-phosphate",
+    "noPhosphateGroup": "No phosphate group"
+  },
+  "macromoleculeProperties": {
+    "noData": "No Data Available",
+    "selectPeptide": "Select monomer, chain or part of a chain",
+    "selectNucleotide": "Select a nucleotide/nucleoside, chain or part of a chain containing nucleotides/nucleosides",
+    "isoelectricPoint": "Isoelectric Point",
+    "extinctionCoef": "Extinction Coef.(1/Mcm)",
+    "hydrophobicity": "Hydrophobicity",
+    "meltingTemp": "Melting Temp. (°C)",
+    "unipositiveIons": "[Unipositive Ions]",
+    "oligonucleotides": "[Oligonucleotides]"
+  },
+  "template": {
+    "placeholder": "template",
+    "selectedAttachmentPoints": "Selected attachment points"
   }
 }

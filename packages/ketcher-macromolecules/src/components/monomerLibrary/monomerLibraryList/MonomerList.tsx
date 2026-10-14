@@ -40,6 +40,7 @@ import {
 } from 'state/rna-builder';
 import { RnaPresetGroup } from '../RnaPresetGroup/RnaPresetGroup';
 import { IRnaPreset } from '../RnaBuilder/types';
+import { i18n } from 'ketcher-react';
 
 export type Group = {
   groupItems: Array<MonomerItemType>;
@@ -87,7 +88,9 @@ const MonomerList = ({
 
   return (
     <MonomerListContainer>
-      {isFavoriteTab && monomerGroups.length > 0 && <div>Monomers</div>}
+      {isFavoriteTab && monomerGroups.length > 0 && (
+        <div>{String(i18n.t('monomerLibrary.favoritesMonomers'))}</div>
+      )}
       {monomerGroups.map(({ groupItems, groupTitle }, _index, groups) => {
         return (
           <MonomerGroup
@@ -102,7 +105,7 @@ const MonomerList = ({
       })}
       {isFavoriteTab && (items as Favorites).presets.length > 0 && (
         <>
-          <div>Presets</div>
+          <div>{String(i18n.t('monomerLibrary.favoritesPresets'))}</div>
           <RnaPresetGroup
             duplicatePreset={duplicatePreset}
             editPreset={editPreset}
