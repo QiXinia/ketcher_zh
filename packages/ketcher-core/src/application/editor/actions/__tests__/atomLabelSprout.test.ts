@@ -296,7 +296,9 @@ describe('atom label editing and nickname replacement', () => {
   it('rejects isotope loss, multiple bonds, mapping conflicts and invalid attachment points before mutation', () => {
     const scenarios = [
       (f: ReturnType<typeof fixture>) => { f.struct.atoms.get(0)!.isotope = 13; },
-      (f: ReturnType<typeof fixture>) => { f.struct.bonds.get(0)!.type = 2; },
+      (f: ReturnType<typeof fixture>) => {
+        f.struct.bonds.set(0, new Bond({ ...f.struct.bonds.get(0)!, type: 2 }));
+      },
       (f: ReturnType<typeof fixture>) => { f.struct.atoms.get(0)!.charge = 1; },
       (f: ReturnType<typeof fixture>) => { f.struct.atoms.get(0)!.abnormalValence = true; },
       (f: ReturnType<typeof fixture>) => { f.struct.atoms.get(1)!.aam = 4; },

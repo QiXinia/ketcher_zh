@@ -35,7 +35,7 @@ const graph = (struct: Struct) => ({
   })),
 });
 const countElement = (struct: Struct, label: string) => [...struct.atoms.values()].filter(atom => atom.label === label).length;
-const connected = (struct: Struct, id: number) => struct.atomGetNeighbors(id).map(neighbor => ({ atom: struct.atoms.get(neighbor.aid)!, bond: struct.bonds.get(neighbor.bid)! }));
+const connected = (struct: Struct, id: number) => (struct.atomGetNeighbors(id) ?? []).map(neighbor => ({ atom: struct.atoms.get(neighbor.aid)!, bond: struct.bonds.get(neighbor.bid)! }));
 
 // Match complete labeled graphs, including the directed origin of stereo
 // bonds, against independently extracted reference data. Atom ordering differs
@@ -136,13 +136,15 @@ describe('contextual ChemDraw atom SPROUT', () => {
     expect(restruct.molecule.atomGetNeighbors(0)).toHaveLength(4);
     expect(newIds.has(0)).toBe(false);
     expect(result.bonds.map(id => restruct.molecule.bonds.get(id)!).filter(bond => bond.begin === 0 || bond.end === 0)).toHaveLength(2);
-    const neighborsOfNew = result.atoms.flatMap(id => restruct.molecule.atomGetNeighbors(id).map(n => n.aid));
+    const neighborsOfNew = result.atoms.flatMap(id => (restruct.molecule.atomGetNeighbors(id) ?? []).map(n => n.aid));
     expect(neighborsOfNew.filter(id => !newIds.has(id))).toEqual([0, 0]);
   });
 
   it.each([false, true])('adds an external phenyl at aromatic carbon (aromatized=%s), preserving the existing ring', aromatized => {
     const ring = createFusionRing('benzene');
-    if (aromatized) ring.bonds.forEach(bond => { bond.type = Bond.PATTERN.TYPE.AROMATIC; });
+    if (aromatized) ring.bonds.forEach((bond, id) => {
+      ring.bonds.set(id, new Bond({ ...bond, type: Bond.PATTERN.TYPE.AROMATIC }));
+    });
     const restruct = makeReStruct(ring);
     const oldBonds = [...ring.bonds.values()].map(bond => [bond.begin, bond.end, bond.type]);
     const result = fromSelectedAtomSprout(restruct, [0], 'phenyl');
@@ -197,7 +199,9 @@ describe('contextual ChemDraw atom SPROUT', () => {
 
   it('does not infer aromaticity from three nonalternating double bonds', () => {
     const ring = createFusionRing(6);
-    ring.bonds.forEach((bond, id) => { bond.type = [1, 2, 3].includes(id) ? 2 : 1; });
+    ring.bonds.forEach((bond, id) => {
+      ring.bonds.set(id, new Bond({ ...bond, type: [1, 2, 3].includes(id) ? 2 : 1 }));
+    });
     const restruct = makeReStruct(ring);
     const result = fromSelectedAtomSprout(restruct, [0], 'wedge-up');
     expect(result.atoms).toHaveLength(1);
@@ -326,9 +330,9 @@ describe('contextual ChemDraw atom SPROUT', () => {
     atom.sgs.add(8);
     expect(() => fromSelectedAtomSprout(restruct, [0], 'phenyl')).toThrow(/S-group/);
     atom.sgs.clear();
-    atom.customQuery = '[#6]';
+    atom.queryProperties.customQuery = '[#6]';
     expect(() => fromSelectedAtomSprout(restruct, [0], 'phenyl')).toThrow(/查询/);
-    atom.customQuery = null;
+    atom.queryProperties.customQuery = null;
     for (let i = 0; i < 36; i++) restruct.molecule.atoms.add(new Atom({ label: 'O', pp: new Vec2(Math.cos(i * Math.PI / 18), Math.sin(i * Math.PI / 18)) }));
     const crowded = graph(restruct.molecule);
     expect(() => fromSelectedAtomSprout(restruct, [0], 'methyl-linear')).toThrow(/重叠/);

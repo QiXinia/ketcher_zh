@@ -80,6 +80,9 @@ const config = {
     asPlugin(tsconfigPaths()),
     json(),
     typescript({
+      // Core declarations are rebuilt separately; stale diagnostics can retain
+      // their old alias paths even when a standalone tsc check passes.
+      clean: isProduction,
       tsconfigOverride: {
         exclude: ['*.test.ts'],
       },

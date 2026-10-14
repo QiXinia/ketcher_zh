@@ -93,7 +93,7 @@
     "rollup-plugin-string": "^3.0.0",
     "rollup-plugin-visualizer": "^5.5.2",
     "ts-jest": "^29.4.11",
-    "tsc-alias": "^1.8.17",
+    "tsc-alias": "1.8.17",
     "typedoc": "^0.28.19",
     "typedoc-plugin-markdown": "^4.11.0",
     "typescript": "^6.0.3"

@@ -14,6 +14,7 @@ import replace from '@rollup/plugin-replace';
 import strip from '@rollup/plugin-strip';
 import svgr from '@svgr/rollup';
 import typescript from 'rollup-plugin-typescript2';
+import ts from 'typescript';
 import { license } from '../../license-banner.mjs';
 import { string } from 'rollup-plugin-string';
 
@@ -97,7 +98,16 @@ const config = {
     }),
     json(),
     typescript({
+      // Resolve the compiler from this workspace, not the hoisted plugin's
+      // TypeScript 4.x dependency, which cannot parse bundler resolution.
+      typescript: ts,
       tsconfig: './tsconfig.build.json',
+      tsconfigOverride: {
+        compilerOptions: {
+          moduleResolution: 'bundler',
+          rootDir: 'src',
+        },
+      },
     }),
     babelPlugin({
       extensions,

@@ -3,6 +3,8 @@ import { ReStruct, Render } from 'application/render';
 import type { RenderOptions } from 'application/render/render.types';
 import { CoreEditor } from 'application/editor';
 import { BondRenderer } from 'application/render/renderers/BondRenderer';
+import { ketcherProvider } from 'application/ketcherProvider';
+import type { Ketcher } from 'application/ketcher';
 import { fromSelectedBondIndicatorVisibility } from 'application/editor/actions/bond';
 import { KetSerializer } from 'domain/serializers';
 import { validate } from 'domain/serializers/ket/validate';
@@ -62,7 +64,7 @@ describe('object-level bond indicator visibility', () => {
     expect(ket.serializeMicromolecules(struct)).toBe(changed);
     // Cloning and attribute hashes feed copy/paste and deletion restoration.
     expect(struct.clone().bonds.get(0)![property]).toBe(false);
-    expect(Bond.getAttrHash(struct.bonds.get(0))![property]).toBe(false);
+    expect(Bond.getAttrHash(struct.bonds.get(0)!)![property]).toBe(false);
   });
 
   it('preflights the complete selection and input before changing any bond', () => {
@@ -151,7 +153,7 @@ describe('object-level bond indicator visibility', () => {
     expect(texts()).toContain('-;!@');
   });
 
-  it('core SVG removes previous indicator nodes on a visibility change', () => {
+  it('core SVG reads persisted query visibility and removes previous indicator nodes', () => {
     const bond = new Bond({ begin: 0, end: 1, type: 1, topology: 1, reactingCenterStatus: 4 });
     const renderer: any = Object.create(BondRenderer.prototype);
     const root = document.createElementNS('http://www.w3.org/2000/svg', 'g');
@@ -161,7 +163,12 @@ describe('object-level bond indicator visibility', () => {
     Object.defineProperty(renderer, 'bondVectors', { value: { startPosition: new Vec2(0, 0), endPosition: new Vec2(40, 0) } });
     renderer.getDoubleBondShift = () => 0;
     const settings = { showQueryIndicators: true };
-    Object.defineProperty(renderer, 'editorSettings', { value: settings });
+    const getKetcher = jest.spyOn(ketcherProvider, 'getKetcher').mockReturnValue({
+      settingsService: { getSettings: () => settings },
+    } as Ketcher);
+    Object.defineProperty(renderer, 'editorSettings', {
+      value: { microModeScale: 40, macroModeScale: 40 },
+    });
     renderer.appendTopologyMark(bond);
     renderer.appendReactingCenterMark(bond);
     expect(root.querySelector('#topology-bond-7')!.textContent).toBe('rng');
@@ -186,5 +193,6 @@ describe('object-level bond indicator visibility', () => {
     renderer.appendReactingCenterMark(bond);
     expect(root.querySelector('#topology-bond-7')).not.toBeNull();
     expect(root.querySelector('#reacting-center-bond-7')).not.toBeNull();
+    getKetcher.mockRestore();
   });
 });
