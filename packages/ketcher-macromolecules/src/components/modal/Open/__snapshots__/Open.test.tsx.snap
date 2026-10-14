@@ -43,7 +43,7 @@ exports[`Open component should render correctly 1`] = `
             <div
               class="css-1uarmuk"
             >
-              Open Structure
+              打开结构
             </div>
             <span>
               <button

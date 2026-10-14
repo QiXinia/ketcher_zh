@@ -18,6 +18,7 @@ import { connect } from 'react-redux';
 import { error } from './constants';
 import { Dialog } from '../../../components';
 import { PasteErrorModalBody } from './PasteErrorModalBody';
+import i18n from '../../../../../../i18n';
 
 import styles from './InfoModal.module.less';
 
@@ -29,7 +30,13 @@ function ErrorInfoModal(props) {
   const paste = 'Paste';
   const isPasteError = props.message === paste;
 
-  const defaultCutCopyMessage = `This action is unavailable via menu. Instead, use shortcut to ${props.message}.`;
+  const actionKey = String(props.message || '').toLowerCase();
+  const action = i18n.exists(`action.${actionKey}`)
+    ? i18n.t(`action.${actionKey}`)
+    : props.message;
+  const defaultCutCopyMessage = i18n.t('infoModal.unavailableViaMenu', {
+    action,
+  });
 
   const headerContent = <div>{props.title ?? error.message}</div>;
 
@@ -44,7 +51,7 @@ function ErrorInfoModal(props) {
           key="ok"
           data-testid={props.testId || 'info-modal-close'}
         >
-          {props.button || 'Close'}
+          {props.button || i18n.t('infoModal.close')}
         </button>,
       ]}
       headerContent={headerContent}

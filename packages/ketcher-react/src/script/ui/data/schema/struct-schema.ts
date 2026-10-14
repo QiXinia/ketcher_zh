@@ -22,6 +22,7 @@ import {
   localizedInvalidMessage,
   localizedProperty,
 } from './i18n';
+import i18n from '../../../../i18n';
 
 interface CommonStructSchema {
   key?: string;
@@ -83,7 +84,9 @@ interface AtomProperties extends Record<string, SchemaProperty> {
 }
 
 export const atom: StructSchema<AtomProperties> = {
-  title: 'Atom',
+  get title() {
+    return i18n.t('atomProperties.atom');
+  },
   type: 'object',
   required: ['label'],
   properties: {
@@ -590,7 +593,9 @@ export const atom: StructSchema<AtomProperties> = {
 
 export const rgroupSchema: StructSchema = localizedProperty(
   {
-    title: 'R-Group',
+    get title() {
+      return i18n.t('rgroup.title');
+    },
     type: 'object',
     properties: {
       values: {
@@ -609,7 +614,9 @@ export const rgroupSchema: StructSchema = localizedProperty(
 
 export const labelEdit: StructSchema = localizedProperty(
   {
-    title: 'Label Edit',
+    get title() {
+      return i18n.t('rgroup.labelEdit');
+    },
     type: 'object',
     required: ['label'],
     properties: {
@@ -632,7 +639,9 @@ export const labelEdit: StructSchema = localizedProperty(
 ) as unknown as StructSchema;
 
 export const attachmentPoints: StructSchema = {
-  title: 'Attachment Points',
+  get title() {
+    return i18n.t('rgroup.attachmentPoints');
+  },
   type: 'object',
   properties: {
     primary: localizedProperty(
@@ -653,7 +662,9 @@ export const attachmentPoints: StructSchema = {
 };
 
 export const bond: StructSchema = {
-  title: 'Bond',
+  get title() {
+    return i18n.t('bondProperties.bond');
+  },
   type: 'object',
   required: ['type'],
   properties: {
@@ -828,7 +839,9 @@ export const bond: StructSchema = {
 const sgroup: Omit<StructSchema, 'properties'> & {
   oneOf?: Partial<StructSchema>[];
 } = {
-  title: 'SGroup',
+  get title() {
+    return i18n.t('sgroup.sgroup');
+  },
   type: 'object',
   required: ['type'],
   oneOf: [
@@ -837,12 +850,16 @@ const sgroup: Omit<StructSchema, 'properties'> & {
     },
     {
       key: 'MUL',
-      title: 'Multiple group',
+      get title() {
+        return i18n.t('sgroup.multipleGroup');
+      },
       type: 'object',
       properties: {
         type: { enum: ['MUL'] },
         mul: {
-          title: 'Repeat count',
+          get title() {
+            return i18n.t('sgroup.repeatCount');
+          },
           type: 'integer',
           default: 1,
           minimum: 1,
@@ -871,12 +888,16 @@ const sgroup: Omit<StructSchema, 'properties'> & {
     },
     {
       key: 'SRU',
-      title: 'SRU polymer',
+      get title() {
+        return i18n.t('sgroup.sruPolymer');
+      },
       type: 'object',
       properties: {
         type: { enum: ['SRU'] },
         subscript: {
-          title: 'Polymer label',
+          get title() {
+            return i18n.t('sgroup.polymerLabel');
+          },
           type: 'string',
           default: 'n',
           // any string, except empty and including double quotes
@@ -885,7 +906,9 @@ const sgroup: Omit<StructSchema, 'properties'> & {
             'SRU subscript should not be empty and contain double quotes',
         },
         connectivity: {
-          title: 'Repeat Pattern',
+          get title() {
+            return i18n.t('sgroup.repeatPattern');
+          },
           enum: ['ht', 'hh', 'eu'],
           enumNames: ['Head-to-tail', 'Head-to-head', 'Either unknown'],
           default: 'ht',
@@ -913,17 +936,23 @@ const sgroup: Omit<StructSchema, 'properties'> & {
     },
     {
       key: 'COP',
-      title: 'Copolymer',
+      get title() {
+        return i18n.t('sgroup.copolymer');
+      },
       type: 'object',
       properties: {
         type: { enum: ['COP'] },
         subtype: {
-          title: 'Subtype',
+          get title() {
+            return i18n.t('sgroup.subtype');
+          },
           enum: ['ran', 'blo', 'alt'],
           enumNames: ['Random', 'Block', 'Alternating'],
         },
         connectivity: {
-          title: 'Repeat Pattern',
+          get title() {
+            return i18n.t('sgroup.repeatPattern');
+          },
           enum: ['ht', 'hh', 'eu'],
           enumNames: ['Head-to-tail', 'Head-to-head', 'Either unknown'],
           default: 'ht',
@@ -951,12 +980,16 @@ const sgroup: Omit<StructSchema, 'properties'> & {
     },
     {
       key: 'SUP',
-      title: 'Superatom',
+      get title() {
+        return i18n.t('sgroup.superatom');
+      },
       type: 'object',
       properties: {
         type: { enum: ['SUP'] },
         name: {
-          title: 'Name',
+          get title() {
+            return i18n.t('sgroup.name');
+          },
           type: 'string',
           default: '',
           minLength: 1,
@@ -985,7 +1018,9 @@ const sgroup: Omit<StructSchema, 'properties'> & {
     },
     {
       key: 'queryComponent',
-      title: 'Query component',
+      get title() {
+        return i18n.t('sgroup.queryComponent');
+      },
       type: 'object',
       properties: {
         type: { enum: ['queryComponent'] },
@@ -993,12 +1028,16 @@ const sgroup: Omit<StructSchema, 'properties'> & {
     },
     {
       key: 'nucleotideComponent',
-      title: 'Nucleotide Component',
+      get title() {
+        return i18n.t('sgroup.nucleotideComponent');
+      },
       type: 'object',
       properties: {
         type: { enum: ['nucleotideComponent'] },
         class: {
-          title: 'Component',
+          get title() {
+            return i18n.t('sgroup.component');
+          },
           enum: ['SUGAR', 'BASE', 'PHOSPHATE'],
           enumNames: ['Sugar', 'Base', 'Phosphate'],
           default: 'Sugar',
@@ -1013,7 +1052,9 @@ export const sgroupMap: Record<string, StructSchema> = mapOf(sgroup, 'type');
 
 export const rgroupLogic: StructSchema = localizedProperty(
   {
-    title: 'R-Group',
+    get title() {
+      return i18n.t('rgroup.title');
+    },
     type: 'object',
     properties: {
       range: localizedInvalidMessage(
@@ -1050,7 +1091,9 @@ export const rgroupLogic: StructSchema = localizedProperty(
 ) as unknown as StructSchema;
 
 export const textSchema: StructSchema = {
-  title: 'Text Edit',
+  get title() {
+    return i18n.t('dialog.textEdit');
+  },
   type: 'object',
   required: ['label'],
   properties: {
@@ -1062,7 +1105,9 @@ export const textSchema: StructSchema = {
 };
 
 export const attachSchema: StructSchema = {
-  title: 'Template edit',
+  get title() {
+    return i18n.t('templates.templateEdit');
+  },
   type: 'object',
   required: ['name'],
   properties: {

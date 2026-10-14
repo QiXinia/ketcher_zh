@@ -51,6 +51,7 @@ import {
   getVisibleAttachmentPointsForRnaPreset,
 } from './RnaPresetAttachmentPointsVisibility';
 import { hasRequiredRnaPresetComponents } from './RnaPresetStructureValidation';
+import i18n from '../../../../../i18n';
 
 interface IRnaPresetTabsProps {
   wizardState: RnaPresetWizardState;
@@ -72,9 +73,9 @@ const ACTIVE_HIGHLIGHT_COLOR = '#CDF1FC';
 const INACTIVE_HIGHLIGHT_COLOR = '#EFF2F5';
 const RNA_COMPONENT_KEYS = ['base', 'sugar', 'phosphate'] as const;
 const RNA_COMPONENT_HINTS: Record<RnaPresetComponentKey, string> = {
-  base: 'Select all atoms that form the base.',
-  sugar: 'Select all atoms that form the sugar.',
-  phosphate: 'Select all atoms that form the phosphate.',
+  base: 'monomerWizard.selectBaseAtoms',
+  sugar: 'monomerWizard.selectSugarAtoms',
+  phosphate: 'monomerWizard.selectPhosphateAtoms',
 };
 
 export const RnaPresetTabs = (props: IRnaPresetTabsProps) => {
@@ -335,7 +336,11 @@ export const RnaPresetTabs = (props: IRnaPresetTabsProps) => {
             hasErrorInTab(wizardState.preset) && styles.errorTab,
           )}
           data-testid="nucleotide-preset-tab"
-          label={<div className={styles.tabLabel}>Preset</div>}
+          label={
+            <div className={styles.tabLabel}>
+              {i18n.t('monomerWizard.typeLabels.preset')}
+            </div>
+          }
           icon={<Icon name="preset" />}
         />
         <Tab
@@ -345,7 +350,11 @@ export const RnaPresetTabs = (props: IRnaPresetTabsProps) => {
               styles.errorTab,
           )}
           data-testid="nucleotide-base-tab"
-          label={<div className={styles.tabLabel}>Base</div>}
+          label={
+            <div className={styles.tabLabel}>
+              {i18n.t('monomerWizard.typeLabels.base')}
+            </div>
+          }
           icon={<Icon name="base" />}
         />
         <Tab
@@ -355,7 +364,11 @@ export const RnaPresetTabs = (props: IRnaPresetTabsProps) => {
               styles.errorTab,
           )}
           data-testid="nucleotide-sugar-tab"
-          label={<div className={styles.tabLabel}>Sugar</div>}
+          label={
+            <div className={styles.tabLabel}>
+              {i18n.t('monomerWizard.typeLabels.sugar')}
+            </div>
+          }
           icon={<Icon name="sugar" />}
         />
         <Tab
@@ -365,7 +378,11 @@ export const RnaPresetTabs = (props: IRnaPresetTabsProps) => {
               styles.errorTab,
           )}
           data-testid="nucleotide-phosphate-tab"
-          label={<div className={styles.tabLabel}>Phosphate</div>}
+          label={
+            <div className={styles.tabLabel}>
+              {i18n.t('monomerWizard.typeLabels.phosphate')}
+            </div>
+          }
           icon={<Icon name="phosphate" />}
         />
       </Tabs>
@@ -373,7 +390,7 @@ export const RnaPresetTabs = (props: IRnaPresetTabsProps) => {
         {selectedTab === 0 && (
           <>
             <AttributeField
-              title="Code"
+              title={i18n.t('monomerWizard.code')}
               control={
                 <input
                   type="text"
@@ -382,7 +399,7 @@ export const RnaPresetTabs = (props: IRnaPresetTabsProps) => {
                     wizardState.preset.errors.name &&
                       monomerCreationWizardStyles.inputError,
                   )}
-                  placeholder="e.g. Diethylene Glycol"
+                  placeholder={i18n.t('monomerWizard.exampleDiethyleneGlycol')}
                   value={wizardState.preset.name}
                   data-testid="code-input"
                   onChange={(event: ChangeEvent<HTMLInputElement>) =>
@@ -405,13 +422,13 @@ export const RnaPresetTabs = (props: IRnaPresetTabsProps) => {
                 <p
                   className={monomerCreationWizardStyles.attachmentPointsTitle}
                 >
-                  Attachment points
+                  {i18n.t('monomerWizard.attachmentPoints')}
                 </p>
                 <span
                   className={
                     monomerCreationWizardStyles.attachmentPointInfoIcon
                   }
-                  title="To add new attachment points, right-click and mark atoms as leaving groups or connection points."
+                  title={i18n.t('monomerWizard.addAttachmentPoints')}
                   data-testid="attachment-point-info-icon"
                 >
                   <Icon name="about" />
@@ -441,7 +458,7 @@ export const RnaPresetTabs = (props: IRnaPresetTabsProps) => {
             index + 1 === selectedTab && (
               <Fragment key={rnaComponentKey}>
                 <div className={styles.createComponentWrapper}>
-                  <div>{RNA_COMPONENT_HINTS[rnaComponentKey]}</div>
+                  <div>{i18n.t(RNA_COMPONENT_HINTS[rnaComponentKey])}</div>
                   <button
                     data-testid={`Mark-as-${rnaComponentKey}-button`}
                     className={clsx(
@@ -465,7 +482,7 @@ export const RnaPresetTabs = (props: IRnaPresetTabsProps) => {
                   attachmentPointsExtra={
                     rnaComponentKey === 'phosphate' ? (
                       <AttributeField
-                        title="Position"
+                        title={i18n.t('monomerWizard.position')}
                         required
                         control={
                           <div
@@ -494,7 +511,7 @@ export const RnaPresetTabs = (props: IRnaPresetTabsProps) => {
                               <span
                                 className={styles.phosphatePositionButtonLabel}
                               >
-                                5&apos;-left
+                                {i18n.t('monomerWizard.fivePrimeLeft')}
                               </span>
                             </button>
                             <button
@@ -515,7 +532,7 @@ export const RnaPresetTabs = (props: IRnaPresetTabsProps) => {
                               <span
                                 className={styles.phosphatePositionButtonLabel}
                               >
-                                3&apos;-right
+                                {i18n.t('monomerWizard.threePrimeRight')}
                               </span>
                             </button>
                           </div>

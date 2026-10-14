@@ -43,7 +43,7 @@ exports[`Save modal renders correctly 1`] = `
             <div
               class="css-1uarmuk"
             >
-              save structure
+              保存结构
             </div>
             <span>
               <button
@@ -181,7 +181,7 @@ exports[`Save modal renders correctly 1`] = `
                 <button
                   class="css-urisxd"
                   data-testid="copy-to-clipboard"
-                  title="Copy to clipboard"
+                  title="复制到剪贴板"
                 >
                   <svg
                     class="css-2ntgcm"
@@ -207,10 +207,10 @@ exports[`Save modal renders correctly 1`] = `
               class="MuiButtonBase-root css-fevlc0-MuiButtonBase-root"
               data-testid="cancel-button"
               tabindex="0"
-              title="Cancel"
+              title="取消"
               type="button"
             >
-              Cancel
+              取消
               <span
                 class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
               />
@@ -219,10 +219,10 @@ exports[`Save modal renders correctly 1`] = `
               class="MuiButtonBase-root css-1gvl3mi-MuiButtonBase-root"
               data-testid="save-button"
               tabindex="0"
-              title="Save"
+              title="保存"
               type="button"
             >
-              Save
+              保存
               <span
                 class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
               />

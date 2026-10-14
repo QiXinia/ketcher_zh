@@ -223,7 +223,7 @@ function Editor({
             setMonomerLibraryLoadError(
               err instanceof Error
                 ? err.message
-                : 'Failed to load monomers library',
+                : i18n.t('macromolecules.failedLoadLibrary'),
             ),
           );
         },

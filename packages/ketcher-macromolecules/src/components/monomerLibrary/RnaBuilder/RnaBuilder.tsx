@@ -16,6 +16,7 @@
 
 import { RnaEditor } from './RnaEditor';
 import { RnaBuilderContainer } from './styles';
+import { i18n } from 'ketcher-react';
 import { useAppDispatch, useAppSelector, useIsCompactView } from 'hooks';
 import {
   selectUniqueNameError,
@@ -64,7 +65,7 @@ export const RnaBuilder = ({ libraryName, duplicatePreset, editPreset }) => {
           Boolean(invalidPresetError) ||
           Boolean(invalidPresetNameError)
         }
-        title="Error Message"
+        title={i18n.t('infoModal.errorMessage')}
         onClose={closeErrorModal}
       >
         <Modal.Content>
