@@ -570,6 +570,23 @@ class ReAtom extends ReObject {
       restruct.addReObjectPath(LayerMap.indices, this.visel, index.path, ps);
     }
 
+    if (options.showAtomNumbers) {
+      const atomNumber = render.paper
+        .text(ps.x + options.fontszsubInPx, ps.y - options.fontszsubInPx, String(aid + 1))
+        .attr({
+          font: options.font,
+          'font-size': options.fontszsubInPx,
+          fill: '#555',
+          'pointer-events': 'none',
+        });
+      restruct.addReObjectPath(
+        LayerMap.indices,
+        this.visel,
+        atomNumber,
+        ps,
+      );
+    }
+
     if (this.showLabel) {
       let hydroIndex: any = null;
       if (isHydrogen && implh > 0) {
@@ -1036,12 +1053,14 @@ class ReAtom extends ReObject {
     // TODO: fragment should not be null
     const fragment = restruct.molecule.frags.get(fragmentId);
 
-    const displayStereoLabel = shouldDisplayStereoLabel(
-      stereoLabel,
-      options.stereoLabelStyle,
-      options.ignoreChiralFlag,
-      fragment?.enhancedStereoFlag,
-    );
+    const displayStereoLabel =
+      options.showEnhancedStereochemistry !== false &&
+      shouldDisplayStereoLabel(
+        stereoLabel,
+        options.stereoLabelStyle,
+        options.ignoreChiralFlag,
+        fragment?.enhancedStereoFlag,
+      );
 
     let text = '';
 
@@ -1049,7 +1068,11 @@ class ReAtom extends ReObject {
       text = `${stereoLabel}\n`;
     }
 
-    if (shortenCustomQueryText.length > 0) {
+    if (options.showStereochemistry && this.a.cip) {
+      text += `${this.a.cip}\n`;
+    }
+
+    if (options.showQueryIndicators !== false && shortenCustomQueryText.length > 0) {
       text += `${shortenCustomQueryText}\n`;
     }
 
@@ -1240,6 +1263,14 @@ class ReAtom extends ReObject {
       this.a.substitutionCount ?? '',
     );
     atomElement?.node?.setAttribute(
+      'data-atomSubstitutionQueryMode',
+      this.a.queryProperties.substitutionQuery?.mode ?? '',
+    );
+    atomElement?.node?.setAttribute(
+      'data-atomSubstitutionQueryCount',
+      this.a.queryProperties.substitutionQuery?.count ?? '',
+    );
+    atomElement?.node?.setAttribute(
       'data-atomUnsaturated',
       this.a.unsaturatedAtom ?? '',
     );
@@ -1250,6 +1281,14 @@ class ReAtom extends ReObject {
     atomElement?.node?.setAttribute(
       'data-atomImplicitHCount',
       this.a.implicitHCount ?? '',
+    );
+    atomElement?.node?.setAttribute(
+      'data-atomUnsaturationQuery',
+      this.a.queryProperties.unsaturation ?? '',
+    );
+    atomElement?.node?.setAttribute(
+      'data-atomTranslationQuery',
+      this.a.queryProperties.translation ?? '',
     );
     atomElement?.node?.setAttribute(
       'data-atomRingMembership',
@@ -1404,18 +1443,39 @@ function isLabelVisible(restruct, options, atom: ReAtom) {
     options.showHydrogenLabels !== ShowHydrogenLabels.Off &&
     options.showHydrogenLabels !== ShowHydrogenLabels.Hetero;
 
+  const isTerminalCarbon = isCarbon && visibleNeighbors.length === 1;
   const neighborsLength =
     visibleNeighbors.length === 0 ||
-    (visibleNeighbors.length < 2 && visibleTerminal);
+    (visibleNeighbors.length < 2 &&
+      (isTerminalCarbon
+        ? options.showTerminalCarbonLabels
+        : visibleTerminal));
 
   if (isAttachmentPointAtom && isCarbon) {
     return false;
   }
 
+  if (isTerminalCarbon && !options.showTerminalCarbonLabels) {
+    return Boolean(
+      atom.a.alias ||
+        atom.a.isotope !== null ||
+        atom.a.radical !== 0 ||
+        atom.a.charge !== null ||
+        atom.a.explicitValence >= 0 ||
+        atom.a.atomList !== null ||
+        atom.a.rglabel !== null ||
+        atom.a.isQuery() ||
+        atom.a.hasRxnProps() ||
+        (atom.a.badConn && options.showValenceWarnings) ||
+        atom.a.label.toLowerCase() !== 'c',
+    );
+  }
+
   const shouldBeVisible =
     neighborsLength ||
     options.carbonExplicitly ||
-    options.showHydrogenLabels === ShowHydrogenLabels.On ||
+    (options.showHydrogenLabels === ShowHydrogenLabels.On &&
+      !isTerminalCarbon) ||
     atom.a.alias ||
     atom.a.isotope !== null ||
     atom.a.radical !== 0 ||
@@ -1513,7 +1573,13 @@ function getOnlyQueryAttributesCustomQuery(atom: Atom) {
       },
       true,
     );
-  return queryText;
+  const extensions = [
+    atom.queryProperties.unsaturation &&
+      `unsaturation:${atom.queryProperties.unsaturation}`,
+    atom.queryProperties.translation &&
+      `translation:${atom.queryProperties.translation}`,
+  ].filter(Boolean);
+  return [queryText, ...extensions].filter(Boolean).join(';');
 }
 
 function addTooltip(node, text: string) {
@@ -2050,6 +2116,7 @@ export function checkIsSmartPropertiesExist(atom) {
     'chirality',
     'aromaticity',
     'customQuery',
+    'substitutionQuery',
   ];
   return smartsSpecificProperties.some((name) => atom.queryProperties?.[name]);
 }
@@ -2087,6 +2154,14 @@ export function getAtomCustomQuery(atom, includeOnlyQueryAttributes?: boolean) {
     ringSize: (value) => `r${value}`,
     connectivity: (value) => `X${value}`,
     chirality: (value) => (value === 'clockwise' ? '@@' : '@'),
+    substitutionQuery: (value) => {
+      if (!value || typeof value !== 'object') return '';
+      const { mode, count } = value;
+      if (mode === 'free-sites') return count === 0 ? 's*' : `s*${count}`;
+      if (mode === 'up-to') return `s<=${count}`;
+      if (mode === 'exactly') return `s=${count}`;
+      return '';
+    },
   };
 
   for (const propertyName in patterns) {
@@ -2117,12 +2192,27 @@ function getQueryAttrsText(atom): string {
     if (queryAttrsText.length > 0) queryAttrsText += ';';
   };
 
-  const { ringBondCount, substitutionCount, unsaturatedAtom, hCount } = atom.a;
+  const {
+    ringBondCount,
+    substitutionCount,
+    unsaturatedAtom,
+    hCount,
+    implicitHCount,
+    queryProperties,
+  } = atom.a;
+  const substitutionQuery = atom.a.queryProperties?.substitutionQuery;
 
   if (ringBondCount !== 0) {
     queryAttrsText += getRingBondCountAttrText(ringBondCount);
   }
-  if (substitutionCount !== 0) {
+  if (substitutionQuery) {
+    addSemicolon();
+    queryAttrsText += substitutionQuery.mode === 'free-sites'
+      ? substitutionQuery.count === 0 ? 's*' : `s*${substitutionQuery.count}`
+      : substitutionQuery.mode === 'up-to'
+        ? `s<=${substitutionQuery.count}`
+        : `s=${substitutionQuery.count}`;
+  } else if (substitutionCount !== 0) {
     addSemicolon();
     queryAttrsText += getSubstitutionCountAttrText(substitutionCount);
   }
@@ -2134,6 +2224,21 @@ function getQueryAttrsText(atom): string {
   if (hCount > 0) {
     addSemicolon();
     queryAttrsText += 'H' + (hCount - 1).toString();
+  }
+  if (implicitHCount !== null && implicitHCount !== undefined) {
+    addSemicolon();
+    queryAttrsText += `h${implicitHCount}`;
+  }
+  // These two ChemDraw predicates have no standard SMARTS spelling.  Keep
+  // them visible as explicit Ketcher query annotations instead of emitting a
+  // token that another parser could mistake for SMARTS.
+  if (queryProperties?.unsaturation) {
+    addSemicolon();
+    queryAttrsText += `unsaturation:${queryProperties.unsaturation}`;
+  }
+  if (queryProperties?.translation) {
+    addSemicolon();
+    queryAttrsText += `translation:${queryProperties.translation}`;
   }
   return queryAttrsText;
 }

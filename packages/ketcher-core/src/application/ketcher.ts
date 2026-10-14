@@ -57,7 +57,15 @@ import {
   parseAndAddMacromoleculesOnCanvas,
   prepareStructToRender,
 } from './utils';
-import { fromTextCreation } from './editor/actions';
+import { Action, fromMoleculesInCircle, fromTextCreation } from './editor/actions';
+import {
+  DocumentAnnotationsSet,
+  DocumentPropertiesSet,
+  ObjectAnnotationsSet,
+  type ObjectAnnotationTarget,
+} from './editor/operations';
+import type { DocumentAnnotation, DocumentProperty } from 'domain/entities/struct';
+import type { ObjectAnnotation } from 'domain/entities/BaseMicromoleculeEntity';
 import { Vec2 } from 'domain/entities/vec2';
 import { type EditorSelection, EditorType } from './editor/editor.types';
 import {
@@ -84,6 +92,15 @@ type AddTextOptions = {
   width?: number;
   height?: number;
 };
+
+function isKetDocument(structStr: string): boolean {
+  try {
+    const document = JSON.parse(structStr) as { ket_version?: unknown };
+    return Boolean(document && typeof document === 'object' && typeof document.ket_version === 'string');
+  } catch {
+    return false;
+  }
+}
 
 const allowedApiSettings = {
   'general.dearomatize-on-load': 'dearomatize-on-load',
@@ -162,9 +179,18 @@ export class Ketcher {
    * Updates editor and triggers re-render if needed
    */
   #onSettingsChanged(settings: Settings): void {
-    // This will be called when settings change
-    // The editor will need to be updated with new settings
-    // For now, this is a placeholder for Phase 2 integration
+    // The macromolecule renderer reads display settings while constructing
+    // atom labels, so refresh them after settings change. The legacy molecule
+    // renderer is refreshed by the React/Redux settings bridge.
+    try {
+      const editor = provideEditorInstance();
+      if (editor.ketcherId !== this.id) return;
+      editor.renderersContainer.atoms.forEach((renderer) =>
+        renderer.redrawLabel(),
+      );
+    } catch {
+      // No macromolecule editor is active for this Ketcher instance.
+    }
     KetcherLogger.info('Settings changed', settings);
   }
 
@@ -345,22 +371,11 @@ export class Ketcher {
     position: { x: number; y: number },
     options: AddTextOptions = {},
   ): number {
-    if (
-      !content ||
-      !position ||
-      !Number.isFinite(position.x) ||
-      !Number.isFinite(position.y)
-    ) {
+    if (!content || !position || !Number.isFinite(position.x) || !Number.isFinite(position.y)) {
       throw new Error('Text content and position are required');
     }
-    const width =
-      Number.isFinite(options.width) && (options.width as number) > 0
-        ? (options.width as number)
-        : 2;
-    const height =
-      Number.isFinite(options.height) && (options.height as number) > 0
-        ? (options.height as number)
-        : 0.7;
+    const width = Number.isFinite(options.width) && (options.width as number) > 0 ? (options.width as number) : 2;
+    const height = Number.isFinite(options.height) && (options.height as number) > 0 ? (options.height as number) : 0.7;
     const topLeft = new Vec2(position.x, position.y);
     const pos = [
       topLeft,
@@ -368,15 +383,141 @@ export class Ketcher {
       new Vec2(position.x + width, position.y + height),
       new Vec2(position.x + width, position.y),
     ];
-    const action = fromTextCreation(
-      this.editor.render.ctab,
-      content,
-      topLeft,
-      pos,
-    );
+    const action = fromTextCreation(this.editor.render.ctab, content, topLeft, pos);
     this.editor.update(action);
     const ids = [...this.editor.struct().texts.keys()];
     return ids[ids.length - 1] ?? -1;
+  }
+
+  getDocumentAnnotations(): DocumentAnnotation[] {
+    return this.editor.struct().annotations.map((annotation) => ({ ...annotation }));
+  }
+
+  setDocumentAnnotations(annotations: DocumentAnnotation[]): void {
+    if (!Array.isArray(annotations)) {
+      throw new Error('Document annotations must be an array');
+    }
+    const normalized = annotations
+      .filter(
+        (annotation) =>
+          annotation &&
+          typeof annotation.keyword === 'string' &&
+          typeof annotation.content === 'string',
+      )
+      .map((annotation) => ({
+        keyword: annotation.keyword,
+        content: annotation.content,
+      }));
+    const action = new Action();
+    action.addOp(new DocumentAnnotationsSet(normalized));
+    this.editor.update(action.perform(this.editor.render.ctab));
+  }
+
+  getDocumentProperties(): DocumentProperty[] {
+    return this.editor.struct().properties.map((property) => ({ ...property }));
+  }
+
+  setDocumentProperties(properties: DocumentProperty[]): void {
+    if (!Array.isArray(properties)) {
+      throw new Error('Document properties must be an array');
+    }
+    const normalized = properties
+      .filter(
+        (property) =>
+          property &&
+          typeof property.name === 'string' &&
+          typeof property.value === 'string' &&
+          typeof property.type === 'string' &&
+          typeof property.rule === 'string' &&
+          typeof property.status === 'string',
+      )
+      .map((property) => ({
+        name: property.name,
+        value: property.value,
+        type: property.type,
+        rule: property.rule,
+        status: property.status,
+      }));
+    const action = new Action();
+    action.addOp(new DocumentPropertiesSet(normalized));
+    this.editor.update(action.perform(this.editor.render.ctab));
+  }
+
+  private selectedObjectAnnotationTargets(): ObjectAnnotationTarget[] {
+    const selection = this.editor.selection() as
+      | (EditorSelection & { sgroupData?: number[] })
+      | null;
+    if (!selection) return [];
+
+    const mapNames: ObjectAnnotationTarget['mapName'][] = [
+      'atoms',
+      'bonds',
+      'sgroups',
+      'rxnArrows',
+      'rxnPluses',
+      'simpleObjects',
+      'texts',
+      'images',
+      'multitailArrows',
+    ];
+    const targets = mapNames.flatMap((mapName) =>
+      (selection[mapName] ?? []).map((id) => ({ mapName, id })),
+    );
+    // Ketcher selects DAT/S-group data through `sgroupData`, while the
+    // annotations live on the corresponding molecule `sgroups` entity.
+    const existingSgroups = new Set(
+      targets
+        .filter((target) => target.mapName === 'sgroups')
+        .map((target) => target.id),
+    );
+    for (const id of selection.sgroupData ?? []) {
+      if (!existingSgroups.has(id)) {
+        targets.push({ mapName: 'sgroups', id });
+        existingSgroups.add(id);
+      }
+    }
+    return targets;
+  }
+
+  getSelectedObjectAnnotationTargetCount(): number {
+    return this.selectedObjectAnnotationTargets().length;
+  }
+
+  getSelectedObjectAnnotations(): ObjectAnnotation[] {
+    const targets = this.selectedObjectAnnotationTargets();
+    if (!targets.length) return [];
+    const annotations = targets.map(
+      ({ mapName, id }) =>
+        this.editor.render.ctab.molecule[mapName]?.get(id)?.annotations ?? [],
+    );
+    const first = annotations[0].map((annotation) => ({ ...annotation }));
+    return annotations.every(
+      (value) => JSON.stringify(value) === JSON.stringify(first),
+    )
+      ? first
+      : [];
+  }
+
+  setSelectedObjectAnnotations(annotations: ObjectAnnotation[]): void {
+    if (!Array.isArray(annotations)) {
+      throw new Error('Object annotations must be an array');
+    }
+    const targets = this.selectedObjectAnnotationTargets();
+    if (!targets.length) return;
+    const normalized = annotations
+      .filter(
+        (annotation) =>
+          annotation &&
+          typeof annotation.keyword === 'string' &&
+          typeof annotation.content === 'string',
+      )
+      .map((annotation) => ({
+        keyword: annotation.keyword,
+        content: annotation.content,
+      }));
+    const action = new Action();
+    action.addOp(new ObjectAnnotationsSet(targets, normalized));
+    this.editor.update(action.perform(this.editor.render.ctab));
   }
 
   getFasta(): Promise<string> {
@@ -390,11 +531,9 @@ export class Ketcher {
   }
 
   async getHelm(): Promise<string> {
-    return (
-      await this.indigo.convert(await this.getKet(), {
-        outputFormat: ChemicalMimeType.HELM,
-      })
-    ).struct;
+    return (await this.indigo.convert(await this.getKet(), {
+      outputFormat: ChemicalMimeType.HELM,
+    })).struct;
   }
 
   async getSequence(
@@ -588,63 +727,57 @@ export class Ketcher {
   ): Promise<void | undefined> {
     const macromoleculesEditor = provideEditorInstance();
     if (macromoleculesEditor?.isSequenceEditInRNABuilderMode) {
-      throw new Error(
-        'Finish RNA Builder sequence editing before replacing the document',
-      );
+      throw new Error('Finish RNA Builder sequence editing before replacing the document');
     }
 
-    await runAsyncAction<void>(
-      async () => {
-        assert(typeof structStr === 'string');
+    await runAsyncAction<void>(async () => {
+      assert(typeof structStr === 'string');
 
-        if (window.isPolymerEditorTurnedOn) {
-          await parseAndAddMacromoleculesOnCanvas(
-            structStr,
-            this.structService,
-            false,
-            true,
-          );
+      if (window.isPolymerEditorTurnedOn) {
+        await parseAndAddMacromoleculesOnCanvas(
+          structStr, this.structService, false, true,
+        );
 
-          if (options?.needZoom !== false) {
-            macromoleculesEditor?.zoomToStructuresIfNeeded();
-            macromoleculesEditor.mode.initialize();
-          }
-        } else {
-          const struct: Struct = await prepareStructToRender(
-            structStr,
-            this.structService,
-            this,
-          );
-
-          const preserveCanvasPosition =
-            options?.preserveCanvasPosition === true;
-
-          if (!preserveCanvasPosition) {
-            struct.rescale();
-          }
-
-          const { x, y } = options?.position ?? {};
-
-          // System coordinates for browser and for chemistry files format (mol, ket, etc.) area are different.
-          // It needs to rotate them by 180 degrees in y-axis.
-          this.editor.struct(struct, false, x, isNumber(y) ? -y : y);
-
-          // Restore selection from initiallySelected flags in the loaded structure
-          this.editor.selection(getSelectionFromStruct(this.editor.struct()));
-          // Clean up initiallySelected flags after restoring selection
-          this.editor.struct().disableInitiallySelected();
-
-          if (!preserveCanvasPosition) {
-            this.editor.zoomAccordingContent(struct);
-          }
-          if (x == null && y == null && !preserveCanvasPosition) {
-            this.editor.centerStruct();
-          }
+        if (options?.needZoom !== false) {
+          macromoleculesEditor?.zoomToStructuresIfNeeded();
+          macromoleculesEditor.mode.initialize();
         }
-      },
-      this.eventBus,
-      true,
-    );
+      } else {
+        const struct: Struct = await prepareStructToRender(
+          structStr,
+          this.structService,
+          this,
+        );
+
+        // KET stores editor coordinates verbatim. Re-centering an imported KET
+        // document changes the absolute positions after a rotate/flip and
+        // breaks a save/reopen round-trip. Keep the explicit option for other
+        // callers, and make the default KET path preserve its coordinates.
+        const preserveCanvasPosition = options?.preserveCanvasPosition === true || isKetDocument(structStr);
+
+        if (!preserveCanvasPosition) {
+          struct.rescale();
+        }
+
+        const { x, y } = options?.position ?? {};
+
+        // System coordinates for browser and for chemistry files format (mol, ket, etc.) area are different.
+        // It needs to rotate them by 180 degrees in y-axis.
+        this.editor.struct(struct, false, x, isNumber(y) ? -y : y);
+
+        // Restore selection from initiallySelected flags in the loaded structure
+        this.editor.selection(getSelectionFromStruct(this.editor.struct()));
+        // Clean up initiallySelected flags after restoring selection
+        this.editor.struct().disableInitiallySelected();
+
+        if (!preserveCanvasPosition) {
+          this.editor.zoomAccordingContent(struct);
+        }
+        if (x == null && y == null && !preserveCanvasPosition) {
+          this.editor.centerStruct();
+        }
+      }
+    }, this.eventBus, true);
   }
 
   async setHelm(helmStr: string): Promise<void | undefined> {
@@ -766,6 +899,17 @@ export class Ketcher {
       );
       const ketSerializer = new KetSerializer();
       await this.setMolecule(ketSerializer.serialize(struct));
+    }, this.eventBus);
+  }
+
+  async layoutMoleculesInCircle(): Promise<void> {
+    if (window.isPolymerEditorTurnedOn) {
+      throw new Error('Circular molecule layout is not available in macro mode');
+    }
+
+    await runAsyncAction<void>(async () => {
+      const action = fromMoleculesInCircle(this.editor.render.ctab);
+      this.editor.update(action);
     }, this.eventBus);
   }
 

@@ -47,6 +47,7 @@ export class AtomRenderer extends BaseRenderer {
   private radicalElement?: D3SvgElementSelection<SVGGElement, void>;
   private cipLabelElement?: D3SvgElementSelection<SVGGElement, void>;
   private stereoLabelElement?: D3SvgElementSelection<SVGGElement, void>;
+  private atomNumberElement?: D3SvgElementSelection<SVGTextElement, void>;
   private badValenceElement?: D3SvgElementSelection<SVGLineElement, void>;
 
   private cipLabelElementBBox?: SVGRect;
@@ -84,6 +85,7 @@ export class AtomRenderer extends BaseRenderer {
       .attr('data-atomLabel', this.atom.label ?? '')
       .attr('data-atomCharge', this.atom.properties.charge ?? '')
       .attr('data-atomIsotopeAtomicMass', this.atom.properties.isotope ?? '')
+      .attr('data-atomIsotopicAbundance', this.atom.properties.isotopicAbundance ?? '')
       .attr('data-atomValence', this.atom.properties.explicitValence ?? '')
       .attr('data-atomRadical', this.atom.properties.radical ?? '')
       .attr('data-atomRingBondCount', '')
@@ -300,6 +302,13 @@ export class AtomRenderer extends BaseRenderer {
     return this.atom.properties.alias ?? this.atom.label;
   }
 
+  private get displaySettings() {
+    const editor = provideEditorInstance();
+    return ketcherProvider
+      .getKetcher(editor.ketcherId)
+      .settingsService?.getSettings();
+  }
+
   private get isAtomTerminal() {
     const editor = provideEditorInstance();
     const viewModel = editor.viewModel;
@@ -323,6 +332,21 @@ export class AtomRenderer extends BaseRenderer {
     const hasAlias = this.atom.hasAlias;
     const hasExplicitValence = this.atom.hasExplicitValence;
     const hasExplicitIsotope = this.atom.hasExplicitIsotope;
+
+    if (
+      isCarbon &&
+      isAtomTerminal &&
+      (atomNeighborsHalfEdges?.length ?? 0) > 0 &&
+      !this.displaySettings?.showTerminalCarbonLabels
+    ) {
+      return Boolean(
+        hasCharge ||
+          hasRadical ||
+          hasAlias ||
+          hasExplicitValence ||
+          hasExplicitIsotope,
+      );
+    }
 
     if (
       isCarbon &&
@@ -497,11 +521,16 @@ export class AtomRenderer extends BaseRenderer {
     this.stereoLabelElement = undefined;
     this.stereoLabelElementBBox = undefined;
     this.stereoTextElementBBox = undefined;
+    this.atomNumberElement?.remove();
+    this.atomNumberElement = undefined;
     this.badValenceElement?.remove();
     this.badValenceElement = undefined;
     this.updateSelectionContour();
     this.appendAtomProperties();
     this.appendBadValenceWarning();
+    this.appendAtomNumber();
+    this.appendStereoLabel();
+    this.appendCIPLabel();
   }
 
   public appendSelection() {
@@ -643,6 +672,25 @@ export class AtomRenderer extends BaseRenderer {
     this.appendExplicitValence();
   }
 
+  private appendAtomNumber() {
+    if (!this.displaySettings?.showAtomNumbers) return;
+
+    const number =
+      this.atom.atomIdInMicroMode !== undefined
+        ? this.atom.atomIdInMicroMode + 1
+        : this.atom.id;
+    this.atomNumberElement = this.rootElement
+      ?.append('text')
+      .attr('data-testid', 'atom-number')
+      .attr('x', 12)
+      .attr('y', -8)
+      .attr('font-family', 'Arial')
+      .attr('font-size', '10px')
+      .attr('fill', '#555')
+      .attr('pointer-events', 'none')
+      .text(String(number));
+  }
+
   private appendBadValenceWarning() {
     if (!this.atom.hasBadValence || !this.isLabelVisible) {
       return;
@@ -674,6 +722,7 @@ export class AtomRenderer extends BaseRenderer {
     this.textElement = this.appendLabel();
     this.appendAtomProperties();
     this.appendBadValenceWarning();
+    this.appendAtomNumber();
     // Must come before appendCIPLabel: CIP positioning depends on the stereo bbox.
     this.appendStereoLabel();
     this.appendCIPLabel();
@@ -682,6 +731,10 @@ export class AtomRenderer extends BaseRenderer {
   }
 
   private appendCIPLabel() {
+    if (!this.displaySettings?.showStereochemistry) {
+      return;
+    }
+
     const cipValue = this.atom.properties.cip;
 
     if (!cipValue) {
@@ -805,6 +858,10 @@ export class AtomRenderer extends BaseRenderer {
   }
 
   private shouldDisplayStereoLabel(): boolean {
+    if (!this.displaySettings?.showEnhancedStereochemistry) {
+      return false;
+    }
+
     const stereoLabel = this.atom.properties.stereoLabel;
     if (!stereoLabel) {
       return false;

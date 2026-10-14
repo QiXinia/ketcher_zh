@@ -15,12 +15,13 @@
  ***************************************************************************/
 
 import {
-  type SimpleObjectMode,
+  SimpleObjectMode,
   fromMultipleMove,
   fromSimpleObjectAddition,
   fromSimpleObjectDeletion,
   fromSimpleObjectResizing,
   CoordinateTransformation,
+  Vec2,
 } from 'ketcher-core';
 import type Editor from '../Editor';
 import type { Tool } from './Tool';
@@ -85,9 +86,12 @@ class SimpleObjectTool implements Tool {
         this.editor.update(this.dragCtx.action, true);
       } else {
         if (!this.dragCtx.action) {
+          const initialPos = this.mode === SimpleObjectMode.bezier
+            ? [this.dragCtx.p0, this.dragCtx.p0, this.dragCtx.p0, this.dragCtx.p0]
+            : [this.dragCtx.p0, this.dragCtx.p0];
           const action = fromSimpleObjectAddition(
             rnd.ctab,
-            [this.dragCtx.p0, this.dragCtx.p0],
+            initialPos,
             this.mode,
             false,
           );
@@ -128,9 +132,18 @@ class SimpleObjectTool implements Tool {
           fromSimpleObjectDeletion(rnd.ctab, this.dragCtx.itemId),
           true,
         );
+        const end = this.dragCtx.previous;
+        const finalPos = this.mode === SimpleObjectMode.bezier && end
+          ? [
+              this.dragCtx.p0,
+              this.dragCtx.p0.add(new Vec2((end.x - this.dragCtx.p0.x) / 3, (end.y - this.dragCtx.p0.y) / 3)),
+              this.dragCtx.p0.add(new Vec2((end.x - this.dragCtx.p0.x) * 2 / 3, (end.y - this.dragCtx.p0.y) * 2 / 3)),
+              end,
+            ]
+          : [this.dragCtx.p0, end];
         this.dragCtx.action = fromSimpleObjectAddition(
           rnd.ctab,
-          [this.dragCtx.p0, this.dragCtx.previous],
+          finalPos,
           this.mode,
           event.shiftKey,
         );

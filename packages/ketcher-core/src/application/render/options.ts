@@ -56,6 +56,11 @@ function defaultOptions(renderOptions: RenderOptions): RenderOptions {
     hideTerminalLabels: false,
     // atoms
     carbonExplicitly: false,
+    showAtomNumbers: false,
+    showTerminalCarbonLabels: false,
+    showQueryIndicators: true,
+    showStereochemistry: false,
+    showEnhancedStereochemistry: true,
     showCharge: true,
     showHydrogenLabels: ShowHydrogenLabels.TerminalAndHetero,
     showValence: true,

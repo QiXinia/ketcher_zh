@@ -1,4 +1,7 @@
-import { BaseMicromoleculeEntity } from 'domain/entities/BaseMicromoleculeEntity';
+import {
+  BaseMicromoleculeEntity,
+  type ObjectAnnotation,
+} from 'domain/entities/BaseMicromoleculeEntity';
 import { Vec2 } from 'domain/entities/vec2';
 import { Pool } from 'domain/entities/pool';
 import { getNodeWithInvertedYCoord } from 'domain/serializers/ket/helpers';
@@ -300,8 +303,9 @@ export class MultitailArrow extends BaseMicromoleculeEntity {
     private tailLength: FixedPrecisionCoordinates,
     private tailsYOffset: Pool<FixedPrecisionCoordinates>,
     arrowId?: number,
+    annotations?: ObjectAnnotation[],
   ) {
-    super();
+    super(undefined, annotations);
     this.arrowId = arrowId;
   }
 
@@ -475,6 +479,7 @@ export class MultitailArrow extends BaseMicromoleculeEntity {
       this.tailLength,
       this.tailsYOffset,
       this.arrowId,
+      this.annotations,
     );
   }
 
@@ -741,7 +746,8 @@ export class MultitailArrow extends BaseMicromoleculeEntity {
   }
 
   toKetNode(): KetFileNode<KetFileMultitailArrowNode> {
-    return MultitailArrow.getParametersForKetNode(
+    return {
+      ...MultitailArrow.getParametersForKetNode(
       this.spineTopX,
       this.spineTopY,
       this.headOffsetX,
@@ -751,6 +757,8 @@ export class MultitailArrow extends BaseMicromoleculeEntity {
       this.height,
       this.center(),
       this.getInitiallySelected(),
-    );
+      ),
+      ...(this.annotations.length ? { annotations: this.annotations } : {}),
+    };
   }
 }

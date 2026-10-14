@@ -392,11 +392,13 @@ function getAttachmentDirectionForOnlyOneBond(
   // eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
   const neighbour = struct.halfBonds.get(onlyNeighbor)!;
   const angle = neighbour.ang;
-  const isTripleBond =
-    struct.bonds.get(neighbour.bid)?.type === Bond.PATTERN.TYPE.TRIPLE;
+  const neighbourBondType = struct.bonds.get(neighbour.bid)?.type;
+  const isLinearBond =
+    neighbourBondType === Bond.PATTERN.TYPE.TRIPLE ||
+    neighbourBondType === Bond.PATTERN.TYPE.QUADRUPLE;
   const finalAngle =
     angle +
-    (isTripleBond ? DEGREE_180_FOR_TRIPLE_BOND : DEGREE_120_FOR_ONE_BOND);
+    (isLinearBond ? DEGREE_180_FOR_TRIPLE_BOND : DEGREE_120_FOR_ONE_BOND);
   return newVectorFromAngle(finalAngle);
 }
 

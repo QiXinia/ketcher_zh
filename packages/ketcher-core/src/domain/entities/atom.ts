@@ -22,6 +22,7 @@ import { Pile } from './pile';
 import type { Struct } from './struct';
 import {
   type initiallySelectedType,
+  type ObjectAnnotation,
   BaseMicromoleculeEntity,
 } from 'domain/entities/BaseMicromoleculeEntity';
 import { isNumber } from 'lodash';
@@ -60,6 +61,27 @@ export enum StereoLabel {
 export type Aromaticity = 'aromatic' | 'aliphatic';
 export type Chirality = 'clockwise' | 'anticlockwise';
 
+export enum IsotopicAbundance {
+  Unspecified = 0,
+  Any = 1,
+  Natural = 2,
+  Enriched = 3,
+  Deficient = 4,
+  Nonnatural = 5,
+}
+
+/** ChemDraw's Substituents query has three distinct predicates. */
+export type SubstitutionQueryMode = 'free-sites' | 'up-to' | 'exactly';
+
+export interface SubstitutionQuery {
+  mode: SubstitutionQueryMode;
+  count: 0 | 1 | 2 | 3 | 4;
+}
+
+/** ChemDraw atom-query predicates that do not have a CTfile primitive. */
+export type UnsaturationQuery = 'must-be-absent' | 'must-be-present';
+export type TranslationQuery = 'equal' | 'broad' | 'narrow' | 'any';
+
 export interface AtomQueryProperties {
   aromaticity?: Aromaticity | null;
   ringMembership?: number | null;
@@ -67,6 +89,9 @@ export interface AtomQueryProperties {
   connectivity?: number | null;
   chirality?: Chirality | null;
   customQuery?: string | null;
+  substitutionQuery?: SubstitutionQuery | null;
+  unsaturation?: UnsaturationQuery | null;
+  translation?: TranslationQuery | null;
 }
 
 export interface AtomAttributes {
@@ -75,6 +100,7 @@ export interface AtomAttributes {
   exactChangeFlag?: number;
   rxnFragmentType?: number;
   invRet?: number;
+  abnormalValence?: boolean;
   aam?: number;
   hCount?: number;
   isPreview?: boolean;
@@ -95,6 +121,7 @@ export interface AtomAttributes {
   radical?: number;
   cip?: AtomCIP | null;
   isotope?: number | null;
+  isotopicAbundance?: IsotopicAbundance;
   alias?: string | null;
   pseudo?: string;
   atomList?: AtomListParams | null;
@@ -104,6 +131,7 @@ export interface AtomAttributes {
   implicitH?: number;
   implicitHCount?: number | null;
   initiallySelected?: initiallySelectedType;
+  annotations?: ObjectAnnotation[];
 }
 
 export type AtomPropertiesInContextMenu = SubsetOfFields<
@@ -113,7 +141,9 @@ export type AtomPropertiesInContextMenu = SubsetOfFields<
   | 'substitutionCount'
   | 'unsaturatedAtom'
   | 'implicitHCount'
->;
+> & {
+  queryProperties?: AtomQueryProperties;
+};
 
 type ValenceContext = {
   label: string;
@@ -149,6 +179,7 @@ export class Atom extends BaseMicromoleculeEntity {
     alias: null,
     label: 'C',
     isotope: null,
+    isotopicAbundance: IsotopicAbundance.Unspecified,
     radical: 0,
     cip: null,
     charge: null,
@@ -164,10 +195,14 @@ export class Atom extends BaseMicromoleculeEntity {
       connectivity: null,
       chirality: null,
       customQuery: null,
+      substitutionQuery: null,
+      unsaturation: null,
+      translation: null,
     },
     atomList: null,
     invRet: 0,
     exactChangeFlag: 0,
+    abnormalValence: false,
     rglabel: null,
     attachmentPoints: null,
     aam: 0,
@@ -183,6 +218,7 @@ export class Atom extends BaseMicromoleculeEntity {
   atomList: AtomList | null;
   attachmentPoints: AttachmentPoints | null;
   isotope: number | null;
+  isotopicAbundance: IsotopicAbundance;
   isPreview: boolean;
   hCount: number;
   radical: number;
@@ -205,6 +241,7 @@ export class Atom extends BaseMicromoleculeEntity {
   aam: number;
   invRet: number;
   exactChangeFlag: number;
+  abnormalValence: boolean;
   rxnFragmentType: number;
   stereoLabel?: string | null;
   stereoParity: number;
@@ -217,11 +254,15 @@ export class Atom extends BaseMicromoleculeEntity {
   }
 
   constructor(attributes: AtomAttributes) {
-    super(attributes?.initiallySelected);
+    super(attributes?.initiallySelected, attributes?.annotations);
     this.label = attributes.label;
     this.fragment = getValueOrDefault(attributes.fragment, -1);
     this.alias = getValueOrDefault(attributes.alias, Atom.attrlist.alias);
     this.isotope = getValueOrDefault(attributes.isotope, Atom.attrlist.isotope);
+    this.isotopicAbundance = getValueOrDefault(
+      attributes.isotopicAbundance,
+      Atom.attrlist.isotopicAbundance,
+    );
     this.radical = getValueOrDefault(attributes.radical, Atom.attrlist.radical);
     this.cip = getValueOrDefault(attributes.cip, Atom.attrlist.cip);
     this.charge = getValueOrDefault(attributes.charge, Atom.attrlist.charge);
@@ -265,10 +306,17 @@ export class Atom extends BaseMicromoleculeEntity {
     this.hCount = getValueOrDefault(attributes.hCount, Atom.attrlist.hCount);
     this.queryProperties = {};
     for (const property in Atom.attrlist.queryProperties) {
-      this.queryProperties[property] = getValueOrDefault(
+      const value = getValueOrDefault(
         attributes.queryProperties?.[property],
         Atom.attrlist.queryProperties[property],
       );
+      // Query properties are copied when atoms are cloned.  Keep the nested
+      // Substituents predicate independent so editing a clone cannot mutate
+      // the source atom's query object.
+      this.queryProperties[property] =
+        property === 'substitutionQuery' && value
+          ? { ...value }
+          : value;
     }
 
     // reaction
@@ -277,6 +325,10 @@ export class Atom extends BaseMicromoleculeEntity {
     this.exactChangeFlag = getValueOrDefault(
       attributes.exactChangeFlag,
       Atom.attrlist.exactChangeFlag,
+    );
+    this.abnormalValence = getValueOrDefault(
+      attributes.abnormalValence,
+      Atom.attrlist.abnormalValence,
     );
     this.rxnFragmentType = getValueOrDefault(attributes.rxnFragmentType, -1);
 
@@ -404,7 +456,13 @@ export class Atom extends BaseMicromoleculeEntity {
         isAnyHalogen ||
         isAnyGroup ||
         this.hCount !== 0 ||
+        // An explicit implicit-H constraint is a query even when the value is
+        // zero ("Not Allowed").  `null` is the ordinary/default state.
+        this.implicitHCount !== null ||
+        this.isotopicAbundance !== IsotopicAbundance.Unspecified ||
         this.atomList !== null ||
+        (this.queryProperties.substitutionQuery !== null &&
+          this.queryProperties.substitutionQuery !== undefined) ||
         Object.values(queryProperties).some((value) => value),
     );
   }
@@ -417,6 +475,7 @@ export class Atom extends BaseMicromoleculeEntity {
     return (
       this.label === 'C' &&
       this.isotope === null &&
+      this.isotopicAbundance === IsotopicAbundance.Unspecified &&
       this.radical === 0 &&
       this.charge === null &&
       this.explicitValence < 0 &&
@@ -424,6 +483,11 @@ export class Atom extends BaseMicromoleculeEntity {
       this.substitutionCount === 0 &&
       this.unsaturatedAtom === 0 &&
       this.hCount === 0 &&
+      this.implicitHCount === null &&
+      !this.abnormalValence &&
+      !this.queryProperties.substitutionQuery &&
+      !this.queryProperties.unsaturation &&
+      !this.queryProperties.translation &&
       !this.atomList
     );
   }
@@ -445,7 +509,10 @@ export class Atom extends BaseMicromoleculeEntity {
   calcValence(connectionCount: number): boolean {
     const label = this.label;
     const charge = this.charge ?? 0;
-    if (this.isQuery() || this.attachmentPoints) {
+    // An explicit implicit-H constraint still needs normal valence
+    // calculation so the requested H count can override the calculated one.
+    // Other query predicates represent generic/query atoms and skip valence.
+    if ((this.isQuery() && this.implicitHCount === null) || this.attachmentPoints) {
       this.implicitH = 0;
       return true;
     }

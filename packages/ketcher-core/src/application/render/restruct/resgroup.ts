@@ -43,6 +43,7 @@ interface SGroupdrawBracketsOptions {
   upperIndexText?: string | null;
   indexAttribute?: object;
   superatomClass?: SUPERATOM_CLASS;
+  bracketStyle?: 'brackets' | 'parentheses' | 'braces';
 }
 
 export const SUPERATOM_CLASS_TEXT = {
@@ -117,6 +118,7 @@ class ReSGroup extends ReObject {
         sgroup,
         bracketBox,
         direction,
+        bracketStyle: sgroup.data.bracketStyle,
       };
       switch (sgroup.type) {
         case 'MUL': {
@@ -395,6 +397,7 @@ function SGroupdrawBrackets({
   upperIndexText,
   indexAttribute,
   superatomClass,
+  bracketStyle,
 }: SGroupdrawBracketsOptions): void {
   const brackets = getBracketParameters(bracketBox, direction);
   let rightBracketIndex = -1;
@@ -409,6 +412,7 @@ function SGroupdrawBrackets({
       bracket.width,
       bracket.height,
       render.options,
+      bracketStyle,
     );
     set.push(path);
     if (
@@ -424,6 +428,16 @@ function SGroupdrawBrackets({
     }
   }
   const bracketR = brackets[rightBracketIndex];
+  // Index labels must be anchored from the bracket geometry, not Raphael path
+  // command indexes: curved delimiters do not expose the same L commands as
+  // square brackets.
+  const bracketCenter = Scale.modelToCanvas(bracketR.center, render.options);
+  const bracketDirection = Scale.modelToCanvas(
+    bracketR.bracketDirection,
+    render.options,
+  );
+  const bracketHalfHeight =
+    (bracketR.height * render.options.microModeScale) / 2;
   function renderIndex(
     text: string,
     isLowerText = false,
@@ -431,15 +445,13 @@ function SGroupdrawBrackets({
   ): void {
     let path: Vec2;
     let lowerPath: Vec2;
-    const bracketPoint1 = new Vec2(
-      set[rightBracketIndex].getPath()[1][1],
-      set[rightBracketIndex].getPath()[1][2],
-      0,
+    const bracketPoint1 = bracketCenter.addScaled(
+      bracketDirection,
+      -bracketHalfHeight,
     );
-    const bracketPoint2 = new Vec2(
-      set[rightBracketIndex].getPath()[2][1],
-      set[rightBracketIndex].getPath()[2][2],
-      0,
+    const bracketPoint2 = bracketCenter.addScaled(
+      bracketDirection,
+      bracketHalfHeight,
     );
     if (bracketPoint2.y === bracketPoint1.y) {
       lowerPath =
@@ -630,20 +642,10 @@ function drawAttachedDat(restruct: ReStruct, sgroup: SGroup): any {
 
 function getBracketParameters(bracketBox: Box2Abs, direction: Vec2) {
   const brackets: BracketParams[] = [];
-  const bracketDirection = direction.rotateSC(1, 0);
   const bracketWidth = Math.min(0.25, bracketBox.sz().x * 0.3);
-  const leftCenter = Vec2.lc2(
-    direction,
-    bracketBox.p0.x,
-    bracketDirection,
-    0.5 * (bracketBox.p0.y + bracketBox.p1.y),
-  );
-  const rightCenter = Vec2.lc2(
-    direction,
-    bracketBox.p1.x,
-    bracketDirection,
-    0.5 * (bracketBox.p0.y + bracketBox.p1.y),
-  );
+  const centerY = 0.5 * (bracketBox.p0.y + bracketBox.p1.y);
+  const leftCenter = new Vec2(bracketBox.p0.x, centerY);
+  const rightCenter = new Vec2(bracketBox.p1.x, centerY);
   const bracketHeight = bracketBox.sz().y;
 
   brackets.push(
@@ -681,32 +683,10 @@ function getHighlighPathInfo(
   const lineWidth = options.lineWidth;
   const vext = new Vec2(lineWidth * 4, lineWidth * 6);
   bracketBox = bracketBox.extend(vext, vext);
-  const direction = sgroup.bracketDirection;
-  const bracketDirection = direction.rotateSC(1, 0);
-  const a0 = Vec2.lc2(
-    direction,
-    bracketBox.p0.x,
-    bracketDirection,
-    bracketBox.p0.y,
-  );
-  const a1 = Vec2.lc2(
-    direction,
-    bracketBox.p0.x,
-    bracketDirection,
-    bracketBox.p1.y,
-  );
-  const b0 = Vec2.lc2(
-    direction,
-    bracketBox.p1.x,
-    bracketDirection,
-    bracketBox.p0.y,
-  );
-  const b1 = Vec2.lc2(
-    direction,
-    bracketBox.p1.x,
-    bracketDirection,
-    bracketBox.p1.y,
-  );
+  const a0 = new Vec2(bracketBox.p0.x, bracketBox.p0.y);
+  const a1 = new Vec2(bracketBox.p0.x, bracketBox.p1.y);
+  const b0 = new Vec2(bracketBox.p1.x, bracketBox.p0.y);
+  const b1 = new Vec2(bracketBox.p1.x, bracketBox.p1.y);
   const size = options.contractedFunctionalGroupSize;
   let startX = (b0.x + a0.x) / 2 - size / 2;
   let startY = (a1.y + a0.y) / 2 - size / 2;

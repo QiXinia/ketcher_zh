@@ -36,7 +36,7 @@ export default templates.reduce((res, struct, i) => {
     shortcut: 't',
     action: {
       tool: 'template',
-      opts: { struct },
+      opts: { struct, ringTool: true },
     },
   };
   return res;

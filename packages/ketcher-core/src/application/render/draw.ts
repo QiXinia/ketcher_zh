@@ -1136,6 +1136,82 @@ function bondSingle(
     .attr(isSnapping ? options.bondSnappingStyle : {});
 }
 
+function bondSingleDashed(
+  paper: RaphaelPaper,
+  halfBond1: HalfBond,
+  halfBond2: HalfBond,
+  options: RenderOptions,
+  isSnapping: boolean,
+) {
+  return bondSingle(paper, halfBond1, halfBond2, options, isSnapping).attr({
+    'stroke-dasharray': '6 4',
+  });
+}
+
+function bondSingleDotted(
+  paper: RaphaelPaper,
+  halfBond1: HalfBond,
+  halfBond2: HalfBond,
+  options: RenderOptions,
+  isSnapping: boolean,
+) {
+  return bondSingle(paper, halfBond1, halfBond2, options, isSnapping).attr({
+    'stroke-dasharray': '1 5',
+    'stroke-linecap': 'round',
+  });
+}
+
+function bondSingleBold(
+  paper: RaphaelPaper,
+  halfBond1: HalfBond,
+  halfBond2: HalfBond,
+  options: RenderOptions,
+  isSnapping: boolean,
+) {
+  return bondSingle(paper, halfBond1, halfBond2, options, isSnapping).attr({
+    'stroke-width': Math.max(3, options.lineWidth * 2),
+  });
+}
+
+function bondSingleHashed(
+  paper: RaphaelPaper,
+  halfBond1: HalfBond,
+  halfBond2: HalfBond,
+  options: RenderOptions,
+  isSnapping: boolean,
+) {
+  const a = halfBond1.p;
+  const b = halfBond2.p;
+  const direction = b.sub(a);
+  const length = direction.length();
+  if (!length) return bondSingle(paper, halfBond1, halfBond2, options, isSnapping);
+  const unit = direction.normalized();
+  const count = Math.max(3, Math.floor(length / (options.lineWidth * 3)));
+  const step = length / (count - 1);
+  const half = options.stereoBond * 0.55;
+  let path = '';
+  for (let i = 0; i < count; i += 1) {
+    const center = a.addScaled(unit, step * i);
+    path += makeStroke(center.addScaled(halfBond1.norm, half), center.addScaled(halfBond1.norm, -half));
+  }
+  return paper.path(path).attr(options.lineattr).attr(isSnapping ? options.bondSnappingStyle : {});
+}
+
+function bondSingleHollowUp(
+  paper: RaphaelPaper,
+  a: Vec2,
+  b2: Vec2,
+  b3: Vec2,
+  options: RenderOptions,
+  isSnapping: boolean,
+) {
+  return paper
+    .path('M{0},{1}L{2},{3}L{4},{5}Z', toFixed(a.x), toFixed(a.y), toFixed(b2.x), toFixed(b2.y), toFixed(b3.x), toFixed(b3.y))
+    .attr(options.lineattr)
+    .attr({ fill: '#fff', stroke: '#000' })
+    .attr(isSnapping ? options.bondSnappingStyle : {});
+}
+
 function bondSingleUp(
   paper: RaphaelPaper,
   a: Vec2,
@@ -1379,6 +1455,33 @@ function bondTriple(
     .attr(isSnapping ? options.bondSnappingStyle : {});
 }
 
+function bondQuadruple(
+  paper: RaphaelPaper,
+  halfBond1: HalfBond,
+  halfBond2: HalfBond,
+  options: RenderOptions,
+  isSnapping: boolean,
+  color = '#000',
+) {
+  const a = halfBond1.p;
+  const b = halfBond2.p;
+  const n = halfBond1.norm;
+  const path = [-1.5, -0.5, 0.5, 1.5]
+    .map((offset) => makeStroke(
+      a.addScaled(n, offset * options.bondSpace),
+      b.addScaled(n, offset * options.bondSpace),
+    ))
+    .join('');
+  return paper
+    .path(path)
+    .attr(options.lineattr)
+    .attr({
+      fill: color,
+      stroke: color,
+    })
+    .attr(isSnapping ? options.bondSnappingStyle : {});
+}
+
 function bondAromatic(
   paper: RaphaelPaper,
   paths: string[],
@@ -1566,6 +1669,7 @@ function bracket(
   bracketWidth: number,
   bracketHeight: number,
   options: RenderOptions,
+  style: 'brackets' | 'parentheses' | 'braces' = 'brackets',
 ) {
   // eslint-disable-line max-params
   bracketWidth = bracketWidth || 0.25;
@@ -1587,6 +1691,55 @@ function bracket(
     bracketAngleDirection,
     -bracketWidth,
   );
+
+  if (style === 'parentheses') {
+    const control0 = bracketArc0
+      .addScaled(bracketAngleDirection, bracketWidth * 0.95)
+      .addScaled(bracketDirection, bracketHeight * 0.18);
+    const control1 = bracketArc1
+      .addScaled(bracketAngleDirection, bracketWidth * 0.95)
+      .addScaled(bracketDirection, -bracketHeight * 0.18);
+    return paper
+      .path(
+        'M{0},{1}C{2},{3},{4},{5},{6},{7}',
+        toFixed(bracketArc0.x),
+        toFixed(bracketArc0.y),
+        toFixed(control0.x),
+        toFixed(control0.y),
+        toFixed(control1.x),
+        toFixed(control1.y),
+        toFixed(bracketArc1.x),
+        toFixed(bracketArc1.y),
+      )
+      .attr(options.sgroupBracketStyle);
+  }
+
+  if (style === 'braces') {
+    const middle = bondCenter;
+    const upperControl0 = bracketPoint0
+      .addScaled(bracketDirection, bracketHeight * 0.2)
+      .addScaled(bracketAngleDirection, bracketWidth * 0.6);
+    const upperControl1 = middle
+      .addScaled(bracketDirection, -bracketHeight * 0.18)
+      .addScaled(bracketAngleDirection, bracketWidth * 0.6);
+    const lowerControl0 = middle
+      .addScaled(bracketDirection, bracketHeight * 0.18)
+      .addScaled(bracketAngleDirection, bracketWidth * 0.6);
+    const lowerControl1 = bracketPoint1
+      .addScaled(bracketDirection, -bracketHeight * 0.2)
+      .addScaled(bracketAngleDirection, bracketWidth * 0.6);
+    const path =
+      `M${toFixed(bracketArc0.x)},${toFixed(bracketArc0.y)}` +
+      `L${toFixed(bracketPoint0.x)},${toFixed(bracketPoint0.y)}` +
+      `C${toFixed(upperControl0.x)},${toFixed(upperControl0.y)},` +
+      `${toFixed(upperControl1.x)},${toFixed(upperControl1.y)},` +
+      `${toFixed(middle.x)},${toFixed(middle.y)}` +
+      `C${toFixed(lowerControl0.x)},${toFixed(lowerControl0.y)},` +
+      `${toFixed(lowerControl1.x)},${toFixed(lowerControl1.y)},` +
+      `${toFixed(bracketPoint1.x)},${toFixed(bracketPoint1.y)}` +
+      `L${toFixed(bracketArc1.x)},${toFixed(bracketArc1.y)}`;
+    return paper.path(path).attr(options.sgroupBracketStyle);
+  }
 
   return paper
     .path(
@@ -1779,6 +1932,11 @@ export default {
   plus,
   aromaticBondPaths,
   bondSingle,
+  bondSingleDashed,
+  bondSingleDotted,
+  bondSingleBold,
+  bondSingleHashed,
+  bondSingleHollowUp,
   bondSingleUp,
   bondSingleStereoBold,
   bondDoubleStereoBold,
@@ -1787,6 +1945,7 @@ export default {
   bondDouble,
   bondSingleOrDouble,
   bondTriple,
+  bondQuadruple,
   bondAromatic,
   bondAny,
   bondHydrogen,

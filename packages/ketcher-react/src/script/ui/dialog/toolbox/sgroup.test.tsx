@@ -47,7 +47,7 @@ describe('Copolymer S-Group type availability', () => {
     renderWithMockStore(
       <SGroup type="MUL" selectedSruCount={selectedSruCount} />,
     );
-    const typeSelect = screen.getByRole('combobox');
+    const typeSelect = screen.getAllByRole('combobox')[0];
     fireEvent.mouseDown(typeSelect);
   };
 
@@ -92,6 +92,50 @@ describe('S-Group DAT type rendering', () => {
       },
     });
     expect(screen.getByText('S-基团属性')).toBeInTheDocument();
+  });
+});
+
+describe('Windowed S-Group form state', () => {
+  const windowForm = {
+    errors: {},
+    valid: true,
+    result: { type: 'SUP', name: 'EtOH' },
+  };
+
+  it('renders a window form when the legacy modal is null', () => {
+    renderWithMockStore(
+      <SGroup type="SUP" formState={windowForm} />,
+      { modal: null },
+    );
+    expect(screen.getByLabelText('Name')).toHaveValue('EtOH');
+  });
+
+  it('prefers the window form over an unrelated modal form', () => {
+    renderWithMockStore(<SGroup type="SUP" formState={windowForm} />);
+    expect(screen.getByLabelText('Name')).toHaveValue('EtOH');
+    expect(screen.queryByLabelText('Repeat count')).not.toBeInTheDocument();
+  });
+
+  it('uses a valid schema while a window form is initializing', () => {
+    renderWithMockStore(<SGroup type="DAT" />, { modal: null });
+    expect(screen.getByText('Field name')).toBeInTheDocument();
+  });
+});
+
+describe('S-Group bracket style controls', () => {
+  it.each(['MUL', 'SRU', 'COP', 'SUP'])('exposes bracket styles for %s', (type) => {
+    const result =
+      type === 'MUL'
+        ? { type, mul: 2, bracketStyle: 'parentheses' }
+        : type === 'SRU'
+          ? { type, subscript: 'n', connectivity: 'ht', bracketStyle: 'braces' }
+          : type === 'COP'
+            ? { type, connectivity: 'eu', bracketStyle: 'parentheses' }
+            : { type, name: 'Et', bracketStyle: 'braces' };
+    const formState = { errors: {}, valid: true, result };
+    renderWithMockStore(<SGroup type={type} formState={formState} />);
+
+    expect(screen.getAllByTestId('bracketStyle')).toHaveLength(2);
   });
 });
 

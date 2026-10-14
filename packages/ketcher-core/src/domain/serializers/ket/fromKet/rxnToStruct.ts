@@ -21,7 +21,10 @@ import { getNodeWithInvertedYCoord } from '../helpers';
 
 export function rxnToStruct(ketItem: any, struct: Struct): Struct {
   if (ketItem.type === 'arrow') {
-    const arrow = new RxnArrow(getNodeWithInvertedYCoord(ketItem.data));
+    const arrow = new RxnArrow({
+      ...getNodeWithInvertedYCoord(ketItem.data),
+      annotations: ketItem.data?.annotations ?? ketItem.annotations,
+    });
     arrow.setInitiallySelected(ketItem.selected);
     struct.addRxnArrow(arrow);
   } else {
@@ -31,6 +34,7 @@ export function rxnToStruct(ketItem: any, struct: Struct): Struct {
         y: -ketItem.location[1],
         z: ketItem.location[2],
       },
+      annotations: ketItem.annotations ?? ketItem.data?.annotations,
     });
     plus.setInitiallySelected(ketItem.selected);
     struct.rxnPluses.add(plus);

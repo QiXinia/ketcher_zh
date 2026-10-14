@@ -40,7 +40,10 @@ export class CanvasLoad extends BaseOperation {
     restruct.clearVisels(); // TODO: What is it?
     const oldStruct = restruct.molecule;
     if (this.data.struct) {
-      restruct.render.setMolecule(this.data.struct, true);
+      // CanvasLoad is followed immediately by selection and editor commands.
+      // A deferred render leaves the new visels empty when a command runs in
+      // the same turn, so finish the initial draw before returning.
+      restruct.render.setMolecule(this.data.struct);
     }
 
     this.data.struct = oldStruct;

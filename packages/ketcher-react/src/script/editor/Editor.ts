@@ -15,8 +15,22 @@
  ***************************************************************************/
 
 import {
+  type Editor as KetcherEditor,
+  type FloatingToolsParams,
+  type IKetAttachmentPoint,
+  type IKetTemplateConnection,
+  type IKetMonomerTemplate,
+  type MonomerCreationInitialValues,
+  type MonomerCreationState,
+  type Pool,
+  type ReStruct,
+  type SGroupAttachmentPoint,
+  type RnaPresetComponentKey,
+  type ComponentStructureUpdateData,
+  type BaseMonomer,
   Action,
   Atom,
+  AttachmentPoints,
   AtomLabel,
   AttachmentPointName,
   Bond,
@@ -25,8 +39,19 @@ import {
   fillNaturalAnalogueForPhosphateAndSugar,
   fromAtomsAttrs,
   fromBondAddition,
+  fromSelectedBondIndicatorVisibility,
   fromDescriptorsAlign,
   fromMultipleMove,
+  fromFlatten,
+  fromCenterOnPage,
+  fromAlignObjects,
+  fromDistributeObjects,
+  fromJoin,
+  fromSimpleObjectArrow,
+  fromSimpleObjectColor,
+  fromSimpleObjectCurve,
+  fromSimpleObjectBracket,
+  fromSimpleObjectStyle,
   fromSelectedTextFormatting,
   fromNewCanvas,
   fromPaste,
@@ -72,20 +97,36 @@ import {
   Visel,
   paperPathFromSVGElement,
   fromFragmentDeletion,
-  type TextFormattingCommand,
-  type Editor as KetcherEditor,
-  type FloatingToolsParams,
-  type IKetAttachmentPoint,
-  type IKetTemplateConnection,
-  type IKetMonomerTemplate,
-  type MonomerCreationInitialValues,
-  type MonomerCreationState,
-  type Pool,
-  type ReStruct,
-  type SGroupAttachmentPoint,
-  type RnaPresetComponentKey,
-  type ComponentStructureUpdateData,
-  type BaseMonomer,
+  fromSelectedRingFill,
+  fromRingFillClear,
+  captureNicknameFragment,
+  type NicknameDraft,
+  type NicknameDefinition,
+  prepareNicknamePreview,
+  fromSelectedRingFusion,
+  type RingFusionKind,
+  fromSelectedAtomSprout,
+  fromSelectedAtomLabelSprout,
+  fromSelectedAtomLabelEdit,
+  captureStructureLabel,
+  fromContractStructureLabel,
+  fromSelectedStructureLabelState,
+  type StructureLabelDraft,
+  validateAtomSproutTarget,
+  parseAtomSproutLabel,
+  FunctionalGroupsProvider,
+  type AtomLabelSproutDraft,
+  type AtomSproutKind,
+  type ChemicalHotspot,
+  type HotspotDirection,
+  validateChemicalHotspot,
+  nextChemicalHotspot,
+} from 'ketcher-core';
+import {
+  SimpleObjectArrow,
+  SimpleObjectFill,
+  SimpleObjectStyle,
+  SimpleObjectBracketType,
 } from 'ketcher-core';
 import {
   DOMSubscription,
@@ -97,6 +138,7 @@ import closest from './shared/closest';
 import { type ChangeEventData, customOnChangeHandler } from './utils';
 import { isEqual } from 'lodash/fp';
 import { toolsMap } from './tool';
+import SelectTool from './tool/select/select';
 import { Highlighter } from './highlighter';
 import { setFunctionalGroupsTooltip } from './utils/functionalGroupsTooltip';
 import type { ContextMenuInfo } from '../ui/views/components/ContextMenu/contextMenu.types';
@@ -109,10 +151,19 @@ import type {
   ToolConstructorInterface,
   ToolEventHandlerName,
 } from './tool/Tool';
+import type { TextFormattingCommand } from 'ketcher-core';
 import { getSelectionMap, getStructCenter } from './utils/structLayout';
 import assert from 'assert';
 import { isNumber } from 'lodash';
 import paperjs from 'paper';
+import {
+  getNicknames,
+  saveNickname,
+  deleteNickname,
+  getNicknameTemplate,
+  exportNicknameLibrary,
+  importNicknameLibrary,
+} from './nicknameLibrary';
 
 const SCALE = provideEditorSettings().microModeScale;
 const HISTORY_SIZE = 32; // put me to options
@@ -185,10 +236,14 @@ function selectStereoFlagsIfNecessary(
 export interface Selection {
   atoms?: Array<number>;
   bonds?: Array<number>;
+  sgroups?: Array<number>;
+  sgroupData?: Array<number>;
+  frags?: Array<number>;
   enhancedFlags?: Array<number>;
   rxnPluses?: Array<number>;
   rxnArrows?: Array<number>;
   texts?: Array<number>;
+  simpleObjects?: Array<number>;
   rgroupAttachmentPoints?: Array<number>;
   [MULTITAIL_ARROW_KEY]?: Array<number>;
 }
@@ -484,6 +539,9 @@ class Editor implements KetcherEditor {
 
     KetcherLogger.log('Editor.struct(), start', value, needToCenterStruct);
 
+    // New documents can reuse atom IDs; a previous document's hover is stale
+    // even if that numerical ID happens to exist in the replacement structure.
+    if (this._tool) this.hover(null);
     this.selection(null);
     const struct = value ?? new Struct();
 
@@ -3241,10 +3299,519 @@ class Editor implements KetcherEditor {
     return this._selection; // eslint-disable-line
   }
 
-  formatSelectedTexts(
-    command: TextFormattingCommand,
-    value?: string | number,
+  flattenSelectedObjects(): number {
+    const selection = this.selection();
+    if (
+      !Object.values(selection ?? {}).some(
+        (ids) => Array.isArray(ids) && ids.length > 0,
+      )
+    ) {
+      throw new Error('请先选择需要压平的结构或对象');
+    }
+    const action = fromFlatten(this.render.ctab, selection);
+    const changedCount = action.operations.length;
+    if (changedCount) {
+      this.update(action);
+      this.rotateController.rerender();
+    }
+    return changedCount;
+  }
+
+  centerSelectedObjects(): number {
+    const selection = this.selection();
+    if (
+      !Object.values(selection ?? {}).some(
+        (ids) => Array.isArray(ids) && ids.length > 0,
+      )
+    ) {
+      throw new Error('请先选择需要居中的结构或对象');
+    }
+    const viewBoxCenter = new Vec2(
+      this.render.viewBox.minX + this.render.viewBox.width / 2,
+      this.render.viewBox.minY + this.render.viewBox.height / 2,
+    );
+    const pageCenter = Scale.canvasToModel(viewBoxCenter, this.render.options);
+    const action = fromCenterOnPage(this.render.ctab, selection, pageCenter);
+    const changedCount = action.operations.length;
+    if (changedCount) {
+      this.update(action);
+      this.rotateController.rerender();
+    }
+    return changedCount;
+  }
+
+  joinSelectedObjects(): number {
+    const selection = this.selection();
+    const simpleObjects = selection?.simpleObjects ?? [];
+    if (simpleObjects.length < 2) {
+      throw new Error('Join 至少需要选择两条直线曲线');
+    }
+    const action = fromJoin(this.render.ctab, selection);
+    const changedCount = action.operations.length;
+    if (changedCount) {
+      this.update(action);
+      const joinedObjectId = action.operations.at(-1)?.data?.id;
+      this.selection(
+        Number.isInteger(joinedObjectId)
+          ? { simpleObjects: [joinedObjectId] }
+          : null,
+      );
+      this.rotateController.rerender();
+    }
+    return changedCount;
+  }
+
+  alignSelectedObjects(
+    alignment:
+      | 'left'
+      | 'horizontal-center'
+      | 'right'
+      | 'top'
+      | 'vertical-center'
+      | 'bottom',
   ): number {
+    const selection = this.selection();
+    const action = fromAlignObjects(this.render.ctab, selection, alignment);
+    const changedCount = action.operations.length;
+    if (changedCount) {
+      this.update(action);
+      this.render.update(true, null);
+      this.rotateController.rerender();
+    }
+    return changedCount;
+  }
+
+  distributeSelectedObjects(direction: 'horizontal' | 'vertical'): number {
+    const selection = this.selection();
+    const action = fromDistributeObjects(this.render.ctab, selection, direction);
+    const changedCount = action.operations.length;
+    if (changedCount) {
+      this.update(action);
+      this.render.update(true, null);
+      this.rotateController.rerender();
+    }
+    return changedCount;
+  }
+
+  setSelectedBondIndicatorVisibility(indicator: 'query' | 'reaction', visible: boolean): number {
+    const inverse = fromSelectedBondIndicatorVisibility(
+      this.render.ctab, this.selection()?.bonds ?? [], indicator, visible,
+    );
+    if (inverse.operations.length) {
+      this.update(inverse);
+      this.render.update(true, null);
+      this.rotateController.rerender();
+    }
+    return inverse.operations.length;
+  }
+
+  setSelectedSimpleObjectStyle(style: 'plain' | 'dashed' | 'bold'): number {
+    const ids = this.selection()?.simpleObjects ?? [];
+    if (!ids.length) throw new Error('请先选择一个或多个图形对象');
+    const action = new Action();
+    ids.forEach((id) => {
+      action.mergeWith(fromSimpleObjectStyle(id, style as SimpleObjectStyle));
+    });
+    const inverseAction = action.perform(this.render.ctab);
+    const changedCount = inverseAction.operations.filter(
+      (operation) => !operation.isDummy(this.render.ctab),
+    ).length;
+    if (changedCount) {
+      this.update(inverseAction);
+      // Curve decorations affect the generated path collection (including
+      // secondary paths and fills), so rebuild all simple-object visuals.
+      this.render.update(true, null);
+      this.rotateController.rerender();
+    }
+    return changedCount;
+  }
+
+  setSelectedSimpleObjectCurveSettings(settings: {
+    lineWidth?: number;
+    doubleLineSpacing?: number;
+  }): number {
+    // Validate the complete request before recording any operation.
+    const properties = ['lineWidth', 'doubleLineSpacing'] as const;
+    properties.forEach((property) => {
+      const value = settings[property];
+      if (value !== undefined && (!Number.isFinite(value) || value < 0.25 || value > 8)) {
+        throw new Error('曲线线宽和双线间距倍率必须在 0.25 到 8 之间');
+      }
+    });
+    const ids = (this.selection()?.simpleObjects ?? []).filter((id) => {
+      const mode = this.render.ctab.molecule.simpleObjects.get(id)?.mode;
+      return mode === 'line' || mode === 'polyline' || mode === 'bezier';
+    });
+    if (!ids.length) throw new Error('请先选择直线、折线或贝塞尔曲线');
+    const action = new Action();
+    ids.forEach((id) => properties.forEach((property) => {
+      const value = settings[property];
+      if (value !== undefined) action.mergeWith(fromSimpleObjectCurve(id, property, value));
+    }));
+    const inverseAction = action.perform(this.render.ctab);
+    const changedCount = inverseAction.operations.filter(
+      (operation) => !operation.isDummy(this.render.ctab),
+    ).length;
+    if (changedCount) {
+      this.update(inverseAction);
+      this.render.update(true, null);
+      this.rotateController.rerender();
+    }
+    return changedCount;
+  }
+
+  setSelectedSimpleObjectColor(color?: string): number {
+    if (color !== undefined && !/^#[\da-f]{3}(?:[\da-f]{3})?$/i.test(color)) {
+      throw new Error('图形对象颜色必须是十六进制颜色')
+    }
+    const ids = this.selection()?.simpleObjects ?? [];
+    if (!ids.length) throw new Error('请先选择一个或多个图形对象');
+    const action = new Action();
+    ids.forEach((id) => action.mergeWith(fromSimpleObjectColor(id, color)));
+    const inverseAction = action.perform(this.render.ctab);
+    const changedCount = inverseAction.operations.filter(
+      (operation) => !operation.isDummy(this.render.ctab),
+    ).length;
+    if (changedCount) {
+      this.update(inverseAction);
+      this.render.update(true, null);
+      this.rotateController.rerender();
+    }
+    return changedCount;
+  }
+
+  setSelectedSimpleObjectArrow(
+    endpoint: 'start' | 'end',
+    arrow: 'none' | 'full' | 'half-left' | 'half-right',
+  ): number {
+    const ids = this.selection()?.simpleObjects ?? [];
+    if (!ids.length) throw new Error('请先选择一个或多个图形对象');
+    const action = new Action();
+    ids.forEach((id) => {
+      action.mergeWith(
+        fromSimpleObjectArrow(id, endpoint, arrow as SimpleObjectArrow),
+      );
+    });
+    const inverseAction = action.perform(this.render.ctab);
+    const changedCount = inverseAction.operations.filter(
+      (operation) => !operation.isDummy(this.render.ctab),
+    ).length;
+    if (changedCount) {
+      this.update(inverseAction);
+      this.rotateController.rerender();
+    }
+    return changedCount;
+  }
+
+  setSelectedSimpleObjectCurveProperty(
+    property: 'doubled' | 'closed' | 'fill' | 'faded',
+    value: boolean | 'none' | 'solid' | 'shaded',
+  ): number {
+    const ids = this.selection()?.simpleObjects ?? [];
+    if (!ids.length) throw new Error('请先选择一个或多个图形对象');
+    const action = new Action();
+    ids.forEach((id) => {
+      action.mergeWith(
+        fromSimpleObjectCurve(
+          id,
+          property,
+          property === 'fill' ? (value as SimpleObjectFill) : Boolean(value),
+        ),
+      );
+    });
+    const inverseAction = action.perform(this.render.ctab);
+    const changedCount = inverseAction.operations.filter(
+      (operation) => !operation.isDummy(this.render.ctab),
+    ).length;
+    if (changedCount) {
+      this.update(inverseAction);
+      // Curve decorations change the generated path collection, so rebuild
+      // all simple-object visuals after recording the undo action.
+      this.render.update(true, null);
+    }
+    return changedCount;
+  }
+
+  setSelectedSimpleObjectBracketType(bracketType: 'bracket' | 'parenthesis' | 'brace'): number {
+    const ids = this.selection()?.simpleObjects ?? [];
+    if (!ids.length) throw new Error('请先选择一个或多个图形对象');
+    const action = new Action();
+    ids.forEach((id) => action.mergeWith(fromSimpleObjectBracket(id, bracketType as SimpleObjectBracketType)));
+    const inverseAction = action.perform(this.render.ctab);
+    const changedCount = inverseAction.operations.filter(
+      (operation) => !operation.isDummy(this.render.ctab),
+    ).length;
+    if (changedCount) {
+      this.update(inverseAction);
+      this.render.update(true, null);
+    }
+    return changedCount;
+  }
+
+  setSelectedRingFillColor(color?: string): number {
+    const result = fromSelectedRingFill(this.render.ctab, this.selection(), color);
+    const inverseAction = result.action.perform(this.render.ctab);
+    const changedCount = inverseAction.operations.filter(
+      (operation) => !operation.isDummy(this.render.ctab),
+    ).length;
+    if (changedCount) {
+      this.update(inverseAction);
+      this.render.update(true, null);
+      this.rotateController.rerender();
+    }
+    return result.ringCount;
+  }
+
+  /** Apply ChemDraw-style charge hotkeys to the selected atoms. */
+  adjustSelectedAtomCharge(delta: -1 | 1): number {
+    if (delta !== -1 && delta !== 1) {
+      throw new Error('原子电荷增量必须为 +1 或 -1');
+    }
+    const atomIds = this.selection()?.atoms ?? [];
+    if (!atomIds.length) throw new Error('请先选择一个或多个原子');
+    const action = new Action();
+    let changedCount = 0;
+    atomIds.forEach((atomId) => {
+      const atom = this.struct().atoms.get(atomId);
+      if (!atom || atom.atomList || atom.rglabel) return;
+      action.mergeWith(
+        fromAtomsAttrs(
+          this.render.ctab,
+          atomId,
+          { charge: (atom.charge ?? 0) + delta },
+          null,
+        ),
+      );
+      changedCount += 1;
+    });
+    if (changedCount) {
+      // fromAtomsAttrs already performs the edit and returns its undo action.
+      this.update(action);
+      this.render.update(true, null);
+    }
+    return changedCount;
+  }
+
+  /** Add ChemDraw's attachment-point marker to selected atoms. */
+  setSelectedAtomAttachmentPoint(): number {
+    const atomIds = this.selection()?.atoms ?? [];
+    if (!atomIds.length) throw new Error('请先选择一个或多个原子');
+    const action = new Action();
+    let changedCount = 0;
+    atomIds.forEach((atomId) => {
+      const atom = this.struct().atoms.get(atomId);
+      if (!atom || atom.isRGroupAttachmentPointEditDisabled || atom.attachmentPoints) return;
+      action.mergeWith(
+        fromAtomsAttrs(
+          this.render.ctab,
+          atomId,
+          { attachmentPoints: AttachmentPoints.FirstSideOnly },
+          null,
+        ),
+      );
+      changedCount += 1;
+    });
+    if (changedCount) {
+      this.update(action);
+      this.render.update(true, null);
+    }
+    return changedCount;
+  }
+
+  captureNicknameFragment(): NicknameDraft {
+    return captureNicknameFragment(
+      this.struct(),
+      this.explicitSelected().atoms,
+    );
+  }
+
+  captureContractLabel(): StructureLabelDraft {
+    return captureStructureLabel(this.struct(), this.selection());
+  }
+
+  contractStructureLabel(label: string, draft: StructureLabelDraft): number {
+    const result = fromContractStructureLabel(this.render.ctab, label, draft);
+    if (result.changed) this.update(result.inverseAction);
+    this.render.update(true, null);
+    this.selection({ sgroups: [result.groupId] });
+    this.rotateController.rerender();
+    return result.changed ? 1 : 0;
+  }
+
+  setSelectedStructureLabelsExpanded(expanded: boolean): number {
+    const result = fromSelectedStructureLabelState(this.render.ctab, this.selection(), expanded);
+    if (result.changedCount) this.update(result.inverseAction);
+    this.render.update(true, null);
+    this.selection({ sgroups: result.groupIds });
+    this.rotateController.rerender();
+    return result.changedCount;
+  }
+
+  fuseRingOnSelectedBond(kind: RingFusionKind): number {
+    const [inverseAction, added] = fromSelectedRingFusion(
+      this.render.ctab,
+      this.selection()?.bonds ?? [],
+      kind,
+    );
+    this.update(inverseAction);
+    this.render.update(true, null);
+    this.rotateController.rerender();
+    return added.atoms.length;
+  }
+
+  getNicknames(): NicknameDefinition[] {
+    return getNicknames();
+  }
+
+  exportNicknameLibrary(): string {
+    return exportNicknameLibrary();
+  }
+
+  importNicknameLibrary(source: string): number {
+    return importNicknameLibrary(source);
+  }
+
+  prepareNicknamePreview(ket: string): string {
+    return prepareNicknamePreview(ket);
+  }
+
+  sproutOnSelectedAtom(kind: AtomSproutKind): number {
+    const selection = this.selection();
+    if (selection?.bonds?.length) throw new Error('请只选择一个原子来生长片段');
+    const result = fromSelectedAtomSprout(this.render.ctab, selection?.atoms ?? [], kind);
+    return this.finishAtomSprout(result);
+  }
+
+  captureAtomLabelSprout(): AtomLabelSproutDraft {
+    const selection = this.selection();
+    if (selection?.bonds?.length) throw new Error('请只选择一个原子来生长标签');
+    const { sourceId } = validateAtomSproutTarget(this.render.ctab, selection?.atoms ?? []);
+    return { atomId: sourceId, sourceKet: new KetSerializer().serializeMicromolecules(this.struct()) };
+  }
+
+  sproutAtomLabel(label: string, draft: AtomLabelSproutDraft): number {
+    if (!draft || !Number.isInteger(draft.atomId) ||
+        draft.sourceKet !== new KetSerializer().serializeMicromolecules(this.struct())) {
+      throw new Error('化学文档已变化，请关闭窗口并重新选择生长原子');
+    }
+    return this.finishAtomSprout(fromSelectedAtomLabelSprout(this.render.ctab, [draft.atomId], label, this.resolveAtomLabelNickname(label)));
+  }
+
+  captureAtomLabelEdit(): AtomLabelSproutDraft & { label: string } {
+    const draft = this.captureAtomLabelSprout();
+    const atom = this.struct().atoms.get(draft.atomId)!;
+    const magnitude = Math.abs(atom.charge ?? 0);
+    const charge = magnitude ? `${magnitude > 1 ? magnitude : ''}${atom.charge! < 0 ? '-' : '+'}` : '';
+    const radical = ['', ':', '.', '^^'][atom.radical] || '';
+    return { ...draft, label: `${atom.isotope ?? ''}${atom.label}${radical}${charge}` };
+  }
+
+  editAtomLabel(label: string, draft: AtomLabelSproutDraft): number {
+    if (!draft || !Number.isInteger(draft.atomId) ||
+        draft.sourceKet !== new KetSerializer().serializeMicromolecules(this.struct())) {
+      throw new Error('化学文档已变化，请关闭窗口并重新选择标签原子');
+    }
+    return this.finishAtomSprout(fromSelectedAtomLabelEdit(this.render.ctab, [draft.atomId], label, this.resolveAtomLabelNickname(label)));
+  }
+
+  private resolveAtomLabelNickname(label: string): { struct: Struct; attachmentAtomId: number } | undefined {
+    const attributes = parseAtomSproutLabel(label);
+    if (attributes.pseudo) {
+      const custom = getNicknames().find(item => item.name.toLowerCase() === attributes.label.toLowerCase());
+      if (custom) {
+        const template = getNicknameTemplate(custom.name);
+        return { struct: template.struct, attachmentAtomId: template.aid };
+      } else {
+        const fragment = FunctionalGroupsProvider.getInstance().getFunctionalGroupsList()
+          .find(item => !SGroup.isSaltOrSolvent(item.name) && item.name.toLowerCase() === attributes.label.toLowerCase());
+        if (fragment) {
+          const group = [...fragment.sgroups.values()].find(group => group.type === 'SUP');
+          return { struct: fragment, attachmentAtomId: group?.getAttachmentAtomId() ?? [...fragment.atoms.keys()][0] };
+        }
+      }
+    }
+    return undefined;
+  }
+
+  private finishAtomSprout(result: ReturnType<typeof fromSelectedAtomSprout>): number {
+    this.update(result.inverseAction);
+    this.render.update(true, null);
+    // Keep the new hotspot selected for successive chain-growth keystrokes.
+    this.selection({ atoms: [result.targetAtomId] });
+    if (this._tool instanceof SelectTool) this.hover({ map: 'atoms', id: result.targetAtomId });
+    this.rotateController.rerender();
+    return result.atoms.length;
+  }
+
+  private isChemicalHotspotVisible(target: ChemicalHotspot): boolean {
+    const ctab = this.render.ctab;
+    if (target.map === 'atoms') return ctab.visibleAtoms.has(target.id);
+    const bond = ctab.molecule.bonds.get(target.id);
+    return !!bond && ctab.visibleBonds.has(target.id)
+      && ctab.visibleAtoms.has(bond.begin) && ctab.visibleAtoms.has(bond.end);
+  }
+
+  getChemicalHotspot(): ChemicalHotspot | null {
+    // Drawing tools also use ci for previews. Only selection-tool hovers
+    // represent ChemDraw hotspots; dragging/merging must keep their own input.
+    if (!(this._tool instanceof SelectTool) || this._tool.isMouseDown
+      || this._tool.isSelectionRunning()) return null;
+    const target = validateChemicalHotspot(this.struct(), (this._tool as Tool).ci);
+    return target && this.isChemicalHotspotVisible(target) ? target : null;
+  }
+
+  selectChemicalHotspot(): boolean {
+    const target = this.getChemicalHotspot();
+    if (!target) return false;
+    this.selection({ [target.map]: [target.id] });
+    return true;
+  }
+
+  moveChemicalHotspot(direction: HotspotDirection): boolean {
+    if (!(this._tool instanceof SelectTool) || this._tool.isMouseDown
+      || this._tool.isSelectionRunning()) return false;
+    const selected = this.selection();
+    let target = this.getChemicalHotspot();
+    if (!target && selected?.bonds?.length === 1) target = { map: 'bonds', id: selected.bonds[0] };
+    else if (!target && selected?.atoms?.length === 1 && !selected.bonds?.length) target = { map: 'atoms', id: selected.atoms[0] };
+    else if (!target && selected && Object.values(selected).some(ids => ids?.length)) return false;
+    const next = nextChemicalHotspot(this.struct(), target, direction, spot => this.isChemicalHotspotVisible(spot));
+    if (!next) return false;
+    this.hover(next);
+    return true;
+  }
+
+  saveNickname(
+    ket: string,
+    name: string,
+    attachmentAtomId: number,
+  ): NicknameDefinition {
+    return saveNickname(ket, name, attachmentAtomId);
+  }
+
+  deleteNickname(name: string): void {
+    deleteNickname(name);
+  }
+
+  activateNickname(name: string): void {
+    this.tool('template', getNicknameTemplate(name));
+  }
+
+  clearRingFills(): number {
+    const action = fromRingFillClear(this.render.ctab);
+    const inverseAction = action.perform(this.render.ctab);
+    const changedCount = inverseAction.operations.filter(
+      (operation) => !operation.isDummy(this.render.ctab),
+    ).length;
+    if (changedCount) {
+      this.update(inverseAction);
+      this.render.update(true, null);
+      this.rotateController.rerender();
+    }
+    return changedCount;
+  }
+
+  formatSelectedTexts(command: TextFormattingCommand, value?: string | number): number {
     const selectedTextIds = this.selection()?.texts ?? [];
     if (!selectedTextIds.length) throw new Error('请先选择一个或多个文本对象');
 
@@ -3252,12 +3819,7 @@ class Editor implements KetcherEditor {
     for (const id of selectedTextIds) {
       const text = this.struct().texts.get(id);
       if (!text?.content) continue;
-      const action = fromSelectedTextFormatting(
-        this.render.ctab,
-        [id],
-        command,
-        value,
-      );
+      const action = fromSelectedTextFormatting(this.render.ctab, [id], command, value);
       if (!action.isDummy()) {
         this.update(action);
         changedCount += 1;

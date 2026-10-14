@@ -23,6 +23,8 @@ export function headerToKet(struct: Struct): any {
   ifDef(header, 'moleculeName', struct.name, '');
   ifDef(header, 'creatorProgram', null, '');
   ifDef(header, 'comment', null, '');
+  ifDef(header, 'annotations', struct.annotations, []);
+  ifDef(header, 'properties', struct.properties, []);
 
   return Object.keys(header).length !== 0 ? header : null;
 }

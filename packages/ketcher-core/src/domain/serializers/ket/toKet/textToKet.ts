@@ -222,6 +222,7 @@ export function textToKet(textNode) {
 
   return {
     selected: textNode.selected,
+    ...(textNode.fragment?.annotations?.length ? { annotations: textNode.fragment.annotations } : {}),
     ...convertToKET20Text(getNodeWithInvertedYCoord(textNode.data)),
   };
 }

@@ -17,6 +17,7 @@
 import { type Point, Vec2 } from './vec2';
 import {
   type initiallySelectedType,
+  type ObjectAnnotation,
   BaseMicromoleculeEntity,
 } from 'domain/entities/BaseMicromoleculeEntity';
 
@@ -47,6 +48,7 @@ export interface RxnArrowAttributes {
   height?: number;
   initiallySelected?: initiallySelectedType;
   arrowId?: number;
+  annotations?: ObjectAnnotation[];
 }
 
 export class RxnArrow extends BaseMicromoleculeEntity {
@@ -65,7 +67,7 @@ export class RxnArrow extends BaseMicromoleculeEntity {
   }
 
   constructor(attributes: RxnArrowAttributes) {
-    super(attributes?.initiallySelected);
+    super(attributes?.initiallySelected, attributes?.annotations);
     this.pos = [];
     this.arrowId = attributes.arrowId;
 

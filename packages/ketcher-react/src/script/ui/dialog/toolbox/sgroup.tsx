@@ -42,6 +42,7 @@ interface SgroupFormState {
 interface SgroupOwnProps extends DialogParams {
   type?: string;
   selectedSruCount?: number;
+  fixedType?: 'DAT';
   [key: string]: unknown;
 }
 
@@ -97,7 +98,7 @@ function Sgroup({ formState, ...props }: Readonly<SgroupProps>) {
         errors={formState.errors as Record<string, string>}
         serialize={serialize as Record<string, string> | undefined}
       >
-        <SelectOneOf
+        {!props.fixedType && <SelectOneOf
           name="type"
           schema={availableSchemes}
           data-testid="s-group-type"
@@ -105,7 +106,7 @@ function Sgroup({ formState, ...props }: Readonly<SgroupProps>) {
             string,
             unknown
           >)}
-        />
+        />}
 
         {type === 'DAT' ? (
           <SDataFieldset
@@ -128,6 +129,17 @@ function Sgroup({ formState, ...props }: Readonly<SgroupProps>) {
   );
 }
 
-export default connect((store: { modal: { form: SgroupFormState } }) => ({
-  formState: store.modal.form,
-}))(Sgroup);
+// WINDOW_OPEN keeps modal null and passes the window's form through props.
+export default connect(
+  (
+    store: { modal?: { form?: SgroupFormState | null } | null },
+    ownProps: Partial<SgroupProps>,
+  ) => ({
+    formState: ownProps.formState ??
+      store.modal?.form ?? {
+        errors: {},
+        valid: false,
+        result: { type: 'DAT' },
+      },
+  }),
+)(Sgroup);

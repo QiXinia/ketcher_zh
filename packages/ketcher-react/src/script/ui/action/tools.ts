@@ -388,6 +388,18 @@ const toolActions: Record<string, ToolActionEntry> = {
     disabled: (editor) => editor.isMonomerCreationWizardActive,
     hidden: (options) => isHidden(options, 'shape-line'),
   },
+  'shape-bezier': {
+    title: '贝塞尔曲线',
+    action: { tool: 'simpleobject', opts: SimpleObjectMode.bezier },
+    disabled: (editor) => editor.isMonomerCreationWizardActive,
+    hidden: (options) => isHidden(options, 'shape-bezier'),
+  },
+  'shape-bracket': {
+    title: '括号',
+    action: { tool: 'simpleobject', opts: SimpleObjectMode.bracket },
+    disabled: (editor) => editor.isMonomerCreationWizardActive,
+    hidden: (options) => isHidden(options, 'shape-bracket'),
+  },
   text: {
     shortcut: 'Alt+t',
     title: i18n.t('tools.addText'),
