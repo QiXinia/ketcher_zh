@@ -17,6 +17,7 @@
 import clsx from 'clsx';
 import type { GenItem } from 'ketcher-core';
 import classes from './ButtonGenSet.module.less';
+import i18n from '../../../../../../../../../../i18n';
 
 type ButtonGenSetProps = {
   button: GenItem;
@@ -34,8 +35,10 @@ const ButtonGenSet = ({
   disabled,
 }: ButtonGenSetProps) => {
   const titleText = disabled
-    ? `${button.label} is disabled`
-    : button.description ?? button.label;
+    ? i18n.t('generics.isDisabled', { label: button.label })
+    : i18n.t(`generics.items.${button.label}`, {
+        defaultValue: button.description ?? button.label,
+      });
 
   return (
     <button

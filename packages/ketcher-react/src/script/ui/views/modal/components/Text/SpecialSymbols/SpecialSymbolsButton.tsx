@@ -20,6 +20,7 @@ import { SpecialSymbolsList } from '../SpecialSymbolsList/SpecialSymbolsList';
 import classes from './SpecialSymbolsButton.module.less';
 import { useId, useState } from 'react';
 import { Icon } from 'components';
+import i18n from '../../../../../../../i18n';
 
 const SpecialSymbolsButton = ({ editor }: { editor: LexicalEditor }) => {
   const [showSpecialSymbols, setShowSpecialSymbols] = useState(false);
@@ -51,7 +52,7 @@ const SpecialSymbolsButton = ({ editor }: { editor: LexicalEditor }) => {
   return (
     <div onBlur={closeSymbolsList} role="none">
       <button
-        title="symbols"
+        title={i18n.t('textEditor.symbols')}
         data-testid="special-symbols-button"
         onMouseDown={(e) => {
           e.preventDefault();

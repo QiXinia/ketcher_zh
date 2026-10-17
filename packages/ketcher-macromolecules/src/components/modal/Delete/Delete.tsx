@@ -25,6 +25,7 @@ import {
 import { StyledActionButton } from 'components/modal/Delete/styledComponents';
 import styled from '@emotion/styled';
 import { selectEditor } from 'state/common';
+import { i18n } from 'ketcher-react';
 
 export interface Props {
   onClose: () => void;
@@ -60,29 +61,33 @@ const Delete = ({ isModalOpen, onClose }: Props) => {
   return (
     <Modal
       isOpen={isModalOpen}
-      title="Delete RNA Preset"
+      title={i18n.t('macromolecules.deleteRnaPreset')}
       onClose={onCloseCallback}
       data-testid="delete-preset-modal"
     >
       <Modal.Content>
         <DeleteTextWrapper data-testid="delete-preset-popup-content">
-          <div>You are about to delete</div>
-          <div>"{activePresetForContextMenu.name}" RNA preset.</div>
-          <div>This operation cannot be undone.</div>
+          <div>{i18n.t('macromolecules.deleteRnaPresetAbout')}</div>
+          <div>
+            {i18n.t('macromolecules.deleteRnaPresetName', {
+              name: activePresetForContextMenu.name,
+            })}
+          </div>
+          <div>{i18n.t('macromolecules.deleteRnaPresetUndo')}</div>
         </DeleteTextWrapper>
       </Modal.Content>
       <Modal.Footer>
         <StyledActionButton
           key="cancel"
           clickHandler={cancelHandler}
-          label="Cancel"
+          label={i18n.t('dialog.cancel')}
           styleType="secondary"
           data-testid="cancel-delete-preset-button"
         />
         <StyledActionButton
           key="delete"
           clickHandler={deleteHandler}
-          label="Delete"
+          label={i18n.t('contextMenu.delete')}
           data-testid="delete-preset-button"
         />
       </Modal.Footer>

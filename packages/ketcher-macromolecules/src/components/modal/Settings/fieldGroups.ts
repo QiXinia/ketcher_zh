@@ -35,7 +35,7 @@ export interface FieldDefinition {
 export const FIELD_GROUPS: FieldGroup[] = [
   {
     id: 'general',
-    title: 'General',
+    title: 'settings.general',
     fields: [
       'resetToSelect',
       'rotationStep',
@@ -53,7 +53,7 @@ export const FIELD_GROUPS: FieldGroup[] = [
   },
   {
     id: 'stereochemistry',
-    title: 'Stereochemistry',
+    title: 'settings.stereochemistry',
     fields: [
       'showStereoFlags',
       'stereoLabelStyle',
@@ -71,7 +71,7 @@ export const FIELD_GROUPS: FieldGroup[] = [
   },
   {
     id: 'atoms',
-    title: 'Atoms',
+    title: 'settings.atoms',
     fields: [
       'carbonExplicitly',
       'showCharge',
@@ -81,7 +81,7 @@ export const FIELD_GROUPS: FieldGroup[] = [
   },
   {
     id: 'bonds',
-    title: 'Bonds',
+    title: 'settings.bonds',
     fields: [
       'aromaticCircle',
       'bondSpacing',
@@ -95,7 +95,7 @@ export const FIELD_GROUPS: FieldGroup[] = [
   },
   {
     id: 'server',
-    title: 'Server',
+    title: 'settings.server',
     fields: [
       'smart-layout',
       'ignore-stereochemistry-errors',
@@ -106,12 +106,12 @@ export const FIELD_GROUPS: FieldGroup[] = [
   },
   {
     id: 'viewer3d',
-    title: '3D Viewer',
+    title: 'settings.viewer3D',
     fields: ['miewMode', 'miewTheme', 'miewAtomLabel'],
   },
   {
     id: 'debug',
-    title: 'Options for Debugging',
+    title: 'settings.optionsForDebugging',
     fields: ['showAtomIds', 'showBondIds', 'showHalfBondIds', 'showLoopIds'],
   },
 ];
@@ -119,31 +119,31 @@ export const FIELD_GROUPS: FieldGroup[] = [
 export const FIELD_DEFINITIONS: Record<string, FieldDefinition> = {
   // General
   resetToSelect: {
-    label: 'Reset to Select Tool',
+    label: 'settings.resetToSelectTool',
     type: 'select',
     options: [
-      { value: true, label: 'Enabled' },
-      { value: false, label: 'Disabled' },
-      { value: 'paste', label: 'After Paste' },
+      { value: true, label: 'settings.enabled' },
+      { value: false, label: 'settings.disabled' },
+      { value: 'paste', label: 'settings.afterPaste' },
     ],
   },
   rotationStep: {
-    label: 'Rotation Step (degrees)',
+    label: 'settings.rotationStep',
     type: 'number',
     min: 1,
     max: 90,
     step: 1,
   },
   showValenceWarnings: {
-    label: 'Show Valence Warnings',
+    label: 'settings.showValenceWarnings',
     type: 'checkbox',
   },
   atomColoring: {
-    label: 'Atom Coloring',
+    label: 'settings.atomColoring',
     type: 'checkbox',
   },
   font: {
-    label: 'Font',
+    label: 'settings.font',
     type: 'select',
     // TODO: Replace with dynamic font detection (see ketcher-react/systemfonts.jsx)
     // This hardcoded list should be replaced with runtime font detection using FontFaceObserver
@@ -177,14 +177,14 @@ export const FIELD_DEFINITIONS: Record<string, FieldDefinition> = {
     ],
   },
   fontsz: {
-    label: 'Font Size',
+    label: 'settings.fontSize',
     type: 'number',
     min: 1,
     max: 96,
     step: 1,
   },
   fontszUnit: {
-    label: 'Font Size Unit',
+    label: 'settings.fontSizeUnit',
     type: 'select',
     options: [
       { value: 'px', label: 'px' },
@@ -194,14 +194,14 @@ export const FIELD_DEFINITIONS: Record<string, FieldDefinition> = {
     ],
   },
   fontszsub: {
-    label: 'Sub/Superscript Font Size',
+    label: 'settings.subFontSize',
     type: 'number',
     min: 1,
     max: 96,
     step: 1,
   },
   fontszsubUnit: {
-    label: 'Sub/Superscript Font Size Unit',
+    label: 'settings.subFontSizeUnit',
     type: 'select',
     options: [
       { value: 'px', label: 'px' },
@@ -211,14 +211,14 @@ export const FIELD_DEFINITIONS: Record<string, FieldDefinition> = {
     ],
   },
   reactionComponentMarginSize: {
-    label: 'Reaction Component Margin Size',
+    label: 'settings.reactionComponentMargin',
     type: 'number',
     min: 0.1,
     max: 1000,
     step: 0.1,
   },
   reactionComponentMarginSizeUnit: {
-    label: 'Reaction Component Margin Size Unit',
+    label: 'settings.reactionComponentMarginUnit',
     type: 'select',
     options: [
       { value: 'px', label: 'px' },
@@ -228,122 +228,122 @@ export const FIELD_DEFINITIONS: Record<string, FieldDefinition> = {
     ],
   },
   imageResolution: {
-    label: 'Image Resolution',
+    label: 'settings.imageResolution',
     type: 'select',
     options: [
-      { value: '72', label: 'low (72 DPI)' },
-      { value: '600', label: 'high (600 DPI)' },
+      { value: '72', label: 'settings.imageResLow' },
+      { value: '600', label: 'settings.imageResHigh' },
     ],
   },
 
   // Stereochemistry
   showStereoFlags: {
-    label: 'Show Stereo Flags',
+    label: 'settings.showStereoFlags',
     type: 'checkbox',
   },
   stereoLabelStyle: {
-    label: 'Label Display at Stereogenic Centers',
+    label: 'settings.labelDisplayStereogenicCenters',
     type: 'select',
     options: [
-      { value: 'Iupac', label: 'IUPAC style' },
-      { value: 'Classic', label: 'Classic' },
-      { value: 'On', label: 'On' },
-      { value: 'Off', label: 'Off' },
+      { value: 'Iupac', label: 'settings.iupacStyle' },
+      { value: 'Classic', label: 'settings.classic' },
+      { value: 'On', label: 'settings.on' },
+      { value: 'Off', label: 'settings.off' },
     ],
   },
   colorOfAbsoluteCenters: {
-    label: 'Color of Absolute Centers',
+    label: 'settings.absoluteCenterColor',
     type: 'color',
   },
   colorOfAndCenters: {
-    label: 'Color of AND Centers',
+    label: 'settings.andCentersColor',
     type: 'color',
   },
   colorOfOrCenters: {
-    label: 'Color of OR Centers',
+    label: 'settings.orCentersColor',
     type: 'color',
   },
   colorStereogenicCenters: {
-    label: 'Color Stereogenic Centers',
+    label: 'settings.colorStereogenicCenters',
     type: 'select',
     options: [
-      { value: 'LabelsOnly', label: 'Labels Only' },
-      { value: 'BondsOnly', label: 'Bonds Only' },
-      { value: 'LabelsAndBonds', label: 'Labels and Bonds' },
-      { value: 'Off', label: 'Off' },
+      { value: 'LabelsOnly', label: 'settings.labelsOnly' },
+      { value: 'BondsOnly', label: 'settings.bondsOnly' },
+      { value: 'LabelsAndBonds', label: 'settings.labelsAndBonds' },
+      { value: 'Off', label: 'settings.off' },
     ],
   },
   autoFadeOfStereoLabels: {
-    label: 'Auto Fade of Stereo Labels',
+    label: 'settings.autoFadeStereoLabels',
     type: 'checkbox',
   },
   absFlagLabel: {
-    label: 'Absolute Flag Label',
+    label: 'settings.textOfAbsoluteFlag',
     type: 'text',
   },
   andFlagLabel: {
-    label: 'AND Flag Label',
+    label: 'settings.textOfAndFlag',
     type: 'text',
   },
   orFlagLabel: {
-    label: 'OR Flag Label',
+    label: 'settings.textOfOrFlag',
     type: 'text',
   },
   mixedFlagLabel: {
-    label: 'Mixed Flag Label',
+    label: 'settings.textOfMixedFlag',
     type: 'text',
   },
   ignoreChiralFlag: {
-    label: 'Ignore Chiral Flag',
+    label: 'settings.ignoreChiralFlag',
     type: 'checkbox',
   },
 
   // Atoms
   carbonExplicitly: {
-    label: 'Show Carbon Explicitly',
+    label: 'settings.displayCarbonExplicitly',
     type: 'checkbox',
   },
   showCharge: {
-    label: 'Show Charge',
+    label: 'settings.displayCharge',
     type: 'checkbox',
   },
   showValence: {
-    label: 'Show Valence',
+    label: 'settings.displayValence',
     type: 'checkbox',
   },
   showHydrogenLabels: {
-    label: 'Show Hydrogen Labels',
+    label: 'settings.showHydrogenLabels',
     type: 'select',
     options: [
-      { value: 'off', label: 'Off' },
-      { value: 'Hetero', label: 'Heteroatoms' },
-      { value: 'Terminal', label: 'Terminal' },
-      { value: 'Terminal and Hetero', label: 'Terminal and Hetero' },
-      { value: 'On', label: 'On' },
+      { value: 'off', label: 'settings.off' },
+      { value: 'Hetero', label: 'settings.hetero' },
+      { value: 'Terminal', label: 'settings.terminal' },
+      { value: 'Terminal and Hetero', label: 'settings.terminalAndHetero' },
+      { value: 'On', label: 'settings.on' },
     ],
   },
 
   // Bonds
   aromaticCircle: {
-    label: 'Aromatic Circle',
+    label: 'settings.aromaticBondsAsCircle',
     type: 'checkbox',
   },
   bondSpacing: {
-    label: 'Bond Spacing',
+    label: 'settings.bondSpacing',
     type: 'number',
     min: 0.1,
     max: 10,
     step: 0.1,
   },
   bondThickness: {
-    label: 'Bond Thickness',
+    label: 'settings.bondThickness',
     type: 'number',
     min: 0.1,
     max: 96,
     step: 0.1,
   },
   bondThicknessUnit: {
-    label: 'Bond Thickness Unit',
+    label: 'settings.bondThicknessUnit',
     type: 'select',
     options: [
       { value: 'px', label: 'px' },
@@ -353,14 +353,14 @@ export const FIELD_DEFINITIONS: Record<string, FieldDefinition> = {
     ],
   },
   stereoBondWidth: {
-    label: 'Stereo Bond Width',
+    label: 'settings.stereoBondWidth',
     type: 'number',
     min: 0.1,
     max: 96,
     step: 0.1,
   },
   stereoBondWidthUnit: {
-    label: 'Stereo Bond Width Unit',
+    label: 'settings.stereoBondWidthUnit',
     type: 'select',
     options: [
       { value: 'px', label: 'px' },
@@ -370,14 +370,14 @@ export const FIELD_DEFINITIONS: Record<string, FieldDefinition> = {
     ],
   },
   hashSpacing: {
-    label: 'Hash Spacing',
+    label: 'settings.hashSpacing',
     type: 'number',
     min: 0.1,
     max: 1000,
     step: 0.1,
   },
   hashSpacingUnit: {
-    label: 'Hash Spacing Unit',
+    label: 'settings.hashSpacingUnit',
     type: 'select',
     options: [
       { value: 'px', label: 'px' },
@@ -389,70 +389,70 @@ export const FIELD_DEFINITIONS: Record<string, FieldDefinition> = {
 
   // Server
   'smart-layout': {
-    label: 'Smart Layout',
+    label: 'settings.smartLayout',
     type: 'checkbox',
   },
   'ignore-stereochemistry-errors': {
-    label: 'Ignore Stereochemistry Errors',
+    label: 'settings.ignoreStereochemistryErrors',
     type: 'checkbox',
   },
   'mass-skip-error-on-pseudoatoms': {
-    label: 'Skip Mass Error on Pseudoatoms',
+    label: 'settings.ignorePseudoatomsAtMass',
     type: 'checkbox',
   },
   'gross-formula-add-rsites': {
-    label: 'Add R-sites to Gross Formula',
+    label: 'settings.addRsitesAtMassCalculation',
     type: 'checkbox',
   },
   'gross-formula-add-isotopes': {
-    label: 'Add Isotopes to Gross Formula',
+    label: 'settings.addIsotopesAtMassCalculation',
     type: 'checkbox',
   },
 
   // 3D Viewer
   miewMode: {
-    label: 'Miew Mode',
+    label: 'settings.miewMode',
     type: 'select',
     options: [
-      { value: 'LN', label: 'Lines' },
-      { value: 'BS', label: 'Ball and Stick' },
-      { value: 'LC', label: 'Licorice' },
+      { value: 'LN', label: 'settings.lines' },
+      { value: 'BS', label: 'settings.ballsAndSticks' },
+      { value: 'LC', label: 'settings.licorice' },
     ],
   },
   miewTheme: {
-    label: 'Miew Theme',
+    label: 'settings.miewTheme',
     type: 'select',
     options: [
-      { value: 'light', label: 'Light' },
-      { value: 'dark', label: 'Dark' },
+      { value: 'light', label: 'settings.light' },
+      { value: 'dark', label: 'settings.dark' },
     ],
   },
   miewAtomLabel: {
-    label: 'Miew Atom Label',
+    label: 'settings.miewAtomLabel',
     type: 'select',
     options: [
-      { value: 'no', label: 'None' },
-      { value: 'bright', label: 'Bright' },
-      { value: 'blackAndWhite', label: 'Black and White' },
-      { value: 'black', label: 'Black' },
+      { value: 'no', label: 'settings.none' },
+      { value: 'bright', label: 'settings.bright' },
+      { value: 'blackAndWhite', label: 'settings.blackAndWhite' },
+      { value: 'black', label: 'settings.black' },
     ],
   },
 
   // Debug
   showAtomIds: {
-    label: 'Show Atom IDs',
+    label: 'settings.showAtomIds',
     type: 'checkbox',
   },
   showBondIds: {
-    label: 'Show Bond IDs',
+    label: 'settings.showBondIds',
     type: 'checkbox',
   },
   showHalfBondIds: {
-    label: 'Show Half-Bond IDs',
+    label: 'settings.showHalfBondIds',
     type: 'checkbox',
   },
   showLoopIds: {
-    label: 'Show Loop IDs',
+    label: 'settings.showLoopIds',
     type: 'checkbox',
   },
 };

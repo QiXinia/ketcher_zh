@@ -126,7 +126,7 @@ exports[`Save Dialog should be rendered correctly should render opened file form
                 >
                   <button
                     class="active"
-                    data-testid="Preview-tab"
+                    data-testid="预览-tab"
                     tabindex="0"
                     type="button"
                   >
@@ -146,7 +146,7 @@ exports[`Save Dialog should be rendered correctly should render opened file form
                   <button
                     class="css-urisxd"
                     data-testid="copy-to-clipboard"
-                    title="Copy to clipboard"
+                    title="复制到剪贴板"
                   >
                     <icon-copy.svg
                       class="css-2ntgcm"
@@ -537,7 +537,7 @@ exports[`Save Dialog should be rendered correctly should render opened file form
               >
                 <button
                   class="active"
-                  data-testid="Preview-tab"
+                  data-testid="预览-tab"
                   tabindex="0"
                   type="button"
                 >
@@ -557,7 +557,7 @@ exports[`Save Dialog should be rendered correctly should render opened file form
                 <button
                   class="css-urisxd"
                   data-testid="copy-to-clipboard"
-                  title="Copy to clipboard"
+                  title="复制到剪贴板"
                 >
                   <icon-copy.svg
                     class="css-2ntgcm"

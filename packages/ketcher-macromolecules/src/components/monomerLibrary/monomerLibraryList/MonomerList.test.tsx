@@ -121,7 +121,7 @@ describe('Monomer List', () => {
       ),
     );
 
-    expect(screen.getByText('Presets')).toBeInTheDocument();
+    expect(screen.getByText('预设')).toBeInTheDocument();
     expect(screen.getByText('A')).toBeInTheDocument();
   });
 

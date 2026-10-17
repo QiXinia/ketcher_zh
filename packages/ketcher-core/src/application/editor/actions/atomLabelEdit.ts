@@ -26,7 +26,7 @@ export function fromSelectedAtomLabelEdit(
     };
   }
 
-  const neighbors = struct.atomGetNeighbors(sourceId);
+  const neighbors = struct.atomGetNeighbors(sourceId) ?? [];
   if (neighbors.length > 1 || neighbors.some(({ bid }) => struct.bonds.get(bid)?.type !== 1)) {
     throw new Error('当前昵称标签仅支持孤立原子或一个外接单键，请使用多连接点模板处理其他情况');
   }

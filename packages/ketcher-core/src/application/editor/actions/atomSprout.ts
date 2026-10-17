@@ -32,7 +32,7 @@ const kinds: readonly AtomSproutKind[] = [
  * doubles alone would incorrectly include cyclopentadiene and cyclic allenes.
  * This is a local growth rule, not a general aromaticity perception engine. */
 function isAromaticHotspot(struct: Struct, sourceId: number): boolean {
-  if (struct.atomGetNeighbors(sourceId).some(({ bid }) =>
+  if ((struct.atomGetNeighbors(sourceId) ?? []).some(({ bid }) =>
     struct.bonds.get(bid)!.type === Bond.PATTERN.TYPE.AROMATIC)) return true;
   return struct.loops.some(loop => {
     if (![5, 6].includes(loop.hbs.length)) return false;
@@ -43,10 +43,10 @@ function isAromaticHotspot(struct: Struct, sourceId: number): boolean {
     let electrons = 0;
     for (const id of ids) {
       const atom = struct.atoms.get(id)!;
-      if (atom.atomList || atom.customQuery || atom.radical) return false;
+      if (atom.atomList || atom.queryProperties.customQuery || atom.radical) return false;
       const ringBonds = bonds.filter(bond => bond.begin === id || bond.end === id);
       const doubleCount = ringBonds.filter(bond => bond.type === 2).length;
-      const externalBonds = struct.atomGetNeighbors(id).map(({ bid }) => struct.bonds.get(bid)!)
+      const externalBonds = (struct.atomGetNeighbors(id) ?? []).map(({ bid }) => struct.bonds.get(bid)!)
         .filter(bond => !bonds.includes(bond));
       if (ringBonds.length !== 2 || externalBonds.some(bond => bond.type !== 1)) return false;
       if (doubleCount === 1 && ['C', 'N', 'O', 'S'].includes(atom.label)) electrons += 1;
@@ -148,14 +148,14 @@ export function validateAtomSproutTarget(restruct: ReStruct, atomIds: readonly n
   const source = struct.atoms.get(sourceId);
   if (!source) throw new Error('所选原子已失效');
   if (source.sgs.size) throw new Error('请先解除所选原子所在的 S-group，再生长片段');
-  if (source.atomList || source.rglabel || source.label === 'R#' || source.customQuery) {
+  if (source.atomList || source.rglabel || source.label === 'R#' || source.queryProperties.customQuery) {
     throw new Error('查询原子和 R-group 连接原子不能直接生长片段');
   }
   return { sourceId, struct, source };
 }
 
 function sproutFromAtom(restruct: ReStruct, sourceId: number, struct: Struct, source: Atom, kind: AtomSproutKind) {
-  const neighbors = struct.atomGetNeighbors(sourceId);
+  const neighbors = struct.atomGetNeighbors(sourceId) ?? [];
   const bonds = neighbors.map(neighbor => struct.bonds.get(neighbor.bid)!);
   const order = bonds.reduce((sum, bond) => sum + (bond.type === Bond.PATTERN.TYPE.AROMATIC ? 1.5 : bond.type), 0);
   const aromatic = isAromaticHotspot(struct, sourceId);

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { IconButton } from 'ketcher-react';
+import { IconButton, i18n } from 'ketcher-react';
 import { About } from '../modal/About/About';
 
 export function ButtonsComponents() {
@@ -15,7 +15,7 @@ export function ButtonsComponents() {
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <IconButton
           iconName="help"
-          title="Help (?)"
+          title={String(i18n.t('topToolbar.helpWithShortcut'))}
           onClick={() => {
             const HELP_LINK = (process.env.HELP_LINK as string) || 'master';
             window.open(
@@ -27,7 +27,7 @@ export function ButtonsComponents() {
         />
         <IconButton
           iconName="about"
-          title="About"
+          title={String(i18n.t('action.about'))}
           onClick={() => setAboutOpen(true)}
           testId="about-button"
         />

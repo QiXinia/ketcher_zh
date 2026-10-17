@@ -1,4 +1,5 @@
 import { provideEditorInstance } from 'application/editor/editorSingleton';
+import { ketcherProvider } from 'application/ketcherProvider';
 import { BaseRenderer } from 'application/render/renderers/BaseRenderer';
 import type { Atom } from 'domain/entities/CoreAtom';
 import { Coordinates } from 'application/editor/shared/coordinates';
@@ -735,10 +736,14 @@ export class BondRenderer extends BaseRenderer {
 
   private appendTopologyMark(bondFromStruct: StructBond) {
     this.rootElement?.select(`#${this.topologyElementId}`).remove();
+    const editor = provideEditorInstance();
+    const settings = ketcherProvider
+      .getKetcher(editor.ketcherId)
+      .settingsService?.getSettings();
     if (
       !this.rootElement ||
       bondFromStruct.showQueryIndicator === false ||
-      this.editorSettings.showQueryIndicators === false
+      settings?.showQueryIndicators === false
     ) {
       return;
     }
