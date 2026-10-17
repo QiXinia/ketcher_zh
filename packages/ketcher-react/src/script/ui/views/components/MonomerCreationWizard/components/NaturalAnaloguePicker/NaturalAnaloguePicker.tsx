@@ -7,6 +7,7 @@ import styles from './NaturalAnaloguePicker.module.less';
 import NaturalAnalogueChip from '../NaturalAnalogueChip/NaturalAnalogueChip';
 import { Icon } from 'components';
 import { KetMonomerClass } from 'ketcher-core';
+import i18n from '../../../../../../../i18n';
 
 interface ChipGridSelectProps {
   monomerType: KetMonomerClass | 'rnaPreset' | undefined;
@@ -81,7 +82,11 @@ const NaturalAnaloguePicker: FC<ChipGridSelectProps> = ({
     (selected: unknown) => {
       const selectedOption = options.find((o) => o.value === selected);
       if (!selectedOption) {
-        return <span className={styles.placeholder}>Select an analogue</span>;
+        return (
+          <span className={styles.placeholder}>
+            {i18n.t('monomerWizard.selectAnalogue')}
+          </span>
+        );
       }
 
       return (

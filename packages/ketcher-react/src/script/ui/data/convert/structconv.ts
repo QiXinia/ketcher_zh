@@ -20,6 +20,7 @@ import {
   AtomList,
   Bond,
   Elements,
+  IsotopicAbundance,
   StereoLabel,
   getAtomType,
 } from 'ketcher-core';
@@ -54,14 +55,20 @@ export interface ElementFormData {
   customQuery?: string | null;
   rglabel?: number | null;
   alias?: string | null;
+  abnormalValence?: boolean | string;
   charge?: string;
   isotope?: string;
+  isotopicAbundance?: IsotopicAbundance;
   explicitValence?: number;
   radical?: number;
   invRet?: number;
   exactChangeFlag?: boolean | number;
   ringBondCount?: number;
   substitutionCount?: number;
+  substitutionQueryMode?: 'free-sites' | 'up-to' | 'exactly' | null;
+  substitutionQueryCount?: number;
+  unsaturation?: 'must-be-absent' | 'must-be-present' | null;
+  translation?: 'equal' | 'broad' | 'narrow' | 'any' | null;
   unsaturatedAtom?: boolean | number;
   hCount?: number;
   stereoParity?: number;
@@ -103,6 +110,8 @@ interface SGroupInput {
 /** S-group form data returned by the S-group dialog. */
 interface SGroupFormData {
   type?: string;
+  fixedType?: 'DAT';
+  init?: unknown;
   context?: string;
   fieldName?: string;
   fieldValue?: string | string[];
@@ -213,6 +222,7 @@ export function fromAtom(satom?: Atom) {
   const atomType = getAtomType(satom);
   return {
     alias,
+    abnormalValence: satom.abnormalValence,
     atomType,
     atomList:
       satom.atomList?.ids.map((i) => Elements.get(i)!.label).join(',') ?? '',
@@ -221,12 +231,17 @@ export function fromAtom(satom?: Atom) {
     label: satom.label,
     charge: satom.charge === null ? '' : satom.charge.toString(),
     isotope: satom.isotope === null ? '' : satom.isotope.toString(),
+    isotopicAbundance: satom.isotopicAbundance,
     explicitValence: satom.explicitValence,
     radical: satom.radical,
     invRet: satom.invRet,
     exactChangeFlag: !!satom.exactChangeFlag,
     ringBondCount: satom.ringBondCount,
     substitutionCount: satom.substitutionCount,
+    substitutionQueryMode: satom.queryProperties.substitutionQuery?.mode ?? null,
+    substitutionQueryCount: satom.queryProperties.substitutionQuery?.count ?? 0,
+    unsaturation: satom.queryProperties.unsaturation ?? null,
+    translation: satom.queryProperties.translation ?? null,
     unsaturatedAtom: !!satom.unsaturatedAtom,
     hCount: satom.hCount,
     stereoParity: satom.stereoParity,
@@ -253,11 +268,19 @@ export function toAtom(atom: ElementFormData): Partial<Atom> {
     connectivity = null,
     chirality = null,
     customQuery = '',
+    substitutionQueryMode = null,
+    substitutionQueryCount = 0,
+    unsaturation = null,
+    translation = null,
+    abnormalValence = false,
     ...restAtom
   } = atom;
+  const isAbnormalValenceAllowed =
+    abnormalValence === true || abnormalValence === 'true';
   if (customQuery && customQuery !== '') {
     return {
       ...restAtom,
+      abnormalValence: isAbnormalValenceAllowed,
       label: 'A',
       atomList: null,
       pseudo: undefined,
@@ -278,6 +301,14 @@ export function toAtom(atom: ElementFormData): Partial<Atom> {
         connectivity: null,
         chirality: null,
         customQuery,
+        substitutionQuery: substitutionQueryMode
+          ? {
+              mode: substitutionQueryMode,
+              count: Number(substitutionQueryCount ?? 0) as 0 | 1 | 2 | 3 | 4,
+            }
+          : null,
+        unsaturation,
+        translation,
       },
       invRet: 0,
       exactChangeFlag: 0,
@@ -288,6 +319,7 @@ export function toAtom(atom: ElementFormData): Partial<Atom> {
 
   const conv = {
     ...restAtom,
+    abnormalValence: isAbnormalValenceAllowed,
     isotope: restAtom.isotope ? Number(restAtom.isotope) : null,
     // empty charge value by default treated as zero,
     // no need to pass and display zero values(0, -0) explicitly
@@ -303,6 +335,15 @@ export function toAtom(atom: ElementFormData): Partial<Atom> {
       connectivity,
       chirality,
       customQuery: customQuery === '' ? null : customQuery,
+      substitutionQuery:
+        substitutionQueryMode
+          ? {
+              mode: substitutionQueryMode,
+              count: Number(substitutionQueryCount ?? 0) as 0 | 1 | 2 | 3 | 4,
+            }
+          : null,
+      unsaturation,
+      translation,
     },
   };
 
@@ -413,6 +454,10 @@ export function fromBond(sbond?: Bond) {
   const isCustomQuery = sbond.customQuery !== null;
   return {
     type: isCustomQuery ? '' : fromBondType(type, stereo),
+    display: sbond.display,
+    doubleBondPosition: sbond.doubleBondPosition,
+    showQueryIndicator: sbond.showQueryIndicator ?? true,
+    showReactionIndicator: sbond.showReactionIndicator ?? true,
     topology: sbond.topology,
     center: sbond.reactingCenterStatus,
     customQuery: !isCustomQuery ? '' : sbond.customQuery!.toString(),
@@ -423,6 +468,10 @@ export function toBond(bond: ReturnType<typeof fromBond>) {
   if (!bond) return null;
   const isCustomQuery = bond.customQuery !== '';
   return {
+    display: bond.display,
+    doubleBondPosition: bond.doubleBondPosition,
+    showQueryIndicator: bond.showQueryIndicator,
+    showReactionIndicator: bond.showReactionIndicator,
     topology: bond.topology,
     reactingCenterStatus: bond.center,
     customQuery: !isCustomQuery ? null : bond.customQuery,
@@ -457,6 +506,10 @@ const bondCaptionMap: Record<string, { type: number; stereo: number }> = {
   },
   triple: {
     type: Bond.PATTERN.TYPE.TRIPLE,
+    stereo: Bond.PATTERN.STEREO.NONE,
+  },
+  quadruple: {
+    type: Bond.PATTERN.TYPE.QUADRUPLE,
     stereo: Bond.PATTERN.STEREO.NONE,
   },
   aromatic: {
@@ -531,7 +584,15 @@ export function fromSgroup(ssgroup: SGroupInput) {
 }
 
 export function toSgroup(sgroup: SGroupFormData) {
-  const { type, radiobuttons, ...props } = sgroup;
+  // Dialog configuration is not chemical data and must not enter DAT attrs.
+  const type = sgroup.type;
+  const radiobuttons = sgroup.radiobuttons;
+  const props = { ...sgroup };
+  delete props.type;
+  delete props.radiobuttons;
+  delete props.fixedType;
+  delete props.init;
+  delete props.selectedSruCount;
   const attrs = { ...props };
 
   const absolute = 'absolute';

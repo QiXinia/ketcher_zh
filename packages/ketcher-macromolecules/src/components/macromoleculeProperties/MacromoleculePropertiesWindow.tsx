@@ -47,7 +47,7 @@ import {
   rnaDnaNaturalAnalogues,
   SingleChainMacromoleculeProperties,
 } from 'ketcher-core';
-import { Icon } from 'ketcher-react';
+import { Icon, i18n } from 'ketcher-react';
 import { DropDown } from 'components/shared/dropDown';
 import { useRecalculateMacromoleculeProperties } from '../../hooks/useRecalculateMacromoleculeProperties';
 import { debounce, isNumber } from 'lodash';
@@ -732,9 +732,11 @@ const HydrophobicityChart = (props: HydrophobicityChartProps) => {
 const PeptideProperties = (props: PeptidePropertiesProps) => {
   return props.isError ? (
     <TabContentErrorWrapper>
-      <TabContentErrorTitle>No Data Available</TabContentErrorTitle>
+      <TabContentErrorTitle>
+        {String(i18n.t('macromoleculeProperties.noData'))}
+      </TabContentErrorTitle>
       <TabContentErrorDescription>
-        Select monomer, chain or part of a chain
+        {String(i18n.t('macromoleculeProperties.selectPeptide'))}
       </TabContentErrorDescription>
     </TabContentErrorWrapper>
   ) : (
@@ -742,7 +744,7 @@ const PeptideProperties = (props: PeptidePropertiesProps) => {
       <PeptideBasicPropertiesWrapper>
         <BasicPropertiesWrapper>
           <BasicProperty
-            name="Isoelectric Point"
+            name={String(i18n.t('macromoleculeProperties.isoelectricPoint'))}
             testId="Isoelectric Point"
             value={
               isNumber(props.macromoleculesProperties.pKa)
@@ -759,7 +761,7 @@ const PeptideProperties = (props: PeptidePropertiesProps) => {
             }
           />
           <BasicProperty
-            name="Extinction Coef.(1/Mcm)"
+            name={String(i18n.t('macromoleculeProperties.extinctionCoef'))}
             testId="Extinction Coefficient"
             value={
               isNumber(props.macromoleculesProperties.extinctionCoefficient)
@@ -777,7 +779,7 @@ const PeptideProperties = (props: PeptidePropertiesProps) => {
           ></BasicProperty>
         </BasicPropertiesWrapper>
         <BasicProperty
-          name="Hydrophobicity"
+          name={String(i18n.t('macromoleculeProperties.hydrophobicity'))}
           testId="Hydrophobicity"
           hint={
             <div>
@@ -846,10 +848,11 @@ const RnaProperties = (props: DnaRnaPropertiesProps) => {
 
   return props.isError ? (
     <TabContentErrorWrapper>
-      <TabContentErrorTitle>No Data Available</TabContentErrorTitle>
+      <TabContentErrorTitle>
+        {String(i18n.t('macromoleculeProperties.noData'))}
+      </TabContentErrorTitle>
       <TabContentErrorDescription>
-        Select a nucleotide/nucleoside, chain or part of a chain containing
-        nucleotides/nucleosides
+        {String(i18n.t('macromoleculeProperties.selectNucleotide'))}
       </TabContentErrorDescription>
     </TabContentErrorWrapper>
   ) : (
@@ -857,7 +860,7 @@ const RnaProperties = (props: DnaRnaPropertiesProps) => {
       <RnaBasicPropertiesWrapper>
         {isNumber(props.macromoleculesProperties.Tm) ? (
           <BasicProperty
-            name="Melting Temp. (°C)"
+            name={String(i18n.t('macromoleculeProperties.meltingTemp'))}
             value={_round(props.macromoleculesProperties.Tm, 1)}
             testId="Melting-Temperature"
             hint={
@@ -873,7 +876,7 @@ const RnaProperties = (props: DnaRnaPropertiesProps) => {
         )}
         <BasicPropertiesWrapper>
           <BasicProperty
-            name="[Unipositive Ions]"
+            name={String(i18n.t('macromoleculeProperties.unipositiveIons'))}
             value={unipositiveIonsValue}
             options={['nM', 'μM', 'mM']}
             testId="Unipositive Ions"
@@ -886,7 +889,7 @@ const RnaProperties = (props: DnaRnaPropertiesProps) => {
             onChangeValue={onChangeUnipositiveIonsValue}
           />
           <BasicProperty
-            name="[Oligonucleotides]"
+            name={String(i18n.t('macromoleculeProperties.oligonucleotides'))}
             value={oligonucleotidesValue}
             options={['nM', 'μM', 'mM']}
             testId="Oligonucleotides"

@@ -38,6 +38,7 @@ export * from './pool';
 export * from './image';
 export * from './multitailArrow';
 export * from './highlight';
+export * from './ringFill';
 export * from './sGroupAttachmentPoint';
 export * from './monomerMicromolecule';
 export * from './Peptide';

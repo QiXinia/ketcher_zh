@@ -9,6 +9,8 @@ export function multitailArrowToStruct(
   ketItem: KetFileNode<KetFileMultitailArrowNode>,
   struct: Struct,
 ) {
-  struct.addMultitailArrow(MultitailArrow.fromKetNode(ketItem));
+  const arrow = MultitailArrow.fromKetNode(ketItem);
+  arrow.annotations = (ketItem.annotations ?? []).map((annotation) => ({ ...annotation }));
+  struct.addMultitailArrow(arrow);
   return struct;
 }

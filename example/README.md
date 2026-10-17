@@ -20,5 +20,6 @@ npx cross-env REACT_APP_API_PATH=https://indigo.example.com/v2 npm run dev:remot
 | `API_PATH` | `REACT_APP_API_PATH` | Indigo service URL consumed by the application when it is available. Prefer `REACT_APP_API_PATH` for consistency between Vite development and Webpack builds. |
 | `PUBLIC_URL` | `./` | Base URL for static assets and Ketcher resources such as icons, the manifest, and standalone assets. |
 | `GENERATE_SOURCEMAP` | `false` | Controls whether Create React App generates production source maps during Webpack builds. |
+| `KETCHER_TS_CHECKER_MEMORY_MB` | `1024` | Maximum old-space size for each ForkTsChecker TypeScript reporter during production builds. Set at least `512` to adjust. |
 | `SKIP_PREFLIGHT_CHECK` | `true` | Skips Create React App dependency preflight checks. |
 | `SEPARATE_INDIGO_RENDER` | unset | Enables the standalone Indigo callback path for builds that use a separate render-capable Indigo module. Normally this is set by standalone package build scripts rather than by contributors running the example. |

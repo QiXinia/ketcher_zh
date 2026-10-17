@@ -558,6 +558,7 @@ export class MacromoleculesConverter {
               charge: atom.charge,
               explicitValence: atom.explicitValence,
               isotope: atom.isotope,
+              isotopicAbundance: atom.isotopicAbundance,
               radical: atom.radical,
               alias: atom.alias,
               cip: atom.cip,
@@ -589,6 +590,8 @@ export class MacromoleculesConverter {
               bond.stereo,
               bondId,
               bond.cip,
+              bond.display,
+              bond.doubleBondPosition,
             ),
           );
         });

@@ -32,12 +32,12 @@ describe('OpenOptions component', () => {
   it('should render correctly with passed props', () => {
     render(withThemeProvider(<OpenOptions {...mockProps} />));
 
-    expect(screen.getByText('Paste from clipboard')).toBeInTheDocument();
-    expect(screen.getByText('Open from file')).toBeInTheDocument();
+    expect(screen.getByText('从剪贴板粘贴')).toBeInTheDocument();
+    expect(screen.getByText('从文件打开')).toBeInTheDocument();
   });
   it('callback for Paste from clipboard button should be called after click', () => {
     render(withThemeProvider(<OpenOptions {...mockProps} />));
-    const button = screen.getByText('Paste from clipboard');
+    const button = screen.getByText('从剪贴板粘贴');
 
     fireEvent.click(button);
 

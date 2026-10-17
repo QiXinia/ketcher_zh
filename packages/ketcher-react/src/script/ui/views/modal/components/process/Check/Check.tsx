@@ -18,6 +18,7 @@ import { type ComponentType, type FC, useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import type { AnyAction } from 'redux';
 import type { ThunkDispatch } from 'redux-thunk';
+import { Pile, type Struct } from 'ketcher-core';
 import Form, {
   type FormState,
   Field,
@@ -25,6 +26,7 @@ import Form, {
 import { Dialog } from '../../../../components';
 import ErrorsCheck from './components';
 import { check } from '../../../../../state/server';
+import type { MoleculeErrorLocations } from '../../../../../state/server/checkLocations';
 import { checkOpts } from '../../../../../state/options';
 import style from './Check.module.less';
 import { LoadingCircles } from 'src/script/ui/views/components/Spinner';
@@ -69,6 +71,7 @@ interface CheckState {
 
 interface CheckFormState extends FormState<CheckState> {
   moleculeErrors: MoleculeErrors;
+  moleculeErrorLocations?: MoleculeErrorLocations;
 }
 
 interface CheckDialogOwnProps {
@@ -79,6 +82,11 @@ interface CheckDialogOwnProps {
 interface CheckDialogStateProps {
   formState: CheckFormState;
   checkState: CheckState;
+  editor: {
+    selection: (selection: { atoms: number[]; bonds: number[] }) => unknown;
+    struct: () => Struct;
+    centerViewportAccordingToStruct: (struct: Struct) => unknown;
+  };
 }
 
 interface CheckDialogDispatchProps {
@@ -91,6 +99,7 @@ type CheckDialogProps = CheckDialogOwnProps &
   CheckDialogDispatchProps;
 
 interface State {
+  editor: CheckDialogStateProps['editor'];
   modal: {
     form: CheckFormState;
   };
@@ -203,9 +212,17 @@ const FooterContent: FC<FooterContentProps> = ({
 };
 
 const CheckDialog: FC<CheckDialogProps> = (props) => {
-  const { formState, checkState, onCheck, onApply, onCancel, ...restProps } =
-    props;
+  const {
+    formState,
+    checkState,
+    editor,
+    onCheck,
+    onApply,
+    onCancel,
+    ...restProps
+  } = props;
   const { result = checkState, moleculeErrors } = formState;
+  const moleculeErrorLocations = formState.moleculeErrorLocations || {};
   const [isStructureChecking, setIsStructureChecking] = useState(false);
   const [lastCheckDate, setLastCheckDate] = useState<Date | null>(null);
   const [isCheckedWithNewSettings, setIsCheckedWithNewSettings] =
@@ -223,6 +240,28 @@ const CheckDialog: FC<CheckDialogProps> = (props) => {
   };
 
   const handleSettingsChange = () => setIsCheckedWithNewSettings(false);
+
+  const handleSelectWarningEntities = (
+    warningAtomIds: number[],
+    bondIds: number[],
+  ) => {
+    const bondLocations = bondIds
+      .map((id) => editor.struct().bonds.get(id))
+      .filter((bond) => bond !== undefined);
+    const atomIds = Array.from(
+      new Set([
+        ...warningAtomIds,
+        ...bondLocations.flatMap(({ begin, end }) => [begin, end]),
+      ]),
+    );
+    if (!atomIds.length && !bondIds.length) return;
+    const selectedAtoms = new Pile(atomIds);
+    editor.selection({ atoms: atomIds, bonds: bondIds });
+    editor.centerViewportAccordingToStruct(
+      editor.struct().clone(selectedAtoms),
+    );
+    onCancel();
+  };
 
   useEffect(() => {
     handleCheck();
@@ -297,7 +336,9 @@ const CheckDialog: FC<CheckDialogProps> = (props) => {
                 >
                   <ErrorsCheck
                     moleculeErrors={moleculeErrors}
+                    moleculeErrorLocations={moleculeErrorLocations}
                     checkSchema={checkSchema}
+                    onSelectWarningEntities={handleSelectWarningEntities}
                   />
                 </div>
               ) : (
@@ -313,10 +354,11 @@ const CheckDialog: FC<CheckDialogProps> = (props) => {
 
 const mapStateToProps = (
   state: State,
-  ownProps: any,
+  ownProps: CheckDialogOwnProps & { formState?: CheckFormState },
 ): CheckDialogStateProps => ({
   formState: ownProps.formState ?? state.modal?.form,
   checkState: state.options.check,
+  editor: state.editor,
 });
 
 const mapDispatchToProps = (

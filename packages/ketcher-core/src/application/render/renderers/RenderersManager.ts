@@ -49,6 +49,8 @@ import type { Loop } from '../view-model/Loop';
 import type { DeepPartial } from 'types';
 import type { SGroupDrawingEntity } from 'domain/entities/SGroupDrawingEntity';
 import { SGroupRenderer } from 'application/render/renderers/SGroupRenderer';
+import { findRingFill } from 'domain/entities/ringFill';
+import { ringFillPath } from '../ringFillPath';
 
 type FlexModeOrSnakeModePolymerBondRenderer =
   | FlexModePolymerBondRenderer
@@ -601,6 +603,42 @@ export class RenderersManager {
     });
   }
 
+  private renderRingFills() {
+    const editor = provideEditorInstance();
+    const viewModel = editor.viewModel;
+    const canvas = ZoomTool.instance?.canvas;
+    if (!canvas?.selectAll) return;
+
+    canvas.selectAll('.ring-fill').remove();
+    viewModel.loops.forEach((loop) => {
+      const monomer = loop.halfEdges[0]?.firstAtom.monomer;
+      const fills = monomer?.monomerItem.struct.ringFills;
+      if (!fills?.size || loop.halfEdges.some((edge) =>
+        edge.firstAtom.monomer !== monomer)) return;
+      const atoms = loop.halfEdges.map((halfEdge) =>
+        halfEdge.firstAtom.atomIdInMicroMode,
+      );
+      const bonds = loop.halfEdges.map(
+        (halfEdge) => halfEdge.bond.bondIdInMicroMode,
+      );
+      const fill = findRingFill(fills.values(), atoms, bonds);
+      if (!fill) return;
+      const settings = provideEditorSettings();
+      const path = ringFillPath(loop.halfEdges.map((edge) =>
+        Scale.modelToCanvas(edge.firstAtom.position, settings),
+      ));
+      if (!path) return;
+      canvas
+        .append('path')
+        .attr('class', 'ring-fill')
+        .attr('d', path)
+        .attr('fill', fill.color)
+        .attr('stroke', 'none')
+        .attr('pointer-events', 'none')
+        .lower();
+    });
+  }
+
   private calculateDashedPolygonPath(loop: Loop) {
     const editorSettings = provideEditorSettings();
     let pathStr = '';
@@ -678,6 +716,7 @@ export class RenderersManager {
     if (this.needRecalculateMonomersEnumeration) {
       this.recalculateMonomersEnumeration();
     }
+    this.renderRingFills();
     this.renderAromaticCircles();
   }
 

@@ -31,6 +31,7 @@ enum SGroupPropType {
   Connectivity = 'connectivity',
   Class = 'class',
   Subtype = 'subtype',
+  BracketStyle = 'bracketStyle',
 }
 
 const propMapping: Record<string, PropMappingValue> = {
@@ -38,6 +39,7 @@ const propMapping: Record<string, PropMappingValue> = {
   fieldName: { maxLength: 30 },
   fieldValue: { type: 'textarea' },
   radiobuttons: { type: 'radio' },
+  bracketStyle: { type: 'select' },
 };
 
 const content = (type: string): JSX.Element[] =>
@@ -47,7 +49,8 @@ const content = (type: string): JSX.Element[] =>
       if (
         prop === SGroupPropType.Connectivity ||
         prop === SGroupPropType.Class ||
-        prop === SGroupPropType.Subtype
+        prop === SGroupPropType.Subtype ||
+        prop === SGroupPropType.BracketStyle
       ) {
         return (
           <Field

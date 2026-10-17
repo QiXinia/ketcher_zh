@@ -141,7 +141,8 @@ function convertKetV2ToInternal(ketText: KETTextV2): {
         if (para.alignment) {
           paragraphNode.format = para.alignment;
         }
-        if (para.lineSpacing !== undefined) paragraphNode.lineSpacing = para.lineSpacing;
+        if (para.lineSpacing !== undefined)
+          paragraphNode.lineSpacing = para.lineSpacing;
 
         return paragraphNode;
       }),
@@ -203,7 +204,10 @@ export function textToStruct(ketItem: any, struct: Struct) {
     }
   }
 
-  const text = new Text(node);
+  const text = new Text({
+    ...node,
+    annotations: node.annotations ?? ketItem.annotations,
+  });
   text.setInitiallySelected(ketItem.selected);
   struct.texts.add(text);
   return struct;

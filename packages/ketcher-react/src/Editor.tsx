@@ -37,9 +37,11 @@ interface MacromoleculesEditorProps {
  *  traverse this dynamic import. If this import is ever changed to a static one, the flag must be removed
  *  and the resulting cross-package cycle (ketcher-macromolecules -> ketcher-react) must be resolved first.
  */
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
 const MacromoleculesEditorComponent = lazy(
+  // ketcher-macromolecules is built after ketcher-react, so its generated
+  // declaration is outside this package's rootDir during this build.
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   () => import('ketcher-macromolecules'),
 ) as unknown as React.LazyExoticComponent<
   React.ComponentType<MacromoleculesEditorProps>

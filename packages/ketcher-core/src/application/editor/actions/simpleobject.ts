@@ -18,7 +18,21 @@ import {
   SimpleObjectAdd,
   SimpleObjectDelete,
   SimpleObjectResize,
+  SimpleObjectStyleSet,
+  SimpleObjectArrowSet,
+  SimpleObjectCurveSet,
+  SimpleObjectBracketSet,
+  SimpleObjectColorSet,
 } from '../operations';
+import {
+  SimpleObjectArrow,
+  SimpleObjectStyle,
+  SimpleObjectBracketType,
+} from 'domain/entities/simpleObject';
+import type {
+  SimpleObjectCurveProperty,
+  SimpleObjectCurveValue,
+} from '../operations/simpleObject';
 
 import { Action } from './action';
 
@@ -45,4 +59,51 @@ export function fromSimpleObjectResizing(
   const action = new Action();
   action.addOp(new SimpleObjectResize(id, d, current, anchor, false, toCircle));
   return action.perform(restruct);
+}
+
+export function fromSimpleObjectStyle(
+  id: number,
+  style: SimpleObjectStyle,
+) {
+  const action = new Action();
+  action.addOp(new SimpleObjectStyleSet(id, style));
+  return action;
+}
+
+export function fromSimpleObjectColor(id: number, color?: string) {
+  const action = new Action();
+  action.addOp(new SimpleObjectColorSet(id, color));
+  return action;
+}
+
+export function fromSimpleObjectArrow(
+  id: number,
+  endpoint: 'start' | 'end',
+  arrow: SimpleObjectArrow,
+) {
+  const action = new Action();
+  action.addOp(new SimpleObjectArrowSet(id, endpoint, arrow));
+  return action;
+}
+
+export function fromSimpleObjectCurve(
+  id: number,
+  property: SimpleObjectCurveProperty,
+  value: SimpleObjectCurveValue,
+) {
+  if (
+    (property === 'lineWidth' || property === 'doubleLineSpacing') &&
+    (typeof value !== 'number' || !Number.isFinite(value) || value < 0.25 || value > 8)
+  ) {
+    throw new Error('曲线线宽和双线间距倍率必须在 0.25 到 8 之间');
+  }
+  const action = new Action();
+  action.addOp(new SimpleObjectCurveSet(id, property, value));
+  return action;
+}
+
+export function fromSimpleObjectBracket(id: number, bracketType: SimpleObjectBracketType) {
+  const action = new Action();
+  action.addOp(new SimpleObjectBracketSet(id, bracketType));
+  return action;
 }

@@ -28,7 +28,7 @@ class EnhancedStereoTool implements Tool {
   private readonly stereoAtoms: Array<number>;
   isNotActiveTool: true;
 
-  constructor(editor) {
+  constructor(editor, options?: { fixedStereo?: 'abs' | 'and' | 'or' }) {
     const selection = editor.selection();
     this.editor = editor;
     this.isNotActiveTool = true;
@@ -44,10 +44,49 @@ class EnhancedStereoTool implements Tool {
       return;
     }
 
-    EnhancedStereoTool.changeAtomsStereoAction(
-      this.editor,
-      this.stereoAtoms,
-    ).then((action) => action && editor.update(action));
+    const fixedStereo = options?.fixedStereo;
+    const actionPromise = fixedStereo
+      ? Promise.resolve(
+          EnhancedStereoTool.fixedStereoAction(
+            this.editor,
+            this.stereoAtoms,
+            fixedStereo,
+          ),
+        )
+      : EnhancedStereoTool.changeAtomsStereoAction(
+          this.editor,
+          this.stereoAtoms,
+        );
+    actionPromise.then((action) => action && editor.update(action));
+  }
+
+  /** Apply a Query Tools stereo marker without opening the generic dialog. */
+  static fixedStereoAction(
+    editor: Editor,
+    stereoAtoms: Array<number>,
+    fixedStereo: 'abs' | 'and' | 'or',
+  ) {
+    const struct = editor.struct();
+    const restruct = editor.render.ctab;
+    const prefix = fixedStereo === 'abs' ? 'abs' : fixedStereo === 'and' ? '&' : 'or';
+    const usedGroups = Array.from(struct.atoms.values())
+      .map((atom) => atom.stereoLabel || '')
+      .filter((label) => label.startsWith(prefix))
+      .map((label) => Number(label.slice(prefix.length)))
+      .filter((number) => Number.isInteger(number) && number > 0);
+    const group = prefix === 'abs' ? '' : String(Math.max(0, ...usedGroups) + 1);
+    const stereoLabel = `${prefix}${group}`;
+    const action = stereoAtoms.reduce(
+      (acc, stereoAtom) => {
+        const frid = struct.atoms.get(stereoAtom)?.fragment;
+        const frag = frid !== undefined ? restruct.molecule.frags.get(frid) : null;
+        if (frag?.stereoAtoms) return acc.mergeWith(fromStereoFlagUpdate(restruct, frid));
+        return acc;
+      },
+      fromAtomsAttrs(restruct, stereoAtoms, { stereoLabel }, false),
+    );
+    action.operations.reverse();
+    return action;
   }
 
   static changeAtomsStereoAction(editor: Editor, stereoAtoms: Array<number>) {

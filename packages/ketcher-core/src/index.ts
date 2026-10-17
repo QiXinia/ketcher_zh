@@ -19,6 +19,9 @@ export * from './domain/entities';
 export * from './domain/serializers';
 export * from './domain/services';
 export * from './domain/helpers';
+// Nickname serialization depends on Struct/SGroup; keep it out of the helpers
+// barrel imported by those entities to avoid an initialization cycle.
+export * from './domain/helpers/nicknames';
 export * from './domain/types';
 
 export * from './infrastructure/services';

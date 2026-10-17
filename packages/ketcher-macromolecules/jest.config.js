@@ -1,4 +1,6 @@
 module.exports = {
+  maxWorkers: 2,
+  workerIdleMemoryLimit: '768MB',
   testMatch: ['**/src/**/?(*.)+(spec|test).[jt]s?(x)'],
   testPathIgnorePatterns: ['fixtures', 'dist', 'node_modules'],
   testEnvironment: 'jsdom',

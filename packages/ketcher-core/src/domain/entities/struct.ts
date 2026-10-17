@@ -34,7 +34,8 @@ import { SGroupForest } from './sgroupForest';
 import type { SimpleObject } from './simpleObject';
 import type { Text } from './text';
 import { Vec2 } from './vec2';
-import type { Highlight } from './highlight';
+import { Highlight } from './highlight';
+import { RingFill, isRingTopology } from './ringFill';
 import type { RGroupAttachmentPoint } from './rgroupAttachmentPoint';
 import { MonomerMicromolecule } from 'domain/entities/monomerMicromolecule';
 import { isNumber } from 'lodash';
@@ -57,6 +58,19 @@ export type StructProperty = {
   value: string;
 };
 
+export type DocumentAnnotation = {
+  keyword: string;
+  content: string;
+};
+
+export type DocumentProperty = {
+  name: string;
+  value: string;
+  type: string;
+  rule: string;
+  status: string;
+};
+
 type ArrowWithId = {
   arrowId?: number;
 };
@@ -67,6 +81,13 @@ function arrayAddIfMissing(array, item) {
   }
   array.push(item);
   return true;
+}
+
+function mapEntityIds(ids: number[], idMap: Map<number, number>): number[] {
+  return ids.flatMap((id) => {
+    const mappedId = idMap.get(id);
+    return mappedId === undefined ? [] : [mappedId];
+  });
 }
 
 export class Struct {
@@ -83,11 +104,14 @@ export class Struct {
   rgroupAttachmentPoints: Pool<RGroupAttachmentPoint>;
   name: string;
   abbreviation?: string;
+  annotations: DocumentAnnotation[];
+  properties: DocumentProperty[];
   sGroupForest: SGroupForest;
   simpleObjects: Pool<SimpleObject>;
   texts: Pool<Text>;
   functionalGroups: Pool<FunctionalGroup>;
   highlights: Pool<Highlight>;
+  ringFills = new Pool<RingFill>();
   images = new Pool<Image>();
   multitailArrows = new Pool<MultitailArrow>();
   private nextArrowId = 0;
@@ -106,6 +130,8 @@ export class Struct {
     this.rgroupAttachmentPoints = new Pool<RGroupAttachmentPoint>();
     this.name = '';
     this.abbreviation = '';
+    this.annotations = [];
+    this.properties = [];
     this.sGroupForest = new SGroupForest();
     this.simpleObjects = new Pool<SimpleObject>();
     this.texts = new Pool<Text>();
@@ -301,6 +327,7 @@ export class Struct {
       new Pile<number>(this.rgroupAttachmentPoints.keys());
     const aids: Map<number, number> = aidMap ?? new Map();
     const bidMap = bidMapEntity ?? new Map();
+    const rgroupAttachmentPointIdMap = new Map<number, number>();
 
     bonds = bonds.filter((bid) => {
       const bond = this.bonds.get(bid)!;
@@ -423,7 +450,44 @@ export class Struct {
     rgroupAttachmentPoints.forEach((id) => {
       const rgroupAttachmentPoint = this.rgroupAttachmentPoints.get(id);
       assert(rgroupAttachmentPoint != null);
-      cp.rgroupAttachmentPoints.add(rgroupAttachmentPoint.clone(aids));
+      const newId = cp.rgroupAttachmentPoints.add(
+        rgroupAttachmentPoint.clone(aids),
+      );
+      rgroupAttachmentPointIdMap.set(id, newId);
+    });
+
+    this.highlights.forEach((highlight) => {
+      const mappedAtoms = mapEntityIds(highlight.atoms, aids);
+      const mappedBonds = mapEntityIds(highlight.bonds, bidMap);
+      const mappedAttachmentPoints = mapEntityIds(
+        highlight.rgroupAttachmentPoints,
+        rgroupAttachmentPointIdMap,
+      );
+      if (
+        mappedAtoms.length ||
+        mappedBonds.length ||
+        mappedAttachmentPoints.length
+      ) {
+        cp.highlights.add(
+          new Highlight({
+            atoms: mappedAtoms,
+            bonds: mappedBonds,
+            rgroupAttachmentPoints: mappedAttachmentPoints,
+            color: highlight.color,
+          }),
+        );
+      }
+    });
+
+    this.ringFills.forEach((fill) => {
+      // A partial ring is not a filled polygon. Preserve only complete rings.
+      if (!isRingTopology(this, fill) || !fill.atoms.every((id) => aids.has(id)) ||
+          !fill.bonds.every((id) => bidMap.has(id))) return;
+      cp.ringFills.add(new RingFill({
+        atoms: mapEntityIds(fill.atoms, aids),
+        bonds: mapEntityIds(fill.bonds, bidMap),
+        color: fill.color,
+      }));
     });
 
     if (!dropRxnSymbols) {
@@ -437,6 +501,8 @@ export class Struct {
     }
 
     cp.name = this.name;
+    cp.annotations = this.annotations.map((annotation) => ({ ...annotation }));
+    cp.properties = this.properties.map((property) => ({ ...property }));
 
     return cp;
   }
@@ -482,6 +548,9 @@ export class Struct {
           break;
         case Bond.PATTERN.TYPE.TRIPLE:
           conn += 3;
+          break;
+        case Bond.PATTERN.TYPE.QUADRUPLE:
+          conn += 4;
           break;
         case Bond.PATTERN.TYPE.DATIVE:
         case Bond.PATTERN.TYPE.HYDROGEN:
@@ -1188,7 +1257,10 @@ export class Struct {
         : 0;
       if (atom.implicitH < 0) {
         atom.implicitH = 0;
-        atom.badConn = true;
+        // ChemDraw's Abnormal Valence flag is local to this atom. Keep the
+        // connectivity calculation intact, but honor the user's explicit
+        // permission when deciding whether this valence is an error.
+        atom.badConn = !atom.abnormalValence;
       }
     } else {
       atom.calcValence(correctConn);
@@ -1312,7 +1384,7 @@ export class Struct {
 
   getBondFragment(bid: number) {
     const aid = this.bonds.get(bid)?.begin;
-    return aid && this.atoms.get(aid)?.fragment;
+    return aid === undefined ? undefined : this.atoms.get(aid)?.fragment;
   }
 
   bindSGroupsToFunctionalGroups() {

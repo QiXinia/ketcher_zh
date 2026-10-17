@@ -13,6 +13,7 @@ export interface Settings {
   // Editor settings
   readonly resetToSelect: boolean | 'paste';
   readonly rotationStep: number;
+  readonly sproutRingsInsteadOfSpiro: boolean;
 
   // General render settings
   readonly showValenceWarnings: boolean;
@@ -39,6 +40,11 @@ export interface Settings {
 
   // Atoms
   readonly carbonExplicitly: boolean;
+  readonly showAtomNumbers: boolean;
+  readonly showTerminalCarbonLabels: boolean;
+  readonly showQueryIndicators: boolean;
+  readonly showStereochemistry: boolean;
+  readonly showEnhancedStereochemistry: boolean;
   readonly showCharge: boolean;
   readonly showValence: boolean;
   readonly showHydrogenLabels:

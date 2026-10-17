@@ -15,7 +15,7 @@
     "build:finalize": "node scripts/copy-build.js",
     "build:remote": "cross-env MODE=remote npm run build:prepare && cross-env MODE=remote npm run build:react && cross-env MODE=remote npm run build:finalize",
     "build:standalone": "cross-env MODE=standalone npm run build:prepare && cross-env MODE=standalone npm run build:react && cross-env MODE=standalone npm run build:finalize",
-    "build:react": "react-app-rewired build",
+    "build:react": "cross-env DISABLE_TERSER_PARALLEL=true DISABLE_SOURCE_MAP_LOADER=true react-app-rewired build",
     "build:react:analyze": "react-app-rewired build --analyze",
     "build": "npm run build:standalone && npm run build:remote",
     "build:standalone:analyze": "cross-env MODE=standalone npm run build:prepare && cross-env MODE=standalone npm run build:react:analyze && cross-env MODE=standalone npm run build:finalize",

@@ -12,7 +12,7 @@ exports[`Menu component should render menu component in a container 1`] = `
           class="css-498x9x"
         >
           <button
-            class="open css-1ceu922"
+            class="open css-koh5fl"
             title=""
           >
             <svg
@@ -34,7 +34,7 @@ exports[`Menu component should render menu component in a container 1`] = `
           class="css-498x9x"
         >
           <button
-            class="erase css-1ceu922"
+            class="erase css-koh5fl"
             title=""
           >
             <svg
@@ -59,7 +59,7 @@ exports[`Menu component should render menu component in a container 1`] = `
               class="css-5su45f"
             >
               <button
-                class="select-lasso css-1ceu922"
+                class="select-lasso css-koh5fl"
                 title=""
               >
                 <svg
@@ -102,7 +102,7 @@ exports[`Menu component should render menu component in a container 1`] = `
               class="css-5su45f"
             >
               <button
-                class="shape-rectangle css-1ceu922"
+                class="shape-rectangle css-koh5fl"
                 title=""
               >
                 <svg
@@ -141,7 +141,7 @@ exports[`Menu component should render menu component in a container 1`] = `
               class="css-5su45f"
             >
               <button
-                class="transform-flip-h css-1ceu922"
+                class="transform-flip-h css-koh5fl"
                 title=""
               >
                 <svg
@@ -184,7 +184,7 @@ exports[`Menu component should render menu component in a container 1`] = `
         class="css-498x9x"
       >
         <button
-          class="open css-1ceu922"
+          class="open css-koh5fl"
           title=""
         >
           <svg
@@ -206,7 +206,7 @@ exports[`Menu component should render menu component in a container 1`] = `
         class="css-498x9x"
       >
         <button
-          class="erase css-1ceu922"
+          class="erase css-koh5fl"
           title=""
         >
           <svg
@@ -231,7 +231,7 @@ exports[`Menu component should render menu component in a container 1`] = `
             class="css-5su45f"
           >
             <button
-              class="select-lasso css-1ceu922"
+              class="select-lasso css-koh5fl"
               title=""
             >
               <svg
@@ -274,7 +274,7 @@ exports[`Menu component should render menu component in a container 1`] = `
             class="css-5su45f"
           >
             <button
-              class="shape-rectangle css-1ceu922"
+              class="shape-rectangle css-koh5fl"
               title=""
             >
               <svg
@@ -313,7 +313,7 @@ exports[`Menu component should render menu component in a container 1`] = `
             class="css-5su45f"
           >
             <button
-              class="transform-flip-h css-1ceu922"
+              class="transform-flip-h css-koh5fl"
               title=""
             >
               <svg

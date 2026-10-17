@@ -209,6 +209,9 @@ logger.warn = (msg, options) => {
 };
 
 export default defineConfig({
+  // The example is embedded below /reference/ketcher rather than served at
+  // the origin root, so generated dynamic imports must stay relative.
+  base: './',
   server: {
     open: true,
   },

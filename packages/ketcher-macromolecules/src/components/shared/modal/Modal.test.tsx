@@ -46,7 +46,7 @@ describe('Modal component', () => {
   it('should call close handler when close icon clicked', () => {
     render(withThemeProvider(mockModal()));
 
-    const closeIcon = screen.getByTitle('Close window');
+    const closeIcon = screen.getByTitle('关闭窗口');
     fireEvent.click(closeIcon);
 
     expect(mockOnCloseHandler).toHaveBeenCalledTimes(1);
@@ -66,7 +66,7 @@ describe('Modal component', () => {
       ),
     );
 
-    expect(screen.queryByTitle('Close window')).not.toBeInTheDocument();
+    expect(screen.queryByTitle('关闭窗口')).not.toBeInTheDocument();
   });
 
   it('should show "Expand window" tooltip when not expanded', () => {
@@ -86,7 +86,7 @@ describe('Modal component', () => {
       ),
     );
 
-    expect(screen.getByTitle('Expand window')).toBeInTheDocument();
+    expect(screen.getByTitle('展开窗口')).toBeInTheDocument();
   });
 
   it('should show "Minimize window" tooltip when expanded', () => {
@@ -106,7 +106,7 @@ describe('Modal component', () => {
       ),
     );
 
-    expect(screen.getByTitle('Minimize window')).toBeInTheDocument();
+    expect(screen.getByTitle('最小化窗口')).toBeInTheDocument();
   });
 
   it('should toggle tooltip when expand button is clicked', () => {
@@ -130,7 +130,7 @@ describe('Modal component', () => {
       ),
     );
 
-    const expandButton = screen.getByTitle('Expand window');
+    const expandButton = screen.getByTitle('展开窗口');
     fireEvent.click(expandButton);
 
     expect(mockSetExpanded).toHaveBeenCalledWith(true);
@@ -151,6 +151,6 @@ describe('Modal component', () => {
       ),
     );
 
-    expect(screen.getByTitle('Minimize window')).toBeInTheDocument();
+    expect(screen.getByTitle('最小化窗口')).toBeInTheDocument();
   });
 });

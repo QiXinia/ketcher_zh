@@ -141,7 +141,8 @@ const TextEditorInner = (props: {
           const formats = new Set<string>();
           if (selection.hasFormat('bold')) formats.add(TextCommand.Bold);
           if (selection.hasFormat('italic')) formats.add(TextCommand.Italic);
-          if (selection.hasFormat('underline')) formats.add(TextCommand.Underline);
+          if (selection.hasFormat('underline'))
+            formats.add(TextCommand.Underline);
           if (selection.hasFormat('subscript'))
             formats.add(TextCommand.Subscript);
           if (selection.hasFormat('superscript'))
@@ -209,7 +210,7 @@ const TextEditorInner = (props: {
         onKeyDown={handleKeyDown}
         role="toolbar"
         tabIndex={0}
-        aria-label="Text formatting toolbar"
+        aria-label={i18n.t('textEditor.formattingToolbar')}
       >
         {buttons.map((button) => {
           return (

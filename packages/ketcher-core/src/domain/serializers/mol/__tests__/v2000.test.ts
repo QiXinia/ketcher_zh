@@ -199,6 +199,15 @@ describe('parseCTabV2000', () => {
   });
 
   describe('parseBondLine', () => {
+    it('parses the ChemWiki quadruple bond extension', () => {
+      const struct = molParsers.parseCTabV2000(
+        ['  1  2 11  0     0  0'],
+        createCountsLine(0, 1),
+      );
+
+      expect(struct.bonds.get(0)!.type).toBe(Bond.PATTERN.TYPE.QUADRUPLE);
+    });
+
     it('should parse atom numbers correctly', () => {
       const bondLines = [
         '1  2  2  0     0  0',

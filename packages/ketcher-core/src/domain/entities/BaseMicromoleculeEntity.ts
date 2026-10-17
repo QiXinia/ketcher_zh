@@ -16,11 +16,37 @@
 
 export const INVALID = 'invalid';
 export type initiallySelectedType = boolean | 'invalid';
+
+export type ObjectAnnotation = {
+  keyword: string;
+  content: string;
+};
+
+export type ObjectAnnotationInput = {
+  initiallySelected?: initiallySelectedType;
+  annotations?: ObjectAnnotation[];
+};
+
 export abstract class BaseMicromoleculeEntity {
   initiallySelected?: initiallySelectedType;
+  annotations: ObjectAnnotation[];
 
-  protected constructor(initiallySelected?: initiallySelectedType) {
-    this.initiallySelected = initiallySelected;
+  protected constructor(
+    initiallySelectedOrAttributes?: initiallySelectedType | ObjectAnnotationInput,
+    annotations?: ObjectAnnotation[],
+  ) {
+    if (
+      initiallySelectedOrAttributes &&
+      typeof initiallySelectedOrAttributes === 'object'
+    ) {
+      this.initiallySelected = initiallySelectedOrAttributes.initiallySelected;
+      this.annotations = cloneObjectAnnotations(
+        initiallySelectedOrAttributes.annotations,
+      );
+    } else {
+      this.initiallySelected = initiallySelectedOrAttributes;
+      this.annotations = cloneObjectAnnotations(annotations);
+    }
   }
 
   getInitiallySelected(): boolean | undefined {
@@ -44,4 +70,21 @@ export abstract class BaseMicromoleculeEntity {
   resetInitiallySelected(invalidate?: boolean): void {
     this.initiallySelected = invalidate ? INVALID : undefined;
   }
+}
+
+export function cloneObjectAnnotations(
+  annotations?: ObjectAnnotation[] | null,
+): ObjectAnnotation[] {
+  if (!Array.isArray(annotations)) return [];
+  return annotations
+    .filter(
+      (annotation) =>
+        annotation &&
+        typeof annotation.keyword === 'string' &&
+        typeof annotation.content === 'string',
+    )
+    .map((annotation) => ({
+      keyword: annotation.keyword,
+      content: annotation.content,
+    }));
 }

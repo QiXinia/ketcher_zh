@@ -75,7 +75,11 @@ import { Cell } from 'domain/entities/canvas-matrix/Cell';
 import { AmbiguousMonomer } from 'domain/entities/AmbiguousMonomer';
 import type { IKetTemplateConnection } from 'application/formatters';
 import { type AtomProperties, Atom } from 'domain/entities/CoreAtom';
-import { Bond } from 'domain/entities/CoreBond';
+import {
+  Bond,
+  type BondDisplay,
+  type DoubleBondPosition,
+} from 'domain/entities/CoreBond';
 import {
   AtomAddOperation,
   AtomDeleteOperation,
@@ -2446,6 +2450,8 @@ export class DrawingEntitiesManager {
         bond.stereo,
         bond.bondIdInMicroMode,
         bond.cip,
+        bond.display,
+        bond.doubleBondPosition,
       );
       const addedBond = bondAddCommand.operations[0].bond as Bond;
 
@@ -3214,6 +3220,8 @@ export class DrawingEntitiesManager {
     bondIdInMicroMode: number,
     _bond?: Bond,
     cip?: BondCIP | null,
+    display?: BondDisplay,
+    doubleBondPosition?: DoubleBondPosition,
   ) {
     if (_bond) {
       this.bonds.set(_bond.id, _bond);
@@ -3228,6 +3236,8 @@ export class DrawingEntitiesManager {
       type,
       stereo,
       cip,
+      display,
+      doubleBondPosition,
     );
 
     this.bonds.set(bond.id, bond);
@@ -3244,6 +3254,8 @@ export class DrawingEntitiesManager {
     stereo: number,
     bondIdInMicroMode: number,
     cip?: BondCIP | null,
+    display?: BondDisplay,
+    doubleBondPosition?: DoubleBondPosition,
   ) {
     const command = new Command();
     const bondAddOperation = new BondAddOperation(
@@ -3256,6 +3268,8 @@ export class DrawingEntitiesManager {
           bondIdInMicroMode,
           bond,
           cip,
+          display,
+          doubleBondPosition,
         ),
       (bond: Bond) => this.deleteBondChangeModel(bond),
     );

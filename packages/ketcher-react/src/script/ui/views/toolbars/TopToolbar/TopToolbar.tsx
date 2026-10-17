@@ -29,7 +29,13 @@ import { TopToolbarIconButton } from './TopToolbarIconButton';
 import { CustomButtons } from './CustomButtons';
 import { ketcherProvider } from 'ketcher-core';
 import i18n from '../../../../../i18n';
-import { cloneElement, useCallback, useMemo, useRef, type RefObject } from 'react';
+import {
+  cloneElement,
+  useCallback,
+  useMemo,
+  useRef,
+  type RefObject,
+} from 'react';
 import type { CustomButton } from '../../../../builders/ketcher/CustomButtons';
 import { useInView } from 'react-intersection-observer';
 import { ArrowScroll } from '../ArrowScroll';

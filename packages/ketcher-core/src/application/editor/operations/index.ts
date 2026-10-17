@@ -17,6 +17,9 @@
 export * from './atom';
 export * from './bond';
 export * from './CanvasLoad';
+export * from './DocumentAnnotationsSet';
+export * from './DocumentPropertiesSet';
+export * from './ObjectAnnotationsSet';
 export * from './descriptors';
 export * from './EnhancedFlagMove';
 export * from './EnhancedFlagClear';
@@ -38,3 +41,4 @@ export * from './Text';
 export * from './monomer';
 export * from './modes';
 export * from './monomerCreation';
+export * from './RingFillSet';

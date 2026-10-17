@@ -51,7 +51,7 @@ const TemplatesList = (props: Props) => {
 
   const makeAction = (struct, index): UiAction => ({
     shortcut: action[`template-${index}`].shortcut,
-    action: { tool: 'template', opts: { struct } },
+    action: { tool: 'template', opts: { struct, ringTool: true } },
     title: getTemplateDisplayName(struct.name),
   });
 

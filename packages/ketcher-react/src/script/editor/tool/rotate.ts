@@ -22,8 +22,12 @@ import {
   Action,
   FunctionalGroup,
   fromFlip,
+  fromRotate180,
   fromItemsFuse,
   fromRotate,
+  fromScale,
+  fromFixLengths,
+  fromFixAngles,
   getHoverToFuse,
   getItemsToFuse,
   isAttachmentBond,
@@ -40,6 +44,17 @@ import type { Tool } from './Tool';
 import { normalizeAngle } from '../utils/normalizeAngle';
 
 type SnapMode = 'one-bond' | 'multiple-bonds';
+type RotateToolOptions =
+  | FlipDirection
+  | { rotate180: FlipDirection }
+  /** Apply an exact angle (radians) around the current selection center. */
+  | { angle: number }
+  /** Apply an exact positive scale factor around the current selection center. */
+  | { scale: number }
+  /** Normalize selected bonds to a model-space length. */
+  | { fixedLength: number }
+  /** Set the first selected local angle in radians. */
+  | { fixedAngle: number };
 type SnapInfo = {
   snapMode: SnapMode;
   rotatableHalfBondAngle: number;
@@ -69,16 +84,85 @@ class RotateTool implements Tool {
   private centerAtomId?: number;
   private snapInfo: SnapInfo | null = null;
 
-  constructor(editor: Editor, flipDirection?: FlipDirection) {
+  constructor(editor: Editor, options?: RotateToolOptions) {
     this.editor = editor;
 
-    if (flipDirection) {
+    if (options && typeof options === 'object' && 'scale' in options) {
+      const scale = Number(options.scale);
+      if (!Number.isFinite(scale) || scale <= 0 || scale === 1) {
+        return;
+      }
+      const selectionCenter = this.getCenter();
+      const canvasCenter = this.reStruct.getVBoxObj().centre();
+      const action = fromScale(
+        this.reStruct,
+        this.selection,
+        selectionCenter || canvasCenter,
+        scale,
+      );
+      editor.update(action);
+      editor.rotateController.rerender();
+    } else if (
+      options &&
+      typeof options === 'object' &&
+      'fixedLength' in options
+    ) {
+      const fixedLength = Number(options.fixedLength);
+      if (!Number.isFinite(fixedLength) || fixedLength <= 0) {
+        throw new Error('Fixed bond length must be a positive finite number');
+      }
+      const action = fromFixLengths(this.reStruct, this.selection, fixedLength);
+      editor.update(action);
+      editor.rotateController.rerender();
+    } else if (
+      options &&
+      typeof options === 'object' &&
+      'fixedAngle' in options
+    ) {
+      const fixedAngle = Number(options.fixedAngle);
+      if (
+        !Number.isFinite(fixedAngle) ||
+        fixedAngle <= 0 ||
+        fixedAngle >= Math.PI
+      ) {
+        throw new Error('Fixed bond angle must be between 0 and 180 degrees');
+      }
+      const action = fromFixAngles(this.reStruct, this.selection, fixedAngle);
+      editor.update(action);
+      editor.rotateController.rerender();
+    } else if (options && typeof options === 'object' && 'angle' in options) {
+      const angle = Number(options.angle);
+      if (!Number.isFinite(angle) || angle === 0) {
+        return;
+      }
+      const selectionCenter = this.getCenter();
+      const canvasCenter = this.reStruct.getVBoxObj().centre();
+      const action = fromRotate(
+        this.reStruct,
+        this.selection,
+        selectionCenter || canvasCenter,
+        angle,
+      );
+      editor.update(action);
+      editor.rotateController.rerender();
+    } else if (options && typeof options === 'object') {
+      const selectionCenter = this.getCenter();
+      const canvasCenter = this.reStruct.getVBoxObj().centre();
+      const action = fromRotate180(
+        this.reStruct,
+        this.selection,
+        options.rotate180,
+        selectionCenter || canvasCenter,
+      );
+      editor.update(action);
+      editor.rotateController.rerender();
+    } else if (options) {
       const selectionCenter = this.getCenter();
       const canvasCenter = this.reStruct.getVBoxObj().centre();
       const action = fromFlip(
         this.reStruct,
         this.selection,
-        flipDirection,
+        options,
         selectionCenter || canvasCenter,
       );
       editor.update(action);

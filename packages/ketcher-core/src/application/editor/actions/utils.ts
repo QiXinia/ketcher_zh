@@ -17,6 +17,7 @@
 import {
   type AtomAttributes,
   type AtomQueryProperties,
+  type SubstitutionQueryMode,
   Atom,
 } from 'domain/entities/atom';
 import { Bond } from 'domain/entities/bond';
@@ -31,10 +32,22 @@ import type { EditorSelection } from '../editor.types';
 export type AtomType = 'single' | 'list' | 'pseudo';
 export type AtomAttributeName = keyof AtomAttributes;
 export type AtomQueryPropertiesName = keyof AtomQueryProperties;
-export type AtomAllAttributeName = AtomAttributeName | AtomQueryPropertiesName;
+export type AtomAllAttributeName =
+  | AtomAttributeName
+  | AtomQueryPropertiesName
+  // Form projection for ChemDraw Substituents' nested query.
+  | 'substitutionQueryMode'
+  | 'substitutionQueryCount';
 export type AtomAllAttributeValue =
   | AtomAttributes[AtomAttributeName]
-  | AtomQueryProperties[AtomQueryPropertiesName];
+  | AtomQueryProperties[AtomQueryPropertiesName]
+  | SubstitutionQueryMode
+  | null
+  | 0
+  | 1
+  | 2
+  | 3
+  | 4;
 
 export function atomGetAttr(
   restruct: ReStruct,
@@ -221,10 +234,13 @@ export function atomForNewBond(restruct, id, bond?) {
       (neighbours.length === 1 &&
         prevBondType === bond?.type &&
         (bond?.type === Bond.PATTERN.TYPE.DOUBLE ||
-          bond?.type === Bond.PATTERN.TYPE.TRIPLE)) ||
+          bond?.type === Bond.PATTERN.TYPE.TRIPLE ||
+          bond?.type === Bond.PATTERN.TYPE.QUADRUPLE)) ||
       (prevBondType === Bond.PATTERN.TYPE.SINGLE &&
-        bond?.type === Bond.PATTERN.TYPE.TRIPLE) ||
-      (prevBondType === Bond.PATTERN.TYPE.TRIPLE &&
+        (bond?.type === Bond.PATTERN.TYPE.TRIPLE ||
+          bond?.type === Bond.PATTERN.TYPE.QUADRUPLE)) ||
+      ((prevBondType === Bond.PATTERN.TYPE.TRIPLE ||
+        prevBondType === Bond.PATTERN.TYPE.QUADRUPLE) &&
         bond?.type === Bond.PATTERN.TYPE.SINGLE);
 
     if (shallBe180DegToPrevBond) {
