@@ -47,3 +47,10 @@
 
 ### 变更时间线
 - 2026-10-26 02:06　首轮：环境就绪（Node24 + npm install + ajv），核心/单测初步排查完成，开始无头浏览器实机复现；按锁刷新要求先推一次 WIP。
+- 2026-10-26 03:30　无头浏览器（vite standalone + 系统 chromium）实机复现并完成修复与端到端验证：
+  - 根因1（Editor.ts domEventSetup）：fork 新增 `if (event.isPrimary === false) return true;` 过滤多指触摸；但 Chrome 把鼠标 click 也派发为 PointerEvent 且 isPrimary===false、pointerType='mouse'，吞掉所有画布 click。文本/图像工具靠 click 创建新对象（mousedown 仅拖动），故两工具"点了没反应"。
+  - 根因2（Text.tsx）：fork 新增可拖拽窗口化弹窗（默认 windowedMode=true），WindowedModal 已传 formState={win.form}；但 Text.tsx 仍 connect 到 store.modal（windowed 模式下为 null），覆盖正确 prop，`formState.form.valid` 崩溃白屏。
+  - 修复（仅2文件 +16/-3）：① Editor.ts 守卫改为仅忽略次要触摸指针 `event.pointerType==='touch' && isPrimary===false`；② Text.tsx valid 改为 `formState?.valid ?? false`，connect 改为 `ownProps.formState ?? state.modal?.form`（与其它弹窗一致）。
+  - E2E（playwright）：Text→点画布→输入→应用→画布出现文本；Image→点画布→选图→画布出现图像；getKet 含 text/image 节点；setMolecule(ket) 重载后两者均在；无 pageerror。
+  - 备注：图像 KET data 要求 base64≥160 字符（上游既有 schema），1x1 测试图过小会触发"Cannot deserialize"，非缺陷。
+  - 测试：core 550 passed（1 个无关 RotationView 颜色）；react Text|Dialog|Modal 75 passed，4 failed/3 snapshot 为 i18n 汉化快照漂移（Save 等，基线既有，非本次回归）。tsc 改动文件无报错。

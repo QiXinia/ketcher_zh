@@ -3241,7 +3241,10 @@ class Editor implements KetcherEditor {
     return this._selection; // eslint-disable-line
   }
 
-  formatSelectedTexts(command: TextFormattingCommand, value?: string | number): number {
+  formatSelectedTexts(
+    command: TextFormattingCommand,
+    value?: string | number,
+  ): number {
     const selectedTextIds = this.selection()?.texts ?? [];
     if (!selectedTextIds.length) throw new Error('请先选择一个或多个文本对象');
 
@@ -3249,7 +3252,12 @@ class Editor implements KetcherEditor {
     for (const id of selectedTextIds) {
       const text = this.struct().texts.get(id);
       if (!text?.content) continue;
-      const action = fromSelectedTextFormatting(this.render.ctab, [id], command, value);
+      const action = fromSelectedTextFormatting(
+        this.render.ctab,
+        [id],
+        command,
+        value,
+      );
       if (!action.isDummy()) {
         this.update(action);
         changedCount += 1;
@@ -3717,7 +3725,14 @@ function domEventSetup(editor: Editor, clientArea: HTMLElement) {
     });
 
     subs.add((event) => {
-      if (event.isPrimary === false) return true;
+      // Ignore only secondary touch pointers (e.g. the second finger of a
+      // pinch). Chrome dispatches `click` as a PointerEvent whose
+      // `isPrimary` is `false` even for the mouse's primary button, so guarding
+      // on `isPrimary === false` alone would swallow every canvas click —
+      // which broke tools that create items on click (Text, Insert Image).
+      if (event.pointerType === 'touch' && event.isPrimary === false) {
+        return true;
+      }
       if (editor.gestureRecognizer?.isGestureActive()) return true;
 
       updateLastCursorPosition(editor, event);
