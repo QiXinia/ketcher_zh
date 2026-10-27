@@ -135,9 +135,9 @@ const Atom: FC<Props> = (props: Props) => {
     }
 
     const query = value ? getAtomCustomQuery(formState) : '';
-    setCustomQuery(query);
     setIsCustomQuery(value);
     setExpandedAccordions([]);
+    setCustomQuery(query);
   };
 
   const customValid = useMemo(() => {

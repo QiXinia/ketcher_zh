@@ -23,7 +23,7 @@ export enum KetcherAsyncEvents {
   FAILURE = 'FAILURE',
 }
 
-export const runAsyncAction = async <T = any>(
+export const runAsyncAction = async <T = unknown>(
   action: () => Promise<T>,
   eventEmitter: EventEmitter,
   rejectOnFailure = false,
