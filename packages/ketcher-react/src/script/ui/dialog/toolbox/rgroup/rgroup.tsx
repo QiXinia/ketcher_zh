@@ -25,6 +25,7 @@ import i18n from '../../../../../i18n';
 
 interface RGroupResult {
   values: number[];
+  [key: string]: unknown;
 }
 
 interface RGroupFormState {

@@ -96,6 +96,7 @@ import {
   Visel,
   paperPathFromSVGElement,
   fromFragmentDeletion,
+  assert,
 } from 'ketcher-core';
 import {
   SimpleObjectArrow,
@@ -128,7 +129,6 @@ import type {
 } from './tool/Tool';
 import type { TextFormattingCommand } from 'ketcher-core';
 import { getSelectionMap, getStructCenter } from './utils/structLayout';
-import assert from 'assert';
 import { isNumber } from 'lodash';
 import paperjs from 'paper';
 

@@ -68,6 +68,7 @@ interface CheckSchema {
 
 interface CheckState {
   checkOptions: CheckOption[];
+  [key: string]: unknown;
 }
 
 interface CheckFormState extends FormState<CheckState> {

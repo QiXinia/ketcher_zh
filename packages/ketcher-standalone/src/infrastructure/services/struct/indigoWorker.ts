@@ -29,6 +29,8 @@ import {
   DearomatizeCommandData,
   GenerateImageCommandData,
   GenerateInchIKeyCommandData,
+  IndigoModule,
+  IndigoOptions,
   InputMessage,
   LayoutCommandData,
   ExplicitHydrogensCommandData,
@@ -53,13 +55,8 @@ const normalizeError = (error: unknown): Error => {
   }
 };
 
-interface IndigoOptions {
-  set: (key: string, value: string) => void;
-}
-
 type HandlerType = (
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  indigo: any,
+  indigo: IndigoModule,
   indigoOptions: IndigoOptions,
 ) => string;
 
@@ -75,7 +72,7 @@ function handleCommand(
   // Catch initialization and option failures as well as chemistry failures.
   // Every outcome must echo the request ID to settle exactly one caller.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  indigoModule.then((indigo: any) => {
+  indigoModule.then((indigo: IndigoModule) => {
     const indigoOptions = new indigo.MapStringString();
     let payload;
     try {

@@ -76,9 +76,9 @@ const Bond = (props: Props) => {
   );
   const handleCustomQueryCheckBoxChange = (
     value: boolean,
-    formState: BondSettings,
-    _,
-    updateFormState: (settings: BondSettings) => void,
+    formState: Record<string, unknown>,
+    _: (value: unknown) => void,
+    updateFormState: (settings: Record<string, unknown>) => void,
   ) => {
     if (isMonomerCreationWizardActive) {
       return;
@@ -86,6 +86,7 @@ const Bond = (props: Props) => {
 
     setIsCustomQuery(value);
     if (value) {
+      const bondFormState = formState as unknown as BondSettings;
       const {
         type,
         display,
@@ -93,7 +94,7 @@ const Bond = (props: Props) => {
         topology,
         center,
         customQuery,
-      } = formState;
+      } = bondFormState;
       previousSettings.current = {
         type,
         display,
@@ -105,15 +106,17 @@ const Bond = (props: Props) => {
     }
     updateFormState(
       value
-          ? {
-              type: '',
-              display: formState.display,
-              doubleBondPosition: formState.doubleBondPosition,
-              topology: null,
-              center: null,
-              customQuery: getBondCustomQuery(formState),
+        ? {
+            display: formState.display,
+            doubleBondPosition: formState.doubleBondPosition,
+            type: '',
+            topology: null,
+            center: null,
+            customQuery: getBondCustomQuery(
+              formState as unknown as BondSettings,
+            ),
           }
-        : previousSettings.current,
+        : (previousSettings.current as unknown as Record<string, unknown>),
     );
   };
 
