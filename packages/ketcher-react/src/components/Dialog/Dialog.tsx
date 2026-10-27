@@ -33,8 +33,8 @@ import { useDraggableDialog } from '../../hooks/useDraggableDialog';
 import i18n from '../../i18n';
 
 interface DialogParamsCallProps {
-  onCancel: () => void;
-  onOk: (result: unknown) => void;
+  onCancel?: () => void;
+  onOk?: (result: unknown) => void;
 }
 
 export interface DialogParams extends DialogParamsCallProps {
@@ -158,7 +158,7 @@ export const Dialog: FC<PropsWithChildren & Props> = (props) => {
   const exit = (mode) => {
     const key = isButtonOk(mode) ? 'onOk' : 'onCancel';
     if (params && key in params && (key !== 'onOk' || valid())) {
-      params[key](result());
+      params[key]?.(result());
     }
   };
 

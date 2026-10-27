@@ -293,6 +293,7 @@ class Editor implements KetcherEditor {
     quickEdit: PipelineSubscription;
     attachEdit: PipelineSubscription;
     removeFG: PipelineSubscription;
+    editMonomer: PipelineSubscription;
     change: Subscription;
     selectionChange: PipelineSubscription;
     aromatizeStruct: PipelineSubscription;
@@ -362,6 +363,7 @@ class Editor implements KetcherEditor {
       quickEdit: new PipelineSubscription(),
       attachEdit: new PipelineSubscription(),
       removeFG: new PipelineSubscription(),
+      editMonomer: new PipelineSubscription(),
       change: new Subscription(),
       selectionChange: new PipelineSubscription(),
       aromatizeStruct: new PipelineSubscription(),
@@ -1960,6 +1962,7 @@ class Editor implements KetcherEditor {
     originalType: KetMonomerClass,
     originalSymbol: string,
     sourceExpanded: boolean,
+    selectedSGroupIds?: number[],
   ) {
     let sourceSGroup: SGroup | undefined;
 
@@ -1976,7 +1979,12 @@ class Editor implements KetcherEditor {
     const replacementSourceSGroup = sourceSGroup;
     this.setMonomerExpandedState(replacementSourceSGroup, sourceExpanded);
 
-    Array.from(struct.sgroups.values()).forEach((sgroup) => {
+    const restrictToIds =
+      selectedSGroupIds && selectedSGroupIds.length > 1
+        ? new Set(selectedSGroupIds)
+        : null;
+
+    Array.from(struct.sgroups.entries()).forEach(([sgId, sgroup]) => {
       const sgroupWithMonomer = sgroup as SGroup & EditableSGroupMonomer;
       const sgroupMonomer = sgroupWithMonomer.monomer;
       const { props, label } = sgroupMonomer?.monomerItem ?? {};
@@ -1988,6 +1996,12 @@ class Editor implements KetcherEditor {
         props?.MonomerClass !== originalType ||
         symbol !== originalSymbol
       ) {
+        return;
+      }
+
+      // When the user had a specific subset of monomers selected, only replace
+      // those — not all canvas instances.
+      if (restrictToIds && !restrictToIds.has(sgId)) {
         return;
       }
 
@@ -2092,7 +2106,7 @@ class Editor implements KetcherEditor {
     let ket = {
       root: {
         templates: libraryItems.map((libraryItem) => {
-          return libraryItem.root.templates![0];
+          return libraryItem.root.templates?.[0];
         }),
       },
     };
@@ -2355,6 +2369,7 @@ class Editor implements KetcherEditor {
           editAllInitialValues.originalType,
           editAllInitialValues.originalSymbol,
           sourceMonomerExpanded,
+          editAllInitialValues.selectedSGroupIds,
         );
         struct.sGroupsRecalcCrossBonds();
       }
@@ -3683,11 +3698,11 @@ class Editor implements KetcherEditor {
     this.selection(null);
 
     const stack = this.historyStack[this.historyPtr];
-    let action!: Action;
+    let action: Action | undefined;
     try {
       action = stack.perform(this.render.ctab);
-    } finally {
       this.historyStack[this.historyPtr] = action;
+    } finally {
       this.historyPtr++;
     }
 

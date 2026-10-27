@@ -97,14 +97,14 @@ export class SimpleObjectAdd extends Base<SimpleObjectAddData> {
       bracketType: this.data.bracketType,
     });
 
+    let itemId: number;
     if (this.data.id == null) {
-      const index = struct.simpleObjects.add(item);
-      this.data.id = index;
+      itemId = struct.simpleObjects.add(item);
+      this.data.id = itemId;
     } else {
-      struct.simpleObjects.set(this.data.id, item);
+      itemId = this.data.id;
+      struct.simpleObjects.set(itemId, item);
     }
-
-    const itemId = this.data.id!;
 
     restruct.simpleObjects.set(itemId, new ReSimpleObject(item));
 
@@ -121,7 +121,10 @@ export class SimpleObjectAdd extends Base<SimpleObjectAddData> {
   }
 
   invert(): SimpleObjectDelete {
-    return new SimpleObjectDelete(this.data.id!);
+    if (this.data.id === undefined) {
+      throw new Error('SimpleObjectAdd: cannot invert before execute');
+    }
+    return new SimpleObjectDelete(this.data.id);
   }
 }
 
