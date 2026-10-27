@@ -46,7 +46,7 @@ interface SimpleObjectAddData {
   color?: string;
   bracketType: SimpleObjectBracketType;
 }
-export class SimpleObjectAdd extends Base {
+export class SimpleObjectAdd extends Base<SimpleObjectAddData> {
   readonly data: SimpleObjectAddData;
 
   constructor(
@@ -120,7 +120,7 @@ export class SimpleObjectAdd extends Base {
     Base.invalidateItem(restruct, 'simpleObjects', itemId, 1);
   }
 
-  invert(): Base {
+  invert(): SimpleObjectDelete {
     return new SimpleObjectDelete(this.data.id!);
   }
 }
