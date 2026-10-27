@@ -8,6 +8,7 @@ import { getStructServiceProvider } from './utils';
 import {
   getHiddenButtonsConfig,
   isMacromoleculesEditorDisabled,
+  getDisabledFunctionalityConfig,
 } from './utils/editorUrlConfig';
 import { safePostMessage } from './utils/safePostMessage';
 import { getCurrentKetcherTheme } from './theme';
@@ -15,6 +16,7 @@ import { getCurrentKetcherTheme } from './theme';
 const App = () => {
   const hiddenButtonsConfig = getHiddenButtonsConfig();
   const disableMacromoleculesEditor = isMacromoleculesEditorDisabled();
+  const disabledFunctionalityConfig = getDisabledFunctionalityConfig();
   const [hasError, setHasError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -37,6 +39,7 @@ const App = () => {
         }}
         buttons={hiddenButtonsConfig}
         disableMacromoleculesEditor={disableMacromoleculesEditor}
+        disabledFunctionality={disabledFunctionalityConfig}
         staticResourcesUrl={process.env.PUBLIC_URL}
         structServiceProvider={structServiceProvider}
         onInit={(ketcher: Ketcher) => {

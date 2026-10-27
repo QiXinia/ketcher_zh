@@ -1,4 +1,3 @@
-/* eslint-disable react-you-might-not-need-an-effect/no-event-handler */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /****************************************************************************
  * Copyright 2021 EPAM Systems
@@ -7,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *    https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -93,7 +92,6 @@ interface TemplateLibProps {
   lib: Array<Template>;
   selected: Template | null;
   tab: number;
-  initialTab: number;
   saltsAndSolvents: Template[];
   renderOptions?: any;
   isMonomerCreationWizardActive?: boolean;
@@ -193,7 +191,6 @@ export const TemplateDialog: FC<Props> = (props) => {
     onTabChange,
     onChangeGroup,
     tab,
-    initialTab = null,
     functionalGroups,
     lib: templateLib,
     saltsAndSolvents,
@@ -219,25 +216,15 @@ export const TemplateDialog: FC<Props> = (props) => {
 
   const filteredTemplateLib = filterLibSelector(props);
 
+  const activeTab =
+    isMonomerCreationWizardActive && tab === TemplateTabs.FunctionalGroupLibrary
+      ? TemplateTabs.TemplateLibrary
+      : tab;
+
   useEffect(() => {
     searchInputRef.current?.focus();
     onSelect(null);
-  }, [tab, onSelect]);
-
-  useEffect(() => {
-    if (initialTab !== null) {
-      onTabChange(initialTab);
-    }
-  }, [initialTab, onTabChange]);
-
-  useEffect(() => {
-    if (
-      isMonomerCreationWizardActive &&
-      tab === TemplateTabs.FunctionalGroupLibrary
-    ) {
-      onTabChange(TemplateTabs.TemplateLibrary);
-    }
-  }, [isMonomerCreationWizardActive, tab, onTabChange]);
+  }, [activeTab, onSelect]);
 
   const handleAccordionChange = (accordion) => (_, isExpanded) => {
     setExpandedAccordions((prevAccordions) =>
@@ -260,8 +247,8 @@ export const TemplateDialog: FC<Props> = (props) => {
       [TemplateTabs.FunctionalGroupLibrary]: functionalGroups,
       [TemplateTabs.SaltsAndSolvents]: saltsAndSolvents,
     };
-    return sdfSerializer.serialize(serializerMapper[tab]);
-  }, [tab, templateLib, functionalGroups, saltsAndSolvents]);
+    return sdfSerializer.serialize(serializerMapper[activeTab]);
+  }, [activeTab, templateLib, functionalGroups, saltsAndSolvents]);
 
   const onSaveError = useCallback(
     (err: unknown) => {
@@ -296,7 +283,7 @@ export const TemplateDialog: FC<Props> = (props) => {
       headerContent={<HeaderContent />}
       footerContent={
         <FooterContent
-          tab={tab}
+          tab={activeTab}
           getData={getData}
           isMonomerCreationWizardActive={isMonomerCreationWizardActive}
           onError={onSaveError}
@@ -321,7 +308,7 @@ export const TemplateDialog: FC<Props> = (props) => {
         <Icon name="search" className={classes.searchIcon} />
       </div>
       <Tabs
-        value={tab}
+        value={activeTab}
         onChange={(_, value) => handleTabChange(value)}
         className={classes.tabs}
       >
@@ -344,7 +331,7 @@ export const TemplateDialog: FC<Props> = (props) => {
         />
       </Tabs>
       <div className={classes.tabsContent}>
-        <TabPanel value={tab} index={TemplateTabs.TemplateLibrary}>
+        <TabPanel value={activeTab} index={TemplateTabs.TemplateLibrary}>
           <div>
             {groupNames.length ? (
               groupNames.map((groupName) => {
@@ -402,7 +389,7 @@ export const TemplateDialog: FC<Props> = (props) => {
             )}
           </div>
         </TabPanel>
-        <TabPanel value={tab} index={TemplateTabs.FunctionalGroupLibrary}>
+        <TabPanel value={activeTab} index={TemplateTabs.FunctionalGroupLibrary}>
           {filteredFG?.length ? (
             <div className={classes.resultsContainer}>
               <MemoizedTemplateTable
@@ -419,7 +406,7 @@ export const TemplateDialog: FC<Props> = (props) => {
             </div>
           )}
         </TabPanel>
-        <TabPanel value={tab} index={TemplateTabs.SaltsAndSolvents}>
+        <TabPanel value={activeTab} index={TemplateTabs.SaltsAndSolvents}>
           {filteredSaltsAndSolvents?.length ? (
             <div className={classes.resultsContainer}>
               <MemoizedTemplateTable
@@ -460,7 +447,6 @@ const onModalClose = (props, dispatch) => {
 export default connect(
   (store: any) => ({
     ...omit(['attach'], store.templates),
-    initialTab: store.modal?.prop?.tab,
     renderOptions: store.editor?.render?.options,
     functionalGroups: functionalGroupsSelector(store),
     saltsAndSolvents: saltsAndSolventsSelector(store),
