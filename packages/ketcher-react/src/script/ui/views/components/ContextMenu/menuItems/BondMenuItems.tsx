@@ -1,8 +1,9 @@
 import { type FC, useEffect, useState } from 'react';
-import { Item, Submenu, Separator } from 'react-contexify';
+import { Item, Submenu } from 'react-contexify';
 import type Editor from 'src/script/editor';
 import tools from '../../../../action/tools';
 import styles from '../ContextMenu.module.less';
+import MenuSeparator from '../MenuSeparator';
 import useBondEdit from '../hooks/useBondEdit';
 import useBondSGroupAttach from '../hooks/useBondSGroupAttach';
 import useBondSGroupEdit from '../hooks/useBondSGroupEdit';
@@ -108,7 +109,7 @@ const BondMenuItems: FC<MenuItemsProps<BondsContextMenuProps>> = (props) => {
             : i18n.t('contextMenu.edit')}
         </span>
       </Item>
-      <Separator />
+      <MenuSeparator />
       {bondNamesWithoutEmptyValue.map((name) => {
         const iconName = getIconName(name);
         const classNames = styles.sameGroup;
@@ -128,7 +129,7 @@ const BondMenuItems: FC<MenuItemsProps<BondsContextMenuProps>> = (props) => {
           </Item>
         );
       })}
-      <Separator />
+      <MenuSeparator />
 
       <Submenu
         {...props}
@@ -187,7 +188,7 @@ const BondMenuItems: FC<MenuItemsProps<BondsContextMenuProps>> = (props) => {
       >
         {i18n.t('contextMenu.editSGroup')}
       </Item>
-      <Separator />
+      <MenuSeparator />
       <Item {...props} data-testid="Delete-option" onClick={handleDelete}>
         <Icon name="deleteMenu" className={styles.icon} />
         <span className={styles.contextMenuText}>

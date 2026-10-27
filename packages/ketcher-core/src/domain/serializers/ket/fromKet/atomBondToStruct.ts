@@ -88,6 +88,11 @@ export function atomToStruct(source) {
     });
   }
 
+  // An atom with a custom query is always rendered as an "Any atom" (label "A").
+  if (params.queryProperties?.customQuery) {
+    params.label = 'A';
+  }
+
   // reaction
   ifDef(params, 'invRet', source.invRet);
   ifDef(params, 'exactChangeFlag', Number(Boolean(source.exactChangeFlag)));

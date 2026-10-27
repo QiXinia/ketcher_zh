@@ -25,11 +25,13 @@ import { PointerEvent } from 'react';
 type SelectedMonomersContextMenuType = {
   selectedMonomers?: BaseMonomer[];
   contextMenuEvent?: PointerEvent;
+  isPasteAvailable?: boolean;
 };
 
 export const SelectedMonomersContextMenu = ({
   selectedMonomers: _selectedMonomers,
   contextMenuEvent,
+  isPasteAvailable = true,
 }: SelectedMonomersContextMenuType) => {
   const selectedMonomers = _selectedMonomers || [];
   const editor = useAppSelector(selectEditor);
@@ -82,7 +84,8 @@ export const SelectedMonomersContextMenu = ({
       name: SequenceItemContextMenuNames.paste,
       title: String(i18n.t('action.paste')),
       icon: <Icon name={'pasteNavBar' as IconName} />,
-      disabled: ({ props = {} }) => !isCanvasContext(props),
+      disabled: ({ props = {} }) =>
+        !isCanvasContext(props) || !isPasteAvailable,
       separator: true,
     },
     {

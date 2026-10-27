@@ -29,7 +29,6 @@ import {
   HollowWedgeBondPathRenderer,
 } from 'application/render/renderers/BondPathRenderer';
 import util from 'application/render/util';
-import { editorEvents } from 'application/editor/editorEvents';
 import {
   SELECTION_COLOR,
   SELECTION_HOVERED_COLOR,
@@ -540,11 +539,11 @@ export class BondRenderer extends BaseRenderer {
 
     hoverPath
       .on('mouseenter', (event) => {
-        editorEvents.mouseOverDrawingEntity.dispatch(event);
+        provideEditorInstance().events.mouseOverDrawingEntity.dispatch(event);
         this.appendHover();
       })
       .on('mouseleave', (event) => {
-        editorEvents.mouseLeaveDrawingEntity.dispatch(event);
+        provideEditorInstance().events.mouseLeaveDrawingEntity.dispatch(event);
         this.removeHover();
       });
   }

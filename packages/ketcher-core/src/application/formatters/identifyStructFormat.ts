@@ -17,6 +17,14 @@
 import { KetcherLogger } from 'utilities';
 import { SupportedFormat } from './structFormatter.types';
 
+function isIdtString(s: string): boolean {
+  // Phosphorothioate nucleotide sequence: A, C, G, T, U joined by *
+  const idtBaseSeq = /^[ACGTUacgtu](\*[ACGTUacgtu])+$/;
+  // IDT modification token: /3Name/, /5Name/, /iName/, /rName/
+  const idtModToken = /\/[35ir][A-Za-z0-9][A-Za-z0-9-]*\/?/;
+  return idtBaseSeq.test(s) || idtModToken.test(s);
+}
+
 export function identifyStructFormat(
   stringifiedStruct: string,
   isMacromolecules = false,
@@ -103,22 +111,27 @@ export function identifyStructFormat(
     return SupportedFormat.fasta;
   }
 
+  if (sanitizedString.indexOf('<CDXML') !== -1) {
+    return SupportedFormat.cdxml;
+  }
+
+  if (isIdtString(sanitizedString)) {
+    return SupportedFormat.idt;
+  }
+
   if (sanitizedString.indexOf('\n') === -1 && !isMacromolecules) {
     // TODO: smiles regexp
     return SupportedFormat.smiles;
   }
 
-  if (sanitizedString.indexOf('<CDXML') !== -1) {
-    return SupportedFormat.cdxml;
+  if (sanitizedString.indexOf('\n') === -1 && !isMacromolecules) {
+    // TODO: smiles regexp
+    return SupportedFormat.smiles;
   }
-
   const isSequence = /^[a-zA-Z\s]*$/.test(sanitizedString);
   const isThreeLetter = /^(?:(?:[A-Z][a-z]{2})\s?)+$/.test(sanitizedString);
-  const isIdt = /([a-zA-Z0-9]+)\/*([a-zA-Z0-9*-]+)/.test(sanitizedString);
 
-  if (!isThreeLetter && isIdt) {
-    return SupportedFormat.idt;
-  } else if (isSequence) {
+  if (!isThreeLetter && isSequence) {
     return SupportedFormat.sequence;
   }
 

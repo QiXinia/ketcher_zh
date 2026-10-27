@@ -30,7 +30,6 @@ interface OpenProps {
   errorHandler: (err: string) => void;
   isRecognizeDisabled: boolean;
   isAnalyzingFile: boolean;
-  ignoreChiralFlag: boolean;
 }
 
 type Props = OpenProps &
@@ -90,9 +89,6 @@ const Open: FC<Props> = (props) => {
     errorHandler,
     isAnalyzingFile,
     isRecognizeDisabled,
-    /* eslint-disable @typescript-eslint/no-unused-vars */
-    ignoreChiralFlag,
-    /* eslint-enable @typescript-eslint/no-unused-vars */
     ...rest
   } = props;
 

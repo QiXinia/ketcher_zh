@@ -51,6 +51,7 @@ import { PointerEvent } from 'react';
 type SequenceItemContextMenuType = {
   selections?: NodesSelection;
   contextMenuEvent?: PointerEvent;
+  isPasteAvailable?: boolean;
 };
 
 export enum SequenceItemContextMenuNames {
@@ -71,6 +72,7 @@ export enum SequenceItemContextMenuNames {
 export const SequenceItemContextMenu = ({
   selections,
   contextMenuEvent,
+  isPasteAvailable = true,
 }: SequenceItemContextMenuType) => {
   const editor = useAppSelector(selectEditor);
   const dispatch = useAppDispatch();
@@ -128,7 +130,7 @@ export const SequenceItemContextMenu = ({
       name: SequenceItemContextMenuNames.paste,
       title: String(i18n.t('action.paste')),
       icon: <Icon name={'pasteNavBar' as IconName} />,
-      disabled: false,
+      disabled: !isPasteAvailable,
       separator: true,
     },
     {

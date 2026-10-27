@@ -225,11 +225,14 @@ class IndigoService implements StructService {
     reject: (reason?: unknown) => void;
   }>();
   private ketcherId: string | null = null;
+  private readonly messageHandler: (
+    e: MessageEvent<OutputMessage<string>>,
+  ) => void;
 
   constructor(defaultOptions: StructServiceOptions) {
     this.defaultOptions = defaultOptions;
     this.worker = getIndigoWorker();
-    this.worker.onmessage = (e: MessageEvent<OutputMessage<unknown>>) => {
+    this.messageHandler = (e: MessageEvent<OutputMessage<string>>) => {
       if (e.data.type === Command.Info && !e.data.hasError) {
         const callbackMethod = process.env.SEPARATE_INDIGO_RENDER
           ? this.callIndigoNoRenderLoadedCallback
@@ -258,6 +261,7 @@ class IndigoService implements StructService {
     };
     this.worker.onerror = failWorker;
     this.worker.onmessageerror = failWorker;
+    this.worker.addEventListener('message', this.messageHandler);
   }
 
   private sendRequest<T, R>(
@@ -852,9 +856,10 @@ class IndigoService implements StructService {
     for (const request of this.pending.values()) request.reject(this.workerFailure);
     this.pending.clear();
     this.worker.terminate();
-    this.worker.onmessage = null;
     this.worker.onerror = null;
     this.worker.onmessageerror = null;
+    this.worker.removeEventListener('message', this.messageHandler);
+    this.worker.terminate();
   }
 }
 
