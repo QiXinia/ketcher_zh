@@ -69,11 +69,15 @@ export function identifyStructFormat(
     }
   }
 
-  if (
-    sanitizedString.startsWith('<') &&
-    sanitizedString.indexOf('<molecule') !== -1
-  ) {
-    return SupportedFormat.cml;
+  // Test XML formats before the single-line SMILES fallback. CML files may
+  // use a namespace prefix on molecule (including after an XML declaration).
+  if (sanitizedString.startsWith('<')) {
+    if (sanitizedString.indexOf('<CDXML') !== -1) {
+      return SupportedFormat.cdxml;
+    }
+    if (/<(?:[A-Za-z_][\w.-]*:)?molecule(?=[\s/>])/.test(sanitizedString)) {
+      return SupportedFormat.cml;
+    }
   }
 
   const clearStr = sanitizedString
@@ -106,10 +110,6 @@ export function identifyStructFormat(
   if (sanitizedString.indexOf('\n') === -1 && !isMacromolecules) {
     // TODO: smiles regexp
     return SupportedFormat.smiles;
-  }
-
-  if (sanitizedString.indexOf('<CDXML') !== -1) {
-    return SupportedFormat.cdxml;
   }
 
   const isSequence = /^[a-zA-Z\s]*$/.test(sanitizedString);

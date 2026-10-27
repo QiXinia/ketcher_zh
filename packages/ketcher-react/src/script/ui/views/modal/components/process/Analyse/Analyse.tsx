@@ -61,8 +61,10 @@ interface AnalyseDialogCallProps {
 
 type Props = AnalyseDialogProps & AnalyseDialogCallProps;
 
-function roundOff(value: string | number, round: number): string {
-  if (typeof value === 'number') return value.toFixed(round);
+function roundOff(value: string | number | undefined, round: number): string {
+  if (typeof value === 'number')
+    return Number.isFinite(value) ? value.toFixed(round) : '';
+  if (typeof value !== 'string') return '';
   return value.replace(/\d*\.\d+/g, (str) => (+str).toFixed(round));
 }
 
@@ -78,6 +80,12 @@ const analyseItems: AnalyseItem[] = [
     name: i18n.t('analyse.molecularWeight'),
     key: 'molecular-weight',
     round: 'roundWeight',
+    withSelector: true,
+  },
+  {
+    name: i18n.t('analyse.mostAbundantMass'),
+    key: 'most-abundant-mass',
+    round: 'roundMass',
     withSelector: true,
   },
   {
@@ -115,8 +123,8 @@ function renderInputComponent(
         readOnly
         value={
           values && !loading && item.round
-            ? roundOff(values[item.key] as string | number, round[item.round])
-            : 0
+            ? roundOff(values[item.key], round[item.round])
+            : ''
         }
         data-testid={item.name + '-input'}
       />
@@ -128,14 +136,14 @@ function renderInputComponent(
       data-testid={item.name + '-input'}
       value={
         values && !loading && item.round
-          ? roundOff(values[item.key] as string | number, round[item.round])
-          : 0
+          ? roundOff(values[item.key], round[item.round])
+          : ''
       }
     />
   );
 }
 
-function AnalyseDialog({
+export function AnalyseDialog({
   values,
   round,
   loading,

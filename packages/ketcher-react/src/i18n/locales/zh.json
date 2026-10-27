@@ -268,6 +268,7 @@
     "title": "计算值",
     "chemicalFormula": "化学式",
     "molecularWeight": "分子量",
+    "mostAbundantMass": "最丰同位素质量",
     "exactMass": "精确质量",
     "elementalAnalysis": "元素分析",
     "decimalPlaces": "小数位数"
