@@ -110,6 +110,7 @@ import {
 } from 'subscription';
 
 import closest from './shared/closest';
+import type { SelectedItems, SkipItem } from './shared/closest.types';
 import { type ChangeEventData, customOnChangeHandler } from './utils';
 import { isEqual } from 'lodash/fp';
 import { toolsMap } from './tool';
@@ -3781,7 +3782,7 @@ class Editor implements KetcherEditor {
   findItem(
     event: Event | MouseEvent | { clientX: number; clientY: number },
     maps: Array<string> | null,
-    skip: unknown = null,
+    skip: SkipItem | null = null,
   ) {
     const pos = CoordinateTransformation.pageToModel(
       event as MouseEvent | { clientX: number; clientY: number },
@@ -3791,7 +3792,7 @@ class Editor implements KetcherEditor {
     return closest.item(this.render.ctab, pos, maps, skip, this.render.options);
   }
 
-  findMerge(srcItems: unknown, maps: string[] | undefined) {
+  findMerge(srcItems: SelectedItems, maps: string[] | undefined) {
     return closest.merge(this.render.ctab, srcItems, this.render.options, maps);
   }
 
