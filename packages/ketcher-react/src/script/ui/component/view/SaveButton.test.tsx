@@ -63,7 +63,9 @@ describe('SaveButton', () => {
     const png = new Blob(['png'], { type: 'image/png' });
     const bitmap = new Blob(['bitmap'], { type: 'image/bmp' });
     const generateImage = jest.fn().mockResolvedValue(png);
-    (ketcherProvider.getKetcher as jest.Mock).mockReturnValue({ generateImage });
+    (ketcherProvider.getKetcher as jest.Mock).mockReturnValue({
+      generateImage,
+    });
     (convertKetcherImageToRaster as jest.Mock).mockResolvedValue(bitmap);
     const onSave = jest.fn();
     render(
@@ -74,7 +76,9 @@ describe('SaveButton', () => {
         options={{ outputFormat: 'png' }}
         rasterFormat="bmp"
         onSave={onSave}
-      >Save</SaveButton>,
+      >
+        Save
+      </SaveButton>,
     );
     fireEvent.click(screen.getByRole('button'));
     await waitFor(() => expect(onSave).toHaveBeenCalled());

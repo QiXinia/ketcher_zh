@@ -88,7 +88,9 @@ const SaveButton = (props: SaveButtonProps) => {
             ? await convertKetcherImageToRaster(blob, rasterFormat)
             : blob;
           const extension = rasterFormat
-            ? KETCHER_RASTER_FORMATS.find((item) => item.format === rasterFormat)?.extension
+            ? KETCHER_RASTER_FORMATS.find(
+                (item) => item.format === rasterFormat,
+              )?.extension
             : options.outputFormat;
           if (!extension) throw new Error('Unsupported image format');
           saveAs(result, `${filename}.${extension}`);

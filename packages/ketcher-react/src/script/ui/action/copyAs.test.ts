@@ -14,7 +14,10 @@ describe('copy as a chemical format', () => {
     writeText.mockReset().mockResolvedValue(undefined);
     errorHandler.mockReset();
     convert.mockReset().mockResolvedValue({ struct: 'C' });
-    Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText } });
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText },
+    });
     global.currentState = {
       editor: { structSelected: molecule, errorHandler },
       server: { convert },
@@ -25,7 +28,9 @@ describe('copy as a chemical format', () => {
   it('converts the selected molecule and copies the requested SMILES', async () => {
     await copyAs('smiles');
     expect(convert).toHaveBeenCalledWith(
-      expect.objectContaining({ output_format: ChemicalMimeType.DaylightSmiles }),
+      expect.objectContaining({
+        output_format: ChemicalMimeType.DaylightSmiles,
+      }),
       expect.any(Object),
     );
     expect(writeText).toHaveBeenCalledWith('C');
@@ -38,7 +43,10 @@ describe('copy as a chemical format', () => {
     ['cdxml', ChemicalMimeType.CDXML],
   ])('requests the correct format for %s', async (format, mime) => {
     await copyAs(format);
-    expect(convert).toHaveBeenCalledWith(expect.objectContaining({ output_format: mime }), expect.any(Object));
+    expect(convert).toHaveBeenCalledWith(
+      expect.objectContaining({ output_format: mime }),
+      expect.any(Object),
+    );
     expect(writeText).toHaveBeenCalledWith('C');
   });
 

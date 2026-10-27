@@ -11,10 +11,19 @@ it('offers labeled chemical formats in the copy dropdown and respects button sta
   render(
     <Provider store={store}>
       <ClipboardControls
-        onCopy={noop} onCopyMol={noop} onCopyKet={noop} onCopyImage={noop}
-        onCopySmiles={onCopySmiles} onCopyInchi={onCopyInchi}
-        onCopyInchiKey={noop} onCopyCdxml={noop} onPaste={noop} onCut={noop}
-        disabledButtons={['copy-inchi']} hiddenButtons={['copy-cdxml']} shortcuts={{}}
+        onCopy={noop}
+        onCopyMol={noop}
+        onCopyKet={noop}
+        onCopyImage={noop}
+        onCopySmiles={onCopySmiles}
+        onCopyInchi={onCopyInchi}
+        onCopyInchiKey={noop}
+        onCopyCdxml={noop}
+        onPaste={noop}
+        onCut={noop}
+        disabledButtons={['copy-inchi']}
+        hiddenButtons={['copy-cdxml']}
+        shortcuts={{}}
       />
     </Provider>,
   );

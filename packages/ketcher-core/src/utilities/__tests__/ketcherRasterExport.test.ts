@@ -5,8 +5,7 @@ import {
 } from '../ketcherRasterExport';
 
 const pixels = new Uint8Array([
-  255, 0, 0, 255, 0, 0, 0, 0,
-  0, 0, 255, 255, 0, 255, 0, 255,
+  255, 0, 0, 255, 0, 0, 0, 0, 0, 0, 255, 255, 0, 255, 0, 255,
 ]);
 
 describe('raster image export', () => {
@@ -17,8 +16,7 @@ describe('raster image export', () => {
     expect(view.getUint32(2, true)).toBe(bytes.length);
     expect(view.getUint16(28, true)).toBe(24);
     expect([...bytes.slice(54)]).toEqual([
-      255, 0, 0, 0, 255, 0, 0, 0,
-      0, 0, 255, 255, 255, 255, 0, 0,
+      255, 0, 0, 0, 255, 0, 0, 0, 0, 0, 255, 255, 255, 255, 0, 0,
     ]);
   });
 
@@ -27,10 +25,12 @@ describe('raster image export', () => {
     const view = new DataView(tiff.buffer);
     expect([...tiff.slice(0, 4)]).toEqual([73, 73, 42, 0]);
     const count = view.getUint16(8, true);
-    const tags = new Map(Array.from({ length: count }, (_, index) => {
-      const offset = 10 + index * 12;
-      return [view.getUint16(offset, true), view.getUint32(offset + 8, true)];
-    }));
+    const tags = new Map(
+      Array.from({ length: count }, (_, index) => {
+        const offset = 10 + index * 12;
+        return [view.getUint16(offset, true), view.getUint32(offset + 8, true)];
+      }),
+    );
     expect(tags.get(256)).toBe(2);
     expect(tags.get(257)).toBe(2);
     expect([...tiff.slice(tags.get(273))]).toEqual([
@@ -57,17 +57,25 @@ describe('raster image export', () => {
       naturalWidth = 2;
       naturalHeight = 2;
       onload?: () => void;
-      set src(_value: string) { queueMicrotask(() => this.onload?.()); }
+      set src(_value: string) {
+        queueMicrotask(() => this.onload?.());
+      }
     }
     global.Image = StubImage as unknown as typeof Image;
     URL.createObjectURL = jest.fn(() => 'blob:test');
     URL.revokeObjectURL = revoke;
-    const getContext = jest.spyOn(HTMLCanvasElement.prototype, 'getContext')
+    const getContext = jest
+      .spyOn(HTMLCanvasElement.prototype, 'getContext')
       .mockReturnValue({ fillRect: jest.fn(), drawImage: jest.fn() } as any);
-    const toBlob = jest.spyOn(HTMLCanvasElement.prototype, 'toBlob')
-      .mockImplementation((callback) => callback(new Blob(['png'], { type: 'image/png' })));
+    const toBlob = jest
+      .spyOn(HTMLCanvasElement.prototype, 'toBlob')
+      .mockImplementation((callback) =>
+        callback(new Blob(['png'], { type: 'image/png' })),
+      );
     try {
-      await expect(convertKetcherImageToRaster(new Blob(['png']), 'jpeg')).rejects.toThrow('JPEG');
+      await expect(
+        convertKetcherImageToRaster(new Blob(['png']), 'jpeg'),
+      ).rejects.toThrow('JPEG');
       expect(revoke).toHaveBeenCalledWith('blob:test');
     } finally {
       getContext.mockRestore();

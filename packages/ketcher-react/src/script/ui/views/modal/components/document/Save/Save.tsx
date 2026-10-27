@@ -200,7 +200,9 @@ const ImageContent = ({
   <div className={classes.imageContainer}>
     {!isCleanStruct && (
       <img
-        src={`data:${format === 'svg' ? 'image/svg+xml' : 'image/png'};base64,${imageSrc}`}
+        src={`data:${
+          format === 'svg' ? 'image/svg+xml' : 'image/png'
+        };base64,${imageSrc}`}
         alt={`${format} preview`}
         data-testid="preview-area"
       />
@@ -676,7 +678,9 @@ class SaveDialog extends Component<SaveDialogProps, SaveDialogState> {
         <SaveButton
           mode="saveImage"
           options={imageOptions as GenerateImageOptions}
-          rasterFormat={isKetcherRasterFormat(imageFormat) ? imageFormat : undefined}
+          rasterFormat={
+            isKetcherRasterFormat(imageFormat) ? imageFormat : undefined
+          }
           data={structStr || ''}
           filename={filename}
           key="save-image-button"

@@ -38,8 +38,13 @@ export default async function copyAs(type) {
       cdxml: SupportedFormat.cdxml,
     };
     if (formats[type]) {
-      if (!state.server) throw new Error(i18n.t('action.copyFormatUnavailable'));
-      if ([struct.simpleObjects, struct.texts, struct.images].some((items) => items?.size)) {
+      if (!state.server)
+        throw new Error(i18n.t('action.copyFormatUnavailable'));
+      if (
+        [struct.simpleObjects, struct.texts, struct.images].some(
+          (items) => items?.size,
+        )
+      ) {
         throw new Error(i18n.t('action.copyFormatRequiresMolecule'));
       }
       // These formats cannot represent all KET query, reaction and graphic
@@ -50,7 +55,10 @@ export default async function copyAs(type) {
         throw new Error(i18n.t('action.copyFormatRequiresMolecule'));
       }
       const options = state.options?.getServerSettings?.() || {};
-      const formatter = new FormatterFactory(state.server).create(formats[type], options);
+      const formatter = new FormatterFactory(state.server).create(
+        formats[type],
+        options,
+      );
       const output = await formatter.getStringFromStructureAsync(struct);
       if (typeof output !== 'string' || !output.trim()) {
         throw new Error(i18n.t('action.copyFormatUnavailable'));

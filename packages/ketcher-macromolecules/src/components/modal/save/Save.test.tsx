@@ -14,7 +14,13 @@
  * limitations under the License.
  ***************************************************************************/
 
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import { Save } from 'components/modal/save';
 import userEvent from '@testing-library/user-event';
 import { Struct } from 'ketcher-core';
@@ -32,17 +38,29 @@ const mockProps = {
 
 describe('Save modal', () => {
   beforeEach(() => {
-    jest.spyOn(ketcherCore, 'provideEditorInstance').mockImplementation(() => ({
-      drawingEntitiesManager: {
-        micromoleculesHiddenEntities: { clone: () => new Struct(), mergeInto: jest.fn() },
-        setMicromoleculesHiddenEntities: jest.fn(),
-        detectBondsOverlappedByMonomers: jest.fn(),
-        monomers: [], polymerBonds: [], bonds: [], monomerToAtomBonds: [],
-        atoms: [], rxnArrows: [], multitailArrows: [], rxnPluses: [],
-      },
-      viewModel: { initialize: jest.fn() },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any));
+    jest.spyOn(ketcherCore, 'provideEditorInstance').mockImplementation(
+      () =>
+        ({
+          drawingEntitiesManager: {
+            micromoleculesHiddenEntities: {
+              clone: () => new Struct(),
+              mergeInto: jest.fn(),
+            },
+            setMicromoleculesHiddenEntities: jest.fn(),
+            detectBondsOverlappedByMonomers: jest.fn(),
+            monomers: [],
+            polymerBonds: [],
+            bonds: [],
+            monomerToAtomBonds: [],
+            atoms: [],
+            rxnArrows: [],
+            multitailArrows: [],
+            rxnPluses: [],
+          },
+          viewModel: { initialize: jest.fn() },
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any),
+    );
     mockOnClose.mockClear();
   });
   afterEach(() => jest.restoreAllMocks());
@@ -63,13 +81,19 @@ describe('Save modal', () => {
 
   it('previews the drawing and saves the selected raster format', async () => {
     const png = new Blob(['png'], { type: 'image/png' });
-    jest.spyOn(ketcherCore, 'getSvgFromDrawnStructures').mockReturnValue('<svg xmlns="http://www.w3.org/2000/svg"/>');
-    const convert = jest.spyOn(ketcherCore, 'convertKetcherImageToRaster').mockResolvedValue(png);
+    jest
+      .spyOn(ketcherCore, 'getSvgFromDrawnStructures')
+      .mockReturnValue('<svg xmlns="http://www.w3.org/2000/svg"/>');
+    const convert = jest
+      .spyOn(ketcherCore, 'convertKetcherImageToRaster')
+      .mockResolvedValue(png);
     mockOnClose.mockClear();
     render(withThemeAndStoreProvider(<Save {...mockProps} />));
     fireEvent.mouseDown(screen.getByRole('combobox'));
     fireEvent.click(screen.getByRole('option', { name: 'PNG Image' }));
-    expect(screen.getByTestId('preview-area').querySelector('svg')).toBeTruthy();
+    expect(
+      screen.getByTestId('preview-area').querySelector('svg'),
+    ).toBeTruthy();
     fireEvent.click(screen.getByTestId('save-button'));
     await waitFor(() => expect(mockOnClose).toHaveBeenCalled());
     expect(convert).toHaveBeenCalledWith(expect.any(Blob), 'png');

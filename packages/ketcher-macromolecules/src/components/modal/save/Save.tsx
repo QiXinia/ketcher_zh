@@ -64,7 +64,10 @@ const options: Array<Option> = [
   { id: 'axo-labs', label: 'AxoLabs' },
   { id: 'svg', label: 'SVG Document' },
   { id: 'png', label: 'PNG Image' },
-  ...KETCHER_RASTER_FORMATS.map((item) => ({ id: item.format, label: `${item.label} Image` })),
+  ...KETCHER_RASTER_FORMATS.map((item) => ({
+    id: item.format,
+    label: `${item.label} Image`,
+  })),
   { id: 'helm', label: 'HELM' },
   { id: 'biln', label: 'BILN' },
 ];
@@ -98,8 +101,9 @@ export const Save = ({
   isModalOpen,
 }: RequiredModalProps): JSX.Element => {
   const dispatch = useAppDispatch();
-  const [currentFileFormat, setCurrentFileFormat] =
-    useState<SupportedFormats | KetcherRasterFormat | 'png'>('ket');
+  const [currentFileFormat, setCurrentFileFormat] = useState<
+    SupportedFormats | KetcherRasterFormat | 'png'
+  >('ket');
   const [currentFileName, setCurrentFileName] = useState('ketcher');
   const [struct, setStruct] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -119,7 +123,11 @@ export const Save = ({
       setStruct(serializedKet);
       return;
     }
-    if (fileFormat === 'svg' || fileFormat === 'png' || isKetcherRasterFormat(fileFormat)) {
+    if (
+      fileFormat === 'svg' ||
+      fileFormat === 'png' ||
+      isKetcherRasterFormat(fileFormat)
+    ) {
       // Get Ketcher root element offset for SVG positioning
       const ketcherRootRect = editor.ketcherRootElementBoundingClientRect;
       const ketcherRootOffsetX = ketcherRootRect?.x || 0;
@@ -188,7 +196,11 @@ export const Save = ({
 
   const handleSave = async () => {
     let blobPart;
-    if (currentFileFormat === 'svg' || currentFileFormat === 'png' || isKetcherRasterFormat(currentFileFormat)) {
+    if (
+      currentFileFormat === 'svg' ||
+      currentFileFormat === 'png' ||
+      isKetcherRasterFormat(currentFileFormat)
+    ) {
       // Get Ketcher root element offset for SVG positioning
       const ketcherRootRect = editor.ketcherRootElementBoundingClientRect;
       const ketcherRootOffsetX = ketcherRootRect?.x || 0;
@@ -209,14 +221,21 @@ export const Save = ({
             new Blob([svgData], { type: 'image/svg+xml' }),
             currentFileFormat,
           );
-          const extension = currentFileFormat === 'png'
-            ? 'png'
-            : KETCHER_RASTER_FORMATS.find((item) => item.format === currentFileFormat)?.extension;
+          const extension =
+            currentFileFormat === 'png'
+              ? 'png'
+              : KETCHER_RASTER_FORMATS.find(
+                  (item) => item.format === currentFileFormat,
+                )?.extension;
           if (!extension) throw new Error('Unsupported image format');
           saveAs(blob, `${currentFileName}.${extension}`);
           onClose();
         } catch (error) {
-          dispatch(openErrorModal(error instanceof Error ? error.message : String(error)));
+          dispatch(
+            openErrorModal(
+              error instanceof Error ? error.message : String(error),
+            ),
+          );
         } finally {
           setIsLoading(false);
         }
@@ -229,7 +248,9 @@ export const Save = ({
     const blob = new Blob([blobPart], {
       type: getPropertiesByFormat(currentFileFormat as SupportedFormats).mime,
     });
-    const formatProperties = getPropertiesByFormat(currentFileFormat as SupportedFormats);
+    const formatProperties = getPropertiesByFormat(
+      currentFileFormat as SupportedFormats,
+    );
     saveAs(blob, `${currentFileName}${formatProperties.extensions[0]}`);
     onClose();
   };
