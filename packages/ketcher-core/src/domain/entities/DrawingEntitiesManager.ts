@@ -95,7 +95,7 @@ import {
   MonomerToAtomBondDeleteOperation,
 } from 'application/editor/operations/monomerToAtomBond/monomerToAtomBond';
 import {
-  type AtomLabel,
+  type CoreAtomLabel,
   HalfMonomerSize,
   SnakeLayoutCellWidth,
 } from 'domain/constants';
@@ -3152,7 +3152,7 @@ export class DrawingEntitiesManager {
     position: Vec2,
     monomer: BaseMonomer,
     atomIdInMicroMode: number,
-    label: AtomLabel,
+    label: CoreAtomLabel,
     properties?: AtomProperties,
     _atom?: Atom,
   ) {
@@ -3179,7 +3179,7 @@ export class DrawingEntitiesManager {
     position: Vec2,
     monomer: BaseMonomer,
     atomIdInMicroMode: number,
-    label: AtomLabel,
+    label: CoreAtomLabel,
     properties?: AtomProperties,
   ) {
     const command = new Command();

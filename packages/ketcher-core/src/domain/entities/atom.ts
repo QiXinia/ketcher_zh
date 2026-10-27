@@ -463,7 +463,9 @@ export class Atom extends BaseMicromoleculeEntity {
         this.atomList !== null ||
         (this.queryProperties.substitutionQuery !== null &&
           this.queryProperties.substitutionQuery !== undefined) ||
-        Object.values(queryProperties).some((value) => value),
+        Object.values(queryProperties).some(
+          (value) => Boolean(value) || value === 0,
+        ),
     );
   }
 
