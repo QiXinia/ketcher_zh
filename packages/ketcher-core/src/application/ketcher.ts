@@ -1048,13 +1048,13 @@ export class Ketcher {
 
   async generateImage(
     data: string,
-    options: GenerateImageOptions = {
-      outputFormat: 'png',
-    },
+    options?: GenerateImageOptions,
   ): Promise<Blob> {
+    const { outputFormat = 'png', ...imageOptions } = (options ??
+      {}) as Partial<GenerateImageOptions>;
     let meta: string;
 
-    switch (options.outputFormat) {
+    switch (outputFormat) {
       case 'svg':
         meta = 'image/svg+xml';
         break;
@@ -1062,13 +1062,13 @@ export class Ketcher {
       case 'png':
       default:
         meta = 'image/png';
-        options.outputFormat = 'png';
     }
     const serverSettings = this.editor.serverSettings;
 
     const base64 = await this.structService.generateImageAsBase64(data, {
       ...serverSettings,
-      ...options,
+      ...imageOptions,
+      outputFormat: outputFormat === 'svg' ? 'svg' : 'png',
     });
     const byteCharacters = atob(base64);
     const byteNumbers = new Array(byteCharacters.length);
@@ -1181,7 +1181,11 @@ export class Ketcher {
       params,
     );
 
-    editor.updateMonomersLibrary(dataInKetFormat);
+    editor.updateMonomersLibrary(
+      dataInKetFormat,
+      undefined,
+      params?.shouldPersist,
+    );
     if (SettingsManager.persistMonomerLibraryUpdates && params?.shouldPersist) {
       const updateString = ensureString(dataInKetFormat);
       SettingsManager.addMonomerLibraryUpdate(updateString);
