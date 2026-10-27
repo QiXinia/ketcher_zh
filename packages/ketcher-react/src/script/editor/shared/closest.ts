@@ -211,7 +211,6 @@ function findClosestBond(
   minDist: number | null,
   options: ClosestFunctionOptions,
 ) {
-  // eslint-disable-line max-params
   let closestBond: number | null = null;
   let closestBondCenter: number | null = null;
   const maxMinDist = 0.8 * getSelectionDistanceCoefficient();
@@ -597,7 +596,6 @@ function findClosestItem(
   skip: SkipItem | null,
   options: ClosestFunctionOptions,
 ): ClosestItemWithMap | null {
-  // eslint-disable-line max-params
   maps = maps ?? Object.keys(findMaps);
 
   let priorityItem: ClosestItemWithMap | null = null;

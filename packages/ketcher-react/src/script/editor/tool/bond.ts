@@ -358,7 +358,7 @@ class BondTool implements Tool {
       );
       if (fgIds.length > 0) {
         dispatchMonomerOrGroupDialog(this.editor, fgIds);
-        delete this.dragCtx;
+        this.dragCtx = undefined;
         return { beginAtom, endAtom, beginPos, shouldReturn: true };
       }
     } else if (endAtom?.map === 'functionalGroups') {

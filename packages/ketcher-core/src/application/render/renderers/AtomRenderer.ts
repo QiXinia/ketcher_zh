@@ -234,7 +234,7 @@ export class AtomRenderer extends BaseRenderer {
         ?.attr('stroke', '#0097a8')
         // selectionContourElement is union type here. For some reason for union selection types
         // ts shows error that first call of attr can return string.
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+
         // @ts-ignore
         .attr('stroke-width', '1.2')
         .attr('fill', 'none')
@@ -584,7 +584,7 @@ export class AtomRenderer extends BaseRenderer {
         ?.attr('fill', SELECTION_COLOR)
         // selectionContourElement is union type here. For some reason for union selection types
         // ts shows error that first call of attr can return string.
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+
         // @ts-ignore
         .attr('class', 'dynamic-element');
     }

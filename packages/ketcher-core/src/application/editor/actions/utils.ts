@@ -222,7 +222,6 @@ export function atomForNewBond(
   atom: number | AtomAttributes,
   bond?: Partial<BondAttributes>,
 ): AtomForNewBondResult {
-  // eslint-disable-line max-statements
   const id = ensureAtomId(atom);
   const neighbours: Array<{ id: number; v: Vec2 }> = [];
   const pos = atomGetPos(restruct, id);
@@ -314,8 +313,8 @@ export function atomForNewBond(
     }
 
     const shallBe180DegToPrevBond =
-      (neighbours.length === 1 &&
-        prevBondType === bond?.type &&
+      neighbours.length === 1 &&
+      ((prevBondType === bond?.type &&
         (bond?.type === Bond.PATTERN.TYPE.DOUBLE ||
           bond?.type === Bond.PATTERN.TYPE.TRIPLE ||
           bond?.type === Bond.PATTERN.TYPE.QUADRUPLE)) ||
@@ -341,7 +340,7 @@ export function atomForNewBond(
     v = v.rotate(angle);
   }
 
-  v.add_(pos); // eslint-disable-line no-underscore-dangle
+  v.add_(pos);
 
   const closestAtom = findClosestAtom(restruct, v, null, 0.1);
   const a = closestAtom === null ? { label: 'C' } : closestAtom.id;

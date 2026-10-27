@@ -125,9 +125,11 @@ export const Modal = ({
     }),
     [
       testId,
+      theme.ketcher.color.background.primary,
       theme.ketcher.color.text.primary,
-      theme.ketcher.color.background.canvas,
+      showExpandButton,
       expanded,
+      modalWidth,
     ],
   );
 
