@@ -49,6 +49,12 @@ export interface BondAttributes {
   endSuperatomAttachmentPointNumber?: number;
   beginSgroup?: SGroup;
   endSgroup?: SGroup;
+  len?: number;
+  sb?: number;
+  sa?: number;
+  angle?: number;
+  hb1?: number;
+  hb2?: number;
 }
 
 export type BondDisplay =
@@ -177,11 +183,19 @@ export class Bond extends BaseMicromoleculeEntity {
     this.center = new Vec2();
   }
 
-  static getAttrHash(bond: Bond) {
-    const attrs = {};
+  static getAttrHash(
+    bond: Bond,
+  ): Partial<Pick<BondAttributes, keyof typeof Bond.attrlist>> {
+    const attrs: Partial<Pick<BondAttributes, keyof typeof Bond.attrlist>> = {};
     for (const attr in Bond.attrlist) {
-      if (bond[attr] || attr === 'stereo' || attr === 'display' || attr === 'doubleBondPosition') {
-        attrs[attr] = bond[attr];
+      const key = attr as keyof typeof Bond.attrlist;
+      if (
+        bond[key] ||
+        key === 'stereo' ||
+        key === 'display' ||
+        key === 'doubleBondPosition'
+      ) {
+        attrs[key] = bond[key] as never;
       }
     }
     return attrs;

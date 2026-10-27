@@ -6,9 +6,16 @@ type ConfirmProps = {
   onCancel: () => void;
   text?: string;
   title?: string;
+  okButtonLabel?: string;
 };
 
-export const Confirm = ({ onOk, onCancel, text, title }: ConfirmProps) => {
+export const Confirm = ({
+  onOk,
+  onCancel,
+  text,
+  title,
+  okButtonLabel,
+}: ConfirmProps) => {
   return (
     <div className={classes.window}>
       <header className={classes.header} data-testid="confirm-header">
@@ -27,7 +34,7 @@ export const Confirm = ({ onOk, onCancel, text, title }: ConfirmProps) => {
         />
         <input
           type="button"
-          value={i18n.t('dialog.ok')}
+          value={okButtonLabel || i18n.t('dialog.ok')}
           className={classes.buttonOk}
           onClick={() => onOk()}
           data-testid="ok-button"

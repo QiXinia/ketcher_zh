@@ -56,7 +56,6 @@ export function prepareStructForKet(struct: Struct) {
         height: item.height,
         ...(item.annotations?.length ? { annotations: item.annotations } : {}),
       },
-      selected: item.getInitiallySelected(),
     });
   });
 
@@ -95,7 +94,6 @@ export function prepareStructForKet(struct: Struct) {
         ...(item.mode === 'bracket' && item.flipType !== 'unspecified' ? { flipType: item.flipType } : {}),
         ...(item.annotations?.length ? { annotations: item.annotations } : {}),
       },
-      selected: item.getInitiallySelected(),
     });
   });
 
@@ -109,7 +107,6 @@ export function prepareStructForKet(struct: Struct) {
         pos: item.pos,
         ...(item.annotations?.length ? { annotations: item.annotations } : {}),
       },
-      selected: item.getInitiallySelected(),
     });
   });
 
