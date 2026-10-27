@@ -56,6 +56,10 @@ export interface PanelProps {
   onCopy: VoidFunction;
   onCopyMol: VoidFunction;
   onCopyKet: VoidFunction;
+  onCopySmiles: VoidFunction;
+  onCopyInchi: VoidFunction;
+  onCopyInchiKey: VoidFunction;
+  onCopyCdxml: VoidFunction;
   onCopyImage: VoidFunction;
   onCut: VoidFunction;
   onPaste: VoidFunction;
@@ -159,6 +163,10 @@ export const TopToolbar = ({
   onCopy,
   onCopyMol,
   onCopyKet,
+  onCopySmiles,
+  onCopyInchi,
+  onCopyInchiKey,
+  onCopyCdxml,
   onCopyImage,
   onCut,
   onPaste,
@@ -266,6 +274,10 @@ export const TopToolbar = ({
           onCopy={onCopy}
           onCopyMol={onCopyMol}
           onCopyKet={onCopyKet}
+          onCopySmiles={onCopySmiles}
+          onCopyInchi={onCopyInchi}
+          onCopyInchiKey={onCopyInchiKey}
+          onCopyCdxml={onCopyCdxml}
           onCopyImage={onCopyImage}
           onPaste={onPaste}
           onCut={onCut}

@@ -1,5 +1,11 @@
 {
   "action": {
+    "copyAsSMILES": "Copy as SMILES",
+    "copyAsInChI": "Copy as InChI",
+    "copyAsInChIKey": "Copy as InChIKey",
+    "copyAsCDXML": "Copy as CDXML (chemical subset)",
+    "copyFormatRequiresMolecule": "Select one concrete molecule without query features, reactions, text or graphics. Use KET for other content.",
+    "copyFormatUnavailable": "The selected copy format is unavailable.",
     "clearCanvas": "Clear Canvas",
     "open": "Open...",
     "saveAs": "Save As...",

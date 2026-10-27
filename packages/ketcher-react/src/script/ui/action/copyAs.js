@@ -14,15 +14,52 @@
  * limitations under the License.
  ***************************************************************************/
 
-import { KetcherLogger, KetSerializer, MolSerializer } from 'ketcher-core';
+import {
+  FormatterFactory,
+  KetcherLogger,
+  KetSerializer,
+  MolSerializer,
+  SupportedFormat,
+  massToChargeFromKet,
+} from 'ketcher-core';
+import i18n from '../../../i18n';
 
-export default function copyAs(type) {
+export default async function copyAs(type) {
   const state = global.currentState;
   const editor = state.editor;
   const struct = editor.structSelected();
   const errorHandler = editor.errorHandler;
   let serializer;
   try {
+    const formats = {
+      smiles: SupportedFormat.smiles,
+      inchi: SupportedFormat.inChI,
+      inchikey: SupportedFormat.inChIKey,
+      cdxml: SupportedFormat.cdxml,
+    };
+    if (formats[type]) {
+      if (!state.server) throw new Error(i18n.t('action.copyFormatUnavailable'));
+      if ([struct.simpleObjects, struct.texts, struct.images].some((items) => items?.size)) {
+        throw new Error(i18n.t('action.copyFormatRequiresMolecule'));
+      }
+      // These formats cannot represent all KET query, reaction and graphic
+      // semantics. Restrict the shortcut to one concrete molecular graph.
+      const ket = new KetSerializer().serialize(struct);
+      const result = massToChargeFromKet(ket, 1);
+      if (!result.ok && result.reason !== 'neutral') {
+        throw new Error(i18n.t('action.copyFormatRequiresMolecule'));
+      }
+      const options = state.options?.getServerSettings?.() || {};
+      const formatter = new FormatterFactory(state.server).create(formats[type], options);
+      const output = await formatter.getStringFromStructureAsync(struct);
+      if (typeof output !== 'string' || !output.trim()) {
+        throw new Error(i18n.t('action.copyFormatUnavailable'));
+      }
+      if (window.clipboardData) window.clipboardData.setData('text', output);
+      else await navigator.clipboard.writeText(output);
+      return;
+    }
+
     switch (type) {
       case 'mol': {
         serializer = new MolSerializer();
@@ -33,8 +70,7 @@ export default function copyAs(type) {
         break;
       }
       default: {
-        serializer = new KetSerializer();
-        break;
+        throw new Error(i18n.t('action.copyFormatUnavailable'));
       }
     }
 
@@ -54,10 +90,10 @@ export default function copyAs(type) {
     if (window.clipboardData) {
       window.clipboardData.setData('text', structData);
     } else {
-      navigator.clipboard.writeText(structData);
+      await navigator.clipboard.writeText(structData);
     }
   } catch (e) {
     KetcherLogger.error('copyAs.js::copyAs', e);
-    errorHandler('This feature is not available in your browser');
+    errorHandler(e instanceof Error ? e.message : String(e));
   }
 }

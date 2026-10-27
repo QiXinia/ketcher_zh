@@ -1,5 +1,11 @@
 {
   "action": {
+    "copyAsSMILES": "复制为 SMILES",
+    "copyAsInChI": "复制为 InChI",
+    "copyAsInChIKey": "复制为 InChIKey",
+    "copyAsCDXML": "复制为 CDXML（化学对象子集）",
+    "copyFormatRequiresMolecule": "请选择一个不含查询、反应、文本或图形的具体分子；其他内容请复制为 KET。",
+    "copyFormatUnavailable": "当前复制格式不可用。",
     "clearCanvas": "清除画布",
     "open": "打开...",
     "saveAs": "另存为...",
