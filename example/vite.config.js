@@ -213,6 +213,7 @@ export default defineConfig({
   // the origin root, so generated dynamic imports must stay relative.
   base: './',
   server: {
+    host: '127.0.0.1',
     open: true,
   },
   optimizeDeps: {
@@ -246,6 +247,7 @@ export default defineConfig({
       '@emotion/sheet',
       '@emotion/utils',
       '@emotion/weak-memoize',
+      '@mui/material',
     ],
   },
   css: {
