@@ -466,7 +466,7 @@ const mapDispatchToProps = (dispatch, ownProps: SettingsOwnProps) => ({
       initState.reactionComponentMarginSize !==
       result.reactionComponentMarginSize;
 
-    showNotification &&
+    if (showNotification) {
       dispatch(
         onAction({
           dialog: 'info-modal',
@@ -477,6 +477,7 @@ const mapDispatchToProps = (dispatch, ownProps: SettingsOwnProps) => ({
           },
         }),
       );
+    }
   },
   onACSStyle: (result) => {
     dispatch(updateFormState({ result }));

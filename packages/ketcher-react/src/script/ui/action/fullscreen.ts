@@ -53,7 +53,11 @@ const getIfFullScreen = () => {
 
 const toggleFullscreen = () => {
   const fullscreenElement = getFullscreenElement();
-  getIfFullScreen() ? exitFullscreen() : requestFullscreen(fullscreenElement);
+  if (getIfFullScreen()) {
+    exitFullscreen();
+  } else {
+    requestFullscreen(fullscreenElement);
+  }
 };
 
 export default {

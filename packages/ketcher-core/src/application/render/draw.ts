@@ -1914,7 +1914,7 @@ function rgroupAttachmentPointLabel(
   labelPosition: Vec2,
   labelText: string,
   options: RenderOptions,
-  fill,
+  fill: string,
 ) {
   const labelPath = paper
     .text(labelPosition.x, labelPosition.y, labelText)

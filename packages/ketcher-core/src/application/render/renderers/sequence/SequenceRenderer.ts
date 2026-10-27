@@ -395,6 +395,15 @@ export class SequenceRenderer {
                 monomer,
               ) as BaseMonomer;
 
+              // Skip rendering side bonds when both monomers map to the same sequence node
+              // (e.g., CHEM self-loops or bonds within the same LinkerSequenceNode).
+              if (
+                monomer.renderer &&
+                monomer.renderer === anotherMonomer.renderer
+              ) {
+                return;
+              }
+
               // Skip handling side chains for sugar(R3) + base(R1) connections.
               if (
                 (monomer instanceof Sugar &&
@@ -1378,10 +1387,13 @@ export class SequenceRenderer {
       top = top ? Math.min(top, nodePosition.y) : nodePosition.y;
       bottom = bottom ? Math.max(bottom, nodePosition.y) : nodePosition.y;
     });
-    assert(left !== undefined);
-    assert(right !== undefined);
-    assert(top !== undefined);
-    assert(bottom !== undefined);
+    assert(
+      left !== undefined &&
+        right !== undefined &&
+        top !== undefined &&
+        bottom !== undefined,
+      'Unable to calculate bounding box: no nodes found',
+    );
     return {
       left,
       right,

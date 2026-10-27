@@ -39,6 +39,7 @@ interface MoleculeErrors {
 type CheckOption =
   | 'valence'
   | 'radicals'
+  | 'isotopes'
   | 'pseudoatoms'
   | 'stereo'
   | 'query'
@@ -120,28 +121,29 @@ const checkSchema: CheckSchema = {
         enum: [
           'valence',
           'radicals',
+          'isotopes',
           'pseudoatoms',
           'stereo',
+          'chiral',
+          'chiral_flag',
           'query',
           'overlapping_atoms',
           'overlapping_bonds',
           'rgroups',
-          'chiral',
           '3d',
-          'chiral_flag',
         ],
         enumNames: [
           i18n.t('check.valence'),
           i18n.t('check.radical'),
           i18n.t('check.pseudoatom'),
           i18n.t('check.stereochemistry'),
+          i18n.t('check.chirality'),
+          i18n.t('check.chiralFlag'),
           i18n.t('check.query'),
           i18n.t('check.overlappingAtoms'),
           i18n.t('check.overlappingBonds'),
           i18n.t('check.rgroups'),
-          i18n.t('check.chirality'),
           i18n.t('check.structure3D'),
-          i18n.t('check.chiralFlag'),
         ],
       },
     },

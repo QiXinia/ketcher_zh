@@ -23,3 +23,4 @@ export * from './useSubscribtionOnEvents';
 export * from './useDraggable';
 export * from './useDraggableDialog';
 export * from './useSettings';
+export * from './usePopoverAnchor';

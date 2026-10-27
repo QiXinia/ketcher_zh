@@ -4,16 +4,18 @@ import classes from '../toolbox/FG/RemoveFG.module.less';
 type ConfirmProps = {
   onOk: () => void;
   onCancel: () => void;
+  text?: string;
+  title?: string;
 };
 
-export const Confirm = ({ onOk, onCancel }: ConfirmProps) => {
+export const Confirm = ({ onOk, onCancel, text, title }: ConfirmProps) => {
   return (
     <div className={classes.window}>
       <header className={classes.header} data-testid="confirm-header">
-        {i18n.t('confirm.warning')}
+        {title || i18n.t('confirm.warning')}
       </header>
       <div className={classes.question} data-testid="confirm-question">
-        {i18n.t('confirm.unsupportedSgroup')}
+        {text || i18n.t('confirm.unsupportedSgroup')}
       </div>
       <footer className={classes.footer}>
         <input

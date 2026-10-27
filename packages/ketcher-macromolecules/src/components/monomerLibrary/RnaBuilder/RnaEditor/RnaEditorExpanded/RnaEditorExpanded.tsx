@@ -583,6 +583,9 @@ export const RnaEditorExpanded = ({
   const onCancel = () => {
     if (isSequenceEditInRNABuilderMode) {
       resetRnaBuilderAfterSequenceUpdate(dispatch, editor);
+    } else if (isActivePresetEmpty && presets.length > 0) {
+      resetRnaBuilder(dispatch);
+      dispatch(setActivePreset(presets[0]));
     } else {
       setNewPreset(activePreset);
       setSelectedPhosphatePosition(
@@ -624,9 +627,11 @@ export const RnaEditorExpanded = ({
         event.preventDefault();
         event.stopPropagation();
       } else if (event.key === 'Enter') {
-        isSequenceEditInRNABuilderMode
-          ? onUpdateSequence()
-          : editor?.events.startNewSequence.dispatch({});
+        if (isSequenceEditInRNABuilderMode) {
+          onUpdateSequence();
+        } else {
+          editor?.events.startNewSequence.dispatch({});
+        }
         event.preventDefault();
         event.stopPropagation();
       }

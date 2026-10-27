@@ -294,7 +294,7 @@ const TemplateDialog: FC<Props> = (props) => {
           className={classes.input}
           type="search"
           value={filter}
-          onChange={(value) => onFilter(value)}
+          onChange={(value) => onFilter(value as string)}
           placeholder={i18n.t('templates.searchByElements')}
           isFocused={true}
           data-testid="template-search-input"

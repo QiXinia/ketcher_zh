@@ -563,6 +563,7 @@ export class MacromoleculesConverter {
               alias: atom.alias,
               cip: atom.cip,
               stereoLabel: atom.stereoLabel,
+              atomList: atom.atomList,
             },
           );
 

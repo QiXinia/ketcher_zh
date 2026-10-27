@@ -369,4 +369,21 @@ describe('Drawing Entities Manager', () => {
       doubleBondPosition: 'right',
     });
   });
+
+  describe('getAntisenseBaseLabel', () => {
+    it.each([
+      ['A', false, 'U'],
+      ['A', true, 'T'],
+      ['C', false, 'G'],
+      ['G', false, 'C'],
+      ['T', false, 'A'],
+      ['U', false, 'A'],
+      ['X', false, undefined],
+      ['X', true, undefined],
+    ] as const)('maps %s (dna=%s) to %s', (label, isDnaAntisense, expected) => {
+      expect(
+        DrawingEntitiesManager.getAntisenseBaseLabel(label, isDnaAntisense),
+      ).toBe(expected);
+    });
+  });
 });
