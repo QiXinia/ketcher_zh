@@ -29,7 +29,13 @@ import { TopToolbarIconButton } from './TopToolbarIconButton';
 import { CustomButtons } from './CustomButtons';
 import { ketcherProvider } from 'ketcher-core';
 import i18n from '../../../../../i18n';
-import { cloneElement, useCallback, useMemo, useRef, type RefObject } from 'react';
+import {
+  cloneElement,
+  useCallback,
+  useMemo,
+  useRef,
+  type RefObject,
+} from 'react';
 import type { CustomButton } from '../../../../builders/ketcher/CustomButtons';
 import { useInView } from 'react-intersection-observer';
 import { ArrowScroll } from '../ArrowScroll';
@@ -56,6 +62,7 @@ export interface PanelProps {
   currentZoom: number | undefined;
   onZoom: (zoom: number) => void;
   onZoomIn: VoidFunction;
+  onZoomFit: VoidFunction;
   onZoomOut: VoidFunction;
   onSettingsOpen: VoidFunction;
   onLayout: VoidFunction;
@@ -158,6 +165,7 @@ export const TopToolbar = ({
   currentZoom,
   onZoom,
   onZoomIn,
+  onZoomFit,
   onZoomOut,
   onSettingsOpen,
   onLayout,
@@ -309,6 +317,7 @@ export const TopToolbar = ({
           <ZoomControls
             currentZoom={currentZoom ?? 1}
             onZoomIn={onZoomIn}
+            onZoomFit={onZoomFit}
             onZoomOut={onZoomOut}
             onZoom={onZoom}
             shortcuts={shortcuts}

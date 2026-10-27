@@ -46,6 +46,7 @@ interface AnalyseItem {
   key: string;
   round?: string;
   withSelector: boolean;
+  tooltip?: string;
 }
 
 interface AnalyseDialogProps extends DialogParams {
@@ -93,6 +94,13 @@ const analyseItems: AnalyseItem[] = [
     key: 'monoisotopic-mass',
     round: 'roundMass',
     withSelector: true,
+  },
+  {
+    name: i18n.t('analyse.massToCharge'),
+    key: 'mass-to-charge',
+    round: 'roundMass',
+    withSelector: true,
+    tooltip: i18n.t('analyse.massToChargeHint'),
   },
   {
     name: i18n.t('analyse.elementalAnalysis'),
@@ -174,7 +182,7 @@ export function AnalyseDialog({
             data-testid={item.name + '-wrapper'}
           >
             <div className={classes.inputWrapper}>
-              <label>{item.name}:</label>
+              <label title={item.tooltip}>{item.name}:</label>
               {renderInputComponent(item, values, loading, round)}
             </div>
             {item.withSelector && item.round ? (

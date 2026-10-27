@@ -48,6 +48,7 @@ type TopToolbarItemVariant =
   | 'copy-ket'
   | 'paste'
   | 'zoom-in'
+  | 'zoom-fit'
   | 'zoom-out'
   | 'zoom-list'
   | 'layout'

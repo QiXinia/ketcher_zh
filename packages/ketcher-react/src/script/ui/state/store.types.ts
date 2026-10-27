@@ -51,6 +51,7 @@ export interface AnalyseValues {
   gross?: string;
   'molecular-weight'?: number;
   'most-abundant-mass'?: string | number;
+  'mass-to-charge'?: number;
   'monoisotopic-mass'?: number;
   'mass-composition'?: string;
   [key: string]: string | number | undefined;

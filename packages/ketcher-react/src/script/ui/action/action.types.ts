@@ -103,6 +103,7 @@ type ToolVariant =
   | 'transform-flip-v'
   | 'transform-rotate'
   | 'zoom-in'
+  | 'zoom-fit'
   | 'zoom-out'
   | 'shape-circle'
   | 'shape-rectangle'

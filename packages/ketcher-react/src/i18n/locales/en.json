@@ -100,6 +100,7 @@
     "dative": "Dative Bond"
   },
   "zoom": {
+    "zoomFit": "Fit to View",
     "zoomOut": "Zoom Out",
     "zoomIn": "Zoom In",
     "zoom100": "Zoom 100%"
@@ -182,6 +183,7 @@
     "zoomOut": "Zoom Out",
     "zoomIn": "Zoom In",
     "zoom100": "Zoom 100%",
+    "zoomFit": "Fit to View",
     "aromatize": "Aromatize",
     "dearomatize": "Dearomatize",
     "layout": "Layout",
@@ -269,6 +271,8 @@
     "chemicalFormula": "Chemical Formula",
     "molecularWeight": "Molecular Weight",
     "mostAbundantMass": "Most Abundant Mass",
+    "massToCharge": "m/z (monoisotopic ion)",
+    "massToChargeHint": "Available for one explicitly charged molecule with no selection; no adduct or protonation is inferred.",
     "exactMass": "Exact Mass",
     "elementalAnalysis": "Elemental Analysis",
     "decimalPlaces": "Decimal places"

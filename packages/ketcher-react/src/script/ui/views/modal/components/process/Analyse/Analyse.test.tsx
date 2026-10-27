@@ -44,6 +44,7 @@ describe('calculated values', () => {
           'molecular-weight': 46.06844,
           'most-abundant-mass': '46.04257',
           'monoisotopic-mass': 46.04186,
+          'mass-to-charge': 46.04131,
           'mass-composition': 'C 52.1445 H 13.1307 O 34.7248',
         }}
       />,
@@ -54,6 +55,9 @@ describe('calculated values', () => {
     );
     expect(screen.getByTestId('analyse.exactMass-input')).toHaveValue(
       '46.0419',
+    );
+    expect(screen.getByTestId('analyse.massToCharge-input')).toHaveValue(
+      '46.0413',
     );
     expect(screen.getByTestId('analyse.elementalAnalysis-input')).toHaveValue(
       'C 52.14 H 13.13 O 34.72',

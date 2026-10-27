@@ -100,6 +100,7 @@ const mapDispatchToProps = (dispatch: Dispatch) => {
     onCut: () => dispatchAction('cut'),
     onPaste: () => dispatchAction('paste'),
     onZoomIn: () => dispatchAction('zoom-in'),
+    onZoomFit: () => dispatchAction('zoom-fit'),
     onZoomOut: () => dispatchAction('zoom-out'),
     onZoom: (zoomValue: number) =>
       dispatch(onAction((editor) => editor.zoom(zoomValue / 100))),

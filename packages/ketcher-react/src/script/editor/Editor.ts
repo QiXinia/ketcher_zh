@@ -36,6 +36,7 @@ import {
   Coordinates,
   Elements,
   fillNaturalAnalogueForPhosphateAndSugar,
+  fitViewport,
   fromAtomsAttrs,
   fromBondAddition,
   fromDescriptorsAlign,
@@ -590,6 +591,34 @@ class Editor implements KetcherEditor {
     try {
       ketcherProvider.getKetcher(this.ketcherId)._dispatchZoomChange(zoomLevel);
     } catch {}
+  }
+
+  /** Fit the full drawing by changing the viewport, without editing history. */
+  fitCanvasToContent(): boolean {
+    if (this.struct().isBlank()) return false;
+    this.render.update();
+    const bounds = this.render.ctab
+      .getVBoxObj()
+      .transform(Scale.modelToCanvas, this.render.options)
+      .translate(this.render.options.offset ?? new Vec2());
+    const transform = fitViewport(
+      {
+        x: bounds.p0.x,
+        y: bounds.p0.y,
+        width: bounds.p1.x - bounds.p0.x,
+        height: bounds.p1.y - bounds.p0.y,
+      },
+      { width: this.render.sz.x, height: this.render.sz.y },
+    );
+    if (!transform) return false;
+    this.zoom(transform.scale);
+    this.render.setViewBox((viewBox) => ({
+      ...viewBox,
+      minX: -transform.x / transform.scale,
+      minY: -transform.y / transform.scale,
+    }));
+    this.event.zoomChanged.dispatch();
+    return true;
   }
 
   centerStruct() {
@@ -3241,7 +3270,10 @@ class Editor implements KetcherEditor {
     return this._selection; // eslint-disable-line
   }
 
-  formatSelectedTexts(command: TextFormattingCommand, value?: string | number): number {
+  formatSelectedTexts(
+    command: TextFormattingCommand,
+    value?: string | number,
+  ): number {
     const selectedTextIds = this.selection()?.texts ?? [];
     if (!selectedTextIds.length) throw new Error('请先选择一个或多个文本对象');
 
@@ -3249,7 +3281,12 @@ class Editor implements KetcherEditor {
     for (const id of selectedTextIds) {
       const text = this.struct().texts.get(id);
       if (!text?.content) continue;
-      const action = fromSelectedTextFormatting(this.render.ctab, [id], command, value);
+      const action = fromSelectedTextFormatting(
+        this.render.ctab,
+        [id],
+        command,
+        value,
+      );
       if (!action.isDummy()) {
         this.update(action);
         changedCount += 1;

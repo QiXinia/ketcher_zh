@@ -40,5 +40,6 @@ export const toolsMap: Record<ToolName, ToolConstructorInterface> = {
 
 export * from './Tool';
 export * from './Zoom';
+export * from './fitViewport';
 export * from './select';
 export * from './rnaPresetConnections';

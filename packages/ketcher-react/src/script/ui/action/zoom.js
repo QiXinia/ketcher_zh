@@ -24,6 +24,13 @@ export const zoomList = [
 ];
 
 export default {
+  'zoom-fit': {
+    title: i18n.t('zoom.zoomFit'),
+    enabledInViewOnly: true,
+    disabled: (editor) => editor.struct().isBlank(),
+    action: (editor) => editor.fitCanvasToContent(),
+    hidden: (options) => isHidden(options, 'zoom-fit'),
+  },
   zoom: {
     shortcut: ['Mod+0'],
     enabledInViewOnly: true,

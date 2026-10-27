@@ -16,6 +16,7 @@
 import { type ZoomBehavior, zoom, select, ZoomTransform, drag } from 'd3';
 import type { BaseTool } from 'application/editor/tools/Tool';
 import { canvasSelector, drawnStructuresSelector } from '../constants';
+import { fitViewport } from './fitViewport';
 import type { D3SvgElementSelection } from 'application/render/types';
 import { Vec2 } from 'domain/entities/vec2';
 import type { DrawingEntitiesManager } from 'domain/entities/DrawingEntitiesManager';
@@ -399,6 +400,31 @@ export class ZoomTool implements BaseTool {
 
   public zoomTo(zoomLevel: number) {
     this.zoomToLeftTopCorner(zoomLevel);
+  }
+
+  /** Fit the rendered macro drawing, including labels and graphics, to view. */
+  public zoomToFit() {
+    if (!this.drawingEntitiesManager.hasDrawingEntities) return false;
+    const node = this.canvas.node();
+    if (!node) return false;
+    let bbox: DOMRect;
+    try {
+      bbox = node.getBBox();
+    } catch {
+      return false;
+    }
+    const transform = fitViewport(
+      bbox,
+      this.canvasWrapperSize,
+      this.MINZOOMSCALE,
+      this.MAXZOOMSCALE,
+    );
+    if (!transform || !this.zoom) return false;
+    this.zoom.transform(
+      this.canvasWrapper,
+      new ZoomTransform(transform.scale, transform.x, transform.y),
+    );
+    return true;
   }
 
   public zoomAtPoint(newZoomLevel: number, centerX: number, centerY: number) {
