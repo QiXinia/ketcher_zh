@@ -63,11 +63,11 @@ const saveSchema = {
       title: i18n.t('save.fileName'),
       type: 'string',
       maxLength: 128,
-      pattern: '^[^.<>:?"*\\\\|\\/][^<>:?"*\\\\|\\/]*$',
+      pattern: String.raw`^[^.<>:?"*\\|\/][^<>:?"*\\|\/]*$`,
       invalidMessage: (res) => {
         if (!res) return 'Filename should contain at least one character';
         if (res.length > 128) return 'Filename is too long';
-        return "A filename cannot contain characters: \\ / : * ? \" < > | and cannot start with '.'";
+        return String.raw`A filename cannot contain characters: \ / : * ? " < > | and cannot start with '.'`;
       },
     },
     format: {
@@ -365,7 +365,7 @@ class SaveDialog extends Component<SaveDialogProps, SaveDialogState> {
       // temporary check if query properties are used
       const queryPropertiesAreUsed = !!(
         type === SupportedFormat.mol &&
-        Array.from(struct.atoms).find(
+        Array.from(struct.atoms).some(
           ([_, atom]) =>
             atom.queryProperties.aromaticity ||
             atom.queryProperties.connectivity ||

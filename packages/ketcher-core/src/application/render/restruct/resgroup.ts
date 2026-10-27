@@ -285,12 +285,12 @@ class ReSGroup extends ReObject {
         const atom = render?.ctab?.atoms?.get(aid);
 
         hoversToCombine.push(atom?.makeHoverPlate(render));
-      }, this);
+      });
       SGroup.getBonds(render.ctab.molecule, sGroupItem).forEach((bid) => {
         hoversToCombine.push(
           render?.ctab?.bonds?.get(bid)?.makeHoverPlate(render),
         );
-      }, this);
+      });
 
       const elements: SVGElement[] = [];
 
@@ -373,7 +373,7 @@ class ReSGroup extends ReObject {
         const atom = render?.ctab?.atoms?.get(aid);
 
         set.push(atom?.makeMonomerAttachmentPointHighlightPlate(render));
-      }, this);
+      });
 
       render.ctab.addReObjectPath(LayerMap.atom, this.visel, set);
       this.expandedMonomerAttachmentPoints = render.paper.setFinish();

@@ -2768,6 +2768,15 @@ export class DrawingEntitiesManager {
       editor.renderersContainer.deleteRxnPlus(rxnPlus);
       editor.renderersContainer.addRxnPlus(rxnPlus);
     });
+
+    this.sgroups.forEach((sgroup) => {
+      editor.renderersContainer.deleteSGroup(sgroup);
+      editor.renderersContainer.addSGroup(sgroup);
+    });
+    this.stereoFlags.forEach((flag) => {
+      editor.renderersContainer.deleteStereoFlag(flag);
+      editor.renderersContainer.addStereoFlag(flag);
+    });
   }
 
   public applyMonomersSequenceLayout() {

@@ -314,8 +314,7 @@ function hasSelection(editor) {
   const selection = editor.selection();
   return (
     selection && // if not only sgroupData selected
-    Object.keys(selection).filter((key) => !['sgroupData'].includes(key))
-      .length > 0
+    Object.keys(selection).some((key) => !['sgroupData'].includes(key))
   );
 }
 

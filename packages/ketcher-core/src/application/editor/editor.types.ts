@@ -90,6 +90,9 @@ export interface Editor {
   setSelectedSimpleObjectBracketType: (bracketType: 'bracket' | 'parenthesis' | 'brace') => number;
   undo: () => void;
   redo: () => void;
+  historyStack: Action[];
+  historyPtr: number;
+  addHistoryAction: (action: Action) => void;
   clear: () => void;
   clearHistory: () => void;
   options(): RenderOptions;
