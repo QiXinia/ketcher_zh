@@ -17,6 +17,7 @@ export enum BondType {
   Any,
   Dative,
   Hydrogen,
+  Quadruple,
 }
 
 export enum BondStereo {
@@ -26,6 +27,17 @@ export enum BondStereo {
   Down = 6,
   CisTrans = 3,
 }
+
+export type BondDisplay =
+  | 'plain'
+  | 'dotted'
+  | 'dashed'
+  | 'hashed'
+  | 'hashed-wedged'
+  | 'hollow-wedged'
+  | 'bold';
+
+export type DoubleBondPosition = 'auto' | 'left' | 'center' | 'right';
 
 export class Bond extends DrawingEntity {
   public endPosition: Vec2 = new Vec2();
@@ -38,6 +50,8 @@ export class Bond extends DrawingEntity {
     public type: BondType = BondType.Single,
     public stereo: BondStereo = BondStereo.None,
     public cip: BondCIP | null = null,
+    public display: BondDisplay = 'plain',
+    public doubleBondPosition: DoubleBondPosition = 'auto',
   ) {
     super(firstAtom.position);
     this.endPosition = secondAtom.position;

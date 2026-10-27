@@ -40,6 +40,7 @@ import { getGroupIdsFromItemArrays } from './helper/getGroupIdsFromItems';
 import { MODES } from 'src/constants';
 import type { Tool } from './Tool';
 import TemplatePreview from './templatePreview';
+import { shouldSproutRing } from './templateRingPolicy';
 import {
   getAngleFromEvent,
   getBondFlipSign,
@@ -57,7 +58,7 @@ class TemplateTool implements Tool {
   private dragCtx: any;
   private targetGroupsIds: Array<number> = [];
   private readonly isSaltOrSolvent: boolean;
-  private event: Event | undefined;
+  private event: MouseEvent | undefined;
 
   constructor(editor: Editor, tmpl) {
     this.editor = editor;
@@ -68,6 +69,7 @@ class TemplateTool implements Tool {
       | SGroup
       | undefined;
     this.template = {
+      ringTool: tmpl.ringTool === true && !this.isModeFunctionalGroup,
       aid: (parseInt(tmpl.aid) || sGroup?.getAttachmentAtomId()) ?? 0,
       bid: parseInt(tmpl.bid) || 0,
     };
@@ -323,7 +325,8 @@ class TemplateTool implements Tool {
         if (targetPos) {
           extraBond = this.isModeFunctionalGroup
             ? true
-            : Vec2.dist(targetPos, eventPosition) > 1;
+            : shouldSproutRing(this.editor, this.template, this.mode, event) ||
+              Vec2.dist(targetPos, eventPosition) > 1;
         }
       }
     }
@@ -395,6 +398,13 @@ class TemplateTool implements Tool {
   }
 
   mouseup(event?) {
+    // Resolve a modifier change at release even when the pointer did not move.
+    if (
+      event && this.dragCtx?.action && this.template.ringTool &&
+      this.dragCtx.item?.map === 'atoms'
+    ) {
+      this.mousemove(event);
+    }
     const dragCtx = this.dragCtx;
 
     if (!dragCtx) {
@@ -503,14 +513,15 @@ class TemplateTool implements Tool {
           return;
         }
 
-        const angle = getAngleFromEvent(event, ci, restruct);
+        const clickEvent = event ?? this.event;
+        const angle = getAngleFromEvent(clickEvent, ci, restruct);
 
         [action] = fromTemplateOnAtom(
           restruct,
           this.template,
           ci.id,
           angle,
-          false,
+          shouldSproutRing(this.editor, this.template, this.mode, clickEvent),
         );
         if (functionalGroupRemoveAction) {
           action = functionalGroupRemoveAction.mergeWith(action);

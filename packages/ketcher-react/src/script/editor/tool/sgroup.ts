@@ -22,6 +22,7 @@ import {
   fromSeveralSgroupAddition,
   fromSgroupAction,
   fromSgroupDeletion,
+  fromSgroupAttrs,
   FunctionalGroup,
   SGroup,
   expandSGroupWithMultipleAttachmentPoint,
@@ -29,7 +30,6 @@ import {
 } from 'ketcher-core';
 
 import LassoHelper from './helper/lasso';
-import { isEqual } from 'lodash/fp';
 import { selMerge } from './select/select.helpers';
 import type { Editor, Selection } from '../Editor';
 import type { Tool } from './Tool';
@@ -88,9 +88,21 @@ class SGroupTool implements Tool {
       const functionalGroups = molecule.functionalGroups;
       const result: Array<number> = [];
 
-      const id = sgroups.find((_, sgroup) =>
-        isEqual(sgroup.atoms, selectedAtoms),
-      );
+      const id = selectedAtoms
+        ? sgroups.find(
+            (_, sgroup) =>
+              sgroup.atoms.length === selectedAtoms.length &&
+              sgroup.atoms.every((atom) => selectedAtoms.includes(atom)),
+          )
+        : null;
+
+      // A complete group selection edits its properties. SUP groups also have
+      // functional-group wrappers, whose partial-selection path removes them.
+      if (id !== null) {
+        SGroupTool.sgroupDialog(this.editor, id);
+        this.isNotActiveTool = true;
+        return;
+      }
 
       if (selectedAtoms && functionalGroups.size) {
         for (const atom of selectedAtoms) {
@@ -718,7 +730,7 @@ class SGroupTool implements Tool {
     this.editor.selection(null);
   }
 
-  static sgroupDialog(editor: Editor, id: number | null) {
+  static sgroupDialog(editor: Editor, id: number | null, options?: { dataOnly?: boolean }) {
     const restruct = editor.render.ctab;
     const struct = restruct.molecule;
     const selection = editor.selection() ?? {};
@@ -743,12 +755,27 @@ class SGroupTool implements Tool {
     }
 
     const res = editor.event.sgroupEdit.dispatch({
-      type: sg?.type,
+      type: sg?.type ?? (options?.dataOnly ? 'DAT' : undefined),
+      fixedType: options?.dataOnly ? 'DAT' : undefined,
       attrs,
     });
 
     return Promise.resolve(res)
       .then((newSg) => {
+        // Editing a DAT field must preserve its identity and the position the
+        // user dragged its label to. Recreating it resets pp and group IDs.
+        if (sg?.type === 'DAT' && newSg.type === 'DAT' &&
+          attrs.context === newSg.attrs.context &&
+          typeof newSg.attrs.fieldValue === 'string') {
+          const changes = Object.fromEntries(Object.entries(newSg.attrs)
+            .filter(([key, value]) => key !== 'init' && key !== 'fixedType' &&
+              !sg.checkAttr(key, value)));
+          if (Object.keys(changes).length) {
+            editor.update(fromSgroupAttrs(restruct, id, changes));
+          }
+          editor.selection(selection);
+          return;
+        }
         // TODO: check before signal
         const isQuerySGroup = SGroup.isQuerySGroup(newSg);
         const isDataSGroup = SGroup.isDataSGroup(newSg);

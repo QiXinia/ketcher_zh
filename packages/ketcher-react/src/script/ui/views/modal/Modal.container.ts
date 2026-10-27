@@ -20,7 +20,7 @@ import type { BaseCallProps, ModalContainerProps } from './modal.types';
 import type { Dispatch } from 'redux';
 import { connect } from 'react-redux';
 import { omit } from 'lodash/fp';
-import { WindowState } from '../../state/modal/windows';
+import type { WindowState } from '../../state/modal/windows';
 
 interface WindowCallProps {
   onWindowClose: (id: string) => void;

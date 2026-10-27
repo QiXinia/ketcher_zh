@@ -195,6 +195,14 @@ export function syncSettingsFromCore(coreSettings) {
     normalizedSettings,
   );
 
+  // windowedMode is a React-only UI option that is not persisted in Core
+  // settings; fall back to the React default when syncing from Core so the
+  // normalized defaults stay equal to getDefaultOptions().
+  const defaultOptions = getDefaultOptions();
+  if (reduxSettings.windowedMode === undefined) {
+    reduxSettings.windowedMode = defaultOptions.windowedMode;
+  }
+
   return {
     type: 'SYNC_SETTINGS_FROM_CORE',
     data: reduxSettings,

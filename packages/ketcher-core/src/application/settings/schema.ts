@@ -12,6 +12,7 @@ export const DEFAULT_SETTINGS: Settings = {
   // Editor settings
   resetToSelect: 'paste', // true, 'paste', or false
   rotationStep: 15, // degrees
+  sproutRingsInsteadOfSpiro: false,
 
   // General render settings
   showValenceWarnings: true,
@@ -38,6 +39,11 @@ export const DEFAULT_SETTINGS: Settings = {
 
   // Atoms
   carbonExplicitly: false,
+  showAtomNumbers: false,
+  showTerminalCarbonLabels: false,
+  showQueryIndicators: true,
+  showStereochemistry: false,
+  showEnhancedStereochemistry: true,
   showCharge: true,
   showValence: true,
   showHydrogenLabels: 'Terminal and Hetero', // 'off', 'Hetero', 'Terminal', 'Terminal and Hetero', 'On'
@@ -138,6 +144,7 @@ export const SCHEMA = {
   type: 'object',
   properties: {
     // Editor settings
+    sproutRingsInsteadOfSpiro: { type: 'boolean' },
     resetToSelect: {
       enum: [true, 'paste', false],
     },
@@ -170,6 +177,11 @@ export const SCHEMA = {
     mixedFlagLabel: { type: 'string' },
     ignoreChiralFlag: { type: 'boolean' },
     carbonExplicitly: { type: 'boolean' },
+    showAtomNumbers: { type: 'boolean' },
+    showTerminalCarbonLabels: { type: 'boolean' },
+    showQueryIndicators: { type: 'boolean' },
+    showStereochemistry: { type: 'boolean' },
+    showEnhancedStereochemistry: { type: 'boolean' },
     showCharge: { type: 'boolean' },
     showValence: { type: 'boolean' },
     showHydrogenLabels: {

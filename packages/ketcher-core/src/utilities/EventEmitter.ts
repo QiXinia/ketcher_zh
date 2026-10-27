@@ -37,6 +37,7 @@ export class EventEmitter {
     eventName: EventName,
     listener: (...args: TArgs) => void,
   ): this;
+
   once(eventName: EventName, listener: (...args: never[]) => void) {
     const onceListener: EventListener = (...args) => {
       this.removeListener(eventName, onceListener);

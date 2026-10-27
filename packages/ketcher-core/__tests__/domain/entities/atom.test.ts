@@ -1,4 +1,5 @@
 import { Atom, AttachmentPoints, radicalElectrons } from 'domain/entities/atom';
+import { Struct } from 'domain/entities/struct';
 
 describe('radicalElectrons', () => {
   it('should return 1 if passed radical is Douplet (value = 2)', () => {
@@ -53,6 +54,35 @@ describe('Atom', () => {
       const atom = new Atom(hydrogenParams);
       expect(atom.pseudo).toBe('');
     });
+
+    it('defaults abnormal valence permission to false and copies an explicit value', () => {
+      const ordinary = new Atom(hydrogenParams);
+      const allowed = new Atom({ ...hydrogenParams, abnormalValence: true });
+
+      expect(ordinary.abnormalValence).toBe(false);
+      expect(allowed.clone().abnormalValence).toBe(true);
+    });
+  });
+
+  describe('abnormal valence permission', () => {
+    it.each([false, true])(
+      'only reports an explicit-valence mismatch when permission is %s',
+      (abnormalValence) => {
+        const struct = new Struct();
+        const atom = new Atom({
+          label: 'C',
+          explicitValence: 1,
+          abnormalValence,
+        });
+        const atomId = struct.atoms.add(atom);
+        struct.calcConn = (() => [2, false]) as typeof struct.calcConn;
+
+        struct.calcImplicitHydrogen(atomId);
+
+        expect(atom.implicitH).toBe(0);
+        expect(atom.badConn).toBe(!abnormalValence);
+      },
+    );
   });
 
   describe('pseudo getter', () => {

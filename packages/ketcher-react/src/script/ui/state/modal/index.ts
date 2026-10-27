@@ -54,7 +54,12 @@ export function openDialog(
   props?: Record<string, unknown>,
 ): Promise<unknown> {
   return new Promise((resolve, reject) => {
-    dispatch(((innerDispatch: Dispatch, getState: () => any) => {
+    dispatch(((
+      innerDispatch: Dispatch,
+      getState: () => {
+        options?: { settings?: { windowedMode?: boolean } };
+      },
+    ) => {
       const state = getState();
       const windowedMode = state.options?.settings?.windowedMode ?? true;
       const actionType = windowedMode ? 'WINDOW_OPEN' : 'MODAL_OPEN';
@@ -69,7 +74,7 @@ export function openDialog(
           },
         },
       });
-    }) as any);
+    }) as unknown as AnyAction);
   });
 }
 

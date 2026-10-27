@@ -15,6 +15,7 @@
  ***************************************************************************/
 import type { Struct } from 'domain/entities/struct';
 import type { Vec2 } from 'domain/entities/vec2';
+import type { ObjectAnnotation } from 'domain/entities/BaseMicromoleculeEntity';
 
 export interface Serializer<T> {
   deserialize: (content: string) => T;
@@ -27,6 +28,7 @@ export interface KetFileNode<T = unknown> {
   center: Vec2;
   data?: T;
   selected?: boolean;
+  annotations?: ObjectAnnotation[];
 }
 
 export interface KetFileRoot {

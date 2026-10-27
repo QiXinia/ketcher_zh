@@ -21,6 +21,15 @@ import type { selectionKeys } from './shared/constants';
 import type { PipelineSubscription, Subscription } from 'subscription';
 import type { IRnaPreset } from './tools/Tool';
 import type { TextFormattingCommand } from './actions/textFormatting';
+import type { ObjectAlignment, ObjectDistribution } from './actions/objectAlignment';
+import type { RingFusionKind } from './actions/ringFusion';
+import type { AtomSproutKind } from './actions/atomSprout';
+import type { ChemicalHotspot, HotspotDirection } from './hotspot';
+import type { StructureLabelDraft } from './actions/structureLabels';
+import type {
+  NicknameDraft,
+  NicknameDefinition,
+} from 'domain/helpers/nicknames';
 
 export type EditorSelection = {
   [key in typeof selectionKeys[number]]?: number[];
@@ -51,6 +60,55 @@ export interface Editor {
   unsubscribe: (eventName: string, subscriber: any) => void;
   selection: (arg?: EditorSelection | 'all' | null) => EditorSelection | null;
   formatSelectedTexts: (command: TextFormattingCommand, value?: string | number) => number;
+  flattenSelectedObjects: () => number;
+  centerSelectedObjects: () => number;
+  joinSelectedObjects: () => number;
+  alignSelectedObjects: (alignment: ObjectAlignment) => number;
+  distributeSelectedObjects: (direction: ObjectDistribution) => number;
+  setSelectedBondIndicatorVisibility: (indicator: 'query' | 'reaction', visible: boolean) => number;
+  setSelectedSimpleObjectStyle: (style: 'plain' | 'dashed' | 'bold') => number;
+  setSelectedSimpleObjectColor: (color?: string) => number;
+  setSelectedSimpleObjectCurveSettings: (settings: {
+    lineWidth?: number;
+    doubleLineSpacing?: number;
+  }) => number;
+  setSelectedSimpleObjectArrow: (
+    endpoint: 'start' | 'end',
+    arrow: 'none' | 'full' | 'half-left' | 'half-right',
+  ) => number;
+  setSelectedSimpleObjectCurveProperty: (
+    property: 'doubled' | 'closed' | 'fill' | 'faded',
+    value: boolean | 'none' | 'solid' | 'shaded',
+  ) => number;
+  setSelectedSimpleObjectBracketType: (bracketType: 'bracket' | 'parenthesis' | 'brace') => number;
+  setSelectedRingFillColor: (color?: string) => number;
+  adjustSelectedAtomCharge: (delta: -1 | 1) => number;
+  setSelectedAtomAttachmentPoint: () => number;
+  fuseRingOnSelectedBond: (kind: RingFusionKind) => number;
+  sproutOnSelectedAtom: (kind: AtomSproutKind) => number;
+  captureAtomLabelSprout: () => { atomId: number; sourceKet: string };
+  sproutAtomLabel: (label: string, draft: { atomId: number; sourceKet: string }) => number;
+  captureAtomLabelEdit: () => { atomId: number; sourceKet: string; label: string };
+  editAtomLabel: (label: string, draft: { atomId: number; sourceKet: string }) => number;
+  captureContractLabel: () => StructureLabelDraft;
+  contractStructureLabel: (label: string, draft: StructureLabelDraft) => number;
+  setSelectedStructureLabelsExpanded: (expanded: boolean) => number;
+  getChemicalHotspot: () => ChemicalHotspot | null;
+  selectChemicalHotspot: () => boolean;
+  moveChemicalHotspot: (direction: HotspotDirection) => boolean;
+  captureNicknameFragment: () => NicknameDraft;
+  getNicknames: () => NicknameDefinition[];
+  exportNicknameLibrary: () => string;
+  importNicknameLibrary: (source: string) => number;
+  prepareNicknamePreview: (ket: string) => string;
+  saveNickname: (
+    ket: string,
+    name: string,
+    attachmentAtomId: number,
+  ) => NicknameDefinition;
+  deleteNickname: (name: string) => void;
+  activateNickname: (name: string) => void;
+  clearRingFills: () => number;
   undo: () => void;
   redo: () => void;
   clear: () => void;

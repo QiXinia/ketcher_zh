@@ -28,6 +28,10 @@ import { checkErrors } from '../modal/form';
 import { indigoVerification } from '../request';
 import { load } from '../shared';
 import i18n from '../../../../i18n';
+import {
+  collectCheckErrorLocations,
+  locationsForWarnings,
+} from './checkLocations';
 
 export function checkServer() {
   return (dispatch, getState) => {
@@ -67,24 +71,25 @@ export function recognize(file, version) {
 
 function ketcherCheck(struct, checkParams) {
   const errors = {};
+  const locations = collectCheckErrorLocations(struct, checkParams);
 
   if (checkParams.includes('chiral_flag')) {
     const isAbs = Array.from(struct.frags.values()).some((fr) =>
-      fr ? fr.enhancedStereoFlag === 'abs' : false,
+      fr ? fr.enhancedStereoFlag === 'ABS' : false,
     );
     if (isAbs) errors.chiral_flag = 'Chiral flag is present on the canvas';
   }
 
   if (checkParams.includes('valence')) {
-    let badVal = 0;
-    struct.atoms.forEach((atom) => atom.badConn && badVal++);
-    if (badVal > 0)
-      errors.valence = `Structure contains ${badVal} atom${
-        badVal !== 1 ? 's' : ''
+    const badValenceAtomIds = locations.valence?.atoms || [];
+    if (badValenceAtomIds.length > 0) {
+      errors.valence = `Structure contains ${badValenceAtomIds.length} atom${
+        badValenceAtomIds.length !== 1 ? 's' : ''
       } with bad valence`;
+    }
   }
 
-  return errors;
+  return { errors, locations };
 }
 
 function localizeCheckErrors(errors) {
@@ -108,7 +113,10 @@ export function check(optsTypes) {
     // because for atoms in collapsed sgroups it can be not calculated
     struct.setImplicitHydrogen(undefined, true);
 
-    const ketcherErrors = ketcherCheck(struct, optsTypes);
+    const { errors: ketcherErrors, locations } = ketcherCheck(
+      struct,
+      optsTypes,
+    );
 
     const options = getState().options.getServerSettings();
     options.data = { types: without(['valence', 'chiral_flag'], optsTypes) };
@@ -117,7 +125,7 @@ export function check(optsTypes) {
       .then((res) => {
         res = Object.assign(res, ketcherErrors); // merge Indigo check with Ketcher check
         res = localizeCheckErrors(res);
-        dispatch(checkErrors(res));
+        dispatch(checkErrors(res, locationsForWarnings(locations, res)));
       })
       .catch((e) => {
         KetcherLogger.error('index.js::check', e);

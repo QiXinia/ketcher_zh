@@ -8,7 +8,7 @@ describe('Multiple repeating S-groups limitations should be in [1, 200]', () => 
   const setup = () => {
     const props = { type: 'MUL' };
     const utils = renderWithMockStore(<SGroup {...props} />);
-    const input = screen.getByLabelText('Repeat count');
+    const input = screen.getByLabelText('重复次数');
     return {
       input,
       ...utils,
@@ -47,18 +47,18 @@ describe('Copolymer S-Group type availability', () => {
     renderWithMockStore(
       <SGroup type="MUL" selectedSruCount={selectedSruCount} />,
     );
-    const typeSelect = screen.getByRole('combobox');
+    const typeSelect = screen.getAllByRole('combobox')[0];
     fireEvent.mouseDown(typeSelect);
   };
 
   it('should hide Copolymer option when fewer than two SRUs are selected', () => {
     renderAndOpenTypeSelect(1);
-    expect(screen.queryByTestId('Copolymer-option')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('共聚物-option')).not.toBeInTheDocument();
   });
 
   it('should show Copolymer option when at least two SRUs are selected', () => {
     renderAndOpenTypeSelect(2);
-    expect(screen.getByTestId('Copolymer-option')).toBeInTheDocument();
+    expect(screen.getByTestId('共聚物-option')).toBeInTheDocument();
   });
 
   it('should show Copolymer option when editing existing Copolymer S-Group', () => {
@@ -73,7 +73,7 @@ describe('Copolymer S-Group type availability', () => {
     });
     const typeSelect = screen.getAllByRole('combobox')[0];
     fireEvent.mouseDown(typeSelect);
-    expect(screen.getByTestId('Copolymer-option')).toBeInTheDocument();
+    expect(screen.getByTestId('共聚物-option')).toBeInTheDocument();
   });
 });
 
@@ -91,7 +91,51 @@ describe('S-Group DAT type rendering', () => {
         },
       },
     });
-    expect(screen.getByText('S-Group Properties')).toBeInTheDocument();
+    expect(screen.getByText('S-基团属性')).toBeInTheDocument();
+  });
+});
+
+describe('Windowed S-Group form state', () => {
+  const windowForm = {
+    errors: {},
+    valid: true,
+    result: { type: 'SUP', name: 'EtOH' },
+  };
+
+  it('renders a window form when the legacy modal is null', () => {
+    renderWithMockStore(
+      <SGroup type="SUP" formState={windowForm} />,
+      { modal: null },
+    );
+    expect(screen.getByLabelText('名称')).toHaveValue('EtOH');
+  });
+
+  it('prefers the window form over an unrelated modal form', () => {
+    renderWithMockStore(<SGroup type="SUP" formState={windowForm} />);
+    expect(screen.getByLabelText('名称')).toHaveValue('EtOH');
+    expect(screen.queryByLabelText('重复次数')).not.toBeInTheDocument();
+  });
+
+  it('uses a valid schema while a window form is initializing', () => {
+    renderWithMockStore(<SGroup type="DAT" />, { modal: null });
+    expect(screen.getByText('字段名')).toBeInTheDocument();
+  });
+});
+
+describe('S-Group bracket style controls', () => {
+  it.each(['MUL', 'SRU', 'COP', 'SUP'])('exposes bracket styles for %s', (type) => {
+    const result =
+      type === 'MUL'
+        ? { type, mul: 2, bracketStyle: 'parentheses' }
+        : type === 'SRU'
+          ? { type, subscript: 'n', connectivity: 'ht', bracketStyle: 'braces' }
+          : type === 'COP'
+            ? { type, connectivity: 'eu', bracketStyle: 'parentheses' }
+            : { type, name: 'Et', bracketStyle: 'braces' };
+    const formState = { errors: {}, valid: true, result };
+    renderWithMockStore(<SGroup type={type} formState={formState} />);
+
+    expect(screen.getAllByTestId('bracketStyle')).toHaveLength(2);
   });
 });
 

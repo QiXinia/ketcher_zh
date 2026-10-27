@@ -20,6 +20,7 @@ export interface AtomProperties {
   charge?: number | null;
   explicitValence?: number;
   isotope?: number | null;
+  isotopicAbundance?: number;
   radical?: AtomRadical;
   alias?: string | null;
   cip?: AtomCIP | null;
@@ -79,6 +80,9 @@ export class Atom extends DrawingEntity {
             break;
           case BondType.Triple:
             connectionsAmount += 3;
+            break;
+          case BondType.Quadruple:
+            connectionsAmount += 4;
             break;
           case BondType.Dative:
           case BondType.Hydrogen:

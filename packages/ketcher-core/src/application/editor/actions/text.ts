@@ -15,8 +15,10 @@
  ***************************************************************************/
 
 import { TextCreate, TextDelete, TextUpdate } from '../operations';
-import type { TextFormattingCommand } from './textFormatting';
-import { formatLexicalText } from './textFormatting';
+import {
+  formatLexicalText,
+  type TextFormattingCommand,
+} from './textFormatting';
 
 import { Action } from './action';
 import type { ReStruct } from '../../render';
@@ -62,7 +64,8 @@ export function fromSelectedTextFormatting(
     const text = restruct.molecule.texts.get(id);
     if (!text?.content) return;
     const nextContent = formatLexicalText(text.content, command, value);
-    if (nextContent !== text.content) action.addOp(new TextUpdate(id, nextContent));
+    if (nextContent !== text.content)
+      action.addOp(new TextUpdate(id, nextContent));
   });
   return action.perform(restruct);
 }

@@ -46,6 +46,7 @@ import i18n from '../../../../../../../i18n';
 
 interface AtomProps extends BaseCallProps, BaseProps {
   alias: string;
+  abnormalValence: boolean;
   charge: string;
   exactChangeFlag: boolean;
   explicitValence: number;
@@ -57,6 +58,10 @@ interface AtomProps extends BaseCallProps, BaseProps {
   ringBondCount: number;
   stereoParity: number;
   substitutionCount: number;
+  substitutionQueryMode: 'free-sites' | 'up-to' | 'exactly' | null;
+  substitutionQueryCount: number;
+  unsaturation: 'must-be-absent' | 'must-be-present' | null;
+  translation: 'equal' | 'broad' | 'narrow' | 'any' | null;
   unsaturatedAtom: boolean;
   customQuery: string;
 }
@@ -77,6 +82,10 @@ const querySpecificFields: Array<{
   { name: 'ringBondCount', component: 'dropdown' },
   { name: 'hCount', component: 'dropdown' },
   { name: 'substitutionCount', component: 'dropdown' },
+  { name: 'substitutionQueryMode', component: 'dropdown' },
+  { name: 'substitutionQueryCount', component: 'dropdown' },
+  { name: 'unsaturation', component: 'dropdown' },
+  { name: 'translation', component: 'dropdown' },
   { name: 'unsaturatedAtom', labelPos: 'before', className: classes.checkbox },
   { name: 'aromaticity', component: 'dropdown' },
   { name: 'implicitHCount', component: 'dropdown' },
@@ -160,6 +169,12 @@ const Atom: FC<Props> = (props: Props) => {
           <AtomElement formState={formState} className=""></AtomElement>
           <Field name="alias" data-testid="alias" />
           <Field
+            name="abnormalValence"
+            component={Select}
+            options={getSelectOptionsFromSchema(atomProps.abnormalValence)}
+            data-testid="abnormalValence"
+          />
+          <Field
             name="charge"
             maxLength={atomProps.charge.maxLength}
             data-testid="charge"
@@ -168,6 +183,12 @@ const Atom: FC<Props> = (props: Props) => {
             name="isotope"
             maxLength={atomProps.isotope.maxLength}
             data-testid="isotope"
+          />
+          <Field
+            name="isotopicAbundance"
+            component={Select}
+            options={getSelectOptionsFromSchema(atomProps.isotopicAbundance)}
+            data-testid="isotopicAbundance"
           />
           <Field
             name="explicitValence"

@@ -8,19 +8,26 @@ describe('KET text formatting round trip', () => {
     const ketText = {
       type: 'text',
       boundingBox: { x: 1, y: 2, width: 4, height: 1 },
-      paragraphs: [{
-        alignment: 'center',
-        lineSpacing: 1.5,
-        parts: [{
-          text: 'H2O+',
-          underline: true,
-          font: { family: 'Arial', size: 18 },
-        }],
-      }],
+      paragraphs: [
+        {
+          alignment: 'center',
+          lineSpacing: 1.5,
+          parts: [
+            {
+              text: 'H2O+',
+              underline: true,
+              font: { family: 'Arial', size: 18 },
+            },
+          ],
+        },
+      ],
     };
 
     textToStruct(ketText, struct);
-    const text = struct.texts.get(0)!;
+    const text = struct.texts.get(0);
+    if (!text) {
+      throw new Error('Expected textToStruct to add a text entity');
+    }
     const roundTripped = textToKet({
       selected: false,
       data: {
@@ -32,11 +39,13 @@ describe('KET text formatting round trip', () => {
     expect(roundTripped.paragraphs[0]).toMatchObject({
       alignment: 'center',
       lineSpacing: 1.5,
-      parts: [{
-        text: 'H2O+',
-        underline: true,
-        font: { family: 'Arial', size: 18 },
-      }],
+      parts: [
+        {
+          text: 'H2O+',
+          underline: true,
+          font: { family: 'Arial', size: 18 },
+        },
+      ],
     });
   });
 });

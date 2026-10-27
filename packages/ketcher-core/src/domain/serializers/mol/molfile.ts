@@ -15,6 +15,7 @@
  ***************************************************************************/
 
 import { StereoFlag } from 'domain/entities/fragment';
+import { Bond } from 'domain/entities/bond';
 import type { Struct } from 'domain/entities/struct';
 import type { SGroupAttachmentPoint } from 'domain/entities/sGroupAttachmentPoint';
 import { SGroup } from 'domain/entities/sgroup';
@@ -596,7 +597,13 @@ export class Molfile {
   private writeBond(bond) {
     this.writePaddedNumber(this.mapping[bond.begin], 3);
     this.writePaddedNumber(this.mapping[bond.end], 3);
-    this.writePaddedNumber(bond.type, 3);
+    // CTfile has no quadruple bond code. Preserve it in KET and make the
+    // loss explicit through couldBeSaved() before a MOL/SDF export.
+    const molBondType =
+      bond.type === Bond.PATTERN.TYPE.QUADRUPLE
+        ? Bond.PATTERN.TYPE.TRIPLE
+        : bond.type;
+    this.writePaddedNumber(molBondType, 3);
 
     if (typeof bond.stereo === 'undefined') {
       bond.stereo = 0;

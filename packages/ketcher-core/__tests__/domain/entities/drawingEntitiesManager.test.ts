@@ -330,4 +330,43 @@ describe('Drawing Entities Manager', () => {
 
     expect(document.querySelector('[data-label-text="Value"]')).toBeTruthy();
   });
+
+  it('should preserve bond display properties when converting a structure to macro drawing entities', () => {
+    const struct = new Struct();
+    const firstAtomId = struct.atoms.add(
+      new Atom({ label: 'C', pp: new Vec2(0, 0) }),
+    );
+    const secondAtomId = struct.atoms.add(
+      new Atom({ label: 'C', pp: new Vec2(1, 0) }),
+    );
+    struct.bonds.add(
+      new Bond({
+        begin: firstAtomId,
+        end: secondAtomId,
+        type: Bond.PATTERN.TYPE.SINGLE,
+        display: 'hollow-wedged',
+        doubleBondPosition: 'right',
+      }),
+    );
+    struct.markFragments();
+
+    const editor = new CoreEditor({
+      canvas: createPolymerEditorCanvas(),
+      theme: {},
+      renderersContainer: createRenderersManager(),
+    });
+    const { modelChanges } =
+      MacromoleculesConverter.convertStructToDrawingEntities(
+        struct,
+        editor.drawingEntitiesManager,
+      );
+
+    editor.renderersContainer.update(modelChanges);
+
+    const drawingBond = [...editor.drawingEntitiesManager.bonds.values()][0];
+    expect(drawingBond).toMatchObject({
+      display: 'hollow-wedged',
+      doubleBondPosition: 'right',
+    });
+  });
 });

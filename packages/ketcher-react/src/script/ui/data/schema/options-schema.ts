@@ -102,6 +102,11 @@ const render: {
   fontszsub: ExtendedSchema;
   fontszsubUnit: ExtendedSchema;
   carbonExplicitly: ExtendedSchema;
+  showAtomNumbers: ExtendedSchema;
+  showTerminalCarbonLabels: ExtendedSchema;
+  showQueryIndicators: ExtendedSchema;
+  showStereochemistry: ExtendedSchema;
+  showEnhancedStereochemistry: ExtendedSchema;
   showCharge: ExtendedSchema;
   showValence: ExtendedSchema;
   showHydrogenLabels: ExtendedSchema;
@@ -317,6 +322,31 @@ const render: {
     },
     'settings.displayCarbonExplicitly',
     'Display carbon explicitly',
+  ),
+  showAtomNumbers: localizedProperty(
+    { type: 'boolean', description: 'slider', default: false },
+    'settings.showAtomNumbers',
+    'Show atom numbers',
+  ),
+  showTerminalCarbonLabels: localizedProperty(
+    { type: 'boolean', description: 'slider', default: false },
+    'settings.showTerminalCarbonLabels',
+    'Show labels on terminal carbons',
+  ),
+  showQueryIndicators: localizedProperty(
+    { type: 'boolean', description: 'slider', default: true },
+    'settings.showQueryIndicators',
+    'Show query indicators',
+  ),
+  showStereochemistry: localizedProperty(
+    { type: 'boolean', description: 'slider', default: false },
+    'settings.showStereochemistry',
+    'Show stereochemistry',
+  ),
+  showEnhancedStereochemistry: localizedProperty(
+    { type: 'boolean', description: 'slider', default: true },
+    'settings.showEnhancedStereochemistry',
+    'Show enhanced stereochemistry',
   ),
   showCharge: localizedProperty(
     {

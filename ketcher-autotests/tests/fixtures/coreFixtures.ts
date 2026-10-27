@@ -1,5 +1,10 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import { test as base, Page, TestInfoError } from '@playwright/test';
+import {
+  test as base,
+  BrowserContext,
+  Page,
+  TestInfoError,
+} from '@playwright/test';
 import { waitForPageInit } from '@utils';
 
 type CoreTestFixtures = {
@@ -17,11 +22,28 @@ type CoreWorkerFixtures = {
   closePage: () => Promise<void>;
 };
 
+// Pin the UI to English for E2E so the upstream selectors (mostly
+// language-independent data-testid, plus a small set of English labels) stay
+// deterministic. The product still defaults to Chinese for real users; this
+// only affects the automated browser. Must run before the app's first load.
+async function pinEnglishLanguage(context: BrowserContext) {
+  await context.addInitScript(() => {
+    window.localStorage.setItem('ketcher-language', 'en');
+  });
+}
+
 export const test = base.extend<CoreTestFixtures, CoreWorkerFixtures>({
+  // Covers tests that use Playwright's built-in context/page fixtures.
+  context: async ({ context }, use) => {
+    await pinEnglishLanguage(context);
+    await use(context);
+  },
+
   createPage: [
     async ({ browser, ketcher }, use) => {
       await use(async () => {
         const context = await browser.newContext();
+        await pinEnglishLanguage(context);
         const page = await context.newPage();
         ketcher.page = page;
         await waitForPageInit(page);

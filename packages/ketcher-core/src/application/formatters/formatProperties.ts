@@ -194,6 +194,10 @@ const formatProperties: FormatPropertiesMap = {
 const imgFormatProperties = {
   svg: { extension: '.svg', name: 'SVG Document' },
   png: { extension: '.png', name: 'PNG Image' },
+  jpeg: { extension: '.jpg', name: 'JPEG Image' },
+  bmp: { extension: '.bmp', name: 'BMP Image' },
+  tiff: { extension: '.tiff', name: 'TIFF Image' },
+  gif: { extension: '.gif', name: 'GIF Image' },
 };
 
 function getPropertiesByImgFormat(format) {

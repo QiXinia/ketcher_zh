@@ -43,6 +43,7 @@ interface DrawBracketsOptions {
   lowerIndexText?: string | null;
   upperIndexText?: string | null;
   indexAttribute?: Record<string, string>;
+  bracketStyle?: 'brackets' | 'parentheses' | 'braces';
 }
 
 export class SGroupRenderer extends BaseRenderer {
@@ -106,7 +107,7 @@ export class SGroupRenderer extends BaseRenderer {
     }
 
     this.sgroup.bracketBox = bracketBox;
-    this.sgroup.bracketDirection = new Vec2(1, 0);
+    this.sgroup.bracketDirection = SGroup.getBracketDirection(this.sgroup);
     this.sgroup.areas = [bracketBox];
 
     if (this.sgroup.isContracted()) {
@@ -116,6 +117,7 @@ export class SGroupRenderer extends BaseRenderer {
     }
 
     const options: DrawBracketsOptions = {};
+    options.bracketStyle = this.sgroup.data.bracketStyle;
     switch (this.sgroup.type) {
       case SGroup.TYPES.MUL:
         options.lowerIndexText = String(this.sgroup.data.mul);
@@ -280,7 +282,12 @@ export class SGroupRenderer extends BaseRenderer {
 
   private drawBrackets(
     bracketBox: Box2Abs,
-    { lowerIndexText, upperIndexText, indexAttribute }: DrawBracketsOptions,
+    {
+      lowerIndexText,
+      upperIndexText,
+      indexAttribute,
+      bracketStyle,
+    }: DrawBracketsOptions,
   ): void {
     const brackets = this.getBracketParameters(bracketBox);
     const rightBracket = brackets.reduce(
@@ -291,7 +298,7 @@ export class SGroupRenderer extends BaseRenderer {
       brackets[0],
     );
 
-    brackets.forEach((bracket) => this.appendBracket(bracket));
+    brackets.forEach((bracket) => this.appendBracket(bracket, bracketStyle));
 
     if (lowerIndexText) {
       this.appendIndex(lowerIndexText, rightBracket, true, indexAttribute);
@@ -317,18 +324,9 @@ export class SGroupRenderer extends BaseRenderer {
     const angleDirection = this.sgroup.bracketDirection;
     const bracketDirection = angleDirection.rotateSC(1, 0);
     const bracketWidth = Math.min(0.25, bracketBox.sz().x * 0.3);
-    const leftCenter = Vec2.lc2(
-      angleDirection,
-      bracketBox.p0.x,
-      bracketDirection,
-      0.5 * (bracketBox.p0.y + bracketBox.p1.y),
-    );
-    const rightCenter = Vec2.lc2(
-      angleDirection,
-      bracketBox.p1.x,
-      bracketDirection,
-      0.5 * (bracketBox.p0.y + bracketBox.p1.y),
-    );
+    const centerY = 0.5 * (bracketBox.p0.y + bracketBox.p1.y);
+    const leftCenter = new Vec2(bracketBox.p0.x, centerY);
+    const rightCenter = new Vec2(bracketBox.p1.x, centerY);
     const bracketHeight = bracketBox.sz().y;
 
     return [
@@ -355,7 +353,7 @@ export class SGroupRenderer extends BaseRenderer {
     angleDirection,
     width,
     height,
-  }: BracketParams): void {
+  }: BracketParams, style: DrawBracketsOptions['bracketStyle']): void {
     const scaledCenter = Scale.modelToCanvas(center, this.editorSettings);
     const scaledDirection = Scale.modelToCanvas(direction, this.editorSettings);
     const scaledAngleDirection = Scale.modelToCanvas(
@@ -370,12 +368,34 @@ export class SGroupRenderer extends BaseRenderer {
     const bracketArc0 = bracketPoint0.addScaled(scaledAngleDirection, -width);
     const bracketArc1 = bracketPoint1.addScaled(scaledAngleDirection, -width);
 
+    let path = `M${bracketArc0.x},${bracketArc0.y}L${bracketPoint0.x},${bracketPoint0.y}L${bracketPoint1.x},${bracketPoint1.y}L${bracketArc1.x},${bracketArc1.y}`;
+    if (style === 'parentheses') {
+      const control0 = bracketArc0
+        .addScaled(scaledAngleDirection, width * 0.95)
+        .addScaled(scaledDirection, height * 0.18);
+      const control1 = bracketArc1
+        .addScaled(scaledAngleDirection, width * 0.95)
+        .addScaled(scaledDirection, -height * 0.18);
+      path = `M${bracketArc0.x},${bracketArc0.y}C${control0.x},${control0.y},${control1.x},${control1.y},${bracketArc1.x},${bracketArc1.y}`;
+    } else if (style === 'braces') {
+      const upperControl0 = bracketPoint0
+        .addScaled(scaledDirection, height * 0.2)
+        .addScaled(scaledAngleDirection, width * 0.6);
+      const upperControl1 = scaledCenter
+        .addScaled(scaledDirection, -height * 0.18)
+        .addScaled(scaledAngleDirection, width * 0.6);
+      const lowerControl0 = scaledCenter
+        .addScaled(scaledDirection, height * 0.18)
+        .addScaled(scaledAngleDirection, width * 0.6);
+      const lowerControl1 = bracketPoint1
+        .addScaled(scaledDirection, -height * 0.2)
+        .addScaled(scaledAngleDirection, width * 0.6);
+      path = `M${bracketArc0.x},${bracketArc0.y}L${bracketPoint0.x},${bracketPoint0.y}C${upperControl0.x},${upperControl0.y},${upperControl1.x},${upperControl1.y},${scaledCenter.x},${scaledCenter.y}C${lowerControl0.x},${lowerControl0.y},${lowerControl1.x},${lowerControl1.y},${bracketPoint1.x},${bracketPoint1.y}L${bracketArc1.x},${bracketArc1.y}`;
+    }
+
     this.rootElement
       ?.append('path')
-      .attr(
-        'd',
-        `M${bracketArc0.x},${bracketArc0.y}L${bracketPoint0.x},${bracketPoint0.y}L${bracketPoint1.x},${bracketPoint1.y}L${bracketArc1.x},${bracketArc1.y}`,
-      )
+      .attr('d', path)
       .attr('fill', 'none')
       .attr('stroke', BRACKET_STROKE)
       .attr('stroke-width', 1);

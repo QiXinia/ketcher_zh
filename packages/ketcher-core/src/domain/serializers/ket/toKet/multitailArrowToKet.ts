@@ -6,5 +6,6 @@ export function multitailArrowToKet(node: KetFileNode) {
     type: MULTITAIL_ARROW_SERIALIZE_KEY,
     data: node.data,
     selected: node.selected,
+    ...(node.annotations?.length ? { annotations: node.annotations } : {}),
   };
 }

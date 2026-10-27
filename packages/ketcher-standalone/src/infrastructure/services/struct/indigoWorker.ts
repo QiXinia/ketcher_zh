@@ -74,23 +74,34 @@ function handleCommand(
 ) {
   // Catch initialization and option failures as well as chemistry failures.
   // Every outcome must echo the request ID to settle exactly one caller.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  indigoModule.then((indigo: any) => {
-    const indigoOptions = new indigo.MapStringString();
-    let payload;
-    try {
-      setOptions(indigoOptions, options ?? {});
-      payload = handler(indigo, indigoOptions);
-    } finally {
-      indigoOptions.delete?.();
-    }
-    self.postMessage({ type: messageType, requestId, payload, hasError: false, inputData });
-  }).catch((error: unknown) => {
-    self.postMessage({
-      type: messageType, requestId, hasError: true,
-      error: normalizeError(error).message, inputData,
+  indigoModule
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .then((indigo: any) => {
+      const indigoOptions = new indigo.MapStringString();
+      let payload;
+      try {
+        setOptions(indigoOptions, options ?? {});
+        payload = handler(indigo, indigoOptions);
+      } finally {
+        indigoOptions.delete?.();
+      }
+      self.postMessage({
+        type: messageType,
+        requestId,
+        payload,
+        hasError: false,
+        inputData,
+      });
+    })
+    .catch((error: unknown) => {
+      self.postMessage({
+        type: messageType,
+        requestId,
+        hasError: true,
+        error: normalizeError(error).message,
+        inputData,
+      });
     });
-  });
 }
 
 function setOptions(indigoOptions: IndigoOptions, options: CommandOptions) {
@@ -296,6 +307,11 @@ self.onmessage = (e: MessageEvent<InputMessage<CommandData>>) => {
     }
 
     default:
-      self.postMessage({ requestId: message.requestId, type: message.type, hasError: true, error: 'Unsupported command' });
+      self.postMessage({
+        requestId: message.requestId,
+        type: message.type,
+        hasError: true,
+        error: 'Unsupported command',
+      });
   }
 };

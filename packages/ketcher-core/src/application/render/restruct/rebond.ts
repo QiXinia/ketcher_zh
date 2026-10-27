@@ -771,6 +771,39 @@ function getBondPath(
   let newHalfBonds: [HalfBond, HalfBond];
   const xShiftMinus1 = -1;
   const xShiftPlus1 = 1;
+  // ChemDraw visual styles are orthogonal to chemical stereo.  Keep the
+  // regular stereo switch below intact and only intercept a plain single bond
+  // carrying an explicit display style.
+  if (
+    bond.b.type === Bond.PATTERN.TYPE.SINGLE &&
+    bond.b.stereo === Bond.PATTERN.STEREO.NONE &&
+    bond.b.display !== 'plain'
+  ) {
+    const display = bond.b.display;
+    if (display === 'dotted') {
+      return draw.bondSingleDotted(render.paper, hb1, hb2, render.options, isSnapping);
+    }
+    if (display === 'dashed') {
+      return draw.bondSingleDashed(render.paper, hb1, hb2, render.options, isSnapping);
+    }
+    if (display === 'bold') {
+      return draw.bondSingleBold(render.paper, hb1, hb2, render.options, isSnapping);
+    }
+    if (display === 'hashed') {
+      return draw.bondSingleHashed(render.paper, hb1, hb2, render.options, isSnapping);
+    }
+    if (display === 'hashed-wedged') {
+      return getBondSingleDownPath(render, hb1, hb2, bond, struct, isSnapping);
+    }
+    if (display === 'hollow-wedged') {
+      const a = hb1.p;
+      const b = hb2.p;
+      const halfWidth = 0.7 * render.options.stereoBond;
+      const b2 = b.addScaled(hb1.norm, halfWidth);
+      const b3 = b.addScaled(hb1.norm, -halfWidth);
+      return draw.bondSingleHollowUp(render.paper, a, b2, b3, render.options, isSnapping);
+    }
+  }
   switch (bond.b.type) {
     case Bond.PATTERN.TYPE.SINGLE:
       switch (bond.b.stereo) {
@@ -858,6 +891,15 @@ function getBondPath(
       break;
     case Bond.PATTERN.TYPE.TRIPLE:
       path = draw.bondTriple(
+        render.paper,
+        hb1,
+        hb2,
+        render.options,
+        isSnapping,
+      );
+      break;
+    case Bond.PATTERN.TYPE.QUADRUPLE:
+      path = draw.bondQuadruple(
         render.paper,
         hb1,
         hb2,
@@ -1272,7 +1314,14 @@ function getBondDoublePath(
   const a = hb1.p;
   const b = hb2.p;
   const n = hb1.norm;
-  const shift = cisTrans ? 0 : bond.doubleBondShift;
+  const explicitPosition = bond.b.doubleBondPosition;
+  const explicitShift =
+    explicitPosition === 'left' ? -1 : explicitPosition === 'right' ? 1 : 0;
+  const shift = cisTrans
+    ? 0
+    : explicitPosition && explicitPosition !== 'auto'
+      ? explicitShift
+      : bond.doubleBondShift;
 
   const options = render.options;
   const bsp = options.bondSpace / 2;
@@ -1442,6 +1491,7 @@ function getReactingCenterPath(
   hb2: HalfBond,
 ) {
   // eslint-disable-line max-statements
+  if (bond.b.showReactionIndicator === false) return null;
   const a = hb1.p;
   const b = hb2.p;
   const c = b.add(a).scaled(0.5);
@@ -1529,6 +1579,7 @@ function getBondMark(
 ) {
   // eslint-disable-line max-statements
   const options = render.options;
+  if (bond.b.showQueryIndicator === false || options.showQueryIndicators === false) return null;
   let mark: string | null = null;
   let tooltip: string | null = null;
   if (bond.b.customQuery) {
@@ -1556,6 +1607,7 @@ function getBondMark(
 
   const s = new Vec2(2, 1).scaled(options.bondSpace);
   if (bond.b.type === Bond.PATTERN.TYPE.TRIPLE) fixed += options.bondSpace;
+  if (bond.b.type === Bond.PATTERN.TYPE.QUADRUPLE) fixed += options.bondSpace * 1.5;
   const p = c.add(new Vec2(n.x * (s.x + fixed), n.y * (s.y + fixed)));
   const path = draw.bondMark(render.paper, p, mark, options);
   tooltip &&
@@ -1587,6 +1639,10 @@ function getIdsPath(
 /* ----- */
 
 function setDoubleBondShift(bond: ReBond, struct: Struct): void {
+  if (bond.b.doubleBondPosition && bond.b.doubleBondPosition !== 'auto') {
+    bond.doubleBondShift = bond.b.doubleBondPosition === 'left' ? -1 : bond.b.doubleBondPosition === 'right' ? 1 : 0;
+    return;
+  }
   const hb1 = bond.b.hb1;
   const hb2 = bond.b.hb2;
 

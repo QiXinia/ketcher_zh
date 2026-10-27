@@ -24,8 +24,7 @@ export const MONOMER_VALIDATION_RULES: MonomerValidationRule[] = [
         expectedLeavingGroup: AtomLabel.O,
       },
     ],
-    warningMessage:
-      'Amino acid monomers typically have a hydrogen as the leaving group for R1, and a hydroxyl as a leaving group for R2. Do you wish to proceed with the current attachment points?',
+    warningMessage: 'monomerWizard.validation.aminoAcid',
   },
   {
     monomerType: KetMonomerClass.Sugar,
@@ -43,8 +42,7 @@ export const MONOMER_VALIDATION_RULES: MonomerValidationRule[] = [
         expectedLeavingGroup: AtomLabel.O,
       },
     ],
-    warningMessage:
-      'Sugar monomers typically have a hydrogen as the leaving group for R1 and R2, and a hydroxyl as a leaving group for R3. Do you wish to proceed with the current attachment points?',
+    warningMessage: 'monomerWizard.validation.sugar',
   },
   {
     monomerType: KetMonomerClass.Base,
@@ -54,8 +52,7 @@ export const MONOMER_VALIDATION_RULES: MonomerValidationRule[] = [
         expectedLeavingGroup: AtomLabel.H,
       },
     ],
-    warningMessage:
-      'Base monomers typically have a hydrogen as the leaving group for R1. Do you wish to proceed with the current attachment points?',
+    warningMessage: 'monomerWizard.validation.base',
   },
   {
     monomerType: KetMonomerClass.Phosphate,
@@ -69,8 +66,7 @@ export const MONOMER_VALIDATION_RULES: MonomerValidationRule[] = [
         expectedLeavingGroup: AtomLabel.O,
       },
     ],
-    warningMessage:
-      'Phosphate monomers typically have a hydroxyl as the leaving group for R1 and R2. Do you wish to proceed with the current attachment points?',
+    warningMessage: 'monomerWizard.validation.phosphate',
   },
   {
     monomerType: KetMonomerClass.RNA,
@@ -84,8 +80,7 @@ export const MONOMER_VALIDATION_RULES: MonomerValidationRule[] = [
         expectedLeavingGroup: AtomLabel.O,
       },
     ],
-    warningMessage:
-      'Nucleotide monomers typically have a hydrogen as the leaving group for R1, and a hydroxyl as a leaving group for R2. Do you wish to proceed with the current attachment points?',
+    warningMessage: 'monomerWizard.validation.nucleotide',
   },
 ];
 

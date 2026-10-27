@@ -15,20 +15,37 @@
  ***************************************************************************/
 
 import { connect } from 'react-redux';
-import config from 'src/script/ui/action';
-import { error } from './constants';
 import { Dialog } from '../../../components';
 import { PasteErrorModalBody } from './PasteErrorModalBody';
+import i18n from '../../../../../../i18n';
+import {
+  translateErrorMessage,
+  translateErrorTitle,
+} from '../../../../../../i18n/helpers';
 
 import styles from './InfoModal.module.less';
 
 function ErrorInfoModal(props) {
-  const paste = config.paste.title ?? 'Paste';
+  // The paste-failure modal is dispatched with the stable id 'Paste'
+  // (see openInfoModal('Paste')). It must not be compared against the
+  // localized action title, otherwise the check breaks under non-English
+  // locales.
+  const paste = 'Paste';
   const isPasteError = props.message === paste;
 
-  const defaultCutCopyMessage = `This action is unavailable via menu. Instead, use shortcut to ${props.message}.`;
+  const actionKey = String(props.message || '').toLowerCase();
+  const action = i18n.exists(`action.${actionKey}`)
+    ? i18n.t(`action.${actionKey}`)
+    : props.message;
+  const defaultCutCopyMessage = i18n.t('infoModal.unavailableViaMenu', {
+    action,
+  });
 
-  const headerContent = <div>{props.title ?? error.message}</div>;
+  const headerContent = <div>{translateErrorTitle(props.title)}</div>;
+  const customText =
+    typeof props.customText === 'string'
+      ? translateErrorMessage(props.customText)
+      : props.customText;
 
   return (
     <Dialog
@@ -41,13 +58,13 @@ function ErrorInfoModal(props) {
           key="ok"
           data-testid={props.testId || 'info-modal-close'}
         >
-          {props.button || 'Close'}
+          {props.button || i18n.t('infoModal.close')}
         </button>,
       ]}
       headerContent={headerContent}
     >
       <div>
-        {props.customText ||
+        {customText ||
           (isPasteError ? <PasteErrorModalBody /> : defaultCutCopyMessage)}
       </div>
     </Dialog>

@@ -14,13 +14,17 @@
  * limitations under the License.
  ***************************************************************************/
 
-import { SimpleObject } from 'domain/entities/simpleObject';
+import { SimpleObject, SimpleObjectBracketType } from 'domain/entities/simpleObject';
 import type { Struct } from 'domain/entities/struct';
 import { getNodeWithInvertedYCoord } from '../helpers';
 
 export function simpleObjectToStruct(ketItem: any, struct: Struct): Struct {
   const object = ketItem.data;
-  const simpleObject = new SimpleObject(getNodeWithInvertedYCoord(object));
+  const simpleObject = new SimpleObject({
+    ...getNodeWithInvertedYCoord(object),
+    bracketType: object.bracketType ?? SimpleObjectBracketType.bracket,
+    annotations: ketItem.annotations ?? object.annotations,
+  });
   simpleObject.setInitiallySelected(ketItem.selected);
   struct.simpleObjects.add(simpleObject);
   return struct;

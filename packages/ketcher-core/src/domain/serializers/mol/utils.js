@@ -84,6 +84,7 @@ const fmtInfo = {
     8: Bond.PATTERN.TYPE.ANY,
     9: Bond.PATTERN.TYPE.DATIVE,
     10: Bond.PATTERN.TYPE.HYDROGEN,
+    11: Bond.PATTERN.TYPE.QUADRUPLE,
   },
   bondStereoMap: {
     0: Bond.PATTERN.STEREO.NONE,

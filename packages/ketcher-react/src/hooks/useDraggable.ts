@@ -1,10 +1,10 @@
 import {
-  RefObject,
   useCallback,
   useEffect,
   useLayoutEffect,
   useRef,
   useState,
+  type RefObject,
 } from 'react';
 
 interface UseDraggableOptions {
@@ -60,7 +60,8 @@ export function useDraggable({
     const MIN_VISIBLE = 40;
 
     function clampPosition(pos: Position): Position {
-      const rect = target!.getBoundingClientRect();
+      const rect = targetRef.current?.getBoundingClientRect();
+      if (!rect) return pos;
       const curPos = positionRef.current;
       const baseX = rect.left - curPos.x;
       const baseY = rect.top - curPos.y;
@@ -80,10 +81,12 @@ export function useDraggable({
 
     function onPointerDown(e: PointerEvent) {
       if (e.button !== 0) return;
-      const target = e.target as HTMLElement;
-      if (target.closest('button, a, input, select, textarea')) return;
+      const eventTarget = e.target as HTMLElement;
+      if (eventTarget.closest('button, a, input, select, textarea')) return;
+      const el = handleRef.current;
+      if (!el) return;
       e.preventDefault();
-      handle!.setPointerCapture(e.pointerId);
+      el.setPointerCapture(e.pointerId);
       startPos.current = { x: e.clientX, y: e.clientY };
       startOffset.current = { ...positionRef.current };
       draggingRef.current = true;
@@ -105,7 +108,7 @@ export function useDraggable({
 
     function onPointerUp(e: PointerEvent) {
       if (!draggingRef.current) return;
-      handle!.releasePointerCapture(e.pointerId);
+      handleRef.current?.releasePointerCapture(e.pointerId);
       draggingRef.current = false;
       setIsDragging(false);
     }

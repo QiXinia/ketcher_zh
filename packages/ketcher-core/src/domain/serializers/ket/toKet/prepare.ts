@@ -54,6 +54,7 @@ export function prepareStructForKet(struct: Struct) {
         mode: item.mode,
         pos: item.pos,
         height: item.height,
+        ...(item.annotations?.length ? { annotations: item.annotations } : {}),
       },
       selected: item.getInitiallySelected(),
     });
@@ -64,6 +65,7 @@ export function prepareStructForKet(struct: Struct) {
       type: 'plus',
       center: item.pp,
       data: {},
+      ...(item.annotations?.length ? { annotations: item.annotations } : {}),
       selected: item.getInitiallySelected(),
     });
   });
@@ -75,6 +77,29 @@ export function prepareStructForKet(struct: Struct) {
       data: {
         mode: item.mode,
         pos: item.pos,
+        ...(item.style && item.style !== 'plain' ? { style: item.style } : {}),
+        ...(item.startArrow && item.startArrow !== 'none'
+          ? { startArrow: item.startArrow }
+          : {}),
+        ...(item.endArrow && item.endArrow !== 'none'
+          ? { endArrow: item.endArrow }
+          : {}),
+        ...(item.doubled ? { doubled: true } : {}),
+        ...(item.closed ? { closed: true } : {}),
+        ...(item.fill && item.fill !== 'none' ? { fill: item.fill } : {}),
+        ...(item.faded ? { faded: true } : {}),
+        ...(item.lineWidth != null && item.lineWidth !== 1
+          ? { lineWidth: item.lineWidth }
+          : {}),
+        ...(item.doubleLineSpacing != null && item.doubleLineSpacing !== 1
+          ? { doubleLineSpacing: item.doubleLineSpacing }
+          : {}),
+        ...(item.color ? { color: item.color } : {}),
+        ...(item.mode === 'bracket' && item.bracketType ? { bracketType: item.bracketType } : {}),
+        ...(item.mode === 'bracket' && item.bracketUsage !== 'unspecified' ? { bracketUsage: item.bracketUsage } : {}),
+        ...(item.mode === 'bracket' && item.repeatPattern !== 'unspecified' ? { repeatPattern: item.repeatPattern } : {}),
+        ...(item.mode === 'bracket' && item.flipType !== 'unspecified' ? { flipType: item.flipType } : {}),
+        ...(item.annotations?.length ? { annotations: item.annotations } : {}),
       },
       selected: item.getInitiallySelected(),
     });
@@ -88,6 +113,7 @@ export function prepareStructForKet(struct: Struct) {
         content: item.content,
         position: item.position,
         pos: item.pos,
+        ...(item.annotations?.length ? { annotations: item.annotations } : {}),
       },
       selected: item.getInitiallySelected(),
     });

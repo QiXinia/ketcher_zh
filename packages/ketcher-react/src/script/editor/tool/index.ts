@@ -36,11 +36,15 @@ import SGroupTool from './sgroup';
 import SimpleObjectTool from './simpleobject';
 import TemplateTool from './template';
 import TextTool from './text';
+import QueryFreeSiteTool from './query-free-site';
+import QuerySubstituentsTool from './query-substituents';
+import QueryAtomPropertyTool from './query-atom-property';
 import type { ToolConstructorInterface } from './Tool';
 import { ImageTool } from './image';
 import { SelectCommonTool } from './select';
 import CreateMonomerTool from './create-monomer';
 import FragmentSelectionTool from './fragmentSelection';
+import FreehandCurveTool from './freehandCurve';
 
 export const toolsMap: Record<string, ToolConstructorInterface> = {
   hand: HandTool,
@@ -64,7 +68,11 @@ export const toolsMap: Record<string, ToolConstructorInterface> = {
   paste: PasteTool,
   rotate: RotateTool,
   enhancedStereo: EnhancedStereoTool,
+  queryFreeSite: QueryFreeSiteTool,
+  querySubstituents: QuerySubstituentsTool,
+  queryAtomProperty: QueryAtomPropertyTool,
   simpleobject: SimpleObjectTool,
+  freehandCurve: FreehandCurveTool,
   text: TextTool,
   [IMAGE_KEY]: ImageTool,
   [CREATE_MONOMER_TOOL_NAME]: CreateMonomerTool,

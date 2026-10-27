@@ -40,6 +40,8 @@ import { IndigoProvider } from 'src/script/providers';
 import { STRUCT_SERVICE_INITIALIZED_EVENT } from '../../../constants';
 import type { CustomButton } from './CustomButtons';
 
+const getBuildMetadataValue = (value: string | undefined) => value ?? '';
+
 class KetcherBuilder {
   private structService: StructService | null;
   private serviceMode: ServiceMode | null;
@@ -166,9 +168,9 @@ class KetcherBuilder {
         {
           buttons: buttons ?? {},
           errorHandler: errorHandler ?? null,
-          version: process.env.VERSION ?? '',
-          buildDate: process.env.BUILD_DATE ?? '',
-          buildNumber: process.env.BUILD_NUMBER ?? '',
+          version: getBuildMetadataValue(process.env.VERSION),
+          buildDate: getBuildMetadataValue(process.env.BUILD_DATE),
+          buildNumber: getBuildMetadataValue(process.env.BUILD_NUMBER),
           customButtons: customButtons ?? [],
         },
         structService,
