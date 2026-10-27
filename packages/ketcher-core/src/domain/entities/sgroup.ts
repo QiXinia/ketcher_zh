@@ -356,9 +356,11 @@ export class SGroup {
     validateUniqueness = true,
   ): void {
     const isAttachmentPointAlreadyExist = this.attachmentPoints.some(
-      ({ atomId, leaveAtomId }) =>
+      ({ atomId, leaveAtomId, attachmentId, attachmentPointNumber }) =>
         attachmentPoint.atomId === atomId &&
-        attachmentPoint.leaveAtomId === leaveAtomId,
+        attachmentPoint.leaveAtomId === leaveAtomId &&
+        attachmentPoint.attachmentId === attachmentId &&
+        attachmentPoint.attachmentPointNumber === attachmentPointNumber,
     );
 
     if (isAttachmentPointAlreadyExist && validateUniqueness) {
@@ -853,7 +855,7 @@ export class SGroup {
     });
 
     if (xBonds.length !== 0 && xBonds.length !== 2) {
-      throw Error('Unsupported cross-bonds number');
+      throw new Error('Unsupported cross-bonds number');
     }
 
     let xAtom1 = -1;
@@ -931,7 +933,7 @@ export class SGroup {
     for (const atomId of atoms) {
       const atom = mol.atoms.get(atomId);
       assert(atom, `SGroup.getMassCentre: atom ${atomId} is not found`);
-      c = c.addScaled(atom.pp, 1.0 / atoms.length);
+      c = c.addScaled(atom.pp, 1 / atoms.length);
     }
     return c;
   }

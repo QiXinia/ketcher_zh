@@ -69,7 +69,7 @@ function defaultOptions(renderOptions: Partial<RenderOptions>): RenderOptions {
 
     microModeScale: scaleFactorMicro,
     macroModeScale: scaleFactorMacro,
-    zoom: 1.0,
+    zoom: 1,
     offset: new Vec2(),
 
     lineWidth: scaleFactorMicro / 20,
@@ -137,7 +137,7 @@ function defaultOptions(renderOptions: Partial<RenderOptions>): RenderOptions {
     viewOnlyMode: false,
   };
 
-  return { ...(defaultOptions || {}), ...(options || {}) };
+  return { ...defaultOptions, ...options };
 }
 
 const measureMap = {

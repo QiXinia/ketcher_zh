@@ -49,7 +49,7 @@ export function atomToStruct(source) {
     params.label = 'L#';
     const ids = source.elements
       .map((el) => Elements.get(el)?.number)
-      .filter((id) => id);
+      .filter(Boolean) as number[];
     ifDef(params, 'atomList', {
       ids,
       notList: source.notList,
@@ -63,7 +63,7 @@ export function atomToStruct(source) {
   ifDef(params, 'pp', {
     x: source.location[0],
     y: -source.location[1],
-    z: source.location[2] || 0.0,
+    z: source.location[2] || 0,
   });
   ifDef(params, 'charge', source.charge);
   ifDef(params, 'explicitValence', source.explicitValence);
