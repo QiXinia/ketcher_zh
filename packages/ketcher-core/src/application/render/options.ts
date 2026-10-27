@@ -23,7 +23,7 @@ import {
   SELECTION_HOVERED_COLOR,
 } from 'application/render/renderers/constants';
 
-function defaultOptions(renderOptions: RenderOptions): RenderOptions {
+function defaultOptions(renderOptions: Partial<RenderOptions>): RenderOptions {
   const options = getOptionsWithConvertedUnits(renderOptions);
 
   const scaleFactorMicro = options.microModeScale || 100;
@@ -100,7 +100,6 @@ function defaultOptions(renderOptions: RenderOptions): RenderOptions {
       stroke: '#365CFF',
       'stroke-width': options.bondThicknessInPx * 1.5,
     },
-    /* eslint-enable quote-props */
     selectionStyle: {
       fill: SELECTION_COLOR,
       stroke: SELECTION_COLOR,
@@ -169,7 +168,7 @@ function convertHashSpacingToPx(
 }
 
 export function getOptionsWithConvertedUnits(
-  options: RenderOptions,
+  options: Partial<RenderOptions>,
 ): RenderOptions {
   const convertedOptions: Partial<
     Pick<
@@ -252,7 +251,7 @@ export function getOptionsWithConvertedUnits(
   return {
     ...options,
     ...convertedOptions,
-  };
+  } as RenderOptions;
 }
 
 export default defaultOptions;

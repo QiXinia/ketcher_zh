@@ -177,7 +177,6 @@ function RecognizeDialog(prop: Readonly<RecognizeDialogProps>) {
             value={version}
             onChange={(val) => onChangeImago(val as string)}
           />
-          {/* eslint-enable jsx-a11y/label-has-associated-control */}
         </label>
         <span>{i18n.t('recognize.originalImage')}</span>
         <span>{i18n.t('recognize.recognizedStructurePreview')}</span>

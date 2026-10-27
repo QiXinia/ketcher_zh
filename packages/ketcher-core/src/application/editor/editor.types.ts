@@ -38,7 +38,7 @@ export interface EditMonomerPayload {
 }
 
 export type EditorSelection = Partial<
-  Record<typeof selectionKeys[number], number[]>
+  Record<(typeof selectionKeys)[number], number[]>
 > & {
   enhancedFlags?: number[];
 };

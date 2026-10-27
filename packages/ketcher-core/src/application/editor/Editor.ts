@@ -1645,7 +1645,7 @@ export class CoreEditor {
     return {
       modelChanges,
       firstMonomer: isFivePrimePhosphate ? phosphate : sugar,
-      lastMonomer: isFivePrimePhosphate ? sugar : phosphate ?? sugar,
+      lastMonomer: isFivePrimePhosphate ? sugar : (phosphate ?? sugar),
       drawingEntities: [
         ...monomers,
         ...(sugar.attachmentPointsToBonds.R2
@@ -1967,8 +1967,7 @@ export class CoreEditor {
 
   private onSelectMode(
     data:
-      | LayoutMode
-      | { mode: LayoutMode; mergeWithLatestHistoryCommand: boolean },
+      LayoutMode | { mode: LayoutMode; mergeWithLatestHistoryCommand: boolean },
   ) {
     const command = new Command();
     const mode = typeof data === 'object' ? data.mode : data;

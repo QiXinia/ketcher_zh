@@ -1158,13 +1158,13 @@ export class Atom extends BaseMicromoleculeEntity {
 
     return Boolean(
       Atom.isSuperatomLeavingGroupAtom(struct, atomId, searchBySgroups) &&
-        attachmentAtomExternalConnections?.find((_, bond) =>
-          bond.begin === attachmentPoint?.atomId
-            ? bond.beginSuperatomAttachmentPointNumber ===
-              attachmentPoint?.attachmentPointNumber
-            : bond.endSuperatomAttachmentPointNumber ===
-              attachmentPoint?.attachmentPointNumber,
-        ) !== null,
+      attachmentAtomExternalConnections?.find((_, bond) =>
+        bond.begin === attachmentPoint?.atomId
+          ? bond.beginSuperatomAttachmentPointNumber ===
+            attachmentPoint?.attachmentPointNumber
+          : bond.endSuperatomAttachmentPointNumber ===
+            attachmentPoint?.attachmentPointNumber,
+      ) !== null,
     );
   }
 
