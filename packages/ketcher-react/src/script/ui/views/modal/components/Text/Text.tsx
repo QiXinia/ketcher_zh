@@ -142,7 +142,8 @@ const TextEditorInner = (props: {
           const formats = new Set<string>();
           if (selection.hasFormat('bold')) formats.add(TextCommand.Bold);
           if (selection.hasFormat('italic')) formats.add(TextCommand.Italic);
-          if (selection.hasFormat('underline')) formats.add(TextCommand.Underline);
+          if (selection.hasFormat('underline'))
+            formats.add(TextCommand.Underline);
           if (selection.hasFormat('subscript'))
             formats.add(TextCommand.Subscript);
           if (selection.hasFormat('superscript'))
@@ -304,5 +305,9 @@ const Text = (props: TextProps) => {
 };
 
 export default connect((state: any, ownProps: any) => ({
+  // In windowed mode (a fork feature) the window already passes `formState`;
+  // fall back to the redux modal slice only in non-windowed (in-place) mode.
+  // Using `state.modal` here overrode the window's form with `null`, which
+  // crashed the text dialog and broke text insertion.
   formState: ownProps.formState ?? state.modal?.form,
 }))(Text);
