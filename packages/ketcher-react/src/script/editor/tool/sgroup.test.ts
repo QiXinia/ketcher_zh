@@ -1,5 +1,6 @@
 import { Pool } from 'ketcher-core';
 import SGroupTool from './sgroup';
+import type Editor from '../Editor';
 
 describe('S-group properties for a complete group selection', () => {
   afterEach(() => jest.restoreAllMocks());
@@ -31,7 +32,7 @@ describe('S-group properties for a complete group selection', () => {
       .spyOn(SGroupTool, 'sgroupDialog')
       .mockResolvedValue(undefined);
 
-    const tool = new SGroupTool(editor);
+    const tool = new SGroupTool(editor as unknown as Editor);
 
     expect(edit).toHaveBeenCalledWith(editor, 7);
     expect(editor.event.removeFG.dispatch).not.toHaveBeenCalled();
