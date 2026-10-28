@@ -5,6 +5,7 @@
     "module": "esnext",
     "lib": ["dom", "esnext"],
     "moduleResolution": "bundler",
+    "ignoreDeprecations": "6.0",
     "jsx": "react-jsx",
     "sourceMap": true,
     "declaration": true,

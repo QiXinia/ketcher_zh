@@ -53,7 +53,7 @@ const dialogs: Record<string, ElementType> = {
   'period-table': PeriodTable,
   'extended-table': ExtendedTable,
   rgroup: Rgroup,
-  attach: TemplateAttach,
+  attach: TemplateAttach as unknown as ElementType,
   templates: TemplatesDialog,
   about: About,
   miew: Miew,
@@ -68,11 +68,11 @@ const dialogs: Record<string, ElementType> = {
   removeFG: RemoveFG,
   editMonomer: EditMonomer,
   save: Save,
-  settings: Settings,
+  settings: Settings as unknown as ElementType,
   sgroup: SGroup,
   text: Text,
   confirm: Confirm,
-  'info-modal': InfoModal,
+  'info-modal': InfoModal as unknown as ElementType,
 };
 
 export default dialogs;

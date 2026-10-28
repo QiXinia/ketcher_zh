@@ -82,6 +82,7 @@ type PreloadedRootState = Pick<
   | 'actionState'
   | 'editor'
   | 'modal'
+  | 'windows'
   | 'options'
   | 'server'
   | 'templates'

@@ -48,7 +48,7 @@ import FreehandCurveTool from './freehandCurve';
 
 export const toolsMap: Record<string, ToolConstructorInterface> = {
   hand: HandTool,
-  rgroupatom: RGroupAtomTool,
+  rgroupatom: RGroupAtomTool as unknown as ToolConstructorInterface,
   select: SelectCommonTool,
   fragmentSelection: FragmentSelectionTool,
   sgroup: SGroupTool,
@@ -79,10 +79,10 @@ export const toolsMap: Record<string, ToolConstructorInterface> = {
   // Cast to ToolConstructorInterface: constructor param types are narrower
   // than `unknown[]`, but toolsMap only ever calls these with the correct args.
   rotate: RotateTool as unknown as ToolConstructorInterface,
-  enhancedStereo: EnhancedStereoTool,
+  enhancedStereo: EnhancedStereoTool as unknown as ToolConstructorInterface,
   queryFreeSite: QueryFreeSiteTool,
-  querySubstituents: QuerySubstituentsTool,
-  queryAtomProperty: QueryAtomPropertyTool,
+  querySubstituents: QuerySubstituentsTool as unknown as ToolConstructorInterface,
+  queryAtomProperty: QueryAtomPropertyTool as unknown as ToolConstructorInterface,
   freehandCurve: FreehandCurveTool,
   // Cast to ToolConstructorInterface: constructor param types are narrower
   // than `unknown[]`, but toolsMap only ever calls these with the correct args.

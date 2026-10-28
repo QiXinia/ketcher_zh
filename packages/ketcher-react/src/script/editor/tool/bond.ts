@@ -773,7 +773,7 @@ class BondTool implements Tool {
   cancel() {
     if (this.dragCtx) {
       if ('action' in this.dragCtx) {
-        this.dragCtx.action.perform(this.editor.render.ctab);
+        this.dragCtx.action?.perform(this.editor.render.ctab);
       }
       delete this.dragCtx;
     }

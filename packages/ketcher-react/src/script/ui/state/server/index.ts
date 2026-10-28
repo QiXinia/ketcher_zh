@@ -14,7 +14,12 @@
  * limitations under the License.
  ***************************************************************************/
 
-import { ChemicalMimeType, KetcherLogger, KetSerializer } from 'ketcher-core';
+import {
+  ChemicalMimeType,
+  KetcherLogger,
+  KetSerializer,
+  type Struct,
+} from 'ketcher-core';
 import { appUpdate } from '../options/actions';
 import { setStruct } from '../options';
 import { omit, without } from 'lodash/fp';
@@ -65,12 +70,14 @@ export function recognize(file, version) {
 }
 
 function ketcherCheck(struct, checkParams) {
-  const errors = {};
+  const errors: { chiral_flag?: string; valence?: string } = {};
   const locations = collectCheckErrorLocations(struct, checkParams);
 
   if (checkParams.includes('chiral_flag')) {
-    const isAbs = Array.from(struct.frags.values()).some((fr) =>
-      fr ? fr.enhancedStereoFlag === 'ABS' : false,
+    const isAbs = Array.from(struct.frags.values() as Iterable<unknown>).some(
+      (value) =>
+        (value as { enhancedStereoFlag?: string } | null)?.enhancedStereoFlag ===
+        'ABS',
     );
     if (isAbs) errors.chiral_flag = 'Chiral flag is present on the canvas';
   }
@@ -165,7 +172,7 @@ export function analyse() {
   };
 }
 
-export function serverTransform(method, data, struct) {
+export function serverTransform(method, data = undefined, struct = undefined) {
   return (dispatch, getState) => {
     const state = getState();
     const opts = state.options.getServerSettings();
@@ -207,7 +214,13 @@ function resetStereoFlagsPosition(struct) {
 }
 
 // TODO: serverCall function should not be exported
-export function serverCall(editor, server, method, options, struct) {
+export function serverCall(
+  editor,
+  server,
+  method,
+  options,
+  struct: Struct | undefined = undefined,
+) {
   const selection = editor.selection();
   let selectedAtoms = [];
   let selectedBonds = [];

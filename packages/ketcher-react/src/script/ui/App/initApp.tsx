@@ -20,7 +20,7 @@ import {
   ErrorsContext,
   SettingsContext,
 } from './../../../contexts';
-import type { StructService } from 'ketcher-core';
+import type { Api } from '../../api';
 
 import App from './App.container';
 import { Provider } from 'react-redux';
@@ -40,17 +40,17 @@ function initApp(
   appRoot: Root,
   staticResourcesUrl: string,
   options: any,
-  server: StructService,
+  server: Api,
   resolve: (args: {
     editor: any;
-    setServer: (server: StructService) => void;
+    setServer: (server: Api) => void;
   }) => void,
   togglerComponent?: ReactElement,
 ) {
   // hack to return server setter to Editor.tsx
   // because it does not have access to store
 
-  let getServerSetter: () => (structService: StructService) => void;
+  let getServerSetter: () => (structService: Api) => void;
 
   const setEditor = (editor) => {
     const setServer = getServerSetter();
@@ -59,7 +59,7 @@ function initApp(
   const store = createStore(options, server, setEditor);
 
   getServerSetter = () => {
-    return (structService: StructService) => {
+    return (structService: Api) => {
       store.dispatch(setServer(structService));
     };
   };

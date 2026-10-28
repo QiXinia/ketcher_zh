@@ -17,6 +17,7 @@
 import _ from 'lodash';
 import { escapeRegExp, filter as _filter, flow, reduce } from 'lodash/fp';
 import type { TFunction } from 'i18next';
+import i18n from '../../../i18n';
 import type { Option } from '../component/form/Select';
 import {
   getTemplateDisplayNameByGroup,
@@ -109,7 +110,7 @@ export function resolveTranslatableText<T>(value: T, t: TFunction): T {
 
 export const getSelectOptionsFromSchema = (
   schema,
-  t: TFunction,
+  t: TFunction = i18n.t,
 ): Array<Option> => {
   return schema.enum.reduce((options, value, index) => {
     options.push({

@@ -25,7 +25,7 @@ const templateLib = {
     title: i18n.t('templates.structureLibrary'),
     action: { dialog: 'templates', prop: { tab: null } },
     selected: (editor) => editor._tool.mode === 'classic',
-    disabled: (editor, server, options) => !options.app.templates,
+    disabled: (_editor, _server, options) => !options.app.templates,
     hidden: (options) => isHidden(options, 'template-lib'),
   },
 };

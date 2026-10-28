@@ -59,7 +59,6 @@ function getSelectionDistanceCoefficient(): number {
   return SELECTION_DISTANCE_COEFFICIENT;
 }
 
-const findMaps = {
 const findMaps: Record<string, FindMapFn> = {
   atoms: findClosestAtom,
   attachmentGroups: findClosestAttachmentGroup,

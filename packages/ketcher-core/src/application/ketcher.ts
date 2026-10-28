@@ -70,7 +70,9 @@ import { Vec2 } from 'domain/entities/vec2';
 import { type EditorSelection, EditorType } from './editor/editor.types';
 import {
   type ExportImageParams,
+  type DisabledFunctionalityConfig,
   type KetcherApiSettings,
+  type KetcherFunctionality,
   type SupportedImageFormats,
   type SupportedModes,
   type UpdateMonomersLibraryParams,
@@ -134,6 +136,7 @@ export class Ketcher {
   _indigo: Indigo;
   readonly #eventBus: EventEmitter;
   readonly #settingsService?: ISettingsService;
+  readonly #disabledFunctionality: ReadonlySet<KetcherFunctionality>;
   changeEvent: Subscription;
   libraryUpdateEvent: Subscription;
 
@@ -162,10 +165,15 @@ export class Ketcher {
     return this.#settingsService;
   }
 
+  isFunctionalityDisabled(functionality: KetcherFunctionality): boolean {
+    return this.#disabledFunctionality.has(functionality);
+  }
+
   constructor(
     structService: StructService,
     formatterFactory: FormatterFactory,
     settingsService?: ISettingsService,
+    disabledFunctionality?: DisabledFunctionalityConfig,
   ) {
     assert(structService != null);
     assert(formatterFactory != null);
@@ -175,6 +183,7 @@ export class Ketcher {
     this.structService = structService;
     this.#formatterFactory = formatterFactory;
     this.#settingsService = settingsService;
+    this.#disabledFunctionality = new Set(disabledFunctionality ?? []);
     this._indigo = new Indigo(this.structService);
     this.#eventBus = new EventEmitter();
     this.logging = {

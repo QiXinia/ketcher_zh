@@ -236,7 +236,7 @@ export default function initEditor(
         .then(() =>
           openDialog(dispatch, 'sgroup', {
             ...fromSgroup(sgroup),
-            fixedType: sgroup.fixedType,
+            fixedType: (sgroup as SGroupInput & { fixedType?: boolean }).fixedType,
             selectedSruCount: getSelectedSruCount(sgroup.type),
           }),
         )

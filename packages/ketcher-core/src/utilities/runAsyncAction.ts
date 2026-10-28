@@ -38,7 +38,7 @@ export const runAsyncAction = async <T = unknown>(
     eventEmitter.emit(KetcherAsyncEvents.FAILURE);
     // Public mutation APIs must allow callers to distinguish failure from a
     // successful void result. Legacy UI actions retain event-only handling.
-    if (rejectOnFailure) throw e;
+    if (rejectOnFailure) throw error;
     return undefined;
   }
 };

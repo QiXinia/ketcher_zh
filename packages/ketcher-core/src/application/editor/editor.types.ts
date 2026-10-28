@@ -21,13 +21,43 @@ import type {
   RenderOptions,
 } from 'application/render';
 import type { Struct } from 'domain/entities/struct';
+import type { AtomAttributes } from 'domain/entities/atom';
+import type { Bond } from 'domain/entities/bond';
+import type { RGroupAttributes } from 'domain/entities/rgroup';
 import type { selectionKeys } from './shared/constants';
 import type { PipelineSubscription, Subscription } from 'subscription';
 import type { IRnaPreset } from './tools/Tool';
 import type { TextFormattingCommand } from './actions/textFormatting';
 import type { ObjectAlignment, ObjectDistribution } from './actions/objectAlignment';
-import type { MonomerOrAmbiguousType, AttachmentPointName } from 'domain/types';
+import type {
+  MonomerOrAmbiguousType,
+  AttachmentPointName,
+  MonomerItemType,
+} from 'domain/types';
 import type { BaseMonomer } from 'domain/entities/BaseMonomer';
+import type { LayoutMode } from 'application/editor/modes/types';
+import type { PolymerBond } from 'domain/entities/PolymerBond';
+
+export type MonomerCreationWizardRequest = {
+  mode: 'create' | 'instance' | 'all' | 'library' | 'duplicate';
+  monomer?: BaseMonomer;
+  libraryItem?: MonomerItemType;
+};
+
+export type CreateBondViaModalPayload = {
+  firstMonomer: BaseMonomer;
+  secondMonomer: BaseMonomer;
+  firstSelectedAttachmentPoint: AttachmentPointName;
+  secondSelectedAttachmentPoint: AttachmentPointName;
+  polymerBond?: PolymerBond;
+  isReconnection?: boolean;
+  initialFirstMonomerAttachmentPoint?: AttachmentPointName;
+  initialSecondMonomerAttachmentPoint?: AttachmentPointName;
+};
+
+export type SelectLayoutModePayload =
+  | LayoutMode
+  | { mode: LayoutMode; mergeWithLatestHistoryCommand: boolean };
 
 export type EditMonomerVariant = 'single' | 'identical' | 'non-identical';
 
@@ -122,28 +152,28 @@ export interface Editor {
   zoomAccordingContent: (struct: Struct) => void;
   errorHandler: ((message: string) => void) | null;
   event: {
-    message: Subscription;
-    tooltip: Subscription;
-    elementEdit: PipelineSubscription;
-    bondEdit: PipelineSubscription;
+    message: Subscription<{ info?: string | false; error?: unknown }>;
+    tooltip: Subscription<{ message: string } | undefined>;
+    elementEdit: PipelineSubscription<unknown, Promise<Partial<AtomAttributes> & { content?: string }>>;
+    bondEdit: PipelineSubscription<Bond[], Promise<Bond>>;
     zoomIn: PipelineSubscription;
     zoomOut: PipelineSubscription;
-    rgroupEdit: PipelineSubscription;
-    sgroupEdit: PipelineSubscription;
+    rgroupEdit: PipelineSubscription<unknown, Promise<RGroupAttributes & { label?: number }>>;
+    sgroupEdit: PipelineSubscription<unknown, Promise<{ type?: string; attrs: { context?: string; expanded?: boolean; [key: string]: unknown } }>>;
     sdataEdit: PipelineSubscription;
     quickEdit: PipelineSubscription;
     attachEdit: PipelineSubscription;
-    removeFG: PipelineSubscription;
+    removeFG: PipelineSubscription<{ fgIds: number[] }, Promise<unknown>>;
     editMonomer: PipelineSubscription;
     change: Subscription;
     selectionChange: PipelineSubscription;
     aromatizeStruct: PipelineSubscription;
     dearomatizeStruct: PipelineSubscription;
-    enhancedStereoEdit: PipelineSubscription;
+    enhancedStereoEdit: PipelineSubscription<{ stereoLabel: string | null | undefined }, Promise<string | null>>;
     confirm: PipelineSubscription;
     showInfo: PipelineSubscription;
     apiSettings: PipelineSubscription;
-    cursor: Subscription;
+    cursor: Subscription<{ status: 'enable'; cursorPosition: { clientX: number; clientY: number } } | { status: 'move' | 'mouseover' | 'leave' | 'disable' }>;
     updateFloatingTools: Subscription<FloatingToolsParams>;
   };
   update: (
