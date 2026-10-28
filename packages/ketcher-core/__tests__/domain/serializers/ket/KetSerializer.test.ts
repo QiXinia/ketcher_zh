@@ -436,12 +436,12 @@ describe('serialize (ToKet)', () => {
     const molecule = moleculeToKet.moleculeToKet(struct);
     const parsed = { root: { nodes: [{ $ref: 'mol0' }] }, mol0: molecule };
     expect(compiledSchema(parsed)).toBe(true);
-    expect(molecule.sgroups[0].bracketStyle).toBe('braces');
+    expect(molecule.sgroups![0].bracketStyle).toBe('braces');
 
     const restored = moleculeToStruct.moleculeToStruct(molecule);
     expect(restored.sgroups.get(0)?.data.bracketStyle).toBe('braces');
 
-    const legacyMolecule = { ...molecule, sgroups: molecule.sgroups.map((group: any) => {
+    const legacyMolecule = { ...molecule, sgroups: molecule.sgroups!.map((group: any) => {
       const { bracketStyle: _bracketStyle, ...legacyGroup } = group;
       return legacyGroup;
     }) };

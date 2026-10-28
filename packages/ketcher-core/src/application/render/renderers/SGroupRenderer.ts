@@ -124,7 +124,11 @@ export class SGroupRenderer extends BaseRenderer {
     }
 
     const options: DrawBracketsOptions = {};
-    options.bracketStyle = this.sgroup.data.bracketStyle;
+    options.bracketStyle = this.sgroup.data.bracketStyle as
+      | 'brackets'
+      | 'parentheses'
+      | 'braces'
+      | undefined;
     switch (this.sgroup.type) {
       case SGroup.TYPES.MUL:
         options.lowerIndexText = String(this.sgroup.data.mul);

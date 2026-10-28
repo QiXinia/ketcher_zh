@@ -20,12 +20,14 @@ import type {
 } from 'domain/entities/atom';
 import type { AtomCIP, BondCIP } from 'domain/entities/types';
 import type { RxnArrowAttributes } from 'domain/entities/rxnArrow';
-import type { StructProperty } from 'domain/entities/struct';
+import type { DocumentProperty, StructProperty } from 'domain/entities/struct';
 import type { SimpleObjectAttributes } from 'domain/entities/simpleObject';
 import type { Point, Vec2 } from 'domain/entities/vec2';
 
 export interface KetHeader {
   moleculeName?: string;
+  annotations?: Array<{ keyword: string; content: string }>;
+  properties?: Array<DocumentProperty>;
 }
 
 export interface KetAtomNode {
@@ -98,6 +100,8 @@ export interface KetSGroupNode {
   fieldName?: string;
   fieldData?: string;
   bonds?: number[];
+  bracketStyle?: 'brackets' | 'parentheses' | 'braces';
+  annotations?: Array<{ keyword: string; content: string }>;
 }
 
 export interface KetMoleculeNode {
@@ -105,6 +109,12 @@ export interface KetMoleculeNode {
   atoms: (KetAtomNode | KetRgLabelNode)[];
   bonds?: KetBondNode[];
   sgroups?: KetSGroupNode[];
+  coloredHighlights?: Array<{
+    atoms?: number[];
+    bonds?: number[];
+    rgroupAttachmentPoints?: number[];
+    color?: string;
+  }>;
   stereoFlagPosition?: Vec2;
   properties?: Array<StructProperty>;
 }
@@ -113,18 +123,22 @@ export interface KetSimpleObjectNode {
   type: 'simpleObject';
   data: SimpleObjectAttributes;
   selected?: boolean;
+  annotations?: Array<{ keyword: string; content: string }>;
 }
 
 export interface KetArrowNode {
   type: 'arrow';
   data: RxnArrowAttributes;
   selected?: boolean;
+  annotations?: Array<{ keyword: string; content: string }>;
 }
 
 export interface KetPlusNode {
   type: 'plus';
   location: [number, number, number?];
+  data?: { annotations?: Array<{ keyword: string; content: string }> };
   selected?: boolean;
+  annotations?: Array<{ keyword: string; content: string }>;
 }
 
 export type KetReactionNode = KetArrowNode | KetPlusNode;

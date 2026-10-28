@@ -324,7 +324,7 @@ export function atomForNewBond(
           bond?.type === Bond.PATTERN.TYPE.QUADRUPLE)) ||
       ((prevBondType === Bond.PATTERN.TYPE.TRIPLE ||
         prevBondType === Bond.PATTERN.TYPE.QUADRUPLE) &&
-        bond?.type === Bond.PATTERN.TYPE.SINGLE);
+        bond?.type === Bond.PATTERN.TYPE.SINGLE));
 
     if (shallBe180DegToPrevBond) {
       const prevBondAngle = getBondAngle(restruct.molecule, prevBondId);

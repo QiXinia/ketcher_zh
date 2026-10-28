@@ -130,7 +130,6 @@ function createEntityIndex(ids: Iterable<number>): Map<number, number> {
   return indexById;
 }
 
-function atomToKet(source, monomer?: BaseMonomer) {
 function atomToKet(source: Atom, monomer?: BaseMonomer): KetAtomNode {
   const result: KetAtomNode = {};
 

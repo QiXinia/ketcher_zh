@@ -17,6 +17,7 @@
 import { mapOf } from './schema-helper';
 import { range } from 'lodash/fp';
 import { sdataCustomSchema } from './sdata-schema';
+export { CUSTOM_QUERY_MAX_LENGTH } from 'ketcher-core';
 import {
   localizedEnumNames,
   localizedInvalidMessage,
@@ -911,8 +912,8 @@ const sgroup: Omit<StructSchema, 'properties'> & {
         type: { enum: ['COP'] },
         subtype: {
           title: 'Subtype',
-          enum: ['ran', 'blo', 'alt'],
-          enumNames: ['Random', 'Block', 'Alternating'],
+          enum: ['', 'ran', 'blo', 'alt'],
+          enumNames: ['<Blank>', 'Random', 'Block', 'Alternating'],
         },
         connectivity: {
           title: 'Repeat Pattern',

@@ -177,6 +177,9 @@ describe('ChemDraw query form projection', () => {
       topology: 1,
       reactingCenterStatus: 2,
     });
+  });
+});
+
 function createStructWithAtomCount(atomCount: number): Struct {
   const struct = new Struct();
 

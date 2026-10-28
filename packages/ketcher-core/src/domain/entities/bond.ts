@@ -27,6 +27,7 @@ import {
 } from 'domain/entities/BaseMicromoleculeEntity';
 import type { SGroup } from 'domain/entities/sgroup';
 import type { BondCIP } from 'domain/entities/types';
+import { HAPTIC_BOND_TYPE } from 'domain/constants/bonds';
 
 export interface BondAttributes {
   reactingCenterStatus?: number | null;
@@ -67,6 +68,8 @@ export type BondDisplay =
   | 'bold';
 
 export type DoubleBondPosition = 'auto' | 'left' | 'center' | 'right';
+export type StructAtomsAndBondsAccess = Pick<Struct, 'atoms' | 'bonds'>;
+export type StructBondEndpointAccess = Pick<Struct, 'getBondEndpoint'>;
 
 export class Bond extends BaseMicromoleculeEntity {
   static readonly PATTERN = {
@@ -82,6 +85,7 @@ export class Bond extends BaseMicromoleculeEntity {
       DATIVE: 9,
       HYDROGEN: 10,
       QUADRUPLE: 11,
+      HAPTIC: HAPTIC_BOND_TYPE,
     },
 
     STEREO: {
@@ -189,12 +193,15 @@ export class Bond extends BaseMicromoleculeEntity {
     const attrs: Partial<Pick<BondAttributes, keyof typeof Bond.attrlist>> = {};
     for (const attr in Bond.attrlist) {
       const key = attr as keyof typeof Bond.attrlist;
-      if (
-        bond[key] ||
-        key === 'stereo' ||
-        key === 'display' ||
-        key === 'doubleBondPosition'
-      ) {
+      if (key === 'display') {
+        if (bond.display !== 'plain') attrs[key] = bond[key] as never;
+        continue;
+      }
+      if (key === 'doubleBondPosition') {
+        if (bond.doubleBondPosition !== 'auto') attrs[key] = bond[key] as never;
+        continue;
+      }
+      if (bond[key] || key === 'stereo') {
         attrs[key] = bond[key] as never;
       }
     }
@@ -335,15 +342,16 @@ export class Bond extends BaseMicromoleculeEntity {
     return !!this.reactingCenterStatus;
   }
 
-  getCenter(struct: any): Vec2 {
-    const p1 = struct.atoms.get(this.begin).pp;
-    const p2 = struct.atoms.get(this.end).pp;
+  getCenter(struct: StructBondEndpointAccess): Vec2 {
+    const p1 = struct.getBondEndpoint(this.begin)?.pp;
+    const p2 = struct.getBondEndpoint(this.end)?.pp;
+    if (!p1 || !p2) return new Vec2();
     return Vec2.lc2(p1, 0.5, p2, 0.5);
   }
 
-  getDir(struct: any): Vec2 {
-    const p1 = struct.atoms.get(this.begin)?.pp;
-    const p2 = struct.atoms.get(this.end)?.pp;
+  getDir(struct: StructBondEndpointAccess): Vec2 {
+    const p1 = struct.getBondEndpoint(this.begin)?.pp;
+    const p2 = struct.getBondEndpoint(this.end)?.pp;
     if (!p1 || !p2) return new Vec2();
     return p2.sub(p1).normalized();
   }

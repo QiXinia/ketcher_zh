@@ -698,7 +698,7 @@ export class SGroup {
     n?: Vec2,
   ): SGroupBracketParams[] {
     const brackets: SGroupBracketParams[] = [];
-    const flipBrackets = d?.x < 0;
+    const flipBrackets = (d?.x ?? 1) < 0;
     const crossBondsPerAtomValues = Object.values(crossBondsPerAtom);
     const crossBonds = crossBondsPerAtomValues.flat();
     if (crossBonds.length < 2) {

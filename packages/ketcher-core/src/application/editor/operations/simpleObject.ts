@@ -86,6 +86,7 @@ export class SimpleObjectAdd extends Base<SimpleObjectAddData> {
     const struct = restruct.molecule;
     const item = new SimpleObject({
       mode: this.data.mode,
+      toCircle: this.data.toCircle,
       style: this.data.style,
       startArrow: this.data.startArrow,
       endArrow: this.data.endArrow,

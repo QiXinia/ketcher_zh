@@ -20,6 +20,9 @@ export const OperationType = Object.freeze({
   ATOM_ATTR: 'Set atom attribute',
   ATOM_MOVE: 'Move atom',
   FLATTEN: 'Flatten object',
+  ATTACHMENT_GROUP_ADD: 'Add attachment group',
+  ATTACHMENT_GROUP_DELETE: 'Delete attachment group',
+  ATTACHMENT_GROUP_ATTR: 'Set attachment group attribute',
   CALC_IMPLICIT_H: 'Calculate implicit hydrogen',
   BOND_ADD: 'Add bond',
   BOND_DELETE: 'Delete bond',
@@ -60,7 +63,6 @@ export const OperationType = Object.freeze({
   SIMPLE_OBJECT_MOVE: 'Move simple object',
   SIMPLE_OBJECT_RESIZE: 'Resize simple object',
   SIMPLE_OBJECT_ATTR: 'Set simple object attribute',
-  SIMPLE_OBJECT_JOIN: 'Join simple objects',
   RESTORE_DESCRIPTORS_POSITION: 'Restore descriptors position',
   FRAGMENT_ADD: 'Add fragment',
   FRAGMENT_DELETE: 'Delete fragment',
@@ -114,6 +116,7 @@ export const OperationType = Object.freeze({
 
 export enum OperationPriority {
   ATOM_ATTR = 1,
+  ATTACHMENT_GROUP_ATTR = 1,
   BOND_ADD = 1,
   R_GROUP_ATTACHMENT_POINT_REMOVE = 1,
   ATOM_MOVE = 2,
@@ -126,6 +129,7 @@ export enum OperationPriority {
   S_GROUP_ATOM_REMOVE = 4,
   S_GROUP_ATTR = 4,
   ATOM_DELETE = 5,
+  ATTACHMENT_GROUP_DELETE = 5,
   FRAGMENT_STEREO_FLAG = 6,
   CALC_IMPLICIT_H = 10,
   FRAGMENT_DELETE_STEREO_ATOM = 90,

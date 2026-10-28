@@ -84,6 +84,7 @@ export enum SimpleObjectFill {
 
 export interface SimpleObjectAttributes {
   mode: SimpleObjectMode;
+  toCircle?: boolean;
   style?: SimpleObjectStyle;
   startArrow?: SimpleObjectArrow;
   endArrow?: SimpleObjectArrow;
@@ -104,6 +105,7 @@ export interface SimpleObjectAttributes {
 export class SimpleObject extends BaseMicromoleculeEntity {
   pos: Array<Vec2>;
   mode: SimpleObjectMode;
+  toCircle: boolean;
   style: SimpleObjectStyle;
   startArrow: SimpleObjectArrow;
   endArrow: SimpleObjectArrow;
@@ -129,6 +131,7 @@ export class SimpleObject extends BaseMicromoleculeEntity {
     }
 
     this.mode = attributes?.mode ?? SimpleObjectMode.line;
+    this.toCircle = attributes?.toCircle ?? false;
     this.style = attributes?.style ?? SimpleObjectStyle.plain;
     this.startArrow = attributes?.startArrow ?? SimpleObjectArrow.none;
     this.endArrow = attributes?.endArrow ?? SimpleObjectArrow.none;

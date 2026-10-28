@@ -90,7 +90,11 @@ class ReSGroup extends ReObject {
         sgroup,
         bracketBox,
         direction,
-        bracketStyle: sgroup.data.bracketStyle,
+        bracketStyle: sgroup.data.bracketStyle as
+          | 'brackets'
+          | 'parentheses'
+          | 'braces'
+          | undefined,
       };
       switch (sgroup.type) {
         case 'MUL': {

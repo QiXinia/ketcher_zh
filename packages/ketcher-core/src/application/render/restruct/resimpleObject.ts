@@ -44,6 +44,16 @@ interface StyledPath {
 interface SimpleObjectItem {
   mode: SimpleObjectMode;
   pos: Array<Vec2>;
+  toCircle?: boolean;
+  closed?: boolean;
+  bracketType?: SimpleObjectBracketType;
+  startArrow?: SimpleObjectArrow;
+  endArrow?: SimpleObjectArrow;
+  style?: string;
+  color?: string;
+  doubled?: boolean;
+  faded?: boolean;
+  fill?: SimpleObjectFill;
 }
 class ReSimpleObject extends ReObject {
   private readonly item: SimpleObjectItem;
