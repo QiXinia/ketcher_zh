@@ -21,6 +21,7 @@ export interface IndigoVectorInt {
 
 export interface IndigoOptions {
   set(key: string, value: string): void;
+  delete?(): void;
 }
 
 export interface IndigoModule {
