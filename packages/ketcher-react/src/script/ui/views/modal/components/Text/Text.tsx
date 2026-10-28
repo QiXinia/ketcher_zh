@@ -199,7 +199,7 @@ const TextEditorInner = (props: {
       title={i18n.t('textEditor.title')}
       params={params}
       result={result}
-      valid={() => formState.form.valid}
+      valid={() => formState?.valid ?? false}
       buttonsNameMap={{ OK: i18n.t('dialog.apply') }}
       buttons={['Cancel', 'OK']}
       withDivider
@@ -303,4 +303,6 @@ const Text = (props: TextProps) => {
   );
 };
 
-export default connect((store: any) => ({ formState: store.modal }))(Text);
+export default connect((state: any, ownProps: any) => ({
+  formState: ownProps.formState ?? state.modal?.form,
+}))(Text);
