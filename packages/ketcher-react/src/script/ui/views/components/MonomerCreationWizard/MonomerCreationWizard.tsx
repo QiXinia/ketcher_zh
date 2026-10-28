@@ -74,6 +74,7 @@ import { useAppContext } from '../../../../../hooks';
 import Editor from '../../../../editor';
 import { isStructureContinuous } from '../../../../editor/utils/structureContinuity';
 import { KETCHER_ROOT_NODE_CSS_SELECTOR } from '../../../../../constants';
+import i18n from '../../../../../i18n';
 import { createPortal } from 'react-dom';
 import tools from '../../../action/tools';
 import MonomerCreationWizardFields from './MonomerCreationWizardFields';
@@ -1165,7 +1166,7 @@ const MonomerCreationWizardInternal = ({
         children: (
           <div className={styles.typeOption}>
             <Icon name={option.iconName} />
-            {option.label}
+            {i18n.t(option.label)}
           </div>
         ),
       })),
@@ -2343,7 +2344,7 @@ const MonomerCreationWizardInternal = ({
               primaryButtons={['Cancel']}
             >
               <div className={styles.DialogMessage}>
-                {leavingGroupDialogMessage}
+                {i18n.t(leavingGroupDialogMessage)}
               </div>
             </Dialog>
           </div>,

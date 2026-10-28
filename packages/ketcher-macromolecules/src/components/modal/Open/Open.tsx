@@ -34,7 +34,7 @@ import {
   SequenceRenderer,
   Vec2,
 } from 'ketcher-core';
-import { IndigoProvider } from 'ketcher-react';
+import { IndigoProvider, i18n } from 'ketcher-react';
 import { RequiredModalProps } from '../modalContainer';
 import { OpenFileWrapper } from './Open.styles';
 import {
@@ -187,7 +187,7 @@ const addToCanvas = ({
   const deserialisedKet = ketSerializer.deserializeToDrawingEntities(struct);
 
   if (!deserialisedKet) {
-    throw new Error('Error during parsing file');
+    throw new Error(i18n.t('open.errorDuringParsingFile'));
   }
 
   if (!deserialisedKet.drawingEntitiesManager.hasDrawingEntities) {
@@ -385,7 +385,7 @@ const Open = ({ isModalOpen, onClose }: RequiredModalProps) => {
       setStructStr(fileContent);
       setCurrentState(MODAL_STATES.textEditor);
     };
-    const onError = () => errorHandler('Error processing file');
+    const onError = () => errorHandler(i18n.t('open.errorProcessingFile'));
 
     const fileName = files[0].name;
     const splittedFilenameByDot = fileName?.split('.');

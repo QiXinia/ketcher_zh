@@ -53,7 +53,7 @@ export const SettingsAccordion = ({
           key={group.id}
           expanded={expandedGroups.includes(group.id)}
           onChange={() => onGroupToggle(group.id)}
-          data-testid={`${group.title}-accordion`}
+          data-testid={`${group.id}-accordion`}
         >
           <AccordionSummary
             aria-controls={`${group.id}-content`}

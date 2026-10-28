@@ -26,6 +26,7 @@ import {
   exceedsMolfileV2000Limit,
   getPropertiesByFormat,
 } from 'ketcher-core';
+import i18n from '../../../../i18n';
 
 export function couldBeSaved(
   struct: Struct,
@@ -139,9 +140,7 @@ export function couldBeSaved(
         bond.type === Bond.PATTERN.TYPE.HYDROGEN,
     );
     if (bondsHaveUnsupportedProperties || atomsHaveUnsupportedProperties) {
-      warnings.push(
-        `Structure contains query properties of atoms and bonds that are not supported in the SMARTS. Query properties will not be reflected in the file saved.`,
-      );
+      warnings.push(i18n.t('saveWarnings.smartsQueryProps'));
     }
     if (arrayOfAtoms.some((atom) => atom.queryProperties.substitutionQuery)) {
       warnings.push(
@@ -164,9 +163,7 @@ export function couldBeSaved(
     const arrayOfAtoms: Array<Atom> = [...struct.atoms.values()];
     const hasGenerics = arrayOfAtoms.some((atom) => atom.pseudo);
     if (hasGenerics) {
-      warnings.push(
-        `Structure contains generic atoms. They will be saved as any atom (*).`,
-      );
+      warnings.push(i18n.t('saveWarnings.smilesGenericAtoms'));
     }
   }
 
@@ -180,16 +177,17 @@ export function couldBeSaved(
         )
       ) {
         warnings.push(
-          `The ${formatName} format does not support drawn elements: the reaction ${rxnArrowMode} arrow will be replaced with the reaction arrow`,
+          i18n.t('saveWarnings.arrowReplaced', {
+            format: formatName,
+            arrowMode: rxnArrowMode,
+          }),
         );
       }
     }
 
     // TODO: find better solution for case when Arrows > 1
     if (rxnArrowsSize > 1) {
-      warnings.push(
-        `The ${formatName} format does not support drawn elements: reaction arrows will be lost.`,
-      );
+      warnings.push(i18n.t('saveWarnings.arrowsLost', { format: formatName }));
     }
   }
 
@@ -206,14 +204,14 @@ export function couldBeSaved(
   ) {
     if (struct.rgroups.size !== 0)
       warnings.push(
-        `In ${formatName} the structure will be saved without R-group fragments`,
+        i18n.t('saveWarnings.noRgroupFragments', { format: formatName }),
       );
 
     struct = struct.clone(); // need this: .getScaffold()
     const isRg = struct.atoms.find((_ind, atom) => atom.label === 'R#');
     if (isRg !== null)
       warnings.push(
-        `In ${formatName} the structure will be saved without R-group members`,
+        i18n.t('saveWarnings.noRgroupMembers', { format: formatName }),
       );
 
     const isSg = struct.sgroups.find(
@@ -221,9 +219,7 @@ export function couldBeSaved(
         sg.type !== 'MUL' && !/^INDIGO_.+_DESC$/i.test(sg.data.fieldName),
     );
     if (isSg !== null)
-      warnings.push(
-        `In ${formatName} the structure will be saved without S-groups`,
-      );
+      warnings.push(i18n.t('saveWarnings.noSgroups', { format: formatName }));
   }
 
   if (
@@ -241,7 +237,9 @@ export function couldBeSaved(
   ) {
     const isVal = struct.atoms.find((_ind, atom) => atom.explicitValence >= 0);
     if (isVal !== null)
-      warnings.push(`In ${formatName} valence is not supported`);
+      warnings.push(
+        i18n.t('saveWarnings.valenceUnsupported', { format: formatName }),
+      );
   }
 
   if (
@@ -262,9 +260,7 @@ export function couldBeSaved(
       return false;
     })
   ) {
-    warnings.push(
-      `Structure contains enhanced stereochemistry features. Information will be partly lost.`,
-    );
+    warnings.push(i18n.t('saveWarnings.enhancedStereoLost'));
   }
 
   if (
@@ -280,14 +276,16 @@ export function couldBeSaved(
   ) {
     if (struct.functionalGroups.size !== 0)
       warnings.push(
-        `In ${formatName} the structure will be saved without functional groups.`,
+        i18n.t('saveWarnings.noFunctionalGroups', { format: formatName }),
       );
   }
 
   if ((['cml'] as SupportedFormat[]).includes(format)) {
     if (struct.functionalGroups.size !== 0)
       warnings.push(
-        `Structure contains functional groups. In ${formatName} information will be partly lost.`,
+        i18n.t('saveWarnings.cmlFunctionalGroupsLost', {
+          format: formatName,
+        }),
       );
   }
 

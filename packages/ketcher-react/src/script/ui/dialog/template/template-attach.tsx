@@ -367,7 +367,7 @@ class Attach extends Component<AttachProps> {
               onChange={(value) => onNameEdit(value as string)}
               placeholder="template"
             />
-            <span>Selected attachment points</span>
+            <span>{i18n.t('template.selectedAttachmentPoints')}</span>
             <AttachmentOutput data-testid="attach-output">
               Atom ID: <strong>{atomid}</strong> Bond ID:{' '}
               <strong>{bondid}</strong>

@@ -103,6 +103,19 @@ const RnaElementsAccordionView = ({
           <Summary
             iconName={groupData.iconName as IconName}
             groupName={groupData.groupName}
+            label={String(
+              i18n.t(
+                groupData.groupName === RnaBuilderPresetsItem.Presets
+                  ? 'monomerLibrary.presetsTab'
+                  : groupData.groupName === MonomerGroups.SUGARS
+                    ? 'monomerLibrary.sugarsTab'
+                    : groupData.groupName === MonomerGroups.BASES
+                      ? 'monomerLibrary.basesTab'
+                      : groupData.groupName === MonomerGroups.PHOSPHATES
+                        ? 'monomerLibrary.phosphatesTab'
+                        : 'monomerLibrary.nucleotidesTab',
+              ),
+            )}
             quantity={quantity}
             expanded={expanded}
           />

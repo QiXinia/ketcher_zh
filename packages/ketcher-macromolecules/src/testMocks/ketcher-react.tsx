@@ -3,6 +3,7 @@ import i18nextInstance from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import macromolecules from '../locales/en/macromolecules.json';
 import macromoleculesDialogs from '../locales/en/macromoleculesDialogs.json';
+import legacy from '../../../ketcher-react/src/i18n/locales/en.json';
 
 // Mirrors the subset of ketcher-react's common.json actually referenced
 // from ketcher-macromolecules via the shared i18next instance. This file
@@ -53,8 +54,9 @@ if (!i18nextInstance.isInitialized) {
     lng: 'en',
     fallbackLng: 'en',
     resources: {
-      en: { macromolecules, macromoleculesDialogs, common, dialogs },
+      en: { macromolecules, macromoleculesDialogs, common, dialogs, legacy },
     },
+    fallbackNS: 'legacy',
     interpolation: { escapeValue: false, prefix: '{', suffix: '}' },
   });
 }

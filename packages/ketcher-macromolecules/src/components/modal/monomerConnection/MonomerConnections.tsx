@@ -17,7 +17,6 @@ import {
   AttachmentPointName,
 } from 'ketcher-core';
 import { i18n } from 'ketcher-react';
-import hydrateLeavingGroup from 'helpers/hydrateLeavingGroup';
 import { getConnectedAttachmentPoints } from 'helpers';
 import MonomerOverview from 'components/shared/ConnectionOverview/components/MonomerOverview/MonomerOverview';
 import ConnectionOverview from 'components/shared/ConnectionOverview/ConnectionOverview';

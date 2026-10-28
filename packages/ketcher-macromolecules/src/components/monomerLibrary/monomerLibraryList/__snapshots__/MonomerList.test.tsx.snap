@@ -24,17 +24,6 @@ exports[`Monomer List should render correct with groups 1`] = `
               >
                 Phe4SD
               </span>
-              <button
-                aria-haspopup="menu"
-                aria-label="Actions for Phe4SD"
-                class="dots"
-                type="button"
-              >
-                <svg
-                  class="css-x2ejol"
-                  name="vertical-dots"
-                />
-              </button>
               <div
                 aria-label=""
                 class="css-aj3s7v"
@@ -78,17 +67,6 @@ exports[`Monomer List should render correct with groups 1`] = `
             >
               Phe4SD
             </span>
-            <button
-              aria-haspopup="menu"
-              aria-label="Actions for Phe4SD"
-              class="dots"
-              type="button"
-            >
-              <svg
-                class="css-x2ejol"
-                name="vertical-dots"
-              />
-            </button>
             <div
               aria-label=""
               class="css-aj3s7v"
@@ -189,17 +167,6 @@ exports[`Monomer List should render correct without groups 1`] = `
               >
                 PEG2
               </span>
-              <button
-                aria-haspopup="menu"
-                aria-label="Actions for PEG2"
-                class="dots"
-                type="button"
-              >
-                <svg
-                  class="css-x2ejol"
-                  name="vertical-dots"
-                />
-              </button>
               <div
                 aria-label=""
                 class="css-aj3s7v"
@@ -243,17 +210,6 @@ exports[`Monomer List should render correct without groups 1`] = `
             >
               PEG2
             </span>
-            <button
-              aria-haspopup="menu"
-              aria-label="Actions for PEG2"
-              class="dots"
-              type="button"
-            >
-              <svg
-                class="css-x2ejol"
-                name="vertical-dots"
-              />
-            </button>
             <div
               aria-label=""
               class="css-aj3s7v"

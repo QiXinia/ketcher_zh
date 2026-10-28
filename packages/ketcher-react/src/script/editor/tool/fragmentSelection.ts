@@ -16,11 +16,8 @@ import type { Tool } from './Tool';
 import { getFragSelection, selMerge } from './select';
 import { handleMovingPosibilityCursor } from '../utils';
 import { getItemCursor } from '../utils/getItemCursor';
+import i18n from '../../../i18n';
 
-const CYCLE_TOOLTIP =
-  'Fragment Selection Tool cannot be used on bonds that participate in a cycle.';
-const COMPONENT_TOOLTIP =
-  'The structure fragment in this direction is already marked as a nucleotide component.';
 const TOOLTIP_DELAY = 200;
 const FORBIDDEN_CURSOR = `url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZGJkYmRiIiBzdHJva2Utd2lkdGg9IjIiLz48bGluZSB4MT0iNSIgeTE9IjUiIHgyPSIxOSIgeTI9IjE5IiBzdHJva2U9IiNkYmRiZGIiIHN0cm9rZS13aWR0aD0iMiIvPjwvc3ZnPg==') 12 12, not-allowed`;
 
@@ -209,7 +206,7 @@ export default class FragmentSelectionTool implements Tool {
     const isStartAtomComponent = componentData.componentAtoms.has(startAtomId);
 
     if (this.isBondInCycle(struct, bondItem.id)) {
-      this.setDisabledState(CYCLE_TOOLTIP);
+      this.setDisabledState(i18n.t('fragmentSelection.cycleTooltip'));
       return;
     }
 
@@ -221,7 +218,7 @@ export default class FragmentSelectionTool implements Tool {
     if (isStartAtomComponent) {
       // Direction leads to marked component - apply common disabled state
       // handling and then show gray arrows for the blocked direction.
-      this.setDisabledState(COMPONENT_TOOLTIP);
+      this.setDisabledState(i18n.t('fragmentSelection.componentTooltip'));
 
       // Draw gray arrows to indicate blocked direction
       this.bondPreview = reBond.drawFragmentSelectionPreview(

@@ -488,7 +488,7 @@ export const RnaPresetTabs = (props: IRnaPresetTabsProps) => {
             index + 1 === selectedTab && (
               <Fragment key={rnaComponentKey}>
                 <div className={styles.createComponentWrapper}>
-                  <div>{RNA_COMPONENT_HINTS[rnaComponentKey]}</div>
+                  <div>{i18n.t(RNA_COMPONENT_HINTS[rnaComponentKey])}</div>
                   <button
                     data-testid={`Mark-as-${rnaComponentKey}-button`}
                     className={clsx(

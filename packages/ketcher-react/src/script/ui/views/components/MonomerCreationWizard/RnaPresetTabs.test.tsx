@@ -533,19 +533,13 @@ describe('RnaPresetTabs - applyHighlights function', () => {
     );
 
     fireEvent.click(screen.getByTestId('nucleotide-base-tab'));
-    expect(
-      screen.getByText('Select all atoms that form the base.'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('Select all atoms that form the base.')).toBeInTheDocument();
 
     fireEvent.click(screen.getByTestId('nucleotide-sugar-tab'));
-    expect(
-      screen.getByText('Select all atoms that form the sugar.'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('Select all atoms that form the sugar.')).toBeInTheDocument();
 
     fireEvent.click(screen.getByTestId('nucleotide-phosphate-tab'));
-    expect(
-      screen.getByText('Select all atoms that form the phosphate.'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('Select all atoms that form the phosphate.')).toBeInTheDocument();
   });
 
   it('should render phosphate position picker in phosphate tab and call selected value handler', () => {

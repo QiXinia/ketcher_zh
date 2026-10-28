@@ -48,6 +48,7 @@ import {
 } from 'components/contextMenu/SelectedMonomersContextMenu/helpers';
 import { LIBRARY_TAB_INDEX } from 'src/constants';
 import { PointerEvent } from 'react';
+import { useTranslation } from 'react-i18next';
 
 type SequenceItemContextMenuType = {
   selections?: NodesSelection;
@@ -77,7 +78,8 @@ export const SequenceItemContextMenu = ({
 }: SequenceItemContextMenuType) => {
   const editor = useAppSelector(selectEditor);
   const dispatch = useAppDispatch();
-  const menuProps = generateSequenceContextMenuProps(selections);
+  const { t } = useTranslation('macromoleculesDialogs');
+  const menuProps = generateSequenceContextMenuProps(selections, t);
   const selectedMonomers: BaseMonomer[] =
     selections?.flat()?.flatMap((nodeSelection) => {
       return nodeSelection.node.monomers;
@@ -107,7 +109,8 @@ export const SequenceItemContextMenu = ({
   const menuItems = [
     {
       name: SequenceItemContextMenuNames.title,
-      title: menuProps?.title,
+      title:
+        menuProps?.title || String(i18n.t('macromolecules.sequenceMenuTitle')),
       isMenuTitle: true,
       disabled: true,
       hidden: ({

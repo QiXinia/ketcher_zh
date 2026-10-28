@@ -413,6 +413,7 @@ describe('SequenceItemContextMenu helpers', () => {
     );
     const expectedResult = {
       title: 'R(A)P',
+      hasAntisense: false,
       isSelectedAtLeastOneNucleoelement: true,
       isSelectedOnlyNucleoelements: true,
       isSequenceFirstsOnlyNucleoelementsSelected: true,
@@ -443,6 +444,7 @@ describe('SequenceItemContextMenu helpers', () => {
     );
     const expectedResult = {
       title: 'R(C)P',
+      hasAntisense: false,
       isSelectedAtLeastOneNucleoelement: true,
       isSelectedOnlyNucleoelements: true,
       isSequenceFirstsOnlyNucleoelementsSelected: false,
@@ -473,6 +475,7 @@ describe('SequenceItemContextMenu helpers', () => {
     );
     const expectedResult = {
       title: 'R(C)',
+      hasAntisense: false,
       isSelectedAtLeastOneNucleoelement: true,
       isSelectedOnlyNucleoelements: true,
       isSequenceFirstsOnlyNucleoelementsSelected: false,
@@ -503,6 +506,7 @@ describe('SequenceItemContextMenu helpers', () => {
     );
     const expectedResult = {
       title: '2 nucleotides',
+      hasAntisense: false,
       isSelectedAtLeastOneNucleoelement: true,
       isSelectedOnlyNucleoelements: true,
       isSequenceFirstsOnlyNucleoelementsSelected: false,
@@ -546,6 +550,7 @@ describe('SequenceItemContextMenu helpers', () => {
     );
     const expectedResult = {
       title: 'R(C)P',
+      hasAntisense: false,
       isSelectedAtLeastOneNucleoelement: true,
       isSelectedOnlyNucleoelements: true,
       isSequenceFirstsOnlyNucleoelementsSelected: false,
@@ -583,6 +588,7 @@ describe('SequenceItemContextMenu helpers', () => {
     );
     const expectedResult = {
       title: '2 elements',
+      hasAntisense: false,
       isSelectedAtLeastOneNucleoelement: true,
       isSelectedOnlyNucleoelements: false,
       isSequenceFirstsOnlyNucleoelementsSelected: false,
@@ -620,6 +626,7 @@ describe('SequenceItemContextMenu helpers', () => {
     );
     const expectedResult = {
       title: '3 elements',
+      hasAntisense: false,
       isSelectedAtLeastOneNucleoelement: true,
       isSelectedOnlyNucleoelements: false,
       isSequenceFirstsOnlyNucleoelementsSelected: false,

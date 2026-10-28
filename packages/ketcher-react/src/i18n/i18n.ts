@@ -12,6 +12,8 @@ import {
   BASE_RESOURCES,
   EXTRA_LOCALE_RESOURCES,
 } from './localeResources.generated';
+import legacyEn from './locales/en.json';
+import legacyZh from './locales/zh.json';
 
 export const defaultNS = 'common';
 
@@ -30,13 +32,35 @@ type LocaleResources = typeof BASE_RESOURCES;
 // build — the type only needs to describe the full (non-flagged) shape so
 // SupportedLanguage/isSupportedLanguage keep working unchanged across both
 // build variants.
-export const resources: {
-  en: LocaleResources;
-} & typeof EXTRA_LOCALE_RESOURCES = MULTI_LANGUAGE_BUILD
-  ? { en: BASE_RESOURCES, ...EXTRA_LOCALE_RESOURCES }
-  : ({ en: BASE_RESOURCES } as {
-      en: LocaleResources;
-    } & typeof EXTRA_LOCALE_RESOURCES);
+type LegacyLocaleResources = LocaleResources & { legacy: typeof legacyEn };
+type AllLocaleResources = { en: LegacyLocaleResources } & {
+  [Locale in keyof typeof EXTRA_LOCALE_RESOURCES]: (typeof EXTRA_LOCALE_RESOURCES)[Locale] & {
+    legacy: typeof legacyEn;
+  };
+};
+
+function getMultiLanguageResources(): AllLocaleResources {
+  const extraLocaleResourcesWithLegacy = Object.fromEntries(
+    Object.entries(EXTRA_LOCALE_RESOURCES).map(
+      ([locale, localeResources]) => [
+        locale,
+        {
+          ...localeResources,
+          legacy: locale === 'zh-CN' ? legacyZh : legacyEn,
+        },
+      ],
+    ),
+  ) as Omit<AllLocaleResources, 'en'>;
+
+  return {
+    en: { ...BASE_RESOURCES, legacy: legacyEn },
+    ...extraLocaleResourcesWithLegacy,
+  };
+}
+
+export const resources: AllLocaleResources = MULTI_LANGUAGE_BUILD
+  ? getMultiLanguageResources()
+  : ({ en: { ...BASE_RESOURCES, legacy: legacyEn } } as AllLocaleResources);
 
 export interface SupportedLanguage {
   code: keyof typeof resources;
@@ -111,6 +135,7 @@ if (!i18n.isInitialized) {
       resources,
       lng: getStoredLanguage(),
       fallbackLng: DEFAULT_LANGUAGE,
+      fallbackNS: 'legacy',
       defaultNS,
       ns: Object.keys(resources.en),
       interpolation: {

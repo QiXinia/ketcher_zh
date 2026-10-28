@@ -184,6 +184,9 @@ export const generateSequenceContextMenuProps = (
     isSelectedOnlyNucleoelements,
     isSelectedAtLeastOneNucleoelement,
     isSequenceFirstsOnlyNucleoelementsSelected,
+    hasAntisense: selectedSequenceLabeledNodes.some(
+      (node) => node.strandType === STRAND_TYPE.ANTISENSE,
+    ),
   };
 };
 

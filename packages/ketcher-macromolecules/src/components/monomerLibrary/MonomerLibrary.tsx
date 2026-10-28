@@ -40,6 +40,7 @@ import {
   MonomerLibraryToggle,
 } from './styles';
 import { Icon, i18n } from 'ketcher-react';
+import { useTranslation } from 'react-i18next';
 
 const COPY = '_Copy';
 
@@ -48,6 +49,7 @@ type Props = {
 };
 
 const MonomerLibrary = ({ toggleLibraryVisibility }: Props) => {
+  const { t } = useTranslation('macromoleculesDialogs');
   const dispatch = useAppDispatch();
   const selectedTabIndex = useAppSelector(selectCurrentTabIndex);
   const presets = useAppSelector(selectAllPresets);
@@ -102,8 +104,8 @@ const MonomerLibrary = ({ toggleLibraryVisibility }: Props) => {
   );
 
   const tabs = useMemo(
-    () => tabsContent(duplicatePreset, editPreset),
-    [duplicatePreset, editPreset],
+    () => tabsContent(t, duplicatePreset, editPreset),
+    [t, duplicatePreset, editPreset],
   );
 
   const handleTabChange = useCallback(

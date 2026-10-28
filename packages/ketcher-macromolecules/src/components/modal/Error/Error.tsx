@@ -7,6 +7,7 @@ import {
   selectErrorModalText,
   selectErrorModalTitle,
 } from 'state/modal';
+import { translateErrorMessage } from 'ketcher-react';
 import { ErrorTextWrapper } from './Error.styles';
 
 export const ErrorModal = () => {
@@ -28,7 +29,7 @@ export const ErrorModal = () => {
     >
       <Modal.Content>
         <ErrorTextWrapper data-testid="error-message-body">
-          {errorMessage}
+          {translateErrorMessage(errorMessage)}
         </ErrorTextWrapper>
       </Modal.Content>
       <Modal.Footer>
