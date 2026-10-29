@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /****************************************************************************
  * Copyright 2021 EPAM Systems
  *
@@ -15,6 +16,8 @@
  ***************************************************************************/
 import _ from 'lodash';
 import { escapeRegExp, filter as _filter, flow, reduce } from 'lodash/fp';
+import type { TFunction } from 'i18next';
+import i18n from '../../../i18n';
 import type { Option } from '../component/form/Select';
 import {
   getTemplateDisplayNameByGroup,
@@ -31,7 +34,9 @@ const GREEK_SIMBOLS = {
 };
 
 const greekRe = new RegExp(
-  '\\b' + Object.keys(GREEK_SIMBOLS).join('\\b|\\b') + '\\b',
+  String.raw`\b` +
+    Object.keys(GREEK_SIMBOLS).join(String.raw`\b|\b`) +
+    String.raw`\b`,
   'g',
 );
 
@@ -90,11 +95,27 @@ export function filterFGLib(lib, filter) {
   )(lib);
 }
 
-export const getSelectOptionsFromSchema = (schema): Array<Option> => {
+/**
+ * Every schema `title`/`enumNames` value must be an explicit
+ * "namespace:key.path" translation key — there is no literal-text
+ * passthrough. `t` is required (not optional) so a call site can't
+ * silently skip translation by omitting it.
+ */
+export function resolveTranslatableText<T>(value: T, t: TFunction): T {
+  if (typeof value !== 'string') {
+    return value;
+  }
+  return t(value) as unknown as T;
+}
+
+export const getSelectOptionsFromSchema = (
+  schema,
+  t: TFunction = i18n.t,
+): Array<Option> => {
   return schema.enum.reduce((options, value, index) => {
     options.push({
       value,
-      label: schema?.enumNames?.[index] ?? value,
+      label: resolveTranslatableText(schema?.enumNames?.[index] ?? value, t),
     });
 
     return options;

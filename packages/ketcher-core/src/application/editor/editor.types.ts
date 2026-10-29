@@ -15,17 +15,60 @@
  ***************************************************************************/
 
 import type { Action } from './actions/action';
-import type { MonomerCreationState, Render } from 'application/render';
+import type {
+  MonomerCreationState,
+  Render,
+  RenderOptions,
+} from 'application/render';
 import type { Struct } from 'domain/entities/struct';
+import type { AtomAttributes } from 'domain/entities/atom';
+import type { Bond } from 'domain/entities/bond';
+import type { RGroupAttributes } from 'domain/entities/rgroup';
 import type { selectionKeys } from './shared/constants';
 import type { PipelineSubscription, Subscription } from 'subscription';
 import type { IRnaPreset } from './tools/Tool';
 import type { TextFormattingCommand } from './actions/textFormatting';
 import type { ObjectAlignment, ObjectDistribution } from './actions/objectAlignment';
+import type {
+  MonomerOrAmbiguousType,
+  AttachmentPointName,
+  MonomerItemType,
+} from 'domain/types';
+import type { BaseMonomer } from 'domain/entities/BaseMonomer';
+import type { LayoutMode } from 'application/editor/modes/types';
+import type { PolymerBond } from 'domain/entities/PolymerBond';
 
-export type EditorSelection = {
-  [key in typeof selectionKeys[number]]?: number[];
-} & {
+export type MonomerCreationWizardRequest = {
+  mode: 'create' | 'instance' | 'all' | 'library' | 'duplicate';
+  monomer?: BaseMonomer;
+  libraryItem?: MonomerItemType;
+};
+
+export type CreateBondViaModalPayload = {
+  firstMonomer: BaseMonomer;
+  secondMonomer: BaseMonomer;
+  firstSelectedAttachmentPoint: AttachmentPointName;
+  secondSelectedAttachmentPoint: AttachmentPointName;
+  polymerBond?: PolymerBond;
+  isReconnection?: boolean;
+  initialFirstMonomerAttachmentPoint?: AttachmentPointName;
+  initialSecondMonomerAttachmentPoint?: AttachmentPointName;
+};
+
+export type SelectLayoutModePayload =
+  | LayoutMode
+  | { mode: LayoutMode; mergeWithLatestHistoryCommand: boolean };
+
+export type EditMonomerVariant = 'single' | 'identical' | 'non-identical';
+
+export interface EditMonomerPayload {
+  fgIds: number[];
+  variant: EditMonomerVariant;
+}
+
+export type EditorSelection = Partial<
+  Record<(typeof selectionKeys)[number], number[]>
+> & {
   enhancedFlags?: number[];
 };
 export type FloatingToolsParams = {
@@ -33,9 +76,27 @@ export type FloatingToolsParams = {
   rotateHandlePosition?: { x: number; y: number };
 };
 
+export type EditorOptions = Partial<
+  RenderOptions & {
+    viewOnlyMode: boolean;
+  }
+>;
+
 export enum EditorType {
   Micromolecules = 0,
   Macromolecules = 1,
+}
+
+export type EditorSubscriber<T = unknown> = {
+  handler: (data?: T) => void;
+};
+
+export interface RotateController {
+  isRotating: boolean;
+  rerender: () => void;
+  revert: () => void;
+  clean: () => void;
+  updateFloatingToolsPosition: () => void;
 }
 
 export interface Editor {
@@ -48,8 +109,14 @@ export interface Editor {
     y?: number,
   ) => Struct;
   structToAddFragment: (struct: Struct, x?: number, y?: number) => Struct;
-  subscribe: (eventName: string, handler: (data?: any) => any) => any;
-  unsubscribe: (eventName: string, subscriber: any) => void;
+  subscribe: <T = unknown>(
+    eventName: string,
+    handler: (data?: T) => void,
+  ) => EditorSubscriber<T>;
+  unsubscribe: <T = unknown>(
+    eventName: string,
+    subscriber: EditorSubscriber<T>,
+  ) => void;
   selection: (arg?: EditorSelection | 'all' | null) => EditorSelection | null;
   formatSelectedTexts: (command: TextFormattingCommand, value?: string | number) => number;
   flattenSelectedObjects: () => number;
@@ -70,38 +137,43 @@ export interface Editor {
   setSelectedSimpleObjectBracketType: (bracketType: 'bracket' | 'parenthesis' | 'brace') => number;
   undo: () => void;
   redo: () => void;
+  historyStack: Action[];
+  historyPtr: number;
+  addHistoryAction: (action: Action) => void;
   clear: () => void;
   clearHistory: () => void;
-  options: (value?: any) => any;
-  setOptions: (opts: string) => any;
-  zoom: (value?: any) => any;
+  options(): RenderOptions;
+  options(value: EditorOptions): void;
+  setOptions: (opts: string) => void;
+  zoom: (value?: number) => number | undefined;
   structSelected: () => Struct;
   explicitSelected: () => EditorSelection;
   centerStruct: () => void;
   zoomAccordingContent: (struct: Struct) => void;
   errorHandler: ((message: string) => void) | null;
   event: {
-    message: Subscription;
-    tooltip: Subscription;
-    elementEdit: PipelineSubscription;
-    bondEdit: PipelineSubscription;
+    message: Subscription<{ info?: string | false; error?: unknown }>;
+    tooltip: Subscription<{ message: string } | undefined>;
+    elementEdit: PipelineSubscription<unknown, Promise<Partial<AtomAttributes> & { content?: string }>>;
+    bondEdit: PipelineSubscription<Bond[], Promise<Bond>>;
     zoomIn: PipelineSubscription;
     zoomOut: PipelineSubscription;
-    rgroupEdit: PipelineSubscription;
-    sgroupEdit: PipelineSubscription;
+    rgroupEdit: PipelineSubscription<unknown, Promise<RGroupAttributes & { label?: number }>>;
+    sgroupEdit: PipelineSubscription<unknown, Promise<{ type?: string; attrs: { context?: string; expanded?: boolean; [key: string]: unknown } }>>;
     sdataEdit: PipelineSubscription;
     quickEdit: PipelineSubscription;
     attachEdit: PipelineSubscription;
-    removeFG: PipelineSubscription;
+    removeFG: PipelineSubscription<{ fgIds: number[] }, Promise<unknown>>;
+    editMonomer: PipelineSubscription;
     change: Subscription;
     selectionChange: PipelineSubscription;
     aromatizeStruct: PipelineSubscription;
     dearomatizeStruct: PipelineSubscription;
-    enhancedStereoEdit: PipelineSubscription;
+    enhancedStereoEdit: PipelineSubscription<{ stereoLabel: string | null | undefined }, Promise<string | null>>;
     confirm: PipelineSubscription;
     showInfo: PipelineSubscription;
     apiSettings: PipelineSubscription;
-    cursor: Subscription;
+    cursor: Subscription<{ status: 'enable'; cursorPosition: { clientX: number; clientY: number } } | { status: 'move' | 'mouseover' | 'leave' | 'disable' }>;
     updateFloatingTools: Subscription<FloatingToolsParams>;
   };
   update: (
@@ -110,8 +182,7 @@ export interface Editor {
     options?: { resizeCanvas: boolean },
   ) => void;
   render: Render;
-  // supposed to be RotateController from 'ketcher-react' package
-  rotateController: any;
+  rotateController: RotateController;
   macromoleculeConvertionError: string | null | undefined;
   setMacromoleculeConvertionError: (errorMessage: string) => void;
   clearMacromoleculeConvertionError: () => void;
@@ -124,9 +195,18 @@ export interface Editor {
 }
 
 export type LibraryItemDragState = {
-  item: IRnaPreset;
+  item: IRnaPreset | MonomerOrAmbiguousType;
   position: {
     x: number;
     y: number;
   };
 } | null;
+
+/**
+ * Identifies a specific free attachment point on a monomer.
+ * Used to track drag-over hover targets during library-item drag operations.
+ */
+export type AttachmentPointTarget = {
+  monomer: BaseMonomer;
+  attachmentPointName: AttachmentPointName;
+};

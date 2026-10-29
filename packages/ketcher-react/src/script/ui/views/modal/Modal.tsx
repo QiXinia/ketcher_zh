@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /****************************************************************************
  * Copyright 2021 EPAM Systems
  *
@@ -14,7 +15,7 @@
  * limitations under the License.
  ***************************************************************************/
 
-import { type RefObject, useRef } from 'react';
+import { type RefObject, useEffect, useRef } from 'react';
 
 import type { BaseCallProps, ModalContainerProps } from './modal.types';
 import classes from './Modal.module.less';
@@ -25,6 +26,8 @@ import modals from '../../dialog';
 import useResizeObserver from 'use-resize-observer/polyfilled';
 import { WindowedModal } from './WindowedModal';
 import { WindowState } from '../../state/modal/windows';
+import { ketcherProvider } from 'ketcher-core';
+import type Editor from '../../../editor';
 
 interface ModalProps extends BaseCallProps {
   modal: {
@@ -44,13 +47,21 @@ type ModalContentProps = Omit<Props, 'modal'> & {
   modal: NonNullable<Props['modal']>;
 };
 
-function ModalContent({ modal, ...rest }: ModalContentProps) {
+function ModalContent({ modal, ketcherId, ...rest }: ModalContentProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const { height, width } = useResizeObserver<HTMLDivElement>({
     ref: containerRef as RefObject<HTMLDivElement>,
   });
 
   const Component = modals[modal.name];
+
+  useEffect(() => {
+    const editor = ketcherProvider.getKetcher(ketcherId).editor as Editor;
+
+    return () => {
+      setTimeout(() => editor.focusCliparea(), 0);
+    };
+  }, [ketcherId]);
 
   if (!Component)
     throw new Error(`There is no modal window named ${modal.name}`);
@@ -67,6 +78,7 @@ function ModalContent({ modal, ...rest }: ModalContentProps) {
             (height && height <= mediaSizes.smallHeight) ||
             (width && width <= mediaSizes.smallWidth),
         })}
+        ketcherId={ketcherId}
         {...rest}
       />
     </div>

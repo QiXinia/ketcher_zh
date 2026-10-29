@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *    https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,14 +16,17 @@
 
 import {
   type Atom,
+  type RxnArrow,
   type Struct,
   type SupportedFormat,
   Bond,
   IsotopicAbundance,
   RxnArrowMode,
   StereoFlag,
+  exceedsMolfileV2000Limit,
   getPropertiesByFormat,
 } from 'ketcher-core';
+import i18n from '../../../../i18n';
 
 export function couldBeSaved(
   struct: Struct,
@@ -120,8 +123,8 @@ export function couldBeSaved(
   const hasRxnArrow = struct.hasRxnArrow();
 
   if (format === 'smarts') {
-    const arrayOfAtoms: Array<Atom> = Array.from(struct.atoms.values());
-    const arrayOfBonds: Array<Bond> = Array.from(struct.bonds.values());
+    const arrayOfAtoms: Array<Atom> = [...struct.atoms.values()];
+    const arrayOfBonds: Array<Bond> = [...struct.bonds.values()];
 
     const atomsHaveUnsupportedProperties = arrayOfAtoms.some(
       (atom) =>
@@ -137,9 +140,7 @@ export function couldBeSaved(
         bond.type === Bond.PATTERN.TYPE.HYDROGEN,
     );
     if (bondsHaveUnsupportedProperties || atomsHaveUnsupportedProperties) {
-      warnings.push(
-        `Structure contains query properties of atoms and bonds that are not supported in the SMARTS. Query properties will not be reflected in the file saved.`,
-      );
+      warnings.push(i18n.t('saveWarnings.smartsQueryProps'));
     }
     if (arrayOfAtoms.some((atom) => atom.queryProperties.substitutionQuery)) {
       warnings.push(
@@ -159,18 +160,16 @@ export function couldBeSaved(
   }
 
   if (format === 'smiles') {
-    const arrayOfAtoms: Array<any> = Array.from(struct.atoms.values());
+    const arrayOfAtoms: Array<Atom> = [...struct.atoms.values()];
     const hasGenerics = arrayOfAtoms.some((atom) => atom.pseudo);
     if (hasGenerics) {
-      warnings.push(
-        `Structure contains generic atoms. They will be saved as any atom (*).`,
-      );
+      warnings.push(i18n.t('saveWarnings.smilesGenericAtoms'));
     }
   }
 
   if (format !== 'ket') {
     if (hasRxnArrow) {
-      const arrayOfArrows: Array<any> = Array.from(struct.rxnArrows.values());
+      const arrayOfArrows: Array<RxnArrow> = [...struct.rxnArrows.values()];
       const rxnArrowMode: RxnArrowMode = arrayOfArrows[0].mode;
       if (
         ![RxnArrowMode.OpenAngle, RxnArrowMode.Retrosynthetic].includes(
@@ -178,16 +177,17 @@ export function couldBeSaved(
         )
       ) {
         warnings.push(
-          `The ${formatName} format does not support drawn elements: the reaction ${rxnArrowMode} arrow will be replaced with the reaction arrow`,
+          i18n.t('saveWarnings.arrowReplaced', {
+            format: formatName,
+            arrowMode: rxnArrowMode,
+          }),
         );
       }
     }
 
     // TODO: find better solution for case when Arrows > 1
     if (rxnArrowsSize > 1) {
-      warnings.push(
-        `The ${formatName} format does not support drawn elements: reaction arrows will be lost.`,
-      );
+      warnings.push(i18n.t('saveWarnings.arrowsLost', { format: formatName }));
     }
   }
 
@@ -204,14 +204,14 @@ export function couldBeSaved(
   ) {
     if (struct.rgroups.size !== 0)
       warnings.push(
-        `In ${formatName} the structure will be saved without R-group fragments`,
+        i18n.t('saveWarnings.noRgroupFragments', { format: formatName }),
       );
 
     struct = struct.clone(); // need this: .getScaffold()
     const isRg = struct.atoms.find((_ind, atom) => atom.label === 'R#');
     if (isRg !== null)
       warnings.push(
-        `In ${formatName} the structure will be saved without R-group members`,
+        i18n.t('saveWarnings.noRgroupMembers', { format: formatName }),
       );
 
     const isSg = struct.sgroups.find(
@@ -219,9 +219,7 @@ export function couldBeSaved(
         sg.type !== 'MUL' && !/^INDIGO_.+_DESC$/i.test(sg.data.fieldName),
     );
     if (isSg !== null)
-      warnings.push(
-        `In ${formatName} the structure will be saved without S-groups`,
-      );
+      warnings.push(i18n.t('saveWarnings.noSgroups', { format: formatName }));
   }
 
   if (
@@ -239,21 +237,30 @@ export function couldBeSaved(
   ) {
     const isVal = struct.atoms.find((_ind, atom) => atom.explicitValence >= 0);
     if (isVal !== null)
-      warnings.push(`In ${formatName} valence is not supported`);
+      warnings.push(
+        i18n.t('saveWarnings.valenceUnsupported', { format: formatName }),
+      );
+  }
+
+  if (
+    (['mol'] as SupportedFormat[]).includes(format) &&
+    exceedsMolfileV2000Limit(struct)
+  ) {
+    warnings.push(
+      'The structure exceeds the MDL Molfile V2000 limit (999 atoms/bonds) and will be saved in V3000 format.',
+    );
   }
 
   if (
     (['mol', 'rxn'] as SupportedFormat[]).includes(format) &&
-    Array.from(struct.frags.values()).some((fr) => {
+    [...struct.frags.values()].some((fr) => {
       if (fr?.enhancedStereoFlag) {
         return fr.enhancedStereoFlag !== StereoFlag.Abs;
       }
       return false;
     })
   ) {
-    warnings.push(
-      `Structure contains enhanced stereochemistry features. Information will be partly lost.`,
-    );
+    warnings.push(i18n.t('saveWarnings.enhancedStereoLost'));
   }
 
   if (
@@ -269,14 +276,16 @@ export function couldBeSaved(
   ) {
     if (struct.functionalGroups.size !== 0)
       warnings.push(
-        `In ${formatName} the structure will be saved without functional groups.`,
+        i18n.t('saveWarnings.noFunctionalGroups', { format: formatName }),
       );
   }
 
   if ((['cml'] as SupportedFormat[]).includes(format)) {
     if (struct.functionalGroups.size !== 0)
       warnings.push(
-        `Structure contains functional groups. In ${formatName} information will be partly lost.`,
+        i18n.t('saveWarnings.cmlFunctionalGroupsLost', {
+          format: formatName,
+        }),
       );
   }
 

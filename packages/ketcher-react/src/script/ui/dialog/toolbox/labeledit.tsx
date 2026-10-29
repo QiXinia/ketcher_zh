@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *    https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -84,7 +84,7 @@ export function deserialize(value: string): AtomLabelData | null {
   const isotope: number | null = match[1]
     ? Number.parseInt(match[1], 10)
     : null;
-  const radical = match[3] ? { ':': 1, '.': 2, '^^': 3 }[match[3]] ?? 0 : 0;
+  const radical = match[3] ? ({ ':': 1, '.': 2, '^^': 3 }[match[3]] ?? 0) : 0;
   const charge: number | null = match[4] ? parseCharge(match[4]) : null;
 
   if (VALID_GENERIC_LABELS.has(label) || Elements.get(label)) {

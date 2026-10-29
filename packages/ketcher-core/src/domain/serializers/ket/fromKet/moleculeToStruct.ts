@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /****************************************************************************
  * Copyright 2021 EPAM Systems
  *
@@ -5,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *    https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -72,6 +73,15 @@ export function moleculeToStruct(ketItem: any): Struct {
   if (ketItem.sgroups) {
     ketItem.sgroups.forEach((sgroupData) => {
       const sgroup = sgroupToStruct(sgroupData);
+      // Drop dangling atom references (atom ids absent from the struct). A malformed
+      // file can reference a non-existent atom; without this the whole S-group is later
+      // silently discarded when the struct is reconstructed/cloned (Struct.clone).
+      // Mirrors the MOL parser (SGroup.filter + empty-group removal in mol/v2000.ts).
+      const hadAtoms = sgroup.atoms.length > 0;
+      sgroup.atoms = sgroup.atoms.filter((atomId) => struct.atoms.has(atomId));
+      if (hadAtoms && sgroup.atoms.length === 0) {
+        return; // all references were invalid — skip this malformed S-group
+      }
       const id = struct.sgroups.add(sgroup);
       sgroup.id = id;
     });
@@ -130,10 +140,12 @@ export function rglabelToStruct(source) {
   ifDef(params, 'pp', {
     x: source.location[0],
     y: -source.location[1],
-    z: source.location[2] || 0.0,
+    z: source.location[2] || 0,
   });
   ifDef(params, 'attachmentPoints', source.attachmentPoints);
-  const rglabel = toRlabel(source.$refs.map((el) => parseInt(el.slice(3))));
+  const rglabel = toRlabel(
+    source.$refs.map((el) => Number.parseInt(el.slice(3))),
+  );
   ifDef(params, 'rglabel', rglabel);
   const newAtom = new Atom(params);
   newAtom.setInitiallySelected(source.selected);
@@ -158,8 +170,6 @@ function addRGroupAttachmentPointsToStruct(
   } else if (attachmentPoints === AttachmentPoints.BothSides) {
     rgroupAttachmentPoints.push(
       new RGroupAttachmentPoint(attachedAtomId, 'primary', initiallySelected),
-    );
-    rgroupAttachmentPoints.push(
       new RGroupAttachmentPoint(attachedAtomId, 'secondary', initiallySelected),
     );
   }
@@ -304,7 +314,7 @@ function sgroupAttachmentPointToStruct(
     atomId,
     leavingAtomId,
     attachmentId,
-    attachmentId && !isNaN(Number(attachmentId))
+    attachmentId && !Number.isNaN(Number(attachmentId))
       ? Number(attachmentId)
       : attachmentPointNumber,
   );

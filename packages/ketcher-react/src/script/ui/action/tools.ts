@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *    https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -60,7 +60,7 @@ const toolActions: Record<string, ToolActionEntry> = {
   'select-structure': {
     title: i18n.t('tools.structureSelection'),
     shortcut: ['Shift+Tab', 'Escape'],
-    action: { tool: 'select', opts: 'fragment' },
+    action: { tool: 'select', opts: 'structure' },
     hidden: (options) => isHidden(options, 'select-structure'),
   },
   'select-fragment': {
@@ -84,12 +84,14 @@ const toolActions: Record<string, ToolActionEntry> = {
     shortcut: 'Alt+e',
     title: i18n.t('tools.stereochemistry'),
     action: { tool: 'enhancedStereo' },
-    disabled: (editor) =>
-      editor.isMonomerCreationWizardActive ||
-      findStereoAtoms(
-        editor?.struct(),
-        Array.from(editor?.struct().atoms.keys()),
-      ).length === 0,
+    disabled: (editor) => {
+      if (editor.isMonomerCreationWizardActive) {
+        return true;
+      }
+      const struct = editor?.struct?.();
+      const atomIds = editor?.selection?.()?.atoms ?? [...struct.atoms.keys()];
+      return findStereoAtoms(struct, atomIds).length === 0;
+    },
     hidden: (options) => isHidden(options, 'enhanced-stereo'),
   },
   'charge-plus': {
@@ -441,7 +443,9 @@ const monomerWizardDisallowedBondTypes: Set<string> = new Set(
 export default bondTypes.reduce<Record<string, ToolActionEntry>>(
   (res, type, i) => {
     res[`bond-${type}`] = {
-      title: type ? getBondDisplayTitle(type) : bondTypeNames[i],
+      title: type
+        ? getBondDisplayTitle(type)
+        : bondTypeNames[i] || i18n.t('bondProperties.type'),
       shortcut: bondCuts[type],
       action: {
         tool: 'bond',

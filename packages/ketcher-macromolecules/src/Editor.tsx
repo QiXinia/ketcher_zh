@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /****************************************************************************
  * Copyright 2021 EPAM Systems
  *
@@ -5,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *    https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,7 +28,7 @@ import { Global, ThemeProvider } from '@emotion/react';
 import { createTheme } from '@mui/material/styles';
 import { merge } from 'lodash';
 import { I18nextProvider } from 'react-i18next';
-import { i18n } from 'ketcher-react';
+import { EditorClassName, i18n } from 'ketcher-react';
 import {
   BaseMonomer,
   CoreEditor,
@@ -36,6 +37,7 @@ import {
   SetEditorLineLengthAction,
   NodeSelection,
   NodesSelection,
+  isPasteContentAvailable,
   DeepPartial,
 } from 'ketcher-core';
 import { store } from 'state';
@@ -69,7 +71,6 @@ import {
 } from 'hooks';
 import { closeErrorTooltip, selectErrorTooltips } from 'state/modal';
 import { ModalContainer } from 'components/modal/modalContainer';
-import { EditorClassName } from 'ketcher-react';
 import { Snackbar } from '@mui/material';
 import {
   StyledIconButton,
@@ -134,7 +135,6 @@ interface EditorProps {
 }
 
 interface EditorContainerProps extends EditorProps {
-  onInit?: (editor: CoreEditor) => void;
   isMacromoleculesEditorTurnedOn?: boolean;
 }
 
@@ -204,6 +204,13 @@ function Editor({
   const [selections, setSelections] = useState<NodeSelection[][]>();
   const [contextMenuEvent, setContextMenuEvent] = useState<PointerEvent>();
   const [selectedMonomers, setSelectedMonomers] = useState<BaseMonomer[]>([]);
+  const [isPasteAvailable, setIsPasteAvailable] = useState(true);
+  const updatePasteAvailability = useCallback(() => {
+    if (!editor) return;
+    isPasteContentAvailable((content) =>
+      editor.mode.isPasteContentValid(content),
+    ).then(setIsPasteAvailable);
+  }, [editor]);
   const { show: showSequenceContextMenu } = useContextMenu({
     id: CONTEXT_MENU_ID.FOR_SEQUENCE,
   });
@@ -224,7 +231,7 @@ function Editor({
             setMonomerLibraryLoadError(
               err instanceof Error
                 ? err.message
-                : 'Failed to load monomers library',
+                : i18n.t('macromolecules.failedLoadLibrary'),
             ),
           );
         },
@@ -243,7 +250,8 @@ function Editor({
     editor?.events.rightClickSequence.add(([event, selections]) => {
       setSelections(selections);
       setContextMenuEvent(event);
-      window.dispatchEvent(new Event('hidePreview'));
+      updatePasteAvailability();
+      globalThis.dispatchEvent(new Event('hidePreview'));
       dispatch(setContextMenuActive(true));
       showSequenceContextMenu({
         event,
@@ -272,6 +280,7 @@ function Editor({
       ([event, selectedMonomers]: [PointerEvent, BaseMonomer[]]) => {
         setSelectedMonomers(selectedMonomers);
         setContextMenuEvent(event);
+        updatePasteAvailability();
         showSelectedMonomersContextMenu({
           event,
           props: { selectedMonomers },
@@ -281,7 +290,8 @@ function Editor({
     editor?.events.rightClickCanvas.add(
       ([event, selections]: [PointerEvent, BaseMonomer[]]) => {
         setContextMenuEvent(event);
-        window.dispatchEvent(new Event('hidePreview'));
+        updatePasteAvailability();
+        globalThis.dispatchEvent(new Event('hidePreview'));
         dispatch(setContextMenuActive(true));
         setSelectedMonomers(selections);
         showSelectedMonomersContextMenu({
@@ -293,7 +303,8 @@ function Editor({
     editor?.events.rightClickCanvasSequence.add(
       ([event, selections]: [PointerEvent, NodesSelection]) => {
         setContextMenuEvent(event);
-        window.dispatchEvent(new Event('hidePreview'));
+        updatePasteAvailability();
+        globalThis.dispatchEvent(new Event('hidePreview'));
         dispatch(setContextMenuActive(true));
         setSelections(selections);
         showSequenceContextMenu({
@@ -322,13 +333,13 @@ function Editor({
       }
     };
 
-    window.addEventListener(
+    globalThis.addEventListener(
       SetEditorLineLengthAction,
       setEditorLineLengthListener,
     );
 
     return () => {
-      window.removeEventListener(
+      globalThis.removeEventListener(
         SetEditorLineLengthAction,
         setEditorLineLengthListener,
       );
@@ -437,10 +448,12 @@ function Editor({
       <SequenceItemContextMenu
         selections={selections}
         contextMenuEvent={contextMenuEvent}
+        isPasteAvailable={isPasteAvailable}
       />
       <SelectedMonomersContextMenu
         selectedMonomers={selectedMonomers}
         contextMenuEvent={contextMenuEvent}
+        isPasteAvailable={isPasteAvailable}
       />
       <ModalContainer />
       <ErrorModal />

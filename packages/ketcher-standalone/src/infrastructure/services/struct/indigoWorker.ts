@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ***************************************************************************/
-/* eslint-disable no-restricted-globals */
 
 import {
   AromatizeCommandData,
@@ -29,14 +28,14 @@ import {
   DearomatizeCommandData,
   GenerateImageCommandData,
   GenerateInchIKeyCommandData,
+  IndigoModule,
+  IndigoOptions,
   InputMessage,
   LayoutCommandData,
   ExplicitHydrogensCommandData,
   CalculateMacromoleculePropertiesCommandData,
 } from './indigoWorker.types';
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
 import indigoModuleFn from '_indigo-ketcher-import-alias_';
 
 const normalizeError = (error: unknown): Error => {
@@ -53,13 +52,8 @@ const normalizeError = (error: unknown): Error => {
   }
 };
 
-interface IndigoOptions {
-  set: (key: string, value: string) => void;
-}
-
 type HandlerType = (
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  indigo: any,
+  indigo: IndigoModule,
   indigoOptions: IndigoOptions,
 ) => string;
 
@@ -75,7 +69,7 @@ function handleCommand(
   // Catch initialization and option failures as well as chemistry failures.
   // Every outcome must echo the request ID to settle exactly one caller.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  indigoModule.then((indigo: any) => {
+  indigoModule.then((indigo: IndigoModule) => {
     const indigoOptions = new indigo.MapStringString();
     let payload;
     try {
@@ -114,7 +108,9 @@ self.onmessage = (e: MessageEvent<InputMessage<CommandData>>) => {
         {
           ...data.options,
           'render-output-format': data.outputFormat,
-          'render-background-color': data.backgroundColor,
+          ...(data.backgroundColor === undefined
+            ? {}
+            : { 'render-background-color': data.backgroundColor }),
         },
         Command.GenerateImageAsBase64,
         data.struct,

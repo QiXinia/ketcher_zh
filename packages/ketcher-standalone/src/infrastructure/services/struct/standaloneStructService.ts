@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *    https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -73,8 +73,6 @@ import {
   STRUCT_SERVICE_INITIALIZED_EVENT,
   STRUCT_SERVICE_NO_RENDER_INITIALIZED_EVENT,
 } from './constants';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
 import { getIndigoWorker } from '_indigo-worker-import-alias_';
 
 interface KeyValuePair {
@@ -225,11 +223,14 @@ class IndigoService implements StructService {
     reject: (reason?: unknown) => void;
   }>();
   private ketcherId: string | null = null;
+  private readonly messageHandler: (
+    e: MessageEvent<OutputMessage<string>>,
+  ) => void;
 
   constructor(defaultOptions: StructServiceOptions) {
     this.defaultOptions = defaultOptions;
     this.worker = getIndigoWorker();
-    this.worker.onmessage = (e: MessageEvent<OutputMessage<unknown>>) => {
+    this.messageHandler = (e: MessageEvent<OutputMessage<string>>) => {
       if (e.data.type === Command.Info && !e.data.hasError) {
         const callbackMethod = process.env.SEPARATE_INDIGO_RENDER
           ? this.callIndigoNoRenderLoadedCallback
@@ -258,6 +259,7 @@ class IndigoService implements StructService {
     };
     this.worker.onerror = failWorker;
     this.worker.onmessageerror = failWorker;
+    this.worker.addEventListener('message', this.messageHandler);
   }
 
   private sendRequest<T, R>(
@@ -297,11 +299,13 @@ class IndigoService implements StructService {
   }
 
   private callIndigoNoRenderLoadedCallback() {
-    window.dispatchEvent(new Event(STRUCT_SERVICE_NO_RENDER_INITIALIZED_EVENT));
+    globalThis.dispatchEvent(
+      new Event(STRUCT_SERVICE_NO_RENDER_INITIALIZED_EVENT),
+    );
   }
 
   private callIndigoLoadedCallback() {
-    window.dispatchEvent(new Event(STRUCT_SERVICE_INITIALIZED_EVENT));
+    globalThis.dispatchEvent(new Event(STRUCT_SERVICE_INITIALIZED_EVENT));
   }
 
   async getInChIKey(struct: string): Promise<string> {
@@ -852,9 +856,10 @@ class IndigoService implements StructService {
     for (const request of this.pending.values()) request.reject(this.workerFailure);
     this.pending.clear();
     this.worker.terminate();
-    this.worker.onmessage = null;
     this.worker.onerror = null;
     this.worker.onmessageerror = null;
+    this.worker.removeEventListener('message', this.messageHandler);
+    this.worker.terminate();
   }
 }
 

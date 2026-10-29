@@ -28,7 +28,7 @@ import {
 import { PresetPhosphateFilterPopup } from './PresetPhosphateFilterPopup';
 import { RnaPresetGroup } from 'components/monomerLibrary/RnaPresetGroup/RnaPresetGroup';
 import { MonomerGroup } from 'components/monomerLibrary/monomerLibraryGroup';
-import { memo, useEffect, useState } from 'react';
+import { memo, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useAppSelector } from 'hooks';
 import { RnaElementsViewProps } from './types';
@@ -61,13 +61,20 @@ const RnaElementsAccordionView = ({
   // state differs from the default ("all options off"), per spec.
   const isFilterActive = Boolean(
     presetPhosphateFilter?.fivePrime ||
-      presetPhosphateFilter?.threePrime ||
-      presetPhosphateFilter?.noPhosphate,
+    presetPhosphateFilter?.threePrime ||
+    presetPhosphateFilter?.noPhosphate,
   );
 
   const [expandedAccordion, setExpandedAccordion] =
     useState<RnaBuilderItem | null>(activeRnaBuilderItem);
+  const [prevActiveRnaBuilderItem, setPrevActiveRnaBuilderItem] =
+    useState(activeRnaBuilderItem);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+
+  if (activeRnaBuilderItem !== prevActiveRnaBuilderItem) {
+    setPrevActiveRnaBuilderItem(activeRnaBuilderItem);
+    setExpandedAccordion(activeRnaBuilderItem);
+  }
 
   const handleAccordionSummaryClick = (rnaBuilderItem: RnaBuilderItem) => {
     if (expandedAccordion === rnaBuilderItem) {
@@ -79,10 +86,6 @@ const RnaElementsAccordionView = ({
       );
     }
   };
-
-  useEffect(() => {
-    setExpandedAccordion(activeRnaBuilderItem);
-  }, [activeRnaBuilderItem]);
 
   return (
     <>
@@ -100,6 +103,19 @@ const RnaElementsAccordionView = ({
           <Summary
             iconName={groupData.iconName as IconName}
             groupName={groupData.groupName}
+            label={String(
+              i18n.t(
+                groupData.groupName === RnaBuilderPresetsItem.Presets
+                  ? 'monomerLibrary.presetsTab'
+                  : groupData.groupName === MonomerGroups.SUGARS
+                    ? 'monomerLibrary.sugarsTab'
+                    : groupData.groupName === MonomerGroups.BASES
+                      ? 'monomerLibrary.basesTab'
+                      : groupData.groupName === MonomerGroups.PHOSPHATES
+                        ? 'monomerLibrary.phosphatesTab'
+                        : 'monomerLibrary.nucleotidesTab',
+              ),
+            )}
             quantity={quantity}
             expanded={expanded}
           />
@@ -172,6 +188,7 @@ const RnaElementsAccordionView = ({
                     key={group.groupTitle}
                     title={group.groupTitle}
                     items={group.groupItems}
+                    groupName={groupData.groupName as MonomerGroups}
                     libraryName={libraryName}
                     selectedMonomerUniqueKey={activeMonomerKey}
                     onItemClick={(monomer) =>

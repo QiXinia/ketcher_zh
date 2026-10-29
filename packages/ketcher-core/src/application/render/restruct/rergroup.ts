@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *    https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -48,7 +48,7 @@ class ReRGroup extends ReObject {
     this.item.frags.forEach((fid) => {
       const frag = render.ctab.frags.get(fid);
       if (frag) {
-        ret = ret.concat(frag.fragGetAtoms(render.ctab, fid));
+        ret = [...ret, ...frag.fragGetAtoms(render.ctab, fid)];
       }
     });
     return ret;
@@ -59,7 +59,7 @@ class ReRGroup extends ReObject {
     this.item.frags.forEach((fid) => {
       const frag = render.ctab.frags.get(fid);
       if (frag) {
-        ret = ret.concat(frag.fragGetBonds(render.ctab, fid));
+        ret = [...ret, ...frag.fragGetBonds(render.ctab, fid)];
       }
     });
     return ret;
@@ -111,7 +111,7 @@ class ReRGroup extends ReObject {
     const p1 = Scale.modelToCanvas(bb.p1, options);
     const brackets = render.paper.set();
 
-    rGroupdrawBrackets(brackets, render, bb); // eslint-disable-line new-cap
+    rGroupdrawBrackets(brackets, render, bb);
 
     ret.data.push(brackets);
     const key = render.ctab.rgroups.keyOf(this);
@@ -161,7 +161,6 @@ class ReRGroup extends ReObject {
   }
 
   _draw(render: Render, _rgid: number, attrs: Record<string, unknown>) {
-    // eslint-disable-line no-underscore-dangle
     const vbox = this.getVBoxObj(render);
     if (!vbox) {
       return null;
@@ -189,7 +188,7 @@ class ReRGroup extends ReObject {
       return null;
     }
 
-    const ret = this._draw(render, rgid, render.options.hoverStyle); // eslint-disable-line no-underscore-dangle
+    const ret = this._draw(render, rgid, render.options.hoverStyle);
     render.ctab.addReObjectPath(LayerMap.hovering, this.visel, ret);
 
     this.item.frags.forEach((_fnum, fid) => {

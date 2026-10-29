@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *    https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -33,8 +33,8 @@ import { useDraggableDialog } from '../../hooks/useDraggableDialog';
 import i18n from '../../i18n';
 
 interface DialogParamsCallProps {
-  onCancel: () => void;
-  onOk: (result: unknown) => void;
+  onCancel?: () => void;
+  onOk?: (result: unknown) => void;
 }
 
 export interface DialogParams extends DialogParamsCallProps {
@@ -47,7 +47,6 @@ interface DialogProps {
   params?: DialogParams;
   buttons?: Array<string | ReactElement>;
   className?: string;
-  testId?: string;
   needMargin?: boolean;
   withDivider?: boolean;
   headerContent?: ReactElement;
@@ -79,7 +78,6 @@ export const Dialog: FC<PropsWithChildren & Props> = (props) => {
     headerContent,
     footerContent,
     className,
-    testId: _testId,
     buttonsNameMap,
     needMargin = true,
     withDivider = false,
@@ -160,7 +158,7 @@ export const Dialog: FC<PropsWithChildren & Props> = (props) => {
   const exit = (mode) => {
     const key = isButtonOk(mode) ? 'onOk' : 'onCancel';
     if (params && key in params && (key !== 'onOk' || valid())) {
-      params[key](result());
+      params[key]?.(result());
     }
   };
 

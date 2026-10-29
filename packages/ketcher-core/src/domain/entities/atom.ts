@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *    https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -29,6 +29,7 @@ import { isNumber } from 'lodash';
 import type { AtomCIP } from './types';
 import { SGroup } from 'domain/entities/sgroup';
 import { FunctionalGroup } from 'domain/entities/functionalGroup';
+import type { BondEndpoint } from './bondEndpoint';
 
 /**
  * Return unions of Pick.
@@ -116,7 +117,7 @@ export interface AtomAttributes {
    * Note: value `-1` has been converted to `3` by indigo.
    */
   attachmentPoints?: AttachmentPoints | null;
-  rglabel?: string | null;
+  rglabel?: number | null;
   charge?: number | null;
   radical?: number;
   cip?: AtomCIP | null;
@@ -158,7 +159,7 @@ type ValenceComputationResult = {
   hydrogenCount: number;
 };
 
-export class Atom extends BaseMicromoleculeEntity {
+export class Atom extends BaseMicromoleculeEntity implements BondEndpoint {
   static readonly PATTERN = {
     RADICAL: {
       NONE: 0,
@@ -237,7 +238,7 @@ export class Atom extends BaseMicromoleculeEntity {
   sgs: Pile<number>;
   badConn: boolean;
   alias: string | null;
-  rglabel: string | null;
+  rglabel: number | null;
   aam: number;
   invRet: number;
   exactChangeFlag: number;
@@ -248,7 +249,9 @@ export class Atom extends BaseMicromoleculeEntity {
   hasImplicitH?: boolean;
   pseudo!: string;
 
-  /** @deprecated */
+  /**
+  @deprecated
+  */
   get attpnt() {
     return this.attachmentPoints;
   }
@@ -350,10 +353,10 @@ export class Atom extends BaseMicromoleculeEntity {
 
     Object.defineProperty(this, 'pseudo', {
       enumerable: true,
-      get: function () {
+      get() {
         return getPseudo(this.label);
       },
-      set: function (value) {
+      set(value) {
         if (isCorrectPseudo(value)) {
           this.label = value;
         }
@@ -380,19 +383,13 @@ export class Atom extends BaseMicromoleculeEntity {
   }
 
   static getConnectedBondIds(struct: Struct, atomId: number): number[] {
-    const result: number[] = [];
-    for (const [bondId, bond] of struct.bonds.entries()) {
-      if (bond.begin === atomId || bond.end === atomId) {
-        result.push(bondId);
-      }
-    }
-    return result;
+    return struct.getConnectedBondIds(atomId);
   }
 
   static getAttrHash(atom: Atom) {
     const attrs: Partial<Record<keyof typeof Atom.attrlist, unknown>> = {};
     for (const attr in Atom.attrlist) {
-      if (typeof atom[attr] !== 'undefined') attrs[attr] = atom[attr];
+      if (atom[attr] !== undefined) attrs[attr] = atom[attr];
     }
     return attrs;
   }
@@ -463,7 +460,9 @@ export class Atom extends BaseMicromoleculeEntity {
         this.atomList !== null ||
         (this.queryProperties.substitutionQuery !== null &&
           this.queryProperties.substitutionQuery !== undefined) ||
-        Object.values(queryProperties).some((value) => value),
+        Object.values(queryProperties).some(
+          (value) => Boolean(value) || value === 0,
+        ),
     );
   }
 
@@ -1155,13 +1154,13 @@ export class Atom extends BaseMicromoleculeEntity {
 
     return Boolean(
       Atom.isSuperatomLeavingGroupAtom(struct, atomId, searchBySgroups) &&
-        attachmentAtomExternalConnections?.find((_, bond) =>
-          bond.begin === attachmentPoint?.atomId
-            ? bond.beginSuperatomAttachmentPointNumber ===
-              attachmentPoint?.attachmentPointNumber
-            : bond.endSuperatomAttachmentPointNumber ===
-              attachmentPoint?.attachmentPointNumber,
-        ) !== null,
+      attachmentAtomExternalConnections?.find((_, bond) =>
+        bond.begin === attachmentPoint?.atomId
+          ? bond.beginSuperatomAttachmentPointNumber ===
+            attachmentPoint?.attachmentPointNumber
+          : bond.endSuperatomAttachmentPointNumber ===
+            attachmentPoint?.attachmentPointNumber,
+      ) !== null,
     );
   }
 
@@ -1186,7 +1185,7 @@ export function radicalElectrons(radical: unknown) {
 }
 
 function getValueOrDefault<T>(value: T | undefined, defaultValue: T): T {
-  return typeof value !== 'undefined' ? value : defaultValue;
+  return value !== undefined ? value : defaultValue;
 }
 
 function isCorrectPseudo(label) {

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *    https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,7 +14,7 @@
  * limitations under the License.
  ***************************************************************************/
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { MenuList } from '@mui/material';
 import MenuItem from '@mui/material/MenuItem';
@@ -49,7 +49,7 @@ export const CDXStructuresViewer = ({
   const editorOptions = useSelector(editorOptionsSelector);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [itemsMap, setItemsMap] = useState<itemsMapInterface>({});
-  const [loading, setLoading] = useState(false);
+  const loading = !!structList[selectedIndex] && !itemsMap[selectedIndex];
 
   useEffect(() => {
     if (!itemsMap[selectedIndex] || itemsMap[selectedIndex].error) {
@@ -59,33 +59,41 @@ export const CDXStructuresViewer = ({
     }
   }, [inputHandler, itemsMap, selectedIndex]);
 
-  const getImage = (str, index) => {
-    setLoading(true);
-    parseStruct(str, server)
-      .then((struct) => {
-        const object = {
-          base64struct: str,
-          struct,
-        };
-        setItemsMap((state) => ({ ...state, [index]: object }));
-      })
-      .catch((error) => {
-        const object = {
-          base64struct: str,
-          error: error.message || error,
-        };
-        setItemsMap((state) => ({ ...state, [index]: object }));
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+  const getImage = useCallback(
+    (str, index) => {
+      parseStruct(str, server)
+        .then((struct) => {
+          setItemsMap((state) => ({
+            ...state,
+            [index]: { base64struct: str, struct },
+          }));
+        })
+        .catch((error) => {
+          setItemsMap((state) => ({
+            ...state,
+            [index]: { base64struct: str, error: error.message || error },
+          }));
+        });
+    },
+    [server],
+  );
+
+  const handleSelectStructure = (index: number) => {
+    setSelectedIndex(index);
+    if (index !== selectedIndex && structList[index] && !itemsMap[index]) {
+      getImage(structList[index], index);
+    }
   };
 
-  useEffect(() => {
-    if (structList[selectedIndex] && !itemsMap[selectedIndex]) {
-      getImage(structList[selectedIndex], selectedIndex);
+  const loadFirstStructure = useCallback(() => {
+    if (structList[0]) {
+      getImage(structList[0], 0);
     }
-  }, [itemsMap, selectedIndex]);
+  }, [getImage, structList]);
+
+  useEffect(() => {
+    loadFirstStructure();
+  }, [loadFirstStructure]);
 
   const renderStructure = (structure: item) => {
     if (loading) {
@@ -131,7 +139,7 @@ export const CDXStructuresViewer = ({
                 key={value + index}
                 data-testid={`cdx-structure-${index + 1}`}
                 selected={index === selectedIndex}
-                onClick={() => setSelectedIndex(index)}
+                onClick={() => handleSelectStructure(index)}
               >
                 {i18n.t('open.structureIndex', { index: index + 1 })}
                 {itemsMap[index]?.error && <Icon name="error" />}

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /****************************************************************************
  * Copyright 2021 EPAM Systems
  *
@@ -19,7 +20,7 @@ import {
   ErrorsContext,
   SettingsContext,
 } from './../../../contexts';
-import type { StructService } from 'ketcher-core';
+import type { Api } from '../../api';
 
 import App from './App.container';
 import { Provider } from 'react-redux';
@@ -29,7 +30,7 @@ import { I18nextProvider } from 'react-i18next';
 import i18n from '../../../i18n';
 import createStore, { setServer } from '../state';
 import { initKeydownListener, removeKeydownListener } from '../state/hotkeys';
-import { initResize } from '../state/toolbar';
+import { initResize, removeResizeListener } from '../state/toolbar';
 import { initMouseListener, removeMouseListeners } from '../state/mouse';
 
 function initApp(
@@ -39,17 +40,17 @@ function initApp(
   appRoot: Root,
   staticResourcesUrl: string,
   options: any,
-  server: StructService,
+  server: Api,
   resolve: (args: {
     editor: any;
-    setServer: (server: StructService) => void;
+    setServer: (server: Api) => void;
   }) => void,
   togglerComponent?: ReactElement,
 ) {
   // hack to return server setter to Editor.tsx
   // because it does not have access to store
-  // eslint-disable-next-line prefer-const
-  let getServerSetter: () => (structService: StructService) => void;
+
+  let getServerSetter: () => (structService: Api) => void;
 
   const setEditor = (editor) => {
     const setServer = getServerSetter();
@@ -58,7 +59,7 @@ function initApp(
   const store = createStore(options, server, setEditor);
 
   getServerSetter = () => {
-    return (structService: StructService) => {
+    return (structService: Api) => {
       store.dispatch(setServer(structService));
     };
   };
@@ -91,6 +92,7 @@ function initApp(
   return () => {
     store.dispatch(removeKeydownListener(element));
     store.dispatch(removeMouseListeners(element));
+    removeResizeListener();
   };
 }
 

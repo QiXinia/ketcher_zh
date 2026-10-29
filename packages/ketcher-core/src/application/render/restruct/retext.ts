@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *    https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,18 +22,21 @@ import { flatten } from 'lodash/fp';
 import { LayerMap } from './generalEnumTypes';
 import ReObject from './reobject';
 import type ReStruct from './restruct';
+import { removeFirstLineVerticalShift } from './retext.utils';
 import { Scale } from 'domain/helpers';
-import type { RaphaelBaseElement } from 'raphael';
+import type { Element, RaphaelBaseElement, RaphaelPaper } from 'raphael';
+import type { Render } from '../raphaelRender';
+import type { RenderOptionStyles, RenderOptions } from '../render.types';
 
 export interface SerializedTextNode {
   detail?: number;
-  font?: string;
   format: number;
   mode?: string;
   style: string;
   text: string;
   type: string;
   version?: number;
+  font?: string;
 }
 
 export interface SerializedParagraphNode {
@@ -41,9 +44,10 @@ export interface SerializedParagraphNode {
   direction?: string;
   format?: string | number;
   indent?: number;
-  lineSpacing?: number;
   type: string;
   version?: number;
+  textFormat?: number;
+  textStyle?: string;
 }
 
 export interface SerializedRootNode {
@@ -59,9 +63,10 @@ export interface SerializedEditorState {
   root: SerializedRootNode;
 }
 
+type TextStyles = RenderOptionStyles & { shiftY?: number };
+
 const IS_BOLD = 1;
 const IS_ITALIC = 2;
-const IS_UNDERLINE = 8;
 const IS_SUBSCRIPT = 32;
 const IS_SUPERSCRIPT = 64;
 
@@ -106,7 +111,7 @@ class ReText extends ReObject {
     return new Box2Abs(leftTopPoint, rightBottomPoint);
   }
 
-  hoverPath(render: any): any {
+  hoverPath(render: Render): Element {
     const { p0, p1 } = this.getRelBox(this.paths);
     const topLeft = p0.sub(render.options.offset);
     const { x: width, y: height } = p1.sub(p0);
@@ -130,12 +135,16 @@ class ReText extends ReObject {
           : widestRow,
       paths[0],
     );
-    const lastElOfWidestRow: RaphaelBaseElement =
-      widestRow[widestRow.length - 1];
+    const lastElOfWidestRow = widestRow.at(-1);
+    const lastRow = paths.at(-1);
+
+    if (!lastElOfWidestRow || !lastRow) {
+      throw new Error('Cannot get the bounds of empty selection paths');
+    }
+
     const rightEdge: number =
       lastElOfWidestRow.getBBox().x + lastElOfWidestRow.getBBox().width;
 
-    const lastRow: Array<RaphaelBaseElement> = paths[paths.length - 1];
     const bottomEdge: number = Math.max(
       ...lastRow.map((path) => path.getBBox().y + path.getBBox().height),
     );
@@ -153,19 +162,23 @@ class ReText extends ReObject {
     }, 0);
   }
 
-  drawHover(render: any): any {
+  drawHover(render: Render): Element | null {
     if (!this.paths.length) return null;
     const ret = this.hoverPath(render).attr(render.options.hoverStyle);
     render.ctab.addReObjectPath(LayerMap.hovering, this.visel, ret);
     return ret;
   }
 
-  makeSelectionPlate(restruct: ReStruct, paper: any, options: any): any {
+  makeSelectionPlate(
+    restruct: ReStruct,
+    paper: RaphaelPaper,
+    options: RenderOptions,
+  ): Element | null {
     if (!this.paths.length || !paper) return null;
     return this.hoverPath(restruct.render).attr(options.selectionStyle);
   }
 
-  show(restruct: ReStruct, _id: number, options: any): void {
+  show(restruct: ReStruct, _id: number, options: RenderOptions): void {
     const render = restruct.render;
     const paper = render.paper;
     const paperScale = Scale.modelToCanvas(this.item.position, options);
@@ -215,9 +228,8 @@ class ReText extends ReObject {
           'text-anchor': 'start',
           fill: '#000000',
         });
-        path.node.setAttribute('data-testid', 'text-label');
-        path.node.setAttribute(
-          'data-text-id',
+        path.node.dataset.testid = 'text-label';
+        path.node.dataset.textId = String(
           restruct.molecule.texts.keyOf(this.item),
         );
         path.translateAbs(0, shiftY);
@@ -235,12 +247,12 @@ class ReText extends ReObject {
             fill: '#000000',
             ...styles,
           });
-          path.node.setAttribute('data-testid', 'text-label');
-          path.node.setAttribute(
-            'data-text-id',
+          path.node.dataset.testid = 'text-label';
+          path.node.dataset.textId = String(
             restruct.molecule.texts.keyOf(this.item),
           );
           path.translateAbs(shiftX, shiftY + (styles.shiftY || 0));
+          removeFirstLineVerticalShift(path.node);
           row.push(path);
           shiftX += path.getBBox().width;
         });
@@ -249,33 +261,7 @@ class ReText extends ReObject {
       this.paths.push(row);
 
       const { p0, p1 } = this.getRelBox([row]);
-      const rowHeight = Math.abs(Vec2.diff(p0, p1).y);
-      const lineSpacing = Number(paragraph.lineSpacing);
-      shiftY +=
-        rowHeight *
-        (Number.isFinite(lineSpacing) && lineSpacing > 0 ? lineSpacing : 1);
-    });
-
-    // Lexical stores paragraph alignment on the paragraph `format` field.
-    // Align rows against the widest rendered row so multi-line labels keep a
-    // stable left/center/right edge without changing their serialized bounds.
-    const maxRowWidth = Math.max(
-      ...this.paths.map((row) => this.getRowWidth(row)),
-      0,
-    );
-    paragraphs.forEach((paragraph, index) => {
-      const row = this.paths[index];
-      if (!row) return;
-      const alignment =
-        typeof paragraph.format === 'string' ? paragraph.format : 'left';
-      const rowWidth = this.getRowWidth(row);
-      const offsetX =
-        alignment === 'center'
-          ? (maxRowWidth - rowWidth) / 2
-          : alignment === 'right'
-            ? maxRowWidth - rowWidth
-            : 0;
-      if (offsetX) row.forEach((path) => path.translateAbs(offsetX, 0));
+      shiftY += Math.abs(Vec2.diff(p0, p1).y);
     });
 
     this.item.setPos(this.getReferencePoints());
@@ -291,14 +277,10 @@ class ReText extends ReObject {
 
   getStylesFromTextNode(
     textNode: SerializedTextNode,
-    options: any,
-  ): Record<string, any> {
-    const styles: Record<string, any> = {};
+    options: RenderOptions,
+  ): TextStyles {
+    const styles: TextStyles = {};
     const format = textNode.format || 0;
-
-    if (textNode.font) {
-      styles['font-family'] = textNode.font;
-    }
 
     // Parse font-size from style string
     let customFontSize: number | null = null;
@@ -307,7 +289,7 @@ class ReText extends ReObject {
         textNode.style,
       );
       if (fontSizeMatch) {
-        customFontSize = parseFloat(fontSizeMatch[1]);
+        customFontSize = Number.parseFloat(fontSizeMatch[1]);
         styles['font-size'] = customFontSize + 'px';
       }
     }
@@ -318,10 +300,6 @@ class ReText extends ReObject {
 
     if (format & IS_ITALIC) {
       styles['font-style'] = 'italic';
-    }
-
-    if (format & IS_UNDERLINE) {
-      styles['text-decoration'] = 'underline';
     }
 
     const fontsz = customFontSize ?? options.fontszInPx;

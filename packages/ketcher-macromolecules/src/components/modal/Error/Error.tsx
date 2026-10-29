@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { ActionButton } from 'components/shared/actionButton';
 import { Modal } from 'components/shared/modal';
 import { useAppDispatch, useAppSelector } from 'hooks';
@@ -6,12 +7,15 @@ import {
   selectErrorModalText,
   selectErrorModalTitle,
 } from 'state/modal';
+import { translateErrorMessage } from 'ketcher-react';
 import { ErrorTextWrapper } from './Error.styles';
 
 export const ErrorModal = () => {
+  const { t } = useTranslation('macromoleculesDialogs');
   const dispatch = useAppDispatch();
   const errorMessage = useAppSelector(selectErrorModalText);
-  const errorTitle = useAppSelector(selectErrorModalTitle) || 'Error message';
+  const errorTitle =
+    useAppSelector(selectErrorModalTitle) || t('error.defaultTitle');
   const isModalOpen = errorMessage !== '';
   const onClose = () => {
     dispatch(closeErrorModal());
@@ -25,12 +29,12 @@ export const ErrorModal = () => {
     >
       <Modal.Content>
         <ErrorTextWrapper data-testid="error-message-body">
-          {errorMessage}
+          {translateErrorMessage(errorMessage)}
         </ErrorTextWrapper>
       </Modal.Content>
       <Modal.Footer>
         <ActionButton
-          label="Close"
+          label={t('common:button.close')}
           clickHandler={onClose}
           data-testid="info-modal-close"
         />

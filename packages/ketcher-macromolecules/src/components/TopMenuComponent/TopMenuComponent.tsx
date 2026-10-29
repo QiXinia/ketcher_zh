@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *    https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,7 +21,6 @@ import {
   selectEditor,
   selectEditorActiveTool,
   selectIsSequenceEditInRNABuilderMode,
-  selectTool,
 } from 'state/common';
 import { modalComponentList } from 'components/modal/modalContainer';
 import { openModal } from 'state/modal';
@@ -30,6 +29,7 @@ import { BaseMonomer } from 'ketcher-core';
 import {
   hasOnlyDeoxyriboseSugars,
   hasOnlyRiboseSugars,
+  hasUnsplitNucleotide,
   isAntisenseCreationDisabled,
   isAntisenseOptionVisible,
   isCycleExistsForSelectedMonomers,
@@ -75,9 +75,15 @@ export function TopMenuComponent() {
         !isAntisenseCreationDisabled(selectedEntities)
       ) {
         setNeedOpenByMenuItemClick(false);
-        if (hasOnlyDeoxyriboseSugars(selectedEntities)) {
+        if (
+          !hasUnsplitNucleotide(selectedEntities) &&
+          hasOnlyDeoxyriboseSugars(selectedEntities)
+        ) {
           setAntisenseActiveOption('antisenseDnaStrand');
-        } else if (hasOnlyRiboseSugars(selectedEntities)) {
+        } else if (
+          !hasUnsplitNucleotide(selectedEntities) &&
+          hasOnlyRiboseSugars(selectedEntities)
+        ) {
           setAntisenseActiveOption('antisenseRnaStrand');
         } else {
           setAntisenseActiveOption('antisenseStrand');
@@ -101,7 +107,6 @@ export function TopMenuComponent() {
     } else if (name === 'clear') {
       editor?.events.resetSequenceEditMode.dispatch();
       editor?.events.selectTool.dispatch([name]);
-      dispatch(selectTool(lastSelectedSelectionMenuItem));
       editor?.events.selectTool.dispatch([lastSelectedSelectionMenuItem]);
       if (isSequenceEditInRNABuilderMode)
         resetRnaBuilderAfterSequenceUpdate(dispatch, editor);

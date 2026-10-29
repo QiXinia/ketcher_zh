@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *    https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -28,6 +28,7 @@ import { changeRound } from '../../../../../state/options';
 import Select from '../../../../../component/form/Select';
 import { getSelectOptionsFromSchema } from '../../../../../utils';
 import type {
+  AnalyseRoundName,
   AnalyseValues,
   StoreState,
 } from '../../../../../state/store.types';
@@ -35,16 +36,15 @@ import classes from './Analyse.module.less';
 import i18n from '../../../../../../../i18n';
 
 interface RoundSettings {
-  roundWeight: number;
-  roundMass: number;
-  roundElAnalysis: number;
-  [key: string]: number;
+  roundWeight: number | string;
+  roundMass: number | string;
+  roundElAnalysis: number | string;
 }
 
 interface AnalyseItem {
   name: string;
   key: string;
-  round?: string;
+  round?: AnalyseRoundName;
   withSelector: boolean;
 }
 
@@ -56,7 +56,7 @@ interface AnalyseDialogProps extends DialogParams {
 
 interface AnalyseDialogCallProps {
   onAnalyse: () => void;
-  onChangeRound: (roundName: string, value: string) => void;
+  onChangeRound: (roundName: AnalyseRoundName, value: string) => void;
 }
 
 type Props = AnalyseDialogProps & AnalyseDialogCallProps;
@@ -115,7 +115,10 @@ function renderInputComponent(
         readOnly
         value={
           values && !loading && item.round
-            ? roundOff(values[item.key] as string | number, round[item.round])
+            ? roundOff(
+                values[item.key] as string | number,
+                Number(round[item.round]),
+              )
             : 0
         }
         data-testid={item.name + '-input'}
@@ -128,7 +131,10 @@ function renderInputComponent(
       data-testid={item.name + '-input'}
       value={
         values && !loading && item.round
-          ? roundOff(values[item.key] as string | number, round[item.round])
+          ? roundOff(
+              values[item.key] as string | number,
+              Number(round[item.round]),
+            )
           : 0
       }
     />
@@ -206,7 +212,7 @@ type AppDispatch = ThunkDispatch<StoreState, unknown, Action<string>>;
 
 const mapDispatchToProps = (dispatch: AppDispatch) => ({
   onAnalyse: () => dispatch(analyse()),
-  onChangeRound: (roundName: string, val: string) =>
+  onChangeRound: (roundName: AnalyseRoundName, val: string) =>
     dispatch(changeRound(roundName, val)),
 });
 

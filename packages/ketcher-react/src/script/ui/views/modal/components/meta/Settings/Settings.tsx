@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /****************************************************************************
  * Copyright 2021 EPAM Systems
  *
@@ -5,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *    https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,7 +21,7 @@ import {
   setDefaultSettings,
   updateFormState,
 } from '../../../../../state/modal/form';
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 
 import ColorPicker from '../../../../../component/form/colorPicker/ColorPicker';
 import { Dialog } from '../../../../components';
@@ -102,7 +103,7 @@ const HeaderContent = ({
         data={JSON.stringify(formState.result)}
         filename="ketcher-settings"
         className={classes.button}
-        data-testid="save-settings-to-file-button"
+        testId="save-settings-to-file-button"
       >
         <Icon name="save-1" />
       </SaveButton>
@@ -135,18 +136,14 @@ const SettingsDialog = (props: Props) => {
     ...prop
   } = props;
 
-  const [changedGroups, setChangedGroups] = useState(new Set());
-
-  useEffect(() => {
+  const changedGroups = useMemo(() => {
     const changed = new Set<string>();
-
     for (const key in initState) {
       if (initState[key] !== formState.result[key]) {
-        const group = fieldGroups[key];
-        changed.add(group);
+        changed.add(fieldGroups[key]);
       }
     }
-    setChangedGroups(changed);
+    return changed;
   }, [initState, formState.result]);
 
   const generalTab = {
@@ -344,7 +341,6 @@ const SettingsDialog = (props: Props) => {
     key: '3dviewer',
     label: i18n.t('settings.viewer3D'),
     content: (
-      // eslint-disable-next-line dot-notation
       <fieldset className={classes.viewer}>
         <Field
           name="miewMode"
@@ -450,8 +446,8 @@ const mapDispatchToProps = (dispatch, ownProps: SettingsOwnProps) => ({
   onOpenFile: (newOpts) => {
     try {
       dispatch(updateFormState({ result: JSON.parse(newOpts) }));
-    } catch (e) {
-      KetcherLogger.error('Settings.tsx::mapDispatchToProps', e);
+    } catch (error) {
+      KetcherLogger.error('Settings.tsx::mapDispatchToProps', error);
       console.info('Bad file');
     }
   },
@@ -466,7 +462,7 @@ const mapDispatchToProps = (dispatch, ownProps: SettingsOwnProps) => ({
       initState.reactionComponentMarginSize !==
       result.reactionComponentMarginSize;
 
-    showNotification &&
+    if (showNotification) {
       dispatch(
         onAction({
           dialog: 'info-modal',
@@ -477,6 +473,7 @@ const mapDispatchToProps = (dispatch, ownProps: SettingsOwnProps) => ({
           },
         }),
       );
+    }
   },
   onACSStyle: (result) => {
     dispatch(updateFormState({ result }));

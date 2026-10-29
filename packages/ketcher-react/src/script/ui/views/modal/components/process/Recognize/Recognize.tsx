@@ -17,16 +17,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { AnyAction } from 'redux';
 import type { ThunkDispatch } from 'redux-thunk';
-import {
-  changeImage,
-  changeVersion,
-  shouldFragment,
-} from '../../../../../state/options';
+import { changeImage, changeVersion } from '../../../../../state/options';
+import type { RecognizeImageFile } from '../../../../../state/options/types';
 
 import { Dialog } from '../../../../components';
 import Input from '../../../../../component/form/Input/Input';
 import OpenButton from '../../../../../component/view/openbutton';
-import type { FileContent } from '../../../../../component/view/openButton.types';
 import { LoadingCircles } from 'src/script/ui/views/components/Spinner';
 import classes from './Recognize.module.less';
 import { connect } from 'react-redux';
@@ -40,8 +36,6 @@ import { useAppContext } from 'src/hooks';
 import i18n from '../../../../../../../i18n';
 
 type StructStringOrPromise = string | Promise<unknown> | null;
-type RecognizeImageFile = File | FileContent | null;
-
 function isImage(file: File | null): boolean {
   return file?.type?.includes('image') ?? false;
 }
@@ -102,7 +96,6 @@ interface RecognizeDialogProps {
   onOk: (result: unknown) => void;
   onCancel: () => void;
   onRecognize: (file: File | null, version: string) => void;
-  isFragment: (v: boolean) => void;
   onImage: (file: RecognizeImageFile) => void;
   onChangeImago: (version: string) => void;
 }
@@ -117,15 +110,7 @@ function RecognizeDialog(prop: Readonly<RecognizeDialogProps>) {
     onOk,
     ...partProps
   } = prop;
-  const {
-    onRecognize,
-    /* eslint-disable @typescript-eslint/no-unused-vars */
-    isFragment,
-    /* eslint-enable @typescript-eslint/no-unused-vars */
-    onImage,
-    onChangeImago,
-    ...props
-  } = partProps;
+  const { onRecognize, onImage, onChangeImago, ...props } = partProps;
   const [canPreviewImage, setCanPreviewImage] = useState(true);
   const result = () =>
     structStr && !(structStr instanceof Promise)
@@ -188,9 +173,8 @@ function RecognizeDialog(prop: Readonly<RecognizeDialogProps>) {
               ),
             }}
             value={version}
-            onChange={onChangeImago}
+            onChange={(val) => onChangeImago(val as string)}
           />
-          {/* eslint-enable jsx-a11y/label-has-associated-control */}
         </label>
         <span>{i18n.t('recognize.originalImage')}</span>
         <span>{i18n.t('recognize.recognizedStructurePreview')}</span>
@@ -275,7 +259,6 @@ const mapStateToProps = (state: RecognizeState) => ({
 const mapDispatchToProps = (
   dispatch: ThunkDispatch<RecognizeState, undefined, AnyAction>,
 ) => ({
-  isFragment: (v: boolean) => dispatch(shouldFragment(v)),
   onImage: (file: RecognizeImageFile) => dispatch(changeImage(file)),
   onRecognize: (file: File | null, ver: string) =>
     dispatch(recognize(file, ver)),
