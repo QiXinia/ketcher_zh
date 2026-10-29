@@ -16,10 +16,12 @@
 
 import { connect } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { error } from './constants';
 import { Dialog } from '../../../components';
 import { PasteErrorModalBody } from './PasteErrorModalBody';
-import { translateErrorMessage, translateErrorTitle } from '../../../../../../i18n/helpers';
+import {
+  translateErrorMessage,
+  translateErrorTitle,
+} from '../../../../../../i18n/helpers';
 
 import styles from './InfoModal.module.less';
 

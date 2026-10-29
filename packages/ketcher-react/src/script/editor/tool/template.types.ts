@@ -27,6 +27,7 @@ export type Sign = 0 | 1 | -1;
  * Contains pre-computed attachment ids, geometry, and the molecule fragment.
  */
 export interface InternalTemplate {
+  ringTool?: boolean;
   aid: number;
   bid: number;
   molecule: Struct;
@@ -47,6 +48,7 @@ export interface InternalTemplate {
  * allows callers to pass richer objects such as `Template` from TemplateTable).
  */
 export interface TemplateToolInput {
+  ringTool?: boolean;
   struct: Struct;
   /**
   Attachment-atom id override (string or number from SDF; falls back to SGroup attachment).

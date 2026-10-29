@@ -206,7 +206,7 @@ export function syncSettingsFromCore(coreSettings: Partial<Settings>) {
   const reduxSettings = pick(
     defaultOptionNames,
     normalizedSettings,
-  ) as SettingsFormValue;
+  ) as SettingsFormValue & { windowedMode?: boolean };
 
   // windowedMode is a React-only UI option that is not persisted in Core
   // settings; fall back to the React default when syncing from Core so the

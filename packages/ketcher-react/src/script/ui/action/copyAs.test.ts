@@ -41,7 +41,7 @@ describe('copy as a chemical format', () => {
     ['inchi', ChemicalMimeType.InChI],
     ['inchikey', ChemicalMimeType.InChIKey],
     ['cdxml', ChemicalMimeType.CDXML],
-  ])('requests the correct format for %s', async (format, mime) => {
+  ] as const)('requests the correct format for %s', async (format, mime) => {
     await copyAs(format);
     expect(convert).toHaveBeenCalledWith(
       expect.objectContaining({ output_format: mime }),
@@ -53,7 +53,7 @@ describe('copy as a chemical format', () => {
   it('does not send a selection containing graphics to the converter', async () => {
     const struct = molecule();
     (struct as any).texts = { size: 1 };
-    global.currentState.editor.structSelected = () => struct;
+    global.currentState.editor!.structSelected = () => struct;
     await copyAs('inchi');
     expect(convert).not.toHaveBeenCalled();
     expect(writeText).not.toHaveBeenCalled();
@@ -63,7 +63,7 @@ describe('copy as a chemical format', () => {
   it('does not convert a disconnected selection', async () => {
     const struct = molecule();
     struct.atoms.add(new Atom({ label: 'O', pp: new Vec2(2, 0) }));
-    global.currentState.editor.structSelected = () => struct;
+    global.currentState.editor!.structSelected = () => struct;
     await copyAs('smiles');
     expect(convert).not.toHaveBeenCalled();
     expect(errorHandler).toHaveBeenCalled();

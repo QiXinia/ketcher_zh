@@ -53,7 +53,8 @@ import {
 import styled from '@emotion/styled';
 import { useAppDispatch } from 'hooks';
 import { openErrorModal } from 'state/modal';
-const options: Array<Option & { id: SupportedFormats }> = [
+type SaveFormat = SupportedFormats | KetcherRasterFormat | 'png';
+const options: Array<Option & { id: SaveFormat }> = [
   { id: 'ket', label: 'Ket Format' },
   { id: 'mol', label: 'MDL Molfile V3000' },
   { id: 'sequence', label: 'Sequence (1-letter code)' },
@@ -103,9 +104,7 @@ export const Save = ({
   const dispatch = useAppDispatch();
   const indigo = IndigoProvider.getIndigo() as StructService;
   const editor = provideEditorInstance();
-  const [currentFileFormat, setCurrentFileFormat] = useState<
-    SupportedFormats | KetcherRasterFormat | 'png'
-  >('ket');
+  const [currentFileFormat, setCurrentFileFormat] = useState<SaveFormat>('ket');
   const [currentFileName, setCurrentFileName] = useState('ketcher');
   const [struct, setStruct] = useState(() => {
     const ketSerializer = new KetSerializer();
@@ -117,7 +116,7 @@ export const Save = ({
   const [isLoading, setIsLoading] = useState(false);
   const [svgData, setSvgData] = useState<string | undefined>();
 
-  const handleSelectChange = async (fileFormat: SupportedFormats) => {
+  const handleSelectChange = async (fileFormat: SaveFormat) => {
     setCurrentFileFormat(fileFormat);
     const ketSerializer = new KetSerializer();
     const serializedKet = ketSerializer.serialize(
@@ -129,7 +128,11 @@ export const Save = ({
       setStruct(serializedKet);
       return;
     }
-    if (fileFormat === 'svg' || fileFormat === 'png' || isKetcherRasterFormat(fileFormat)) {
+    if (
+      fileFormat === 'svg' ||
+      fileFormat === 'png' ||
+      isKetcherRasterFormat(fileFormat)
+    ) {
       const svgData = getSvgFromDrawnStructures(editor.canvas, 'preview');
       setSvgData(svgData);
       return;
@@ -202,7 +205,11 @@ export const Save = ({
 
   const handleSave = async () => {
     let blobPart;
-    if (currentFileFormat === 'svg' || currentFileFormat === 'png' || isKetcherRasterFormat(currentFileFormat)) {
+    if (
+      currentFileFormat === 'svg' ||
+      currentFileFormat === 'png' ||
+      isKetcherRasterFormat(currentFileFormat)
+    ) {
       const svgData = getSvgFromDrawnStructures(editor.canvas, 'file');
       if (!svgData) {
         dispatch(openErrorModal('无法生成画布图像'));

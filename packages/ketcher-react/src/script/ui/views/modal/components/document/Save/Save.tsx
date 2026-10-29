@@ -674,7 +674,11 @@ class SaveDialog extends Component<SaveDialogProps, SaveDialogState> {
           key="save-image-button"
           type={`image/${format}+xml`}
           onSave={this.props.onOk}
-          onError={(error) => this.context.errorHandler(error)}
+          onError={(error) =>
+            this.context.errorHandler(
+              error instanceof Error ? error.message : String(error),
+            )
+          }
           testId="save-button"
           disabled={
             disableControls ||

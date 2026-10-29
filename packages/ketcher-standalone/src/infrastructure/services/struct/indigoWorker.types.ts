@@ -17,7 +17,7 @@ import { IKetMacromoleculesContent } from 'ketcher-core';
 
 export interface IndigoVectorInt {
   push_back(value: number): void;
-  delete?(): void;
+  delete(): void;
 }
 
 export interface IndigoOptions {
@@ -28,7 +28,7 @@ export interface IndigoOptions {
 export interface IndigoModule {
   MapStringString: new () => IndigoOptions;
   VectorInt: new () => IndigoVectorInt;
-  logp(struct: string, options: IndigoOptions, selected: IndigoVectorInt): string;
+  logp(struct: string, options: IndigoOptions): string;
   render(struct: string, options: IndigoOptions): string;
   layout(struct: string, format: string, options: IndigoOptions): string;
   dearomatize(struct: string, format: string, options: IndigoOptions): string;

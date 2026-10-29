@@ -25,7 +25,7 @@ import mediaSizes from './mediaSizes';
 import modals from '../../dialog';
 import useResizeObserver from 'use-resize-observer/polyfilled';
 import { WindowedModal } from './WindowedModal';
-import { WindowState } from '../../state/modal/windows';
+import type { WindowState } from '../../state/modal/windows';
 import { ketcherProvider } from 'ketcher-core';
 import type Editor from '../../../editor';
 

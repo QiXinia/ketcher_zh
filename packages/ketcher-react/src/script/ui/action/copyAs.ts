@@ -27,9 +27,16 @@ import type { CurrentAppState, StoreState } from '../state/store.types';
 import type { SerializationType, StructSerializer } from '../../../types';
 
 export default async function copyAs(type: SerializationType): Promise<void> {
-  const state = (globalThis as typeof globalThis & { currentState: CurrentAppState & Pick<StoreState, 'server'> }).currentState;
+  const state = (
+    globalThis as typeof globalThis & {
+      currentState: CurrentAppState & Pick<StoreState, 'server'>;
+    }
+  ).currentState;
   const editor = state.editor;
-  if (!editor) { KetcherLogger.error('copyAs.ts::copyAs', 'Editor is not initialized'); return; }
+  if (!editor) {
+    KetcherLogger.error('copyAs.ts::copyAs', 'Editor is not initialized');
+    return;
+  }
   const struct = editor.structSelected();
   const errorHandler = editor.errorHandler;
   let serializer: StructSerializer;
@@ -60,13 +67,15 @@ export default async function copyAs(type: SerializationType): Promise<void> {
       const options = state.options?.getServerSettings?.() || {};
       const formatter = new FormatterFactory(state.server).create(
         formats[type]!,
-        options,
+        options as unknown as Parameters<FormatterFactory['create']>[1],
       );
       const output = await formatter.getStringFromStructureAsync(struct);
       if (typeof output !== 'string' || !output.trim()) {
         throw new Error(i18n.t('action.copyFormatUnavailable'));
       }
-      const { clipboardData } = globalThis as typeof globalThis & { clipboardData?: DataTransfer };
+      const { clipboardData } = globalThis as typeof globalThis & {
+        clipboardData?: DataTransfer;
+      };
       if (clipboardData) clipboardData.setData('text', output);
       else await navigator.clipboard.writeText(output);
       return;
@@ -99,7 +108,9 @@ export default async function copyAs(type: SerializationType): Promise<void> {
 
     const structData = serializer.serialize(struct);
 
-    const { clipboardData } = globalThis as typeof globalThis & { clipboardData?: DataTransfer };
+    const { clipboardData } = globalThis as typeof globalThis & {
+      clipboardData?: DataTransfer;
+    };
     if (clipboardData) {
       clipboardData.setData('text', structData);
     } else {

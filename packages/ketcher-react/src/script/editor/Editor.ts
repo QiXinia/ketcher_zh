@@ -359,7 +359,10 @@ class Editor implements KetcherEditor {
     selectionChange: PipelineSubscription;
     aromatizeStruct: PipelineSubscription;
     dearomatizeStruct: PipelineSubscription;
-    enhancedStereoEdit: PipelineSubscription<EnhancedStereoEditParams, Promise<string | null>>;
+    enhancedStereoEdit: PipelineSubscription<
+      EnhancedStereoEditParams,
+      Promise<string | null>
+    >;
     confirm: PipelineSubscription;
     showInfo: PipelineSubscription;
     apiSettings: PipelineSubscription;
@@ -413,13 +416,22 @@ class Editor implements KetcherEditor {
     this.event = {
       message: new Subscription(),
       tooltip: new Subscription(),
-      elementEdit: new PipelineSubscription<unknown, Promise<ElementEditResult>>(),
+      elementEdit: new PipelineSubscription<
+        unknown,
+        Promise<ElementEditResult>
+      >(),
       bondEdit: new PipelineSubscription<Bond[], Promise<BondEditResult>>(),
       zoomIn: new PipelineSubscription(),
       zoomOut: new PipelineSubscription(),
       zoomChanged: new PipelineSubscription(),
-      rgroupEdit: new PipelineSubscription<unknown, Promise<RGroupEditResult>>(),
-      sgroupEdit: new PipelineSubscription<unknown, Promise<SGroupDialogResult>>(),
+      rgroupEdit: new PipelineSubscription<
+        unknown,
+        Promise<RGroupEditResult>
+      >(),
+      sgroupEdit: new PipelineSubscription<
+        unknown,
+        Promise<SGroupDialogResult>
+      >(),
       sdataEdit: new PipelineSubscription(),
       quickEdit: new PipelineSubscription(),
       attachEdit: new PipelineSubscription(),
@@ -430,7 +442,10 @@ class Editor implements KetcherEditor {
       aromatizeStruct: new PipelineSubscription(),
       dearomatizeStruct: new PipelineSubscription(),
       // TODO: correct
-      enhancedStereoEdit: new PipelineSubscription<EnhancedStereoEditParams, Promise<string | null>>(),
+      enhancedStereoEdit: new PipelineSubscription<
+        EnhancedStereoEditParams,
+        Promise<string | null>
+      >(),
       confirm: new PipelineSubscription(),
       cursor: new PipelineSubscription<EditorCursor>(),
       showInfo: new PipelineSubscription(),
@@ -1015,7 +1030,11 @@ class Editor implements KetcherEditor {
         [bond.begin, bond.end],
         [bond.end, bond.begin],
       ] as const) {
-        if (bondCounts.get(leavingId) !== 1 || excludedLeavingAtomIds.has(leavingId)) continue;
+        if (
+          bondCounts.get(leavingId) !== 1 ||
+          excludedLeavingAtomIds.has(leavingId)
+        )
+          continue;
         const ids = candidates.get(attachmentId) ?? new Set<number>();
         ids.add(leavingId);
         candidates.set(attachmentId, ids);
@@ -1260,10 +1279,14 @@ class Editor implements KetcherEditor {
   private originalHistoryPointer = 0;
   private readonly selectedToOriginalAtomsIdMap = new Map<number, number>();
 
-  private changeEventSubscriber: EditorSubscriber<ChangeEventData[]> | null = null;
+  private changeEventSubscriber: EditorSubscriber<ChangeEventData[]> | null =
+    null;
   private readonly getMonomerCreationWizardZoom =
     createMonomerCreationWizardZoomCalculator();
-  private viewBeforeMonomerCreationWizard: { zoom: number; viewBox: ViewBox } | null = null;
+  private viewBeforeMonomerCreationWizard: {
+    zoom: number;
+    viewBox: ViewBox;
+  } | null = null;
   private onMonomerWizardFinish?: (savedCanvas: boolean) => void;
 
   private completeMonomerWizardSession(savedCanvas: boolean) {
@@ -1279,7 +1302,9 @@ class Editor implements KetcherEditor {
         this.completeMonomerWizardSession(true);
       } catch (error) {
         this.completeMonomerWizardSession(false);
-        this.errorHandler?.(error instanceof Error ? error.message : String(error));
+        this.errorHandler?.(
+          error instanceof Error ? error.message : String(error),
+        );
       }
     }, 0);
   }
@@ -1292,16 +1317,28 @@ class Editor implements KetcherEditor {
     const leavingAtoms = new Set<number>();
     const placeholders = new Map<number, number>();
     monomerToAtomIdMap.forEach((atomMap, monomer) => {
-      if (!Array.from(atomMap.values()).every((id) => selectedAtoms.has(id))) return;
+      if (!Array.from(atomMap.values()).every((id) => selectedAtoms.has(id)))
+        return;
       monomer.monomerItem.attachmentPoints?.forEach((point, index) => {
-        if (!monomer.isAttachmentPointUsed(monomer.listOfAttachmentPoints[index])) return;
+        if (
+          !monomer.isAttachmentPointUsed(monomer.listOfAttachmentPoints[index])
+        )
+          return;
         const template = monomer.monomerItem.struct;
         if (template.atoms.get(point.attachmentAtom)?.label === 'R#') {
           const bonds = Array.from(template.bonds.values()).filter(
-            (bond) => bond.begin === point.attachmentAtom || bond.end === point.attachmentAtom,
+            (bond) =>
+              bond.begin === point.attachmentAtom ||
+              bond.end === point.attachmentAtom,
           );
-          if (bonds.length !== 1) throw new Error('Cannot expand a non-terminal attachment placeholder.');
-          const neighbor = bonds[0].begin === point.attachmentAtom ? bonds[0].end : bonds[0].begin;
+          if (bonds.length !== 1)
+            throw new Error(
+              'Cannot expand a non-terminal attachment placeholder.',
+            );
+          const neighbor =
+            bonds[0].begin === point.attachmentAtom
+              ? bonds[0].end
+              : bonds[0].begin;
           const placeholderId = atomMap.get(point.attachmentAtom);
           const attachmentId = atomMap.get(neighbor);
           assert(isNumber(placeholderId) && isNumber(attachmentId));
@@ -1315,7 +1352,11 @@ class Editor implements KetcherEditor {
       });
     });
     Array.from(struct.sgroups.entries()).forEach(([id, group]) => {
-      if (!group.isMonomer || !group.atoms.every((atomId) => selectedAtoms.has(atomId))) return;
+      if (
+        !group.isMonomer ||
+        !group.atoms.every((atomId) => selectedAtoms.has(atomId))
+      )
+        return;
       struct.sGroupDelete(id);
       Array.from(struct.functionalGroups.entries()).forEach(([fgId, fg]) => {
         if (fg.relatedSGroupId === id) struct.functionalGroups.delete(fgId);
@@ -1334,8 +1375,10 @@ class Editor implements KetcherEditor {
       }
       bond.begin = begin;
       bond.end = end;
-      if (selectedAtoms.has(begin)) bond.beginSuperatomAttachmentPointNumber = undefined;
-      if (selectedAtoms.has(end)) bond.endSuperatomAttachmentPointNumber = undefined;
+      if (selectedAtoms.has(begin))
+        bond.beginSuperatomAttachmentPointNumber = undefined;
+      if (selectedAtoms.has(end))
+        bond.endSuperatomAttachmentPointNumber = undefined;
     });
     struct.initHalfBonds();
     struct.initNeighbors();
@@ -1387,7 +1430,9 @@ class Editor implements KetcherEditor {
     const monomer = primary.monomer;
     const atoms = Array.from(primary.atoms);
     const bonds = Array.from(struct.bonds.entries())
-      .filter(([, bond]) => atoms.includes(bond.begin) && atoms.includes(bond.end))
+      .filter(
+        ([, bond]) => atoms.includes(bond.begin) && atoms.includes(bond.end),
+      )
       .map(([id]) => id);
     const initialValues = editAllInstances
       ? getEditAllInstancesInitialValues(
@@ -1397,14 +1442,20 @@ class Editor implements KetcherEditor {
       : getEditInstanceInitialValues(monomer);
     const selectedSGroupIds = sgroupIds.filter((id) => {
       const candidate = struct.sgroups.get(id);
-      return candidate instanceof MonomerMicromolecule && isSameMonomerType(candidate, monomer);
+      return (
+        candidate instanceof MonomerMicromolecule &&
+        isSameMonomerType(candidate, monomer)
+      );
     });
     if (editAllInstances && selectedSGroupIds.length > 1) {
       initialValues.selectedSGroupIds = selectedSGroupIds;
     }
     this.openMonomerCreationWizard(
       { atoms, bonds },
-      { ...initialValues, ...(primary.pp ? { position: new Vec2(primary.pp) } : {}) },
+      {
+        ...initialValues,
+        ...(primary.pp ? { position: new Vec2(primary.pp) } : {}),
+      },
       primary.getAttachmentPoints(),
     );
     return true;
@@ -1415,31 +1466,43 @@ class Editor implements KetcherEditor {
     onFinish: (savedCanvas: boolean) => void,
   ) {
     const macroEditor = provideEditorInstance();
-    const selectedEntities = macroEditor.drawingEntitiesManager.selectedEntities;
-    const libraryRequest = request.mode === 'library' || request.mode === 'duplicate';
-    const { struct, monomerToAtomIdMap } = macroEditor.beginMonomerWizardSession(!libraryRequest);
-    this.onMonomerWizardFinish = (savedCanvas) => onFinish(savedCanvas && !libraryRequest);
+    const selectedEntities =
+      macroEditor.drawingEntitiesManager.selectedEntities;
+    const libraryRequest =
+      request.mode === 'library' || request.mode === 'duplicate';
+    const { struct, monomerToAtomIdMap } =
+      macroEditor.beginMonomerWizardSession(!libraryRequest);
+    this.onMonomerWizardFinish = (savedCanvas) =>
+      onFinish(savedCanvas && !libraryRequest);
     try {
       if (libraryRequest) {
         assert(request.libraryItem);
-        this.openLibraryMonomerCreationWizard(request.libraryItem, request.mode as 'library' | 'duplicate');
+        this.openLibraryMonomerCreationWizard(
+          request.libraryItem,
+          request.mode as 'library' | 'duplicate',
+        );
         return;
       }
       const atoms = new Set<number>();
       if (request.mode === 'create') {
         selectedEntities.forEach(([, entity]) => {
           if (entity instanceof CoreAtom) {
-            const atomId = monomerToAtomIdMap.get(entity.monomer)?.get(entity.atomIdInMicroMode);
+            const atomId = monomerToAtomIdMap
+              .get(entity.monomer)
+              ?.get(entity.atomIdInMicroMode);
             if (isNumber(atomId)) atoms.add(atomId);
           } else {
-            monomerToAtomIdMap.get(entity as BaseMonomer)?.forEach((id) => atoms.add(id));
+            monomerToAtomIdMap
+              .get(entity as BaseMonomer)
+              ?.forEach((id) => atoms.add(id));
           }
         });
       } else {
         assert(request.monomer);
         monomerToAtomIdMap.get(request.monomer)?.forEach((id) => atoms.add(id));
       }
-      if (!atoms.size) throw new Error('Select a structure to create or edit a monomer.');
+      if (!atoms.size)
+        throw new Error('Select a structure to create or edit a monomer.');
       const atomIds = Array.from(atoms);
       const bonds = Array.from(struct.bonds.entries())
         .filter(([, bond]) => atoms.has(bond.begin) && atoms.has(bond.end))
@@ -1448,7 +1511,10 @@ class Editor implements KetcherEditor {
       this.selection({ atoms: atomIds, bonds });
       if (request.mode === 'create') {
         this.prepareMacroMonomersForCreation(struct, atoms, monomerToAtomIdMap);
-        if (!this.isMonomerCreationWizardEnabled) throw new Error('The selected structure cannot be used to create a monomer.');
+        if (!this.isMonomerCreationWizardEnabled)
+          throw new Error(
+            'The selected structure cannot be used to create a monomer.',
+          );
         this.openMonomerCreationWizard({ atoms: atomIds, bonds });
       } else {
         assert(request.monomer);
@@ -1456,8 +1522,10 @@ class Editor implements KetcherEditor {
           const ids = monomerToAtomIdMap.get(monomer);
           if (!ids) return undefined;
           const atomSet = new Set(ids.values());
-          return Array.from(struct.sgroups.entries()).find(([, group]) =>
-            group instanceof MonomerMicromolecule && group.atoms.some((id) => atomSet.has(id)),
+          return Array.from(struct.sgroups.entries()).find(
+            ([, group]) =>
+              group instanceof MonomerMicromolecule &&
+              group.atoms.some((id) => atomSet.has(id)),
           )?.[0];
         };
         const primaryId = findSGroupId(request.monomer);
@@ -3496,7 +3564,10 @@ class Editor implements KetcherEditor {
       this.collectChangesForMonomerCreationStateInvalidation(data);
     };
 
-    this.changeEventSubscriber = this.subscribe<ChangeEventData[]>('change', handleChangeEvent);
+    this.changeEventSubscriber = this.subscribe<ChangeEventData[]>(
+      'change',
+      handleChangeEvent,
+    );
   }
 
   private unsubscribeFromChangeEventInMonomerCreationWizard() {
@@ -3932,7 +4003,9 @@ class Editor implements KetcherEditor {
     const changedCount = action.operations.length;
     if (changedCount) {
       this.update(action);
-      const joinedObjectId = (action.operations.at(-1)?.data as { id?: unknown } | undefined)?.id;
+      const joinedObjectId = (
+        action.operations.at(-1)?.data as { id?: unknown } | undefined
+      )?.id;
       this.selection(
         Number.isInteger(joinedObjectId)
           ? ({ simpleObjects: [joinedObjectId] } as Selection)
@@ -3965,7 +4038,11 @@ class Editor implements KetcherEditor {
 
   distributeSelectedObjects(direction: 'horizontal' | 'vertical'): number {
     const selection = this.selection();
-    const action = fromDistributeObjects(this.render.ctab, selection, direction);
+    const action = fromDistributeObjects(
+      this.render.ctab,
+      selection,
+      direction,
+    );
     const changedCount = action.operations.length;
     if (changedCount) {
       this.update(action);
@@ -3975,9 +4052,15 @@ class Editor implements KetcherEditor {
     return changedCount;
   }
 
-  setSelectedBondIndicatorVisibility(indicator: 'query' | 'reaction', visible: boolean): number {
+  setSelectedBondIndicatorVisibility(
+    indicator: 'query' | 'reaction',
+    visible: boolean,
+  ): number {
     const inverse = fromSelectedBondIndicatorVisibility(
-      this.render.ctab, this.selection()?.bonds ?? [], indicator, visible,
+      this.render.ctab,
+      this.selection()?.bonds ?? [],
+      indicator,
+      visible,
     );
     if (inverse.operations.length) {
       this.update(inverse);
@@ -4016,7 +4099,10 @@ class Editor implements KetcherEditor {
     const properties = ['lineWidth', 'doubleLineSpacing'] as const;
     properties.forEach((property) => {
       const value = settings[property];
-      if (value !== undefined && (!Number.isFinite(value) || value < 0.25 || value > 8)) {
+      if (
+        value !== undefined &&
+        (!Number.isFinite(value) || value < 0.25 || value > 8)
+      ) {
         throw new Error('曲线线宽和双线间距倍率必须在 0.25 到 8 之间');
       }
     });
@@ -4026,10 +4112,13 @@ class Editor implements KetcherEditor {
     });
     if (!ids.length) throw new Error('请先选择直线、折线或贝塞尔曲线');
     const action = new Action();
-    ids.forEach((id) => properties.forEach((property) => {
-      const value = settings[property];
-      if (value !== undefined) action.mergeWith(fromSimpleObjectCurve(id, property, value));
-    }));
+    ids.forEach((id) =>
+      properties.forEach((property) => {
+        const value = settings[property];
+        if (value !== undefined)
+          action.mergeWith(fromSimpleObjectCurve(id, property, value));
+      }),
+    );
     const inverseAction = action.perform(this.render.ctab);
     const changedCount = inverseAction.operations.filter(
       (operation) => !operation.isDummy(this.render.ctab),
@@ -4044,7 +4133,7 @@ class Editor implements KetcherEditor {
 
   setSelectedSimpleObjectColor(color?: string): number {
     if (color !== undefined && !/^#[\da-f]{3}(?:[\da-f]{3})?$/i.test(color)) {
-      throw new Error('图形对象颜色必须是十六进制颜色')
+      throw new Error('图形对象颜色必须是十六进制颜色');
     }
     const ids = this.selection()?.simpleObjects ?? [];
     if (!ids.length) throw new Error('请先选择一个或多个图形对象');
@@ -4114,11 +4203,17 @@ class Editor implements KetcherEditor {
     return changedCount;
   }
 
-  setSelectedSimpleObjectBracketType(bracketType: 'bracket' | 'parenthesis' | 'brace'): number {
+  setSelectedSimpleObjectBracketType(
+    bracketType: 'bracket' | 'parenthesis' | 'brace',
+  ): number {
     const ids = this.selection()?.simpleObjects ?? [];
     if (!ids.length) throw new Error('请先选择一个或多个图形对象');
     const action = new Action();
-    ids.forEach((id) => action.mergeWith(fromSimpleObjectBracket(id, bracketType as SimpleObjectBracketType)));
+    ids.forEach((id) =>
+      action.mergeWith(
+        fromSimpleObjectBracket(id, bracketType as SimpleObjectBracketType),
+      ),
+    );
     const inverseAction = action.perform(this.render.ctab);
     const changedCount = inverseAction.operations.filter(
       (operation) => !operation.isDummy(this.render.ctab),
@@ -4131,7 +4226,11 @@ class Editor implements KetcherEditor {
   }
 
   setSelectedRingFillColor(color?: string): number {
-    const result = fromSelectedRingFill(this.render.ctab, this.selection(), color);
+    const result = fromSelectedRingFill(
+      this.render.ctab,
+      this.selection(),
+      color,
+    );
     const inverseAction = result.action.perform(this.render.ctab);
     const changedCount = inverseAction.operations.filter(
       (operation) => !operation.isDummy(this.render.ctab),
@@ -4182,7 +4281,12 @@ class Editor implements KetcherEditor {
     let changedCount = 0;
     atomIds.forEach((atomId) => {
       const atom = this.struct().atoms.get(atomId);
-      if (!atom || atom.isRGroupAttachmentPointEditDisabled || atom.attachmentPoints) return;
+      if (
+        !atom ||
+        atom.isRGroupAttachmentPointEditDisabled ||
+        atom.attachmentPoints
+      )
+        return;
       action.mergeWith(
         fromAtomsAttrs(
           this.render.ctab,
@@ -4203,7 +4307,7 @@ class Editor implements KetcherEditor {
   captureNicknameFragment(): NicknameDraft {
     return captureNicknameFragment(
       this.struct(),
-      this.explicitSelected().atoms,
+      this.explicitSelected().atoms ?? [],
     );
   }
 
@@ -4221,7 +4325,11 @@ class Editor implements KetcherEditor {
   }
 
   setSelectedStructureLabelsExpanded(expanded: boolean): number {
-    const result = fromSelectedStructureLabelState(this.render.ctab, this.selection(), expanded);
+    const result = fromSelectedStructureLabelState(
+      this.render.ctab,
+      this.selection(),
+      expanded,
+    );
     if (result.changedCount) this.update(result.inverseAction);
     this.render.update(true, null);
     this.selection({ sgroups: result.groupIds });
@@ -4260,67 +4368,122 @@ class Editor implements KetcherEditor {
   sproutOnSelectedAtom(kind: AtomSproutKind): number {
     const selection = this.selection();
     if (selection?.bonds?.length) throw new Error('请只选择一个原子来生长片段');
-    const result = fromSelectedAtomSprout(this.render.ctab, selection?.atoms ?? [], kind);
+    const result = fromSelectedAtomSprout(
+      this.render.ctab,
+      selection?.atoms ?? [],
+      kind,
+    );
     return this.finishAtomSprout(result);
   }
 
   captureAtomLabelSprout(): AtomLabelSproutDraft {
     const selection = this.selection();
     if (selection?.bonds?.length) throw new Error('请只选择一个原子来生长标签');
-    const { sourceId } = validateAtomSproutTarget(this.render.ctab, selection?.atoms ?? []);
-    return { atomId: sourceId, sourceKet: new KetSerializer().serializeMicromolecules(this.struct()) };
+    const { sourceId } = validateAtomSproutTarget(
+      this.render.ctab,
+      selection?.atoms ?? [],
+    );
+    return {
+      atomId: sourceId,
+      sourceKet: new KetSerializer().serializeMicromolecules(this.struct()),
+    };
   }
 
   sproutAtomLabel(label: string, draft: AtomLabelSproutDraft): number {
-    if (!draft || !Number.isInteger(draft.atomId) ||
-        draft.sourceKet !== new KetSerializer().serializeMicromolecules(this.struct())) {
+    if (
+      !draft ||
+      !Number.isInteger(draft.atomId) ||
+      draft.sourceKet !==
+        new KetSerializer().serializeMicromolecules(this.struct())
+    ) {
       throw new Error('化学文档已变化，请关闭窗口并重新选择生长原子');
     }
-    return this.finishAtomSprout(fromSelectedAtomLabelSprout(this.render.ctab, [draft.atomId], label, this.resolveAtomLabelNickname(label)));
+    return this.finishAtomSprout(
+      fromSelectedAtomLabelSprout(
+        this.render.ctab,
+        [draft.atomId],
+        label,
+        this.resolveAtomLabelNickname(label),
+      ),
+    );
   }
 
   captureAtomLabelEdit(): AtomLabelSproutDraft & { label: string } {
     const draft = this.captureAtomLabelSprout();
     const atom = this.struct().atoms.get(draft.atomId)!;
     const magnitude = Math.abs(atom.charge ?? 0);
-    const charge = magnitude ? `${magnitude > 1 ? magnitude : ''}${atom.charge! < 0 ? '-' : '+'}` : '';
+    const charge = magnitude
+      ? `${magnitude > 1 ? magnitude : ''}${atom.charge! < 0 ? '-' : '+'}`
+      : '';
     const radical = ['', ':', '.', '^^'][atom.radical] || '';
-    return { ...draft, label: `${atom.isotope ?? ''}${atom.label}${radical}${charge}` };
+    return {
+      ...draft,
+      label: `${atom.isotope ?? ''}${atom.label}${radical}${charge}`,
+    };
   }
 
   editAtomLabel(label: string, draft: AtomLabelSproutDraft): number {
-    if (!draft || !Number.isInteger(draft.atomId) ||
-        draft.sourceKet !== new KetSerializer().serializeMicromolecules(this.struct())) {
+    if (
+      !draft ||
+      !Number.isInteger(draft.atomId) ||
+      draft.sourceKet !==
+        new KetSerializer().serializeMicromolecules(this.struct())
+    ) {
       throw new Error('化学文档已变化，请关闭窗口并重新选择标签原子');
     }
-    return this.finishAtomSprout(fromSelectedAtomLabelEdit(this.render.ctab, [draft.atomId], label, this.resolveAtomLabelNickname(label)));
+    return this.finishAtomSprout(
+      fromSelectedAtomLabelEdit(
+        this.render.ctab,
+        [draft.atomId],
+        label,
+        this.resolveAtomLabelNickname(label),
+      ),
+    );
   }
 
-  private resolveAtomLabelNickname(label: string): { struct: Struct; attachmentAtomId: number } | undefined {
+  private resolveAtomLabelNickname(
+    label: string,
+  ): { struct: Struct; attachmentAtomId: number } | undefined {
     const attributes = parseAtomSproutLabel(label);
     if (attributes.pseudo) {
-      const custom = getNicknames().find(item => item.name.toLowerCase() === attributes.label.toLowerCase());
+      const custom = getNicknames().find(
+        (item) => item.name.toLowerCase() === attributes.label.toLowerCase(),
+      );
       if (custom) {
         const template = getNicknameTemplate(custom.name);
         return { struct: template.struct, attachmentAtomId: template.aid };
       } else {
-        const fragment = FunctionalGroupsProvider.getInstance().getFunctionalGroupsList()
-          .find(item => !SGroup.isSaltOrSolvent(item.name) && item.name.toLowerCase() === attributes.label.toLowerCase());
+        const fragment = FunctionalGroupsProvider.getInstance()
+          .getFunctionalGroupsList()
+          .find(
+            (item) =>
+              !SGroup.isSaltOrSolvent(item.name) &&
+              item.name.toLowerCase() === attributes.label.toLowerCase(),
+          );
         if (fragment) {
-          const group = [...fragment.sgroups.values()].find(group => group.type === 'SUP');
-          return { struct: fragment, attachmentAtomId: group?.getAttachmentAtomId() ?? [...fragment.atoms.keys()][0] };
+          const group = [...fragment.sgroups.values()].find(
+            (group) => group.type === 'SUP',
+          );
+          return {
+            struct: fragment,
+            attachmentAtomId:
+              group?.getAttachmentAtomId() ?? [...fragment.atoms.keys()][0],
+          };
         }
       }
     }
     return undefined;
   }
 
-  private finishAtomSprout(result: ReturnType<typeof fromSelectedAtomSprout>): number {
+  private finishAtomSprout(
+    result: ReturnType<typeof fromSelectedAtomSprout>,
+  ): number {
     this.update(result.inverseAction);
     this.render.update(true, null);
     // Keep the new hotspot selected for successive chain-growth keystrokes.
     this.selection({ atoms: [result.targetAtomId] });
-    if (this._tool instanceof SelectTool) this.hover({ map: 'atoms', id: result.targetAtomId });
+    if (this._tool instanceof SelectTool)
+      this.hover({ map: 'atoms', id: result.targetAtomId });
     this.rotateController.rerender();
     return result.atoms.length;
   }
@@ -4329,16 +4492,27 @@ class Editor implements KetcherEditor {
     const ctab = this.render.ctab;
     if (target.map === 'atoms') return ctab.visibleAtoms.has(target.id);
     const bond = ctab.molecule.bonds.get(target.id);
-    return !!bond && ctab.visibleBonds.has(target.id)
-      && ctab.visibleAtoms.has(bond.begin) && ctab.visibleAtoms.has(bond.end);
+    return (
+      !!bond &&
+      ctab.visibleBonds.has(target.id) &&
+      ctab.visibleAtoms.has(bond.begin) &&
+      ctab.visibleAtoms.has(bond.end)
+    );
   }
 
   getChemicalHotspot(): ChemicalHotspot | null {
     // Drawing tools also use ci for previews. Only selection-tool hovers
     // represent ChemDraw hotspots; dragging/merging must keep their own input.
-    if (!(this._tool instanceof SelectTool) || this._tool.isMouseDown
-      || this._tool.isSelectionRunning()) return null;
-    const target = validateChemicalHotspot(this.struct(), (this._tool as Tool).ci);
+    if (
+      !(this._tool instanceof SelectTool) ||
+      this._tool.isMouseDown ||
+      this._tool.isSelectionRunning()
+    )
+      return null;
+    const target = validateChemicalHotspot(
+      this.struct(),
+      (this._tool as Tool).ci,
+    );
     return target && this.isChemicalHotspotVisible(target) ? target : null;
   }
 
@@ -4350,14 +4524,31 @@ class Editor implements KetcherEditor {
   }
 
   moveChemicalHotspot(direction: HotspotDirection): boolean {
-    if (!(this._tool instanceof SelectTool) || this._tool.isMouseDown
-      || this._tool.isSelectionRunning()) return false;
+    if (
+      !(this._tool instanceof SelectTool) ||
+      this._tool.isMouseDown ||
+      this._tool.isSelectionRunning()
+    )
+      return false;
     const selected = this.selection();
     let target = this.getChemicalHotspot();
-    if (!target && selected?.bonds?.length === 1) target = { map: 'bonds', id: selected.bonds[0] };
-    else if (!target && selected?.atoms?.length === 1 && !selected.bonds?.length) target = { map: 'atoms', id: selected.atoms[0] };
-    else if (!target && selected && Object.values(selected).some(ids => ids?.length)) return false;
-    const next = nextChemicalHotspot(this.struct(), target, direction, spot => this.isChemicalHotspotVisible(spot));
+    if (!target && selected?.bonds?.length === 1)
+      target = { map: 'bonds', id: selected.bonds[0] };
+    else if (
+      !target &&
+      selected?.atoms?.length === 1 &&
+      !selected.bonds?.length
+    )
+      target = { map: 'atoms', id: selected.atoms[0] };
+    else if (
+      !target &&
+      selected &&
+      Object.values(selected).some((ids) => ids?.length)
+    )
+      return false;
+    const next = nextChemicalHotspot(this.struct(), target, direction, (spot) =>
+      this.isChemicalHotspotVisible(spot),
+    );
     if (!next) return false;
     this.hover(next);
     return true;
@@ -4615,7 +4806,10 @@ class Editor implements KetcherEditor {
     return subscriber;
   }
 
-  unsubscribe<T = unknown>(eventName: string, subscriber: EditorSubscriber<T>): void {
+  unsubscribe<T = unknown>(
+    eventName: string,
+    subscriber: EditorSubscriber<T>,
+  ): void {
     switch (eventName) {
       case 'change': {
         ketcherProvider

@@ -29,6 +29,7 @@ declare module 'ketcher-react' {
   >;
   export const ArrowScroll: React.ComponentType<Record<string, unknown>>;
   export const EditorClassName: string;
+  export const translateErrorTitle: (title?: string) => string;
   export const translateErrorMessage: (message: string) => string;
   export const KETCHER_MACROMOLECULES_ROOT_NODE_SELECTOR: string;
   export const isTouchDevice: boolean;
