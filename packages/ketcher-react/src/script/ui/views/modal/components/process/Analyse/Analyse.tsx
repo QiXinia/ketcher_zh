@@ -37,6 +37,7 @@ import i18n from '../../../../../../../i18n';
 interface RoundSettings {
   roundWeight: number;
   roundMass: number;
+  roundLogP: number;
   roundElAnalysis: number;
   [key: string]: number;
 }
@@ -101,6 +102,13 @@ const analyseItems: AnalyseItem[] = [
     round: 'roundMass',
     withSelector: true,
     tooltip: i18n.t('analyse.massToChargeHint'),
+  },
+  {
+    name: i18n.t('analyse.crippenLogP'),
+    key: 'crippen-logp',
+    round: 'roundLogP',
+    withSelector: true,
+    tooltip: i18n.t('analyse.crippenLogPHint'),
   },
   {
     name: i18n.t('analyse.elementalAnalysis'),
@@ -214,6 +222,7 @@ const mapStateToProps = (state: StoreState) => ({
   round: {
     roundWeight: state.options.analyse.roundWeight,
     roundMass: state.options.analyse.roundMass,
+    roundLogP: state.options.analyse.roundLogP,
     roundElAnalysis: state.options.analyse.roundElAnalysis,
   },
 });

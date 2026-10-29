@@ -43,6 +43,7 @@ export const initOptionsState = {
     values: null,
     roundWeight: 3,
     roundMass: 3,
+    roundLogP: 3,
     roundElAnalysis: 1,
   },
   check: {

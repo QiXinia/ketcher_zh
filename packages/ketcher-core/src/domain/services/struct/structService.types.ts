@@ -145,6 +145,7 @@ export type CalculateProps =
   | 'molecular-weight'
   | 'most-abundant-mass'
   | 'monoisotopic-mass'
+  | 'crippen-logp'
   | 'gross'
   | 'mass-composition';
 
@@ -185,6 +186,8 @@ export interface GenerateImageOptions extends StructServiceOptions {
 export interface StructService {
   /** True when local worker requests are correlated by an explicit request id. */
   readonly supportsRequestIds?: boolean;
+  /** True when calculate can return the local Crippen logP estimate. */
+  readonly supportsCrippenLogP?: boolean;
   addKetcherId: (id: string) => void;
   info: () => Promise<InfoResult>;
   convert: (

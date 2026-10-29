@@ -147,6 +147,7 @@ export type CalculateProps =
   | 'molecular-weight'
   | 'most-abundant-mass'
   | 'monoisotopic-mass'
+  | 'crippen-logp'
   | 'gross'
   | 'gross-formula'
   | 'mass-composition';
@@ -156,6 +157,7 @@ export interface CalculateCommandData
     WithStruct,
     WithSelection {
   properties: Array<string>;
+  calculateCrippenLogP?: boolean;
 }
 
 export interface AutomapCommandData

@@ -21,7 +21,11 @@ jest.mock('../../../../i18n', () => ({
   default: { t: (key: string) => key },
 }));
 
-function fixture(selection: object | null, changeDuringCalculate = false) {
+function fixture(
+  selection: object | null,
+  changeDuringCalculate = false,
+  supportsCrippenLogP = false,
+) {
   const struct = { ket: 'first', clone: jest.fn(() => ({ ket: 'cloned' })) };
   const editor = {
     struct: () => struct,
@@ -30,15 +34,22 @@ function fixture(selection: object | null, changeDuringCalculate = false) {
     errorHandler: jest.fn(),
   };
   const server = Object.assign(Promise.resolve(), {
-    calculate: jest.fn(async () => {
+    supportsCrippenLogP,
+    calculate: jest.fn(async ({ properties }: { properties: string[] }) => {
       if (changeDuringCalculate) struct.ket = 'changed';
-      return { 'monoisotopic-mass': '22.9897690' };
+      return {
+        'monoisotopic-mass': '22.9897690',
+        ...(properties.includes('crippen-logp')
+          ? { 'crippen-logp': 1.23 }
+          : {}),
+      };
     }),
   });
   const options = { getServerSettings: () => ({}) };
   const dispatch = jest.fn();
   return {
     dispatch,
+    server,
     run: () => analyse()(dispatch, () => ({ editor, server, options })),
   };
 }
@@ -79,4 +90,37 @@ describe('analyse m/z safety', () => {
       });
     },
   );
+});
+
+describe('analyse Crippen cLogP', () => {
+  it('requests the local estimate only when the service supports it', async () => {
+    const { dispatch, server, run } = fixture(null, false, true);
+    await run();
+    expect(server.calculate.mock.calls[0][0].properties).toContain(
+      'crippen-logp',
+    );
+    expect(dispatch.mock.calls.at(-1)?.[0].data.values['crippen-logp']).toBe(
+      1.23,
+    );
+
+    const remote = fixture(null);
+    await remote.run();
+    expect(remote.server.calculate.mock.calls[0][0].properties).not.toContain(
+      'crippen-logp',
+    );
+  });
+
+  it('does not calculate a selection or keep a result after the canvas changes', async () => {
+    const selected = fixture({ atoms: [0] }, false, true);
+    await selected.run();
+    expect(selected.server.calculate.mock.calls[0][0].properties).not.toContain(
+      'crippen-logp',
+    );
+
+    const changed = fixture(null, true, true);
+    await changed.run();
+    expect(
+      changed.dispatch.mock.calls.at(-1)?.[0].data.values['crippen-logp'],
+    ).toBeUndefined();
+  });
 });

@@ -68,6 +68,7 @@ import {
   CalculateMacromoleculePropertiesData,
   CalculateMacromoleculePropertiesResult,
   provideEditorInstance,
+  massToChargeFromKet,
 } from 'ketcher-core';
 import {
   STRUCT_SERVICE_INITIALIZED_EVENT,
@@ -79,6 +80,20 @@ import { getIndigoWorker } from '_indigo-worker-import-alias_';
 
 interface KeyValuePair {
   [key: string]: number | string | boolean | object;
+}
+
+interface ChemwikiRecognition {
+  host: () => unknown;
+  versions: () => string[];
+  recognize: (blob: Blob) => Promise<RecognizeResult>;
+}
+
+function chemwikiRecognition(): ChemwikiRecognition | undefined {
+  return (
+    globalThis as typeof globalThis & {
+      chemwikiRecognition?: ChemwikiRecognition;
+    }
+  ).chemwikiRecognition;
 }
 
 function convertMimeTypeToOutputFormat(
@@ -218,6 +233,7 @@ class IndigoService implements StructService {
   // Responses are correlated by request, including simultaneous conversions
   // of the same input to different output formats.
   readonly supportsRequestIds = true;
+  readonly supportsCrippenLogP = true;
   private nextRequestId = 0;
   private workerFailure: Error | null = null;
   private readonly pending = new Map<
@@ -339,7 +355,7 @@ class IndigoService implements StructService {
         if (!msg.hasError) {
           const result: InfoResult = {
             indigoVersion: msg.payload,
-            imagoVersions: (globalThis as any).chemwikiRecognition?.versions() || [],
+            imagoVersions: chemwikiRecognition()?.versions() || [],
             isAvailable: true,
           };
           resolve(result);
@@ -710,6 +726,15 @@ class IndigoService implements StructService {
         properties,
         options: this.getStandardServerOptions(options),
         selectedAtoms: selected ?? [],
+        // Restrict the estimate to one connected neutral concrete molecule.
+        // The graph check also rejects reactions, query atoms and mixtures.
+        calculateCrippenLogP:
+          properties.includes('crippen-logp') &&
+          !selected?.length &&
+          (() => {
+            const result = massToChargeFromKet(struct, 1);
+            return !result.ok && result.reason === 'neutral';
+          })(),
       };
 
       const inputMessage: InputMessage<CalculateCommandData> = {
@@ -724,7 +749,7 @@ class IndigoService implements StructService {
   recognize(_blob: Blob, _version: string): Promise<RecognizeResult> {
     // Same-origin ChemWiki Direct API keeps the native preview/apply dialog
     // while all iframes share the parent page's model Worker and settings.
-    const bridge = (globalThis as any).chemwikiRecognition;
+    const bridge = chemwikiRecognition();
     if (bridge?.host()) return bridge.recognize(_blob);
     return Promise.reject(new Error('Not supported in standalone mode'));
   }

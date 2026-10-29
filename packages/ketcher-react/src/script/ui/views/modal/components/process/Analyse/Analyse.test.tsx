@@ -29,7 +29,7 @@ jest.mock('../../../../../../../i18n', () => ({
 describe('calculated values', () => {
   const commonProps = {
     ...({} as DialogParams),
-    round: { roundWeight: 2, roundMass: 4, roundElAnalysis: 2 },
+    round: { roundWeight: 2, roundMass: 4, roundLogP: 4, roundElAnalysis: 2 },
     loading: false,
     onAnalyse: jest.fn(),
     onChangeRound: jest.fn(),
@@ -45,6 +45,7 @@ describe('calculated values', () => {
           'most-abundant-mass': '46.04257',
           'monoisotopic-mass': 46.04186,
           'mass-to-charge': 46.04131,
+          'crippen-logp': -0.0014,
           'mass-composition': 'C 52.1445 H 13.1307 O 34.7248',
         }}
       />,
@@ -58,6 +59,9 @@ describe('calculated values', () => {
     );
     expect(screen.getByTestId('analyse.massToCharge-input')).toHaveValue(
       '46.0413',
+    );
+    expect(screen.getByTestId('analyse.crippenLogP-input')).toHaveValue(
+      '-0.0014',
     );
     expect(screen.getByTestId('analyse.elementalAnalysis-input')).toHaveValue(
       'C 52.14 H 13.13 O 34.72',
@@ -78,5 +82,6 @@ describe('calculated values', () => {
     expect(screen.getByTestId('analyse.elementalAnalysis-input')).toHaveValue(
       '',
     );
+    expect(screen.getByTestId('analyse.crippenLogP-input')).toHaveValue('');
   });
 });

@@ -34,6 +34,7 @@ import {
   ExplicitHydrogensCommandData,
   CalculateMacromoleculePropertiesCommandData,
 } from './indigoWorker.types';
+import { addCrippenLogP } from './indigoCalculateExtras';
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -194,10 +195,23 @@ self.onmessage = (e: MessageEvent<InputMessage<CommandData>>) => {
       handle(
         (indigo, indigoOptions) => {
           const selectedAtoms = new indigo.VectorInt();
-          data.selectedAtoms.forEach((atomId) =>
-            selectedAtoms.push_back(atomId),
-          );
-          return indigo.calculate(data.struct, indigoOptions, selectedAtoms);
+          try {
+            data.selectedAtoms.forEach((atomId) =>
+              selectedAtoms.push_back(atomId),
+            );
+            const calculated = indigo.calculate(
+              data.struct,
+              indigoOptions,
+              selectedAtoms,
+            );
+            return data.calculateCrippenLogP
+              ? addCrippenLogP(calculated, () =>
+                  indigo.logp(data.struct, indigoOptions),
+                )
+              : calculated;
+          } finally {
+            selectedAtoms.delete();
+          }
         },
         data.options,
         Command.Calculate,

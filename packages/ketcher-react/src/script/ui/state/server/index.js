@@ -168,15 +168,20 @@ export function analyse() {
         'mass-composition',
       ],
     };
+    if (!hasSelection && massSnapshot && server.supportsCrippenLogP) {
+      serverSettings.data.properties.push('crippen-logp');
+    }
 
     return serverCall(editor, server, 'calculate', serverSettings)
       .then((values) => {
         let mz;
+        let sameSnapshot = false;
         try {
-          if (
+          sameSnapshot = !!(
             massSnapshot &&
             serializer.serialize(editor.struct()) === massSnapshot
-          ) {
+          );
+          if (sameSnapshot) {
             const result = massToChargeFromKet(
               massSnapshot,
               values?.['monoisotopic-mass'],
@@ -184,6 +189,10 @@ export function analyse() {
             if (result.ok) mz = result.mz;
           }
         } catch {}
+        if (!sameSnapshot && values?.['crippen-logp'] !== undefined) {
+          values = { ...values };
+          delete values['crippen-logp'];
+        }
         return dispatch({
           type: 'CHANGE_ANALYSE',
           data: {

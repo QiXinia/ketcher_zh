@@ -297,6 +297,8 @@
     "mostAbundantMass": "最丰同位素质量",
     "massToCharge": "m/z（单同位素离子）",
     "massToChargeHint": "适用于未选择局部、且明确带电的单一分子；不自动推断加合物或质子化状态。",
+    "crippenLogP": "Crippen cLogP",
+    "crippenLogPHint": "对单个中性、具体分子的本地估算值，并非实测 logP 或随 pH 变化的 logD。",
     "exactMass": "精确质量",
     "elementalAnalysis": "元素分析",
     "decimalPlaces": "小数位数"

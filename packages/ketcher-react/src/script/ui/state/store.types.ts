@@ -52,6 +52,7 @@ export interface AnalyseValues {
   'molecular-weight'?: number;
   'most-abundant-mass'?: string | number;
   'mass-to-charge'?: number;
+  'crippen-logp'?: number;
   'monoisotopic-mass'?: number;
   'mass-composition'?: string;
   [key: string]: string | number | undefined;
@@ -62,6 +63,7 @@ export interface AnalyseState {
   loading: boolean;
   roundWeight: number;
   roundMass: number;
+  roundLogP: number;
   roundElAnalysis: number;
 }
 

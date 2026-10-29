@@ -297,6 +297,8 @@
     "mostAbundantMass": "Most Abundant Mass",
     "massToCharge": "m/z (monoisotopic ion)",
     "massToChargeHint": "Available for one explicitly charged molecule with no selection; no adduct or protonation is inferred.",
+    "crippenLogP": "Crippen cLogP",
+    "crippenLogPHint": "Local estimate for one neutral, concrete molecule. This is not a measured logP or a pH-dependent logD.",
     "exactMass": "Exact Mass",
     "elementalAnalysis": "Elemental Analysis",
     "decimalPlaces": "Decimal places"

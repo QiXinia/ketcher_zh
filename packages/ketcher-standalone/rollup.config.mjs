@@ -6,6 +6,7 @@ import resolve from '@rollup/plugin-node-resolve';
 const resolvePlugin = resolve.default ?? resolve;
 import strip from '@rollup/plugin-strip';
 import typescript from 'rollup-plugin-typescript2';
+import ts from 'typescript';
 import webWorkerLoader from 'rollup-plugin-web-worker-loader';
 import copy from 'rollup-plugin-copy';
 import alias from '@rollup/plugin-alias';
@@ -63,7 +64,8 @@ const baseConfig = {
   plugins: [
     resolvePlugin({ extensions }),
     commonjs(),
-    typescript(),
+    // Use this workspace's compiler; the hoisted plugin can resolve TS 4.x.
+    typescript({ typescript: ts }),
     babel({
       extensions,
       babelHelpers: 'runtime',
