@@ -103,6 +103,8 @@ export type ToolVariant =
   | 'template-5'
   | 'template-6'
   | 'template-7'
+  | 'template-8'
+  | 'template-9'
   | 'template-lib'
   | 'text'
   | 'transform-flip-h'
