@@ -1,0 +1,55 @@
+name: One-time lockfile repair
+on:
+  push:
+    branches:
+      - feat/cml-mass-ui-20261027
+permissions:
+  contents: write
+jobs:
+  repair:
+    if: github.repository == 'QiXinia/ketcher_zh' && github.event.head_commit.message == '临时：修复依赖审计并自动移除工作流'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24.20.0
+      - name: Update only the verified lockfile entries
+        run: |
+          node - package-lock.json package-lock.json <<'NODE'
+          const fs = require('node:fs');
+          const original = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
+          const h = original.packages['node_modules/handlebars'];
+          const p = original.packages['node_modules/proxy-addr'];
+          if (h.version !== '4.7.9' || p.version !== '2.0.7') throw new Error('Unexpected base versions');
+          h.version = '4.7.10';
+          h.resolved = 'https://registry.npmjs.org/handlebars/-/handlebars-4.7.10.tgz';
+          h.integrity = 'sha512-P5VJMVM7qgBn6vjXMw8WG9uVI+ncf2pi72j4de4yz5ZULLj2RGqLYaKOYGsgyrViQ0tePOVlN1tDCCXXtFqXKg==';
+          h.dependencies.minimist = '^1.2.8';
+          original.packages['node_modules/proxy-addr'] = {
+            version: '2.0.8',
+            resolved: 'https://registry.npmjs.org/proxy-addr/-/proxy-addr-2.0.8.tgz',
+            integrity: 'sha512-5nnx0yGyVUcY6t9RnWcARWtwT9F1D8O9rt08htPvnd49W1IgZtmLkhu9WfMzQj1cFxjHIO6connUNVW5k7AVyQ==',
+            ...Object.fromEntries(Object.entries(p).filter(([key]) => key !== 'version')),
+            funding: { type: 'opencollective', url: 'https://opencollective.com/express' },
+          };
+          fs.writeFileSync(process.argv[3], JSON.stringify(original, null, 2) + '\n');
+          NODE
+          test "$(git hash-object package-lock.json)" = 066161b3190f3ef46ad35ce240c36f04b8296575
+          npm ci --dry-run --ignore-scripts --no-audit --no-fund
+          npm audit --all --audit-level=critical
+      - name: Commit the lockfile and remove this workflow
+        env:
+          TARGET_BRANCH: feat/cml-mass-ui-20261027
+        run: |
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git rm -- .github/workflows/codex-lock-repair-once.yml
+          git add -- package-lock.json
+          git diff --cached --check
+          git commit -m '修复依赖锁中的严重审计问题'
+          git push origin "HEAD:refs/heads/$TARGET_BRANCH"
