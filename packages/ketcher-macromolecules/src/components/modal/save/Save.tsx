@@ -14,7 +14,7 @@
  * limitations under the License.
  ***************************************************************************/
 
-import { useState, type MouseEvent } from 'react';
+import { useEffect, useRef, useState, type MouseEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Modal } from 'components/shared/modal';
@@ -114,9 +114,19 @@ export const Save = ({
     );
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [isSavingImage, setIsSavingImage] = useState(false);
+  const conversionVersion = useRef(0);
+  useEffect(
+    () => () => {
+      conversionVersion.current += 1;
+    },
+    [],
+  );
   const [svgData, setSvgData] = useState<string | undefined>();
 
   const handleSelectChange = async (fileFormat: SaveFormat) => {
+    const version = ++conversionVersion.current;
+    setIsLoading(false);
     setCurrentFileFormat(fileFormat);
     const ketSerializer = new KetSerializer();
     const serializedKet = ketSerializer.serialize(
@@ -182,8 +192,10 @@ export const Save = ({
         },
         formatProperties.options,
       );
+      if (version !== conversionVersion.current) return;
       setStruct(result.struct);
     } catch (error) {
+      if (version !== conversionVersion.current) return;
       let stringError;
       if (error instanceof Error) {
         stringError = error.message;
@@ -194,8 +206,9 @@ export const Save = ({
       dispatch(openErrorModal(errorMessage));
       KetcherLogger.error(errorMessage);
       setCurrentFileFormat('ket');
+      setStruct(serializedKet);
     } finally {
-      setIsLoading(false);
+      if (version === conversionVersion.current) setIsLoading(false);
     }
   };
 
@@ -218,6 +231,7 @@ export const Save = ({
       if (currentFileFormat !== 'svg') {
         try {
           setIsLoading(true);
+          setIsSavingImage(true);
           const blob = await convertKetcherImageToRaster(
             new Blob([svgData], { type: 'image/svg+xml' }),
             currentFileFormat,
@@ -239,6 +253,7 @@ export const Save = ({
           );
         } finally {
           setIsLoading(false);
+          setIsSavingImage(false);
         }
         return;
       }
@@ -258,6 +273,7 @@ export const Save = ({
 
   const handleCopy = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
+    if (isLoading) return;
 
     if (!isClipboardAPIAvailable()) {
       dispatch(openErrorModal(t('common:errors.featureNotAvailableInBrowser')));
@@ -294,8 +310,9 @@ export const Save = ({
               options={options}
               currentSelection={currentFileFormat}
               selectionHandler={(value) =>
-                handleSelectChange(value as SupportedFormats)
+                handleSelectChange(value as SaveFormat)
               }
+              disabled={isSavingImage}
               customStylesForExpanded={stylesForExpanded}
               testId="file-format-list"
             />
@@ -310,6 +327,7 @@ export const Save = ({
               <TextArea testId="preview-area" value={struct} readonly />
               <IconButton
                 onClick={handleCopy}
+                disabled={isLoading}
                 iconName="copy"
                 title={t('save.copyToClipboard')}
                 testId="copy-to-clipboard"
