@@ -52,6 +52,8 @@ interface SimpleObjectItem {
   style?: string;
   color?: string;
   doubled?: boolean;
+  lineWidth?: number;
+  doubleLineSpacing?: number;
   faded?: boolean;
   fill?: SimpleObjectFill;
 }
@@ -539,6 +541,12 @@ class ReSimpleObject extends ReObject {
 
     paths.forEach((path, index) => {
       applySimpleObjectStyle(path, this.item.style);
+      // Scale the final style width, including Bold and half-arrow strokes.
+      // Solid arrowheads deliberately keep their zero-width outline.
+      if (this.item.lineWidth != null && this.item.lineWidth !== 1) {
+        const width = Number(path.attr('stroke-width') ?? options.lineattr['stroke-width'] ?? 1);
+        path.attr({ 'stroke-width': width * this.item.lineWidth });
+      }
       if (this.item.color) path.attr({ stroke: this.item.color });
       if (index < (this.item.doubled ? 2 : 1)) {
         applySimpleObjectDecoration(path, this.item, options, index > 0);
@@ -572,7 +580,7 @@ function generateCurvePaths(item: any, paper: any, pos: Vec2[], options: any): a
   ) {
     const direction = directionFrom(pos[0], pos[1]);
     if (direction) {
-      const gap = Math.max(2, options.microModeScale / 7);
+      const gap = Math.max(2, options.microModeScale / 7) * (item.doubleLineSpacing ?? 1);
       const normal = new Vec2(-direction.y * gap, direction.x * gap);
       paths.push(
         generatePath(
@@ -725,15 +733,16 @@ function generatePath(
       break;
     }
     case SimpleObjectMode.bezier: {
-      const start = pos[0];
-      const control1 = pos[1] || start;
-      const control2 = pos[2] || pos[3] || start;
-      const end = pos[3] || pos[2] || start;
-      path = paper.path([
-        'M', start.x, start.y,
-        'C', control1.x, control1.y, control2.x, control2.y, end.x, end.y,
-        ...(closed ? ['Z'] : []),
-      ]);
+      const start = pos[0] || new Vec2();
+      const commands: Array<string | number> = ['M', start.x, start.y];
+      for (let index = 1; index + 2 < pos.length; index += 3) {
+        const control1 = pos[index];
+        const control2 = pos[index + 1];
+        const end = pos[index + 2];
+        commands.push('C', control1.x, control1.y, control2.x, control2.y, end.x, end.y);
+      }
+      if (closed) commands.push('Z');
+      path = paper.path(commands);
       break;
     }
     case SimpleObjectMode.bracket: {
@@ -823,11 +832,14 @@ function bezierPoint(points: Vec2[], t: number): Vec2 {
 function bezierDistance(point: Vec2, points: Vec2[]): number {
   if (points.length < 4) return Infinity;
   let min = Infinity;
-  let previous = points[0];
-  for (let index = 1; index <= 32; index += 1) {
-    const current = bezierPoint(points, index / 32);
-    min = Math.min(min, point.calculateDistanceToLine([previous, current]));
-    previous = current;
+  for (let segment = 0; segment + 3 < points.length; segment += 3) {
+    const segmentPoints = points.slice(segment, segment + 4);
+    let previous = segmentPoints[0];
+    for (let index = 1; index <= 32; index += 1) {
+      const current = bezierPoint(segmentPoints, index / 32);
+      min = Math.min(min, point.calculateDistanceToLine([previous, current]));
+      previous = current;
+    }
   }
   return min;
 }
@@ -837,7 +849,7 @@ function applySimpleObjectStyle(path: any, style?: string): void {
   if (style === 'dashed') {
     path.attr({ 'stroke-dasharray': '-' });
   } else if (style === 'bold') {
-    path.attr({ 'stroke-width': 2 });
+    if (Number(path.attr('stroke-width')) !== 0) path.attr({ 'stroke-width': 2 });
   }
 }
 

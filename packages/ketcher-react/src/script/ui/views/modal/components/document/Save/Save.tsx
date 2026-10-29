@@ -23,6 +23,7 @@ import {
   type Struct,
   type StructService,
   type OutputFormatType,
+  type KetcherRasterFormat,
   type StructServiceOptions,
   type GenerateImageOptions,
   type SupportedFormatProperties,
@@ -36,6 +37,7 @@ import {
   Atom,
   isClipboardAPIAvailable,
   SupportedFormat,
+  isKetcherRasterFormat,
 } from 'ketcher-core';
 
 import { Dialog } from '../../../../components';
@@ -54,6 +56,8 @@ import { IconButton } from 'components';
 import type { ThunkDispatch } from 'redux-thunk';
 import type { AnyAction } from 'redux';
 import i18n from '../../../../../../../i18n';
+
+type SaveImageFormat = OutputFormatType | KetcherRasterFormat;
 
 const saveSchema = {
   title: i18n.t('save.title'),
@@ -107,7 +111,7 @@ interface PreviewContentProps {
 interface FormState {
   result: {
     filename: string;
-    format: SupportedFormat | OutputFormatType | SupportedFormatProperties;
+    format: SupportedFormat | SaveImageFormat | SupportedFormatProperties;
   };
   valid: boolean;
   errors: Record<string, string>;
@@ -184,7 +188,9 @@ const ImageContent = ({
   <div className={classes.imageContainer}>
     {!isCleanStruct && (
       <img
-        src={`data:image/${format}+xml;base64,${imageSrc}`}
+        src={`data:${
+          format === 'svg' ? 'image/svg+xml' : 'image/png'
+        };base64,${imageSrc}`}
         alt={`${format} preview`}
         data-testid="preview-area"
       />
@@ -271,6 +277,10 @@ class SaveDialog extends Component<SaveDialogProps, SaveDialogState> {
           '<----secondDivider--->', // for dividers in select list
           'svg',
           'png',
+          'jpeg',
+          'bmp',
+          'tiff',
+          'gif',
           SupportedFormat.cdxml,
           SupportedFormat.cdx,
           SupportedFormat.binaryCdx,
@@ -301,7 +311,7 @@ class SaveDialog extends Component<SaveDialogProps, SaveDialogState> {
     );
   }
 
-  isImageFormat = (format: string): format is OutputFormatType => {
+  isImageFormat = (format: string): format is SaveImageFormat => {
     return !!getPropertiesByImgFormat(format);
   };
 
@@ -315,7 +325,7 @@ class SaveDialog extends Component<SaveDialogProps, SaveDialogState> {
   };
 
   changeType = (
-    type: SupportedFormat | OutputFormatType,
+    type: SupportedFormat | SaveImageFormat,
   ): Promise<Error | void> => {
     const { struct, server, options, formState, ignoreChiralFlag } = this.props;
 
@@ -341,7 +351,7 @@ class SaveDialog extends Component<SaveDialogProps, SaveDialogState> {
       });
       const serverOptions = { ...options };
 
-      serverOptions.outputFormat = type;
+      serverOptions.outputFormat = isKetcherRasterFormat(type) ? 'png' : type;
 
       return server
         .generateImageAsBase64(structStr, serverOptions as GenerateImageOptions)
@@ -425,7 +435,7 @@ class SaveDialog extends Component<SaveDialogProps, SaveDialogState> {
     this.setState({ tabIndex: index });
   };
 
-  getWarnings = (format: SupportedFormat | OutputFormatType): string[] => {
+  getWarnings = (format: SupportedFormat | SaveImageFormat): string[] => {
     const { struct, moleculeErrors } = this.props;
     const warnings: string[] = [];
     const structWarning = i18n.t('save.structureErrorsFull');
@@ -459,14 +469,14 @@ class SaveDialog extends Component<SaveDialogProps, SaveDialogState> {
   };
 
   isValidStringFormat = (
-    format: SupportedFormat | OutputFormatType | SupportedFormatProperties,
-  ): format is SupportedFormat | OutputFormatType => {
+    format: SupportedFormat | SaveImageFormat | SupportedFormatProperties,
+  ): format is SupportedFormat | SaveImageFormat => {
     return (
       typeof format === 'string' &&
       !format.startsWith('<----') &&
       !!(
         getPropertiesByFormat(format as SupportedFormat) ||
-        getPropertiesByImgFormat(format as OutputFormatType)
+        getPropertiesByImgFormat(format as SaveImageFormat)
       )
     );
   };
@@ -482,6 +492,7 @@ class SaveDialog extends Component<SaveDialogProps, SaveDialogState> {
         ? [
             {
               caption: i18n.t('save.preview'),
+              testId: 'Preview',
               component: this.renderSaveFile,
               tabIndex: 0,
             },
@@ -489,11 +500,13 @@ class SaveDialog extends Component<SaveDialogProps, SaveDialogState> {
         : [
             {
               caption: i18n.t('save.preview'),
+              testId: 'Preview',
               component: this.renderSaveFile,
               tabIndex: 0,
             },
             {
               caption: i18n.t('save.warnings'),
+              testId: 'Warnings',
               component: this.renderWarnings,
               tabIndex: 1,
             },
@@ -513,7 +526,7 @@ class SaveDialog extends Component<SaveDialogProps, SaveDialogState> {
           <Field
             name="format"
             onChange={(type) => {
-              this.changeType(type as SupportedFormat | OutputFormatType);
+              this.changeType(type as SupportedFormat | SaveImageFormat);
             }}
             options={getSelectOptionsFromSchema(
               this.saveSchema.properties.format,
@@ -564,7 +577,7 @@ class SaveDialog extends Component<SaveDialogProps, SaveDialogState> {
       return (
         <ImageContent
           classes={classes}
-          format={format}
+          format={isKetcherRasterFormat(format) ? 'png' : format}
           imageSrc={imageSrc || ''}
           isCleanStruct={isCleanStruct}
         />
@@ -610,7 +623,10 @@ class SaveDialog extends Component<SaveDialogProps, SaveDialogState> {
     const { filename, format } = formState.result;
     const isCleanStruct = this.props.struct.isBlank();
 
-    options.outputFormat = imageFormat;
+    const imageOptions = {
+      ...options,
+      outputFormat: isKetcherRasterFormat(imageFormat) ? 'png' : imageFormat,
+    };
 
     const savingStruct =
       this.isValidStringFormat(format) &&
@@ -649,12 +665,20 @@ class SaveDialog extends Component<SaveDialogProps, SaveDialogState> {
       buttons.push(
         <SaveButton
           mode="saveImage"
-          options={options as GenerateImageOptions}
+          options={imageOptions as GenerateImageOptions}
+          rasterFormat={
+            isKetcherRasterFormat(imageFormat) ? imageFormat : undefined
+          }
           data={structStr || ''}
           filename={filename}
           key="save-image-button"
           type={`image/${format}+xml`}
           onSave={this.props.onOk}
+          onError={(error) =>
+            this.context.errorHandler(
+              error instanceof Error ? error.message : String(error),
+            )
+          }
           testId="save-button"
           disabled={
             disableControls ||
@@ -719,7 +743,10 @@ const serverSettingsSelector = createSelector([getOptions], (options) =>
   options.getServerSettings(),
 );
 
-const mapStateToProps = (state: AppState, ownProps: any) => ({
+const mapStateToProps = (
+  state: AppState,
+  ownProps: { formState?: FormState },
+) => ({
   server: state.options.app.server ? state.server : null,
   struct: state.editor.struct(),
   options: serverSettingsSelector(state),

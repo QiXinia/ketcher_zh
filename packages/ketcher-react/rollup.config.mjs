@@ -16,13 +16,14 @@ import replace from '@rollup/plugin-replace';
 import strip from '@rollup/plugin-strip';
 import svgr from '@svgr/rollup';
 import typescript from 'rollup-plugin-typescript2';
+import ts from 'typescript';
 import { fileURLToPath } from 'node:url';
 import { license } from '../../license-banner.mjs';
 import { string } from 'rollup-plugin-string';
 
 // Loads a repo-root .env file, if present, without overriding variables
 // already set in the shell (dotenv's default: existing process.env values
-// win). This lets a consumer set KETCHER_MULTI_LANGUAGE_BUILD=true in a
+// win). This lets a consumer set KETCHER_MULTI_LANGUAGE_BUILD=false in a
 // local .env instead of exporting it before every build invocation — see
 // packages/ketcher-react/src/locales/README.md for the full flag docs.
 loadEnv({
@@ -76,7 +77,7 @@ export const valuesToReplace = {
     process.env.INDIGO_MACHINE || '',
   ),
   'process.env.KETCHER_MULTI_LANGUAGE_BUILD': JSON.stringify(
-    process.env.KETCHER_MULTI_LANGUAGE_BUILD === 'true' ? 'true' : 'false',
+    process.env.KETCHER_MULTI_LANGUAGE_BUILD === 'false' ? 'false' : 'true',
   ),
 };
 
@@ -112,14 +113,23 @@ const config = {
     peerDepsExternal({ includeDependencies: true }),
     nodeResolvePlugin({ extensions }),
     commonjs(),
+    json(),
+    typescript({
+      // Resolve the compiler from this workspace, not the hoisted plugin's
+      // TypeScript 4.x dependency, which cannot parse bundler resolution.
+      typescript: ts,
+      tsconfig: './tsconfig.build.json',
+      tsconfigOverride: {
+        compilerOptions: {
+          moduleResolution: 'bundler',
+          rootDir: 'src',
+        },
+      },
+    }),
     replace({
       include: includePattern,
       preventAssignment: true,
       values: valuesToReplace,
-    }),
-    json(),
-    typescript({
-      tsconfig: './tsconfig.build.json',
     }),
     babelPlugin({
       extensions,

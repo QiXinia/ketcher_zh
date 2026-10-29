@@ -41,16 +41,16 @@ exports[`Save modal renders correctly 1`] = `
             id="_r_0_"
           >
             <div
-              class="css-1g1p06n"
+              class="css-1uarmuk"
             >
-              保存结构
+              save structure
             </div>
             <span>
               <button
                 class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-78trlr-MuiButtonBase-root-MuiIconButton-root"
                 data-testid="close-window-button"
                 tabindex="0"
-                title="关闭窗口"
+                title="Close window"
                 type="button"
               >
                 <svg
@@ -175,10 +175,10 @@ exports[`Save modal renders correctly 1`] = `
               class="MuiButtonBase-root css-fevlc0-MuiButtonBase-root"
               data-testid="cancel-button"
               tabindex="0"
-              title="取消"
+              title="Cancel"
               type="button"
             >
-              取消
+              Cancel
               <span
                 class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
               />
@@ -187,10 +187,10 @@ exports[`Save modal renders correctly 1`] = `
               class="MuiButtonBase-root css-1gvl3mi-MuiButtonBase-root"
               data-testid="save-button"
               tabindex="0"
-              title="保存"
+              title="Save"
               type="button"
             >
-              保存
+              Save
               <span
                 class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
               />

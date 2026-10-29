@@ -30,6 +30,8 @@ import type { DrawingEntitiesManager } from 'domain/entities/DrawingEntitiesMana
 import { getPropertiesByFormat } from './formatProperties';
 import { KetcherLogger } from 'utilities';
 import { SmilesFormatter } from './smilesFormatter';
+import { normalizeCmlForIndigo } from './normalizeCmlForIndigo';
+import { ChemicalMimeType } from 'domain/services/struct/structService.types';
 
 type ConvertPromise = (
   data: ConvertData,
@@ -135,7 +137,9 @@ export class ServerFormatter implements StructFormatter {
     stringifiedStruct: string,
   ): Promise<Struct> {
     const { method, struct } = this.getCallingMethod(
-      stringifiedStruct,
+      this.#format === SupportedFormat.cml
+        ? normalizeCmlForIndigo(stringifiedStruct)
+        : stringifiedStruct,
       this.#format,
     );
     const data: ConvertData | LayoutData = {
@@ -144,7 +148,36 @@ export class ServerFormatter implements StructFormatter {
     };
 
     try {
-      const result = await method(data, this.#options);
+      // Struct services are class instances; retain their receiver when the
+      // selected convert/layout method is invoked through a variable.
+      const result = await method.call(
+        this.#structService,
+        data,
+        this.#options,
+      );
+      if (this.#format === SupportedFormat.cml) {
+        // Indigo can silently drop CML stereochemistry when constructing KET.
+        // Equality is deliberately conservative; uncertainty blocks the load.
+        const before = await this.#structService.convert({
+          struct,
+          input_format: ChemicalMimeType.CML,
+          output_format: ChemicalMimeType.DaylightSmiles,
+        });
+        const after = await this.#structService.convert({
+          struct: result.struct,
+          input_format: ChemicalMimeType.KET,
+          output_format: ChemicalMimeType.DaylightSmiles,
+        });
+        const beforeIdentity = String(before.struct || '').trim();
+        if (
+          !beforeIdentity ||
+          beforeIdentity !== String(after.struct || '').trim()
+        ) {
+          throw new Error(
+            'CML conversion could not preserve the chemical or stereochemical structure',
+          );
+        }
+      }
       const parsedStruct = this.#ketSerializer.deserialize(result.struct);
       if (method === this.#structService.layout) {
         parsedStruct.rescale();

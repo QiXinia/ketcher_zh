@@ -95,6 +95,8 @@ export const formsState: ModalFormsState = {
       type: 'single',
       display: 'plain',
       doubleBondPosition: 'auto',
+      showQueryIndicator: true,
+      showReactionIndicator: true,
       topology: 0,
       center: 0,
       customQuery: null,

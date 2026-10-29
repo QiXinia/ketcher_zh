@@ -26,6 +26,8 @@ import type { Loop } from 'domain/entities/loop';
 import type { Struct } from 'domain/entities/struct';
 import type ReStruct from './restruct';
 import type { RenderOptions, RenderPath } from '../render.types';
+import { findRingFill } from 'domain/entities/ringFill';
+import { ringFillPath } from '../ringFillPath';
 
 class ReLoop extends ReObject {
   loop: Loop;
@@ -110,6 +112,36 @@ class ReLoop extends ReObject {
         this.radius < 0 ? distance : Math.min(this.radius, distance);
     }
     this.radius *= 0.7;
+
+    const ringAtomIds = halfBondIds.map(
+      (halfBondId) => molecule.halfBonds.get(halfBondId)!.begin,
+    );
+    const ringBondIds = halfBondIds.map(
+      (halfBondId) => molecule.halfBonds.get(halfBondId)!.bid,
+    );
+    const sgroup = molecule.getGroupFromAtomId(ringAtomIds[0]);
+    if (sgroup?.isContracted() && ringAtomIds.every(
+      (id) => molecule.getGroupFromAtomId(id) === sgroup,
+    )) return;
+    const ringFill = findRingFill(
+      molecule.ringFills.values(),
+      ringAtomIds,
+      ringBondIds,
+    );
+    if (ringFill) {
+      const fillPath = ringFillPath(ringAtomIds.map((id) =>
+        Scale.modelToCanvas(restruct.atoms.get(id)!.a.pp, options),
+      ));
+      if (!fillPath) return;
+      const fill = paper.path(fillPath).attr({
+        fill: ringFill.color,
+        stroke: 'none',
+        'pointer-events': 'none',
+      });
+      fill.node.setAttribute('class', 'ring-fill');
+      restruct.addReObjectPath(LayerMap.ringFill, this.visel, fill, null, true);
+    }
+
     if (!loop.aromatic) {
       return;
     }
@@ -130,15 +162,6 @@ class ReLoop extends ReObject {
     // explicit undefined check rather than a truthiness check.
     if (firstAtomId === undefined) {
       return;
-    }
-    const sgroup = molecule.getGroupFromAtomId(firstAtomId);
-    if (sgroup?.isContracted()) {
-      const allInSameSgroup = [...atomIds].every(
-        (atomId) => molecule.getGroupFromAtomId(atomId) === sgroup,
-      );
-      if (allInSameSgroup) {
-        return;
-      }
     }
 
     let path: RenderPath;

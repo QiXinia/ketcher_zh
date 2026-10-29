@@ -37,6 +37,8 @@ interface BondSettings {
   type: string;
   display: string;
   doubleBondPosition: string;
+  showQueryIndicator: boolean;
+  showReactionIndicator: boolean;
   topology: number | null;
   center: number | null;
   customQuery: string;
@@ -56,6 +58,8 @@ const Bond = (props: Props) => {
     type: 'single',
     display: 'plain',
     doubleBondPosition: 'auto',
+    showQueryIndicator: true,
+    showReactionIndicator: true,
     topology: 0,
     center: 0,
     customQuery: '',
@@ -94,6 +98,8 @@ const Bond = (props: Props) => {
         type,
         display,
         doubleBondPosition,
+        showQueryIndicator,
+        showReactionIndicator,
         topology,
         center,
         customQuery,
@@ -102,6 +108,8 @@ const Bond = (props: Props) => {
         type,
         display,
         doubleBondPosition,
+        showQueryIndicator,
+        showReactionIndicator,
         topology,
         center,
         customQuery,
@@ -109,17 +117,21 @@ const Bond = (props: Props) => {
     }
     updateFormState(
       value
-        ? {
-            display: formState.display,
-            doubleBondPosition: formState.doubleBondPosition,
-            type: '',
-            topology: null,
-            center: null,
-            customQuery: getBondCustomQuery(
-              formState as unknown as BondSettings,
-            ),
+          ? {
+              type: '',
+              display: formState.display,
+              doubleBondPosition: formState.doubleBondPosition,
+              showQueryIndicator: formState.showQueryIndicator,
+              showReactionIndicator: formState.showReactionIndicator,
+              topology: null,
+              center: null,
+              customQuery: getBondCustomQuery(formState as unknown as BondSettings),
           }
-        : (previousSettings.current as unknown as Record<string, unknown>),
+        : {
+            ...(previousSettings.current as unknown as Record<string, unknown>),
+            showQueryIndicator: formState.showQueryIndicator,
+            showReactionIndicator: formState.showReactionIndicator,
+          },
     );
   };
 
@@ -178,6 +190,8 @@ const Bond = (props: Props) => {
           formName="bond-properties"
           data-testid="reacting-center"
         />
+        <Field name="showQueryIndicator" labelPos="before" data-testid="show-query-indicator" />
+        <Field name="showReactionIndicator" labelPos="before" data-testid="show-reaction-indicator" />
         {!SettingsManager.disableCustomQuery && (
           <div
             className={classes.customQueryWrapper}

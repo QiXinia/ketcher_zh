@@ -126,7 +126,7 @@ exports[`Save Dialog should be rendered correctly should render opened file form
                 >
                   <button
                     class="active"
-                    data-testid="预览-tab"
+                    data-testid="Preview-tab"
                     tabindex="0"
                     type="button"
                   >
@@ -382,6 +382,46 @@ exports[`Save Dialog should be rendered correctly should render opened file form
           <li
             aria-selected="false"
             class="MuiButtonBase-root MuiMenuItem-root MuiMenuItem-gutters MuiMenuItem-root MuiMenuItem-gutters css-kk1bwy-MuiButtonBase-root-MuiMenuItem-root"
+            data-testid="JPEG Image-option"
+            data-value="jpeg"
+            role="option"
+            tabindex="-1"
+          >
+            JPEG Image
+          </li>
+          <li
+            aria-selected="false"
+            class="MuiButtonBase-root MuiMenuItem-root MuiMenuItem-gutters MuiMenuItem-root MuiMenuItem-gutters css-kk1bwy-MuiButtonBase-root-MuiMenuItem-root"
+            data-testid="BMP Image-option"
+            data-value="bmp"
+            role="option"
+            tabindex="-1"
+          >
+            BMP Image
+          </li>
+          <li
+            aria-selected="false"
+            class="MuiButtonBase-root MuiMenuItem-root MuiMenuItem-gutters MuiMenuItem-root MuiMenuItem-gutters css-kk1bwy-MuiButtonBase-root-MuiMenuItem-root"
+            data-testid="TIFF Image-option"
+            data-value="tiff"
+            role="option"
+            tabindex="-1"
+          >
+            TIFF Image
+          </li>
+          <li
+            aria-selected="false"
+            class="MuiButtonBase-root MuiMenuItem-root MuiMenuItem-gutters MuiMenuItem-root MuiMenuItem-gutters css-kk1bwy-MuiButtonBase-root-MuiMenuItem-root"
+            data-testid="GIF Image-option"
+            data-value="gif"
+            role="option"
+            tabindex="-1"
+          >
+            GIF Image
+          </li>
+          <li
+            aria-selected="false"
+            class="MuiButtonBase-root MuiMenuItem-root MuiMenuItem-gutters MuiMenuItem-root MuiMenuItem-gutters css-kk1bwy-MuiButtonBase-root-MuiMenuItem-root"
             data-testid="CDXML-option"
             data-value="cdxml"
             role="option"
@@ -537,7 +577,7 @@ exports[`Save Dialog should be rendered correctly should render opened file form
               >
                 <button
                   class="active"
-                  data-testid="预览-tab"
+                  data-testid="Preview-tab"
                   tabindex="0"
                   type="button"
                 >

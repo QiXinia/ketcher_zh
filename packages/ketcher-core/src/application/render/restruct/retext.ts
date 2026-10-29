@@ -40,6 +40,7 @@ export interface SerializedTextNode {
 }
 
 export interface SerializedParagraphNode {
+  lineSpacing?: number;
   children: Array<SerializedTextNode | { type: string }>;
   direction?: string;
   format?: string | number;
@@ -261,7 +262,33 @@ class ReText extends ReObject {
       this.paths.push(row);
 
       const { p0, p1 } = this.getRelBox([row]);
-      shiftY += Math.abs(Vec2.diff(p0, p1).y);
+      const rowHeight = Math.abs(Vec2.diff(p0, p1).y);
+      const lineSpacing = Number(paragraph.lineSpacing);
+      shiftY +=
+        rowHeight *
+        (Number.isFinite(lineSpacing) && lineSpacing > 0 ? lineSpacing : 1);
+    });
+
+    // Lexical stores paragraph alignment on the paragraph `format` field.
+    // Align rows against the widest rendered row so multi-line labels keep a
+    // stable left/center/right edge without changing their serialized bounds.
+    const maxRowWidth = Math.max(
+      ...this.paths.map((row) => this.getRowWidth(row)),
+      0,
+    );
+    paragraphs.forEach((paragraph, index) => {
+      const row = this.paths[index];
+      if (!row) return;
+      const alignment =
+        typeof paragraph.format === 'string' ? paragraph.format : 'left';
+      const rowWidth = this.getRowWidth(row);
+      const offsetX =
+        alignment === 'center'
+          ? (maxRowWidth - rowWidth) / 2
+          : alignment === 'right'
+          ? maxRowWidth - rowWidth
+          : 0;
+      if (offsetX) row.forEach((path) => path.translateAbs(offsetX, 0));
     });
 
     this.item.setPos(this.getReferencePoints());

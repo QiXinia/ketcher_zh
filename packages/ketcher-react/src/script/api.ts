@@ -34,6 +34,7 @@ function createApi(
 
   return Object.assign(info, {
     supportsRequestIds: structService.supportsRequestIds,
+    supportsCrippenLogP: structService.supportsCrippenLogP,
     addKetcherId: structService.addKetcherId.bind(structService),
     info: structService.info.bind(structService),
     convert: structService.convert.bind(structService),

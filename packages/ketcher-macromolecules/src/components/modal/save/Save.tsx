@@ -14,7 +14,7 @@
  * limitations under the License.
  ***************************************************************************/
 
-import { useState, type MouseEvent } from 'react';
+import { useEffect, useRef, useState, type MouseEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Modal } from 'components/shared/modal';
@@ -33,6 +33,10 @@ import {
   isClipboardAPIAvailable,
   isHelmCompatible,
   provideEditorInstance,
+  KETCHER_RASTER_FORMATS,
+  convertKetcherImageToRaster,
+  isKetcherRasterFormat,
+  type KetcherRasterFormat,
 } from 'ketcher-core';
 import { saveAs } from 'file-saver';
 import { RequiredModalProps } from '../modalContainer';
@@ -49,7 +53,8 @@ import {
 import styled from '@emotion/styled';
 import { useAppDispatch } from 'hooks';
 import { openErrorModal } from 'state/modal';
-const options: Array<Option & { id: SupportedFormats }> = [
+type SaveFormat = SupportedFormats | KetcherRasterFormat | 'png';
+const options: Array<Option & { id: SaveFormat }> = [
   { id: 'ket', label: 'Ket Format' },
   { id: 'mol', label: 'MDL Molfile V3000' },
   { id: 'sequence', label: 'Sequence (1-letter code)' },
@@ -58,6 +63,11 @@ const options: Array<Option & { id: SupportedFormats }> = [
   { id: 'idt', label: 'IDT' },
   { id: 'axo-labs', label: 'AxoLabs' },
   { id: 'svg', label: 'SVG Document' },
+  { id: 'png', label: 'PNG Image' },
+  ...KETCHER_RASTER_FORMATS.map((item) => ({
+    id: item.format,
+    label: `${item.label} Image`,
+  })),
   { id: 'helm', label: 'HELM' },
   { id: 'biln', label: 'BILN' },
 ];
@@ -94,8 +104,7 @@ export const Save = ({
   const dispatch = useAppDispatch();
   const indigo = IndigoProvider.getIndigo() as StructService;
   const editor = provideEditorInstance();
-  const [currentFileFormat, setCurrentFileFormat] =
-    useState<SupportedFormats>('ket');
+  const [currentFileFormat, setCurrentFileFormat] = useState<SaveFormat>('ket');
   const [currentFileName, setCurrentFileName] = useState('ketcher');
   const [struct, setStruct] = useState(() => {
     const ketSerializer = new KetSerializer();
@@ -105,9 +114,19 @@ export const Save = ({
     );
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [isSavingImage, setIsSavingImage] = useState(false);
+  const conversionVersion = useRef(0);
+  useEffect(
+    () => () => {
+      conversionVersion.current += 1;
+    },
+    [],
+  );
   const [svgData, setSvgData] = useState<string | undefined>();
 
-  const handleSelectChange = async (fileFormat: SupportedFormats) => {
+  const handleSelectChange = async (fileFormat: SaveFormat) => {
+    const version = ++conversionVersion.current;
+    setIsLoading(false);
     setCurrentFileFormat(fileFormat);
     const ketSerializer = new KetSerializer();
     const serializedKet = ketSerializer.serialize(
@@ -119,7 +138,11 @@ export const Save = ({
       setStruct(serializedKet);
       return;
     }
-    if (fileFormat === 'svg') {
+    if (
+      fileFormat === 'svg' ||
+      fileFormat === 'png' ||
+      isKetcherRasterFormat(fileFormat)
+    ) {
       const svgData = getSvgFromDrawnStructures(editor.canvas, 'preview');
       setSvgData(svgData);
       return;
@@ -169,8 +192,10 @@ export const Save = ({
         },
         formatProperties.options,
       );
+      if (version !== conversionVersion.current) return;
       setStruct(result.struct);
     } catch (error) {
+      if (version !== conversionVersion.current) return;
       let stringError;
       if (error instanceof Error) {
         stringError = error.message;
@@ -181,8 +206,9 @@ export const Save = ({
       dispatch(openErrorModal(errorMessage));
       KetcherLogger.error(errorMessage);
       setCurrentFileFormat('ket');
+      setStruct(serializedKet);
     } finally {
-      setIsLoading(false);
+      if (version === conversionVersion.current) setIsLoading(false);
     }
   };
 
@@ -190,12 +216,45 @@ export const Save = ({
     setCurrentFileName(value);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     let blobPart;
-    if (currentFileFormat === 'svg') {
+    if (
+      currentFileFormat === 'svg' ||
+      currentFileFormat === 'png' ||
+      isKetcherRasterFormat(currentFileFormat)
+    ) {
       const svgData = getSvgFromDrawnStructures(editor.canvas, 'file');
       if (!svgData) {
-        onClose();
+        dispatch(openErrorModal('无法生成画布图像'));
+        return;
+      }
+      if (currentFileFormat !== 'svg') {
+        try {
+          setIsLoading(true);
+          setIsSavingImage(true);
+          const blob = await convertKetcherImageToRaster(
+            new Blob([svgData], { type: 'image/svg+xml' }),
+            currentFileFormat,
+          );
+          const extension =
+            currentFileFormat === 'png'
+              ? 'png'
+              : KETCHER_RASTER_FORMATS.find(
+                  (item) => item.format === currentFileFormat,
+                )?.extension;
+          if (!extension) throw new Error('Unsupported image format');
+          saveAs(blob, `${currentFileName}.${extension}`);
+          onClose();
+        } catch (error) {
+          dispatch(
+            openErrorModal(
+              error instanceof Error ? error.message : String(error),
+            ),
+          );
+        } finally {
+          setIsLoading(false);
+          setIsSavingImage(false);
+        }
         return;
       }
       blobPart = svgData;
@@ -203,15 +262,18 @@ export const Save = ({
       blobPart = struct;
     }
     const blob = new Blob([blobPart], {
-      type: getPropertiesByFormat(currentFileFormat).mime,
+      type: getPropertiesByFormat(currentFileFormat as SupportedFormats).mime,
     });
-    const formatProperties = getPropertiesByFormat(currentFileFormat);
+    const formatProperties = getPropertiesByFormat(
+      currentFileFormat as SupportedFormats,
+    );
     saveAs(blob, `${currentFileName}${formatProperties.extensions[0]}`);
     onClose();
   };
 
   const handleCopy = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
+    if (isLoading) return;
 
     if (!isClipboardAPIAvailable()) {
       dispatch(openErrorModal(t('common:errors.featureNotAvailableInBrowser')));
@@ -248,8 +310,9 @@ export const Save = ({
               options={options}
               currentSelection={currentFileFormat}
               selectionHandler={(value) =>
-                handleSelectChange(value as SupportedFormats)
+                handleSelectChange(value as SaveFormat)
               }
+              disabled={isSavingImage}
               customStylesForExpanded={stylesForExpanded}
               testId="file-format-list"
             />
@@ -264,6 +327,7 @@ export const Save = ({
               <TextArea testId="preview-area" value={struct} readonly />
               <IconButton
                 onClick={handleCopy}
+                disabled={isLoading}
                 iconName="copy"
                 title={t('save.copyToClipboard')}
                 testId="copy-to-clipboard"
@@ -289,7 +353,7 @@ export const Save = ({
         <ActionButton
           label={t('common:button.save')}
           clickHandler={handleSave}
-          disabled={!currentFileName}
+          disabled={!currentFileName || isLoading}
           data-testid="save-button"
         />
       </Modal.Footer>

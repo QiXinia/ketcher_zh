@@ -78,6 +78,7 @@ export const OperationType = Object.freeze({
   ADD_HIGHLIGHT: 'Highlight',
   UPDATE_HIGHLIGHT: 'Update highlight',
   REMOVE_HIGHLIGHT: 'Remove highlight',
+  RING_FILL_SET: 'Set ring fill',
   POLYMER_BOND_ADD: 'Add polymer bond',
   POLYMER_BOND_DELETE: 'Remove polymer bond',
   POLYMER_BOND_MOVE: 'Move polymer bond',

@@ -1,4 +1,4 @@
-import { AnyAction } from 'redux';
+import type { AnyAction } from 'redux';
 import { formsState, type ModalFormState } from './form';
 
 interface ModalDialogProps {

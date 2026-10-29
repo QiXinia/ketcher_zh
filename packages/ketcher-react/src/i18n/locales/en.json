@@ -1,5 +1,11 @@
 {
   "action": {
+    "copyAsSMILES": "Copy as SMILES",
+    "copyAsInChI": "Copy as InChI",
+    "copyAsInChIKey": "Copy as InChIKey",
+    "copyAsCDXML": "Copy as CDXML (chemical subset)",
+    "copyFormatRequiresMolecule": "Select one concrete molecule without query features, reactions, text or graphics. Use KET for other content.",
+    "copyFormatUnavailable": "The selected copy format is unavailable.",
     "clearCanvas": "Clear Canvas",
     "open": "Open...",
     "saveAs": "Save As...",
@@ -100,6 +106,7 @@
     "dative": "Dative Bond"
   },
   "zoom": {
+    "zoomFit": "Fit to View",
     "zoomOut": "Zoom Out",
     "zoomIn": "Zoom In",
     "zoom100": "Zoom 100%"
@@ -182,6 +189,7 @@
     "zoomOut": "Zoom Out",
     "zoomIn": "Zoom In",
     "zoom100": "Zoom 100%",
+    "zoomFit": "Fit to View",
     "aromatize": "Aromatize",
     "dearomatize": "Dearomatize",
     "layout": "Layout",
@@ -286,6 +294,11 @@
     "title": "Calculated Values",
     "chemicalFormula": "Chemical Formula",
     "molecularWeight": "Molecular Weight",
+    "mostAbundantMass": "Most Abundant Mass",
+    "massToCharge": "m/z (monoisotopic ion)",
+    "massToChargeHint": "Available for one explicitly charged molecule with no selection; no adduct or protonation is inferred.",
+    "crippenLogP": "Crippen cLogP",
+    "crippenLogPHint": "Local estimate for one neutral, concrete molecule. This is not a measured logP or a pH-dependent logD.",
     "exactMass": "Exact Mass",
     "elementalAnalysis": "Elemental Analysis",
     "decimalPlaces": "Decimal places"
@@ -452,6 +465,8 @@
   "infoModal": {
     "errorMessage": "Error Message",
     "close": "Close",
+    "monomerLibraryConversionFailed": "Monomer library conversion failed",
+    "monomerLibraryUpdateFailed": "Monomer library update failed",
     "pasteError": "Your browser doesn't allow pasting clipboard content via button. Please use shortcut instead.",
     "forPaste": "for paste",
     "unavailableViaMenu": "This action is unavailable via menu. Instead, use shortcut to {{action}}."
@@ -661,6 +676,8 @@
     "type": "Type",
     "topology": "Topology",
     "reactingCenter": "Reacting Center",
+    "showQueryIndicator": "Show query indicator",
+    "showReactionIndicator": "Show reaction indicator",
     "single": "Single",
     "singleUp": "Single Up",
     "singleDown": "Single Down",
@@ -956,6 +973,8 @@
     "sgroupNotEmpty": "S-Group not empty!",
     "sgroupDeclarationIncomplete": "S-group declaration incomplete.",
     "sgroupBraceInvalid": "Brace balance broken. S-group properies invalid!",
+    "mergeFragmentsUnavailable": "It is impossible to merge fragments. Attachment point to establish bonds are not available.",
+    "monomerLibraryLoadFailed": "Failed to load monomers library",
     "ringBondCountInvalid": "Ring bond count invalid",
     "substitutionCountInvalid": "Substitution count invalid",
     "unsaturatedAtomInvalid": "Unsaturated atom invalid value"

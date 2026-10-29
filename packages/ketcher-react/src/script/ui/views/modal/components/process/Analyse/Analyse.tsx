@@ -38,7 +38,9 @@ import i18n from '../../../../../../../i18n';
 interface RoundSettings {
   roundWeight: number | string;
   roundMass: number | string;
+  roundLogP: number | string;
   roundElAnalysis: number | string;
+  [key: string]: number | string;
 }
 
 interface AnalyseItem {
@@ -46,6 +48,7 @@ interface AnalyseItem {
   key: string;
   round?: AnalyseRoundName;
   withSelector: boolean;
+  tooltip?: string;
 }
 
 interface AnalyseDialogProps extends DialogParams {
@@ -61,8 +64,10 @@ interface AnalyseDialogCallProps {
 
 type Props = AnalyseDialogProps & AnalyseDialogCallProps;
 
-function roundOff(value: string | number, round: number): string {
-  if (typeof value === 'number') return value.toFixed(round);
+function roundOff(value: string | number | undefined, round: number): string {
+  if (typeof value === 'number')
+    return Number.isFinite(value) ? value.toFixed(round) : '';
+  if (typeof value !== 'string') return '';
   return value.replace(/\d*\.\d+/g, (str) => (+str).toFixed(round));
 }
 
@@ -81,10 +86,30 @@ const analyseItems: AnalyseItem[] = [
     withSelector: true,
   },
   {
+    name: i18n.t('analyse.mostAbundantMass'),
+    key: 'most-abundant-mass',
+    round: 'roundMass',
+    withSelector: true,
+  },
+  {
     name: i18n.t('analyse.exactMass'),
     key: 'monoisotopic-mass',
     round: 'roundMass',
     withSelector: true,
+  },
+  {
+    name: i18n.t('analyse.massToCharge'),
+    key: 'mass-to-charge',
+    round: 'roundMass',
+    withSelector: true,
+    tooltip: i18n.t('analyse.massToChargeHint'),
+  },
+  {
+    name: i18n.t('analyse.crippenLogP'),
+    key: 'crippen-logp',
+    round: 'roundLogP',
+    withSelector: true,
+    tooltip: i18n.t('analyse.crippenLogPHint'),
   },
   {
     name: i18n.t('analyse.elementalAnalysis'),
@@ -119,7 +144,7 @@ function renderInputComponent(
                 values[item.key] as string | number,
                 Number(round[item.round]),
               )
-            : 0
+            : ''
         }
         data-testid={item.name + '-input'}
       />
@@ -135,13 +160,13 @@ function renderInputComponent(
               values[item.key] as string | number,
               Number(round[item.round]),
             )
-          : 0
+          : ''
       }
     />
   );
 }
 
-function AnalyseDialog({
+export function AnalyseDialog({
   values,
   round,
   loading,
@@ -172,7 +197,7 @@ function AnalyseDialog({
             data-testid={item.name + '-wrapper'}
           >
             <div className={classes.inputWrapper}>
-              <label>{item.name}:</label>
+              <label title={item.tooltip}>{item.name}:</label>
               {renderInputComponent(item, values, loading, round)}
             </div>
             {item.withSelector && item.round ? (
@@ -204,6 +229,7 @@ const mapStateToProps = (state: StoreState) => ({
   round: {
     roundWeight: state.options.analyse.roundWeight,
     roundMass: state.options.analyse.roundMass,
+    roundLogP: state.options.analyse.roundLogP,
     roundElAnalysis: state.options.analyse.roundElAnalysis,
   },
 });

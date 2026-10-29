@@ -28,6 +28,7 @@ import {
 import type Editor from '../Editor';
 import { MODES } from 'src/constants';
 import { getAngleFromEvent, getBondFlipSign } from './template.helpers';
+import { shouldSproutRing } from './templateRingPolicy';
 
 const PREVIEW_DELAY = 300;
 type ClosestItemType = { map: string; id: number; dist: number };
@@ -111,11 +112,19 @@ class TemplatePreview {
     const struct = this.editor.struct();
     const previewTarget = this.getPreviewTarget(event);
     const isMouseAwayFromAtomsAndBonds = !previewTarget;
+    const sprout = previewTarget?.map === 'atoms' &&
+      shouldSproutRing(this.editor, this.template, this.mode, event);
+    const previewId = previewTarget &&
+      `${getUniqueCiId(previewTarget)}-${sprout}-${Boolean(event.ctrlKey)}`;
     const isPreviewTargetChanged =
-      previewTarget && this.lastPreviewId !== getUniqueCiId(previewTarget);
+      previewTarget && this.lastPreviewId !== previewId;
 
     const shouldHidePreview =
       isMouseAwayFromAtomsAndBonds || isPreviewTargetChanged;
+
+    if (shouldHidePreview) {
+      this.hideConnectedPreview();
+    }
 
     const shouldShowPreview =
       previewTarget &&
@@ -123,11 +132,8 @@ class TemplatePreview {
       !this.connectedPreviewAction &&
       !this.connectedPreviewTimeout;
 
-    if (shouldHidePreview) {
-      this.hideConnectedPreview();
-    }
     if (shouldShowPreview) {
-      this.lastPreviewId = getUniqueCiId(previewTarget);
+      this.lastPreviewId = previewId;
       this.connectedPreviewTimeout = setTimeout(() => {
         this.previousPosition = this.position;
         this.hideFloatingPreview();
@@ -228,17 +234,20 @@ class TemplatePreview {
       this.connectedPreviewAction = action;
     } else if (ci.map === 'atoms') {
       const angle = getAngleFromEvent(event, ci, this.restruct);
+      const extraBond = shouldSproutRing(
+        this.editor, this.template, this.mode, event,
+      );
 
       let [action, pasteItems] = fromTemplateOnAtom(
         this.restruct,
         this.template,
         ci.id,
         angle,
-        false,
+        extraBond,
         true,
       );
 
-      if (pasteItems && !this.isModeFunctionalGroup) {
+      if (pasteItems && !this.isModeFunctionalGroup && !extraBond) {
         const mergeItems = getItemsToFuse(this.editor, pasteItems);
         action = fromItemsFuse(this.restruct, mergeItems).mergeWith(action);
       }

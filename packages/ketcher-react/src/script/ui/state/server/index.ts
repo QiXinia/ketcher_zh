@@ -18,6 +18,7 @@ import {
   ChemicalMimeType,
   KetcherLogger,
   KetSerializer,
+  massToChargeFromKet,
   type Struct,
 } from 'ketcher-core';
 import { appUpdate } from '../options/actions';
@@ -147,6 +148,19 @@ export function analyse() {
       type: 'ANALYSE_LOADING',
     });
     const { editor, server, options } = getState();
+    // The calculation service may evaluate a selection. Only derive m/z when
+    // its mass and the explicit charge refer to the same complete drawing.
+    const selection = editor.selection();
+    const hasSelection =
+      selection &&
+      Object.values(selection).some(
+        (value) => Array.isArray(value) && value.length > 0,
+      );
+    const serializer = new KetSerializer();
+    let massSnapshot = '';
+    try {
+      if (!hasSelection) massSnapshot = serializer.serialize(editor.struct());
+    } catch {}
     const serverSettings = options.getServerSettings();
     serverSettings.data = {
       properties: [
@@ -157,14 +171,39 @@ export function analyse() {
         'mass-composition',
       ],
     };
+    if (!hasSelection && massSnapshot && server.supportsCrippenLogP) {
+      serverSettings.data.properties.push('crippen-logp');
+    }
 
     return serverCall(editor, server, 'calculate', serverSettings)
-      .then((values) =>
-        dispatch({
+      .then((values) => {
+        let mz;
+        let sameSnapshot = false;
+        try {
+          sameSnapshot = !!(
+            massSnapshot &&
+            serializer.serialize(editor.struct()) === massSnapshot
+          );
+          if (sameSnapshot) {
+            const result = massToChargeFromKet(
+              massSnapshot,
+              values?.['monoisotopic-mass'],
+            );
+            if (result.ok) mz = result.mz;
+          }
+        } catch {}
+        if (!sameSnapshot && values?.['crippen-logp'] !== undefined) {
+          values = { ...values };
+          delete values['crippen-logp'];
+        }
+        return dispatch({
           type: 'CHANGE_ANALYSE',
-          data: { values },
-        }),
-      )
+          data: {
+            values:
+              mz === undefined ? values : { ...values, 'mass-to-charge': mz },
+          },
+        });
+      })
       .catch((e) => {
         KetcherLogger.error('index.js::analyse', e);
         editor.errorHandler(e);

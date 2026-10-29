@@ -139,14 +139,39 @@ describe('Simple line object styles', () => {
       ['closed', true],
       ['fill', SimpleObjectFill.shaded],
       ['faded', true],
+      ['lineWidth', 2.5],
+      ['doubleLineSpacing', 0.5],
     ] as const;
     cases.forEach(([property, value]) => {
       const inverse = fromSimpleObjectCurve(0, property, value).perform(restruct);
       expect(simpleObjects.get(0)[property]).toBe(value);
       inverse.perform(restruct);
       expect(simpleObjects.get(0)[property]).toBe(
-        property === 'fill' ? SimpleObjectFill.none : false,
+        property === 'fill' ? SimpleObjectFill.none
+          : property === 'lineWidth' || property === 'doubleLineSpacing' ? 1 : false,
       );
     });
+  });
+
+  it('rejects invalid curve widths and spacing without changing the object', () => {
+    for (const property of ['lineWidth', 'doubleLineSpacing'] as const) {
+      for (const value of [0, -1, 0.24, 8.01, NaN, Infinity]) {
+        expect(() => fromSimpleObjectCurve(0, property, value)).toThrow('0.25 到 8');
+      }
+    }
+  });
+
+  it('keeps widths and spacing through Join, undo, redo and deletion restore', () => {
+    const { restruct, simpleObjects } = createRestruct([[[0, 0], [1, 0]], [[1, 0], [2, 0]]]);
+    simpleObjects.get(0).lineWidth = 2;
+    simpleObjects.get(0).doubleLineSpacing = 0.5;
+    simpleObjects.get(1).lineWidth = 3;
+    const inverse = fromJoin(restruct, { simpleObjects: [0, 1] });
+    expect([...simpleObjects.values()][0]).toMatchObject({ lineWidth: 2, doubleLineSpacing: 0.5 });
+    const redo = inverse.perform(restruct);
+    expect(simpleObjects.get(0)).toMatchObject({ lineWidth: 2, doubleLineSpacing: 0.5 });
+    expect(simpleObjects.get(1).lineWidth).toBe(3);
+    redo.perform(restruct);
+    expect([...simpleObjects.values()][0]).toMatchObject({ lineWidth: 2, doubleLineSpacing: 0.5 });
   });
 });

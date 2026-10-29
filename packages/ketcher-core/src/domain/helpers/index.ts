@@ -15,6 +15,7 @@
  ***************************************************************************/
 
 export * from './scale';
+export * from './atomSproutLabel';
 export * from './stereoValidator';
 export * from './functionalGroupsProvider';
 export * from './saltsAndSolventsProvider';

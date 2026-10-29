@@ -17,6 +17,7 @@ import { IKetMacromoleculesContent } from 'ketcher-core';
 
 export interface IndigoVectorInt {
   push_back(value: number): void;
+  delete(): void;
 }
 
 export interface IndigoOptions {
@@ -27,6 +28,7 @@ export interface IndigoOptions {
 export interface IndigoModule {
   MapStringString: new () => IndigoOptions;
   VectorInt: new () => IndigoVectorInt;
+  logp(struct: string, options: IndigoOptions): string;
   render(struct: string, options: IndigoOptions): string;
   layout(struct: string, format: string, options: IndigoOptions): string;
   dearomatize(struct: string, format: string, options: IndigoOptions): string;
@@ -174,6 +176,7 @@ export type CalculateProps =
   | 'molecular-weight'
   | 'most-abundant-mass'
   | 'monoisotopic-mass'
+  | 'crippen-logp'
   | 'gross'
   | 'gross-formula'
   | 'mass-composition';
@@ -181,6 +184,7 @@ export type CalculateProps =
 export interface CalculateCommandData
   extends CommandData, WithStruct, WithSelection {
   properties: Array<string>;
+  calculateCrippenLogP?: boolean;
 }
 
 export interface AutomapCommandData

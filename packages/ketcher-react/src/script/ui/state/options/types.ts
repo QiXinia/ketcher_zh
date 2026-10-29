@@ -17,11 +17,14 @@ export type CheckOption =
 
 export type RecognizeImageFile = File | FileContent | null;
 
-export type AnalyseRoundName = 'roundWeight' | 'roundMass' | 'roundElAnalysis';
+export type AnalyseRoundName = 'roundWeight' | 'roundMass' | 'roundLogP' | 'roundElAnalysis';
 
 export interface AnalyseValues {
   gross?: string;
   'molecular-weight'?: number;
+  'most-abundant-mass'?: string | number;
+  'mass-to-charge'?: number;
+  'crippen-logp'?: number;
   'monoisotopic-mass'?: number;
   'mass-composition'?: string;
   [key: string]: string | number | undefined;
@@ -32,6 +35,7 @@ export interface AnalyseState {
   loading: boolean;
   roundWeight: number | string;
   roundMass: number | string;
+  roundLogP: number | string;
   roundElAnalysis: number | string;
 }
 

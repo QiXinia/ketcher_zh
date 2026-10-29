@@ -1,5 +1,11 @@
 {
   "action": {
+    "copyAsSMILES": "复制为 SMILES",
+    "copyAsInChI": "复制为 InChI",
+    "copyAsInChIKey": "复制为 InChIKey",
+    "copyAsCDXML": "复制为 CDXML（化学对象子集）",
+    "copyFormatRequiresMolecule": "请选择一个不含查询、反应、文本或图形的具体分子；其他内容请复制为 KET。",
+    "copyFormatUnavailable": "当前复制格式不可用。",
     "clearCanvas": "清除画布",
     "open": "打开...",
     "saveAs": "另存为...",
@@ -100,6 +106,7 @@
     "dative": "配位键"
   },
   "zoom": {
+    "zoomFit": "适应窗口",
     "zoomOut": "缩小",
     "zoomIn": "放大",
     "zoom100": "缩放 100%"
@@ -182,6 +189,7 @@
     "zoomOut": "缩小",
     "zoomIn": "放大",
     "zoom100": "缩放 100%",
+    "zoomFit": "适应窗口",
     "aromatize": "芳香化",
     "dearomatize": "去芳香化",
     "layout": "布局",
@@ -286,6 +294,11 @@
     "title": "计算值",
     "chemicalFormula": "化学式",
     "molecularWeight": "分子量",
+    "mostAbundantMass": "最丰同位素质量",
+    "massToCharge": "m/z（单同位素离子）",
+    "massToChargeHint": "适用于未选择局部、且明确带电的单一分子；不自动推断加合物或质子化状态。",
+    "crippenLogP": "Crippen cLogP",
+    "crippenLogPHint": "对单个中性、具体分子的本地估算值，并非实测 logP 或随 pH 变化的 logD。",
     "exactMass": "精确质量",
     "elementalAnalysis": "元素分析",
     "decimalPlaces": "小数位数"
@@ -452,6 +465,8 @@
   "infoModal": {
     "errorMessage": "错误信息",
     "close": "关闭",
+    "monomerLibraryConversionFailed": "单体库转换失败",
+    "monomerLibraryUpdateFailed": "单体库更新失败",
     "pasteError": "您的浏览器不允许通过按钮粘贴剪贴板内容。请使用快捷键代替。",
     "forPaste": "用于粘贴",
     "unavailableViaMenu": "此操作无法通过菜单执行。请使用快捷键 {{action}}。"
@@ -661,6 +676,8 @@
     "type": "类型",
     "topology": "拓扑",
     "reactingCenter": "反应中心",
+    "showQueryIndicator": "显示查询标记",
+    "showReactionIndicator": "显示反应标记",
     "single": "单键",
     "singleUp": "上楔单键",
     "singleDown": "下楔单键",
@@ -956,6 +973,8 @@
     "sgroupNotEmpty": "S-基团不为空！",
     "sgroupDeclarationIncomplete": "S-基团声明不完整。",
     "sgroupBraceInvalid": "括号配对错误，S-基团属性无效！",
+    "mergeFragmentsUnavailable": "无法合并片段，因为没有可用于建立连接的连接点。",
+    "monomerLibraryLoadFailed": "加载单体库失败",
     "ringBondCountInvalid": "环键数无效",
     "substitutionCountInvalid": "取代基数无效",
     "unsaturatedAtomInvalid": "不饱和原子的值无效"

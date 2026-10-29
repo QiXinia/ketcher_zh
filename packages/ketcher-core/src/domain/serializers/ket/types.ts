@@ -109,6 +109,7 @@ export interface KetMoleculeNode {
   atoms: (KetAtomNode | KetRgLabelNode)[];
   bonds?: KetBondNode[];
   sgroups?: KetSGroupNode[];
+  ringFills?: Array<{ atoms: number[]; bonds: number[]; color: string }>;
   coloredHighlights?: Array<{
     atoms?: number[];
     bonds?: number[];

@@ -6,6 +6,8 @@ const toolsWithoutTitles = new Set([
   'reaction-mapping-tools',
   'rgroup',
   'shapes',
+  // Empty bond type is a schema placeholder, not a selectable tool.
+  'bond-',
 ]);
 const isToolWithTitle = (tool) => !toolsWithoutTitles.has(tool);
 const toolsWithTitles = Object.keys(toolActions).filter(isToolWithTitle);

@@ -246,6 +246,13 @@ const App = (props: Props) => {
         openDialog(dispatch, 'check').catch(() => undefined);
         return;
       }
+      if (dialog === 'templates') {
+        openDialog(dispatch, 'templates', { tab: null }).catch((error) => {
+          if (detail) detail.error = error instanceof Error ? error.message : String(error);
+          KetcherLogger.error('ChemWiki Templates bridge', error);
+        });
+        return;
+      }
       if (dialog === 'attachData' || dialog === 'editAttachedData') {
         if (detail) detail.handled = true;
         try {

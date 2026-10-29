@@ -19,7 +19,7 @@ import type { Serializer, Struct } from 'ketcher-core';
 /**
  * Supported serialization format types for structure copying.
  */
-export type SerializationType = 'mol' | 'ket';
+export type SerializationType = 'mol' | 'ket' | 'smiles' | 'inchi' | 'inchikey' | 'cdxml';
 
 /**
  * Serializer for a Struct type.

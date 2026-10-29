@@ -35,6 +35,7 @@ import {
   ExplicitHydrogensCommandData,
   CalculateMacromoleculePropertiesCommandData,
 } from './indigoWorker.types';
+import { addCrippenLogP } from './indigoCalculateExtras';
 
 import indigoModuleFn from '_indigo-ketcher-import-alias_';
 
@@ -68,23 +69,33 @@ function handleCommand(
 ) {
   // Catch initialization and option failures as well as chemistry failures.
   // Every outcome must echo the request ID to settle exactly one caller.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  indigoModule.then((indigo: IndigoModule) => {
-    const indigoOptions = new indigo.MapStringString();
-    let payload;
-    try {
-      setOptions(indigoOptions, options ?? {});
-      payload = handler(indigo, indigoOptions);
-    } finally {
-      indigoOptions.delete?.();
-    }
-    self.postMessage({ type: messageType, requestId, payload, hasError: false, inputData });
-  }).catch((error: unknown) => {
-    self.postMessage({
-      type: messageType, requestId, hasError: true,
-      error: normalizeError(error).message, inputData,
+  indigoModule
+    .then((indigo: IndigoModule) => {
+      const indigoOptions = new indigo.MapStringString();
+      let payload;
+      try {
+        setOptions(indigoOptions, options ?? {});
+        payload = handler(indigo, indigoOptions);
+      } finally {
+        indigoOptions.delete?.();
+      }
+      self.postMessage({
+        type: messageType,
+        requestId,
+        payload,
+        hasError: false,
+        inputData,
+      });
+    })
+    .catch((error: unknown) => {
+      self.postMessage({
+        type: messageType,
+        requestId,
+        hasError: true,
+        error: normalizeError(error).message,
+        inputData,
+      });
     });
-  });
 }
 
 function setOptions(indigoOptions: IndigoOptions, options: CommandOptions) {
@@ -179,10 +190,23 @@ self.onmessage = (e: MessageEvent<InputMessage<CommandData>>) => {
       handle(
         (indigo, indigoOptions) => {
           const selectedAtoms = new indigo.VectorInt();
-          data.selectedAtoms.forEach((atomId) =>
-            selectedAtoms.push_back(atomId),
-          );
-          return indigo.calculate(data.struct, indigoOptions, selectedAtoms);
+          try {
+            data.selectedAtoms.forEach((atomId) =>
+              selectedAtoms.push_back(atomId),
+            );
+            const calculated = indigo.calculate(
+              data.struct,
+              indigoOptions,
+              selectedAtoms,
+            );
+            return data.calculateCrippenLogP
+              ? addCrippenLogP(calculated, () =>
+                  indigo.logp(data.struct, indigoOptions),
+                )
+              : calculated;
+          } finally {
+            selectedAtoms.delete();
+          }
         },
         data.options,
         Command.Calculate,
@@ -292,6 +316,11 @@ self.onmessage = (e: MessageEvent<InputMessage<CommandData>>) => {
     }
 
     default:
-      self.postMessage({ requestId: message.requestId, type: message.type, hasError: true, error: 'Unsupported command' });
+      self.postMessage({
+        requestId: message.requestId,
+        type: message.type,
+        hasError: true,
+        error: 'Unsupported command',
+      });
   }
 };

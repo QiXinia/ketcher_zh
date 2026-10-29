@@ -14,9 +14,9 @@
  * limitations under the License.
  ***************************************************************************/
 
-import { error } from './constants';
 import { useEffect, useRef, type ReactElement } from 'react';
-import { translateErrorMessage } from '../../i18n/helpers';
+import i18n from '../../i18n';
+import { translateErrorMessage, translateErrorTitle } from '../../i18n/helpers';
 
 import styles from './InfoModal.module.less';
 
@@ -50,7 +50,7 @@ const InfoModal = ({ message, close }: InfoModalProps): ReactElement => {
         aria-describedby="dialog-content"
         data-testid="info-modal-window"
       >
-        <header id="dialog-label">{error.message}</header>
+        <header id="dialog-label">{translateErrorTitle()}</header>
         <div
           className={styles.infoModalBody}
           id="dialog-content"
@@ -64,7 +64,7 @@ const InfoModal = ({ message, close }: InfoModalProps): ReactElement => {
             onClick={close}
             data-testid="info-modal-close"
           >
-            {error.close}
+            {i18n.t('infoModal.close')}
           </button>
         </footer>
       </dialog>

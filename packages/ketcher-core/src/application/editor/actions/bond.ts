@@ -285,6 +285,31 @@ export function fromBondsAttrs(
   return action;
 }
 
+/** Apply only display flags and return the inverse for one editor history entry. */
+export function fromSelectedBondIndicatorVisibility(
+  restruct: ReStruct,
+  ids: number[],
+  indicator: 'query' | 'reaction',
+  visible: boolean,
+): Action {
+  if (!['query', 'reaction'].includes(indicator) || typeof visible !== 'boolean') {
+    throw new Error('键标记类型或显示状态无效');
+  }
+  if (!ids.length) throw new Error('请先选择一个或多个化学键');
+  const property = indicator === 'query' ? 'showQueryIndicator' : 'showReactionIndicator';
+  const uniqueIds = [...new Set(ids)];
+  // Preflight every target before performing any operation.
+  const bonds = uniqueIds.map((id) => {
+    const bond = Number.isInteger(id) ? restruct.molecule.bonds.get(id) : undefined;
+    if (!bond) throw new Error('化学键选区已失效，请重新选择');
+    return { id, bond };
+  });
+  const changed = bonds.filter(({ bond }) => (bond[property] ?? true) !== visible);
+  return changed.length
+    ? fromBondsAttrs(restruct, changed.map(({ id }) => id), { [property]: visible }, false)
+    : new Action();
+}
+
 export function fromBondsMerge(
   restruct: ReStruct,
   mergeMap: Map<number, number>,

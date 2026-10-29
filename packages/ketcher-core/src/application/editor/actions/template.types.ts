@@ -22,6 +22,10 @@ import type { Struct } from 'domain/entities/struct';
  */
 export interface EditorTemplate {
   molecule: Struct;
+  ringTool?: boolean;
+  preserveTargetAtomAttributes?: boolean;
+  preserveExistingBondAttributes?: boolean;
+  mergeNearbyAtoms?: boolean;
   /**
   Id of the template attachment atom.
   */

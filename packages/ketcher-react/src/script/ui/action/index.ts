@@ -189,6 +189,42 @@ const config: Record<string, UiAction> = {
     disabled: (editor) => !hasSelection(editor),
     hidden: (options) => isHidden(options, 'copy-ket'),
   },
+  'copy-smiles': {
+    enabledInViewOnly: true,
+    title: i18n.t('action.copyAsSMILES'),
+    action: () => {
+      void copyAs('smiles');
+    },
+    disabled: (editor) => !hasSelection(editor),
+    hidden: (options) => isHidden(options, 'copy-smiles'),
+  },
+  'copy-inchi': {
+    enabledInViewOnly: true,
+    title: i18n.t('action.copyAsInChI'),
+    action: () => {
+      void copyAs('inchi');
+    },
+    disabled: (editor) => !hasSelection(editor),
+    hidden: (options) => isHidden(options, 'copy-inchi'),
+  },
+  'copy-inchikey': {
+    enabledInViewOnly: true,
+    title: i18n.t('action.copyAsInChIKey'),
+    action: () => {
+      void copyAs('inchikey');
+    },
+    disabled: (editor) => !hasSelection(editor),
+    hidden: (options) => isHidden(options, 'copy-inchikey'),
+  },
+  'copy-cdxml': {
+    enabledInViewOnly: true,
+    title: i18n.t('action.copyAsCDXML'),
+    action: () => {
+      void copyAs('cdxml');
+    },
+    disabled: (editor) => !hasSelection(editor),
+    hidden: (options) => isHidden(options, 'copy-cdxml'),
+  },
   paste: {
     shortcut: 'Mod+v',
     title: i18n.t('action.paste'),

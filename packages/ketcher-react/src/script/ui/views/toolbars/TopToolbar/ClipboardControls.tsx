@@ -17,11 +17,55 @@
 import { ElementWithDropdown } from './ElementWithDropdown';
 import { TopToolbarIconButton } from './TopToolbarIconButton';
 import i18n from '../../../../../i18n';
+import styled from '@emotion/styled';
+
+const FormatButton = styled('button')`
+  min-width: 56px;
+  min-height: 28px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font-size: 11px;
+  &:hover {
+    background: var(--ketcher-surface-hover, #e9eef1);
+  }
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+`;
+
+const CopyFormatButton = ({
+  isHidden,
+  title,
+  label,
+  handler,
+  disabled,
+  testId,
+}) =>
+  isHidden ? null : (
+    <FormatButton
+      type="button"
+      title={title}
+      aria-label={title}
+      onClick={handler}
+      disabled={disabled}
+      data-testid={testId}
+    >
+      {label}
+    </FormatButton>
+  );
 
 interface ClipboardControlsProps {
   onCopy: () => void;
   onCopyMol: () => void;
   onCopyKet: () => void;
+  onCopySmiles: () => void;
+  onCopyInchi: () => void;
+  onCopyInchiKey: () => void;
+  onCopyCdxml: () => void;
   onCopyImage: () => void;
   onPaste: () => void;
   onCut: () => void;
@@ -34,6 +78,10 @@ export const ClipboardControls = ({
   onCopy,
   onCopyMol,
   onCopyKet,
+  onCopySmiles,
+  onCopyInchi,
+  onCopyInchiKey,
+  onCopyCdxml,
   onCopyImage,
   onPaste,
   onCut,
@@ -66,20 +114,59 @@ export const ClipboardControls = ({
       handler: onCopyImage,
       testId: 'copy-image-button',
     },
+    {
+      name: 'copy-smiles',
+      title: i18n.t('action.copyAsSMILES'),
+      label: 'SMILES',
+      handler: onCopySmiles,
+      testId: 'copy-smiles-button',
+    },
+    {
+      name: 'copy-inchi',
+      title: i18n.t('action.copyAsInChI'),
+      label: 'InChI',
+      handler: onCopyInchi,
+      testId: 'copy-inchi-button',
+    },
+    {
+      name: 'copy-inchikey',
+      title: i18n.t('action.copyAsInChIKey'),
+      label: 'InChIKey',
+      handler: onCopyInchiKey,
+      testId: 'copy-inchikey-button',
+    },
+    {
+      name: 'copy-cdxml',
+      title: i18n.t('action.copyAsCDXML'),
+      label: 'CDXML',
+      handler: onCopyCdxml,
+      testId: 'copy-cdxml-button',
+    },
   ];
 
-  const getButtonElement = (button) => (
-    <TopToolbarIconButton
-      title={button.title}
-      onClick={button.handler}
-      iconName={button.name}
-      shortcut={shortcuts[button.name]}
-      disabled={disabledButtons.includes(button.name)}
-      isHidden={hiddenButtons.includes(button.name)}
-      key={button.name}
-      testId={button.testId}
-    />
-  );
+  const getButtonElement = (button) =>
+    button.label ? (
+      <CopyFormatButton
+        title={button.title}
+        label={button.label}
+        handler={button.handler}
+        disabled={disabledButtons.includes(button.name)}
+        isHidden={hiddenButtons.includes(button.name)}
+        key={button.name}
+        testId={button.testId}
+      />
+    ) : (
+      <TopToolbarIconButton
+        title={button.title}
+        onClick={button.handler}
+        iconName={button.name}
+        shortcut={shortcuts[button.name]}
+        disabled={disabledButtons.includes(button.name)}
+        isHidden={hiddenButtons.includes(button.name)}
+        key={button.name}
+        testId={button.testId}
+      />
+    );
 
   const firstButtonObj = copyButtons.find(
     (button) => !hiddenButtons.includes(button.name),
@@ -92,7 +179,9 @@ export const ClipboardControls = ({
     <>
       {!hiddenButtons.includes('copies') && (
         <ElementWithDropdown
-          topElement={getButtonElement(firstButtonObj)}
+          topElement={
+            firstButtonObj ? getButtonElement(firstButtonObj) : undefined
+          }
           dropDownElements={collapsibleElements}
         />
       )}

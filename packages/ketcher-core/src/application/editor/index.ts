@@ -29,6 +29,7 @@ export * from './shared/constants';
 export * from './shared/coordinates';
 export * from './shared/customEvents';
 export * from './editor.types';
+export * from './hotspot';
 export * from './Editor';
 export * from './editorSingleton';
 export * from './shared/sort';

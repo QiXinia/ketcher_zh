@@ -1,5 +1,6 @@
 import {
   Atom,
+  Bond,
   IsotopicAbundance,
   Struct,
   SupportedFormat,
@@ -9,6 +10,14 @@ import { couldBeSaved } from './structConverter';
 import { fromAtom, fromBond, toAtom, toBond } from './structconv';
 
 describe('couldBeSaved isotopic abundance warning', () => {
+  it.each(['showQueryIndicator', 'showReactionIndicator'] as const)('warns only about non-KET loss of hidden %s', property => {
+    const struct = new Struct();
+    struct.bonds.add(new Bond({ begin: 0, end: 1, type: 1, [property]: false }));
+    expect(couldBeSaved(struct, SupportedFormat.ket)).toBeNull();
+    expect(couldBeSaved(struct, SupportedFormat.mol)).toContain('indicator visibility');
+    struct.bonds.get(0)![property] = true;
+    expect(couldBeSaved(struct, SupportedFormat.mol)).toBeNull();
+  });
   it('warns when a non-KET format would drop isotopic abundance', () => {
     const struct = new Struct();
     struct.atoms.add(
@@ -163,6 +172,8 @@ describe('ChemDraw query form projection', () => {
       doubleBondPosition: 'right',
       topology: 1,
       reactingCenterStatus: 2,
+      showQueryIndicator: false,
+      showReactionIndicator: false,
     } as any;
     const form = fromBond(bond)!;
     expect(form).toMatchObject({
@@ -170,12 +181,16 @@ describe('ChemDraw query form projection', () => {
       doubleBondPosition: 'right',
       topology: 1,
       center: 2,
+      showQueryIndicator: false,
+      showReactionIndicator: false,
     });
     expect(toBond(form)).toMatchObject({
       display: 'hollow-wedged',
       doubleBondPosition: 'right',
       topology: 1,
       reactingCenterStatus: 2,
+      showQueryIndicator: false,
+      showReactionIndicator: false,
     });
   });
 });

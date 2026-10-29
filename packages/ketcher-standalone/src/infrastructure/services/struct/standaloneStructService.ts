@@ -68,15 +68,32 @@ import {
   CalculateMacromoleculePropertiesData,
   CalculateMacromoleculePropertiesResult,
   provideEditorInstance,
+  massToChargeFromKet,
 } from 'ketcher-core';
 import {
   STRUCT_SERVICE_INITIALIZED_EVENT,
   STRUCT_SERVICE_NO_RENDER_INITIALIZED_EVENT,
 } from './constants';
-import { getIndigoWorker } from '_indigo-worker-import-alias_';
+import { getIndigoWorker, releaseIndigoWorker } from '_indigo-worker-import-alias_';
+
+let nextSharedRequestId = 0;
 
 interface KeyValuePair {
   [key: string]: number | string | boolean | object;
+}
+
+interface ChemwikiRecognition {
+  host: () => unknown;
+  versions: () => string[];
+  recognize: (blob: Blob) => Promise<RecognizeResult>;
+}
+
+function chemwikiRecognition(): ChemwikiRecognition | undefined {
+  return (
+    globalThis as typeof globalThis & {
+      chemwikiRecognition?: ChemwikiRecognition;
+    }
+  ).chemwikiRecognition;
 }
 
 function convertMimeTypeToOutputFormat(
@@ -216,12 +233,18 @@ class IndigoService implements StructService {
   // Responses are correlated by request, including simultaneous conversions
   // of the same input to different output formats.
   readonly supportsRequestIds = true;
-  private nextRequestId = 0;
+  readonly supportsCrippenLogP = true;
+  private destroyed = false;
+  private readonly failureHandler: (event: ErrorEvent | MessageEvent) => void;
   private workerFailure: Error | null = null;
-  private readonly pending = new Map<number, {
-    action: (response: OutputMessageWrapper<unknown>) => void;
-    reject: (reason?: unknown) => void;
-  }>();
+  private readonly pending = new Map<
+    number,
+    {
+      action: (response: OutputMessageWrapper<unknown>) => void;
+      reject: (reason?: unknown) => void;
+    }
+  >();
+
   private ketcherId: string | null = null;
   private readonly messageHandler: (
     e: MessageEvent<OutputMessage<string>>,
@@ -231,18 +254,16 @@ class IndigoService implements StructService {
     this.defaultOptions = defaultOptions;
     this.worker = getIndigoWorker();
     this.messageHandler = (e: MessageEvent<OutputMessage<string>>) => {
-      if (e.data.type === Command.Info && !e.data.hasError) {
-        const callbackMethod = process.env.SEPARATE_INDIGO_RENDER
-          ? this.callIndigoNoRenderLoadedCallback
-          : this.callIndigoLoadedCallback;
-
-        callbackMethod();
-      }
-
       const message = e.data;
       if (message.requestId === undefined) return;
       const request = this.pending.get(message.requestId);
       if (!request) return;
+      if (message.type === Command.Info && !message.hasError) {
+        const callbackMethod = process.env.SEPARATE_INDIGO_RENDER
+          ? this.callIndigoNoRenderLoadedCallback
+          : this.callIndigoLoadedCallback;
+        callbackMethod();
+      }
       this.pending.delete(message.requestId);
       try {
         request.action({ data: message });
@@ -250,15 +271,18 @@ class IndigoService implements StructService {
         request.reject(error);
       }
     };
-    const failWorker = (event: ErrorEvent | MessageEvent) => {
+    this.failureHandler = (event: ErrorEvent | MessageEvent) => {
       this.workerFailure = new Error(
-        'message' in event && event.message ? event.message : 'Indigo worker failed',
+        'message' in event && event.message
+          ? event.message
+          : 'Indigo worker failed',
       );
-      for (const request of this.pending.values()) request.reject(this.workerFailure);
+      for (const request of this.pending.values())
+        request.reject(this.workerFailure);
       this.pending.clear();
     };
-    this.worker.onerror = failWorker;
-    this.worker.onmessageerror = failWorker;
+    this.worker.addEventListener('error', this.failureHandler);
+    this.worker.addEventListener('messageerror', this.failureHandler);
     this.worker.addEventListener('message', this.messageHandler);
   }
 
@@ -271,9 +295,14 @@ class IndigoService implements StructService {
       reject(this.workerFailure);
       return;
     }
-    const requestId = ++this.nextRequestId;
+    if (nextSharedRequestId >= Number.MAX_SAFE_INTEGER) {
+      reject(new Error('Indigo request identifier space exhausted'));
+      return;
+    }
+    const requestId = ++nextSharedRequestId;
     this.pending.set(requestId, {
-      action: (response) => action(response as OutputMessageWrapper<R>), reject,
+      action: (response) => action(response as OutputMessageWrapper<R>),
+      reject,
     });
     try {
       this.worker.postMessage({ ...message, requestId });
@@ -335,7 +364,7 @@ class IndigoService implements StructService {
         if (!msg.hasError) {
           const result: InfoResult = {
             indigoVersion: msg.payload,
-            imagoVersions: (globalThis as any).chemwikiRecognition?.versions() || [],
+            imagoVersions: chemwikiRecognition()?.versions() || [],
             isAvailable: true,
           };
           resolve(result);
@@ -362,16 +391,14 @@ class IndigoService implements StructService {
     return new Promise((resolve, reject) => {
       const action = ({ data }: OutputMessageWrapper) => {
         const msg: OutputMessage<string> = data;
-        {
-          if (!msg.hasError) {
-            const result: ConvertResult = {
-              struct: msg.payload,
-              format: outputFormat,
-            };
-            resolve(result);
-          } else {
-            reject(new Error(msg.error));
-          }
+        if (!msg.hasError) {
+          const result: ConvertResult = {
+            struct: msg.payload,
+            format: outputFormat,
+          };
+          resolve(result);
+        } else {
+          reject(new Error(msg.error));
         }
       };
       const monomerLibrary = JSON.stringify(
@@ -708,6 +735,15 @@ class IndigoService implements StructService {
         properties,
         options: this.getStandardServerOptions(options),
         selectedAtoms: selected ?? [],
+        // Restrict the estimate to one connected neutral concrete molecule.
+        // The graph check also rejects reactions, query atoms and mixtures.
+        calculateCrippenLogP:
+          properties.includes('crippen-logp') &&
+          !selected?.length &&
+          (() => {
+            const result = massToChargeFromKet(struct, 1);
+            return !result.ok && result.reason === 'neutral';
+          })(),
       };
 
       const inputMessage: InputMessage<CalculateCommandData> = {
@@ -722,7 +758,7 @@ class IndigoService implements StructService {
   recognize(_blob: Blob, _version: string): Promise<RecognizeResult> {
     // Same-origin ChemWiki Direct API keeps the native preview/apply dialog
     // while all iframes share the parent page's model Worker and settings.
-    const bridge = (globalThis as any).chemwikiRecognition;
+    const bridge = chemwikiRecognition();
     if (bridge?.host()) return bridge.recognize(_blob);
     return Promise.reject(new Error('Not supported in standalone mode'));
   }
@@ -852,14 +888,16 @@ class IndigoService implements StructService {
   }
 
   public destroy() {
+    if (this.destroyed) return;
+    this.destroyed = true;
     this.workerFailure = new Error('Indigo service was destroyed');
     for (const request of this.pending.values()) request.reject(this.workerFailure);
     this.pending.clear();
-    this.worker.terminate();
-    this.worker.onerror = null;
-    this.worker.onmessageerror = null;
     this.worker.removeEventListener('message', this.messageHandler);
-    this.worker.terminate();
+    this.worker.removeEventListener('error', this.failureHandler);
+    this.worker.removeEventListener('messageerror', this.failureHandler);
+    releaseIndigoWorker(this.worker);
+
   }
 }
 

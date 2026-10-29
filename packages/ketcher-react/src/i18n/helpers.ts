@@ -303,10 +303,38 @@ const LITERAL_ERROR_KEYS: Record<string, string> = {
   'Ring bond count invalid': 'coreErrors.ringBondCountInvalid',
   'Substitution count invalid': 'coreErrors.substitutionCountInvalid',
   'Unsaturated atom invalid value': 'coreErrors.unsaturatedAtomInvalid',
+  'It is impossible to merge fragments. Attachment point to establish bonds are not available.':
+    'coreErrors.mergeFragmentsUnavailable',
+  'Failed to load monomers library': 'coreErrors.monomerLibraryLoadFailed',
+};
+
+// Error modal titles are dispatched by ketcher-core as stable English strings.
+// Translate only known titles and preserve unknown titles for diagnostics.
+const ERROR_TITLE_KEYS: Record<string, string> = {
+  'Error Message': 'infoModal.errorMessage',
+  Error: 'common.error',
+  'Unsupported symbols': 'open.unsupportedSymbols',
+  'Monomer library conversion failed':
+    'infoModal.monomerLibraryConversionFailed',
+  'Monomer library update failed': 'infoModal.monomerLibraryUpdateFailed',
+};
+
+export const translateErrorTitle = (title?: string): string => {
+  if (!title) return String(i18n.t('infoModal.errorMessage'));
+  const key = ERROR_TITLE_KEYS[title];
+  return key ? String(i18n.t(key)) : title;
 };
 
 export const translateErrorMessage = (message?: string): string => {
   if (!message) return message ?? '';
+  // Core wraps conversion failures; translate the known prefix while keeping
+  // unrecognized details intact for troubleshooting.
+  const conversionPrefix = 'Convert error! ';
+  if (message.startsWith(conversionPrefix)) {
+    return i18n.t('save.convertError', {
+      error: translateErrorMessage(message.slice(conversionPrefix.length)),
+    });
+  }
   const key = CORE_ERROR_KEYS[message] ?? LITERAL_ERROR_KEYS[message];
   return key ? i18n.t(key) : message;
 };

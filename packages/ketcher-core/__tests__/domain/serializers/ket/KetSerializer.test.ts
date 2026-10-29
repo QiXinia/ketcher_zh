@@ -171,6 +171,20 @@ describe('deserialize (ToStruct)', () => {
     expect(serialized.root.nodes[0].data.startArrow).toBe('half-left');
     expect(serialized.root.nodes[0].data.endArrow).toBe('full');
   });
+  it('accepts multi-segment Bezier paths and rejects incomplete segments', () => {
+    const valid = { ket_version: '2.0.0', root: { nodes: [{ type: 'simpleObject', data: { mode: 'bezier', pos: [
+      { x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 1 }, { x: 3, y: 0 },
+      { x: 4, y: -1 }, { x: 5, y: 0 }, { x: 6, y: 0 },
+    ] } }] } };
+    expect(validate.validate(JSON.parse(JSON.stringify(valid)))).toBe(true);
+    const struct = ket.deserializeMicromolecules(JSON.stringify(valid));
+    expect(struct.simpleObjects.get(0)?.pos).toHaveLength(7);
+    const incomplete = JSON.parse(JSON.stringify(valid));
+    incomplete.root.nodes[0].data.pos.pop();
+    expect(validate.validate(incomplete)).toBe(false);
+    expect(() => ket.deserializeMicromolecules(JSON.stringify(incomplete))).toThrow('Cannot deserialize input JSON.');
+  });
+
   it('round-trips composable simple-object curve decorations', () => {
     const source = JSON.stringify({
       ket_version: '1.0.0',
@@ -184,6 +198,8 @@ describe('deserialize (ToStruct)', () => {
               closed: true,
               fill: 'shaded',
               faded: true,
+              lineWidth: 2.5,
+              doubleLineSpacing: 0.5,
               pos: [{ x: 1, y: 2 }, { x: 4, y: 2 }, { x: 3, y: 4 }],
             },
           },
@@ -202,7 +218,26 @@ describe('deserialize (ToStruct)', () => {
       closed: true,
       fill: 'shaded',
       faded: true,
+      lineWidth: 2.5,
+      doubleLineSpacing: 0.5,
     });
+  });
+  it('defaults legacy curve dimensions and rejects out-of-range KET dimensions', () => {
+    const source = { ket_version: '2.0.0', root: { nodes: [{ type: 'simpleObject', data: {
+      mode: 'line', pos: [{ x: 0, y: 0 }, { x: 1, y: 0 }],
+    } }] } };
+    const struct = ket.deserializeMicromolecules(JSON.stringify(source));
+    expect(struct.simpleObjects.get(0)).toMatchObject({ lineWidth: 1, doubleLineSpacing: 1 });
+    expect(JSON.parse(ket.serializeMicromolecules(struct)).root.nodes[0].data).not.toHaveProperty('lineWidth');
+    expect(JSON.parse(ket.serializeMicromolecules(struct)).root.nodes[0].data).not.toHaveProperty('doubleLineSpacing');
+    for (const property of ['lineWidth', 'doubleLineSpacing']) {
+      for (const value of [0, 8.01, -1]) {
+        const invalid = JSON.parse(JSON.stringify(source));
+        invalid.root.nodes[0].data[property] = value;
+        expect(validate.validate(invalid)).toBe(false);
+        expect(() => ket.deserializeMicromolecules(JSON.stringify(invalid))).toThrow('Cannot deserialize input JSON.');
+      }
+    }
   });
   it('round-trips independent bracket object geometry and shape', () => {
     const source = JSON.stringify({

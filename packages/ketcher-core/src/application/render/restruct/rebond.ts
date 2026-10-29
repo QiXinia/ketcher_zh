@@ -1548,6 +1548,8 @@ function getReactingCenterPath(
   hb1: HalfBond,
   hb2: HalfBond,
 ) {
+  // eslint-disable-line max-statements
+  if (bond.b.showReactionIndicator === false) return null;
   const a = hb1.p;
   const b = hb2.p;
   const c = b.add(a).scaled(0.5);
@@ -1633,7 +1635,8 @@ function getBondMark(
   hb2: HalfBond,
 ) {
   const options = render.options;
-  let mark: string;
+  if (bond.b.showQueryIndicator === false || options.showQueryIndicators === false) return null;
+  let mark: string | null = null;
   let tooltip: string | null = null;
   if (bond.b.customQuery) {
     mark = bond.b.customQuery;

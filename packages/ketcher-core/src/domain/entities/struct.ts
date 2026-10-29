@@ -36,6 +36,7 @@ import type { SimpleObject } from './simpleObject';
 import type { Text } from './text';
 import { Vec2 } from './vec2';
 import { Highlight } from './highlight';
+import { RingFill, isRingTopology } from './ringFill';
 import type { RGroupAttachmentPoint } from './rgroupAttachmentPoint';
 import { MonomerMicromolecule } from 'domain/entities/monomerMicromolecule';
 import { isNumber } from 'lodash';
@@ -121,6 +122,7 @@ export class Struct {
   texts: Pool<Text>;
   functionalGroups: Pool<FunctionalGroup>;
   highlights: Pool<Highlight>;
+  ringFills = new Pool<RingFill>();
   images = new Pool<Image>();
   multitailArrows = new Pool<MultitailArrow>();
   private static readonly MIN_RESCALE = 0.01;
@@ -564,6 +566,17 @@ export class Struct {
           }),
         );
       }
+    });
+
+    this.ringFills.forEach((fill) => {
+      // A partial ring is not a filled polygon. Preserve only complete rings.
+      if (!isRingTopology(this, fill) || !fill.atoms.every((id) => aids.has(id)) ||
+          !fill.bonds.every((id) => bidMap.has(id))) return;
+      cp.ringFills.add(new RingFill({
+        atoms: mapEntityIds(fill.atoms, aids),
+        bonds: mapEntityIds(fill.bonds, bidMap),
+        color: fill.color,
+      }));
     });
 
     if (!dropRxnSymbols) {

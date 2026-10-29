@@ -25,7 +25,7 @@ import mediaSizes from './mediaSizes';
 import modals from '../../dialog';
 import useResizeObserver from 'use-resize-observer/polyfilled';
 import { WindowedModal } from './WindowedModal';
-import { WindowState } from '../../state/modal/windows';
+import type { WindowState } from '../../state/modal/windows';
 import { ketcherProvider } from 'ketcher-core';
 import type Editor from '../../../editor';
 
@@ -95,12 +95,18 @@ function Modal(props: Props) {
     ...rest
   } = props;
 
-  if (windowedMode && windows && windows.length > 0) {
+  if (
+    windowedMode &&
+    windows &&
+    windows.length > 0 &&
+    onWindowClose &&
+    onBringToFront
+  ) {
     return (
       <WindowedModal
         windows={windows}
-        onWindowClose={onWindowClose!}
-        onBringToFront={onBringToFront!}
+        onWindowClose={onWindowClose}
+        onBringToFront={onBringToFront}
         ketcherId={(rest as any).ketcherId}
       />
     );

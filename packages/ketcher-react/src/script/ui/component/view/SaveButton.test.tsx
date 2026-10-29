@@ -14,7 +14,9 @@
  * limitations under the License.
  ***************************************************************************/
 
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { convertKetcherImageToRaster, ketcherProvider } from 'ketcher-core';
+import { saveAs } from 'file-saver';
 import { SaveButton } from './savebutton';
 
 jest.mock('../../../../hooks', () => {
@@ -26,7 +28,12 @@ jest.mock('../../../../hooks', () => {
   };
 });
 
-jest.mock('ketcher-core');
+jest.mock('ketcher-core', () => ({
+  ...jest.requireActual('ketcher-core'),
+  convertKetcherImageToRaster: jest.fn(),
+  ketcherProvider: { getKetcher: jest.fn() },
+}));
+jest.mock('file-saver', () => ({ saveAs: jest.fn() }));
 
 describe('SaveButton', () => {
   const defaultProps = {
@@ -50,6 +57,34 @@ describe('SaveButton', () => {
       const btn = screen.getByRole('button');
       expect(btn).toBeDisabled();
     });
+  });
+
+  it('renders a PNG first, then saves the requested bitmap with its real extension', async () => {
+    const png = new Blob(['png'], { type: 'image/png' });
+    const bitmap = new Blob(['bitmap'], { type: 'image/bmp' });
+    const generateImage = jest.fn().mockResolvedValue(png);
+    (ketcherProvider.getKetcher as jest.Mock).mockReturnValue({
+      generateImage,
+    });
+    (convertKetcherImageToRaster as jest.Mock).mockResolvedValue(bitmap);
+    const onSave = jest.fn();
+    render(
+      <SaveButton
+        filename="structure"
+        data="ket"
+        mode="saveImage"
+        options={{ outputFormat: 'png' }}
+        rasterFormat="bmp"
+        onSave={onSave}
+      >
+        Save
+      </SaveButton>,
+    );
+    fireEvent.click(screen.getByRole('button'));
+    await waitFor(() => expect(onSave).toHaveBeenCalled());
+    expect(generateImage).toHaveBeenCalledWith('ket', { outputFormat: 'png' });
+    expect(convertKetcherImageToRaster).toHaveBeenCalledWith(png, 'bmp');
+    expect(saveAs).toHaveBeenCalledWith(bitmap, 'structure.bmp');
   });
 
   it('Should get file data only after the button is clicked', () => {

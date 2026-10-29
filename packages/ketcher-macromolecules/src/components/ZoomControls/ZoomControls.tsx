@@ -106,6 +106,10 @@ export const ZoomControls = () => {
     ZoomTool.instance.resetZoom();
   };
 
+  const onZoomFit = () => {
+    ZoomTool.instance.zoomToFit();
+  };
+
   return (
     <ElementAndDropdown ref={setContainerElement}>
       <DropDownButton onClick={onExpand} data-testid="zoom-selector">
@@ -159,6 +163,13 @@ export const ZoomControls = () => {
           >
             <span>{i18n.t('topToolbar.zoom100')}</span>
             <ShortcutLabel>{hotkeysShortcuts['zoom-reset']}</ShortcutLabel>
+          </ZoomControlButton>
+          <ZoomControlButton
+            data-testid="zoom-fit"
+            title={String(i18n.t('topToolbar.zoomFit'))}
+            onClick={onZoomFit}
+          >
+            <span>{i18n.t('topToolbar.zoomFit')}</span>
           </ZoomControlButton>
         </DropDownContent>
       </Dropdown>

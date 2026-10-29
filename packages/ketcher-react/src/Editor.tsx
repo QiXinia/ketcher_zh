@@ -43,6 +43,10 @@ interface MacromoleculesEditorProps {
 
 // @ts-ignore ketcher-macromolecules is not available during ketcher-react build (dynamic import)
 const MacromoleculesEditorComponent = lazy(
+  // ketcher-macromolecules is built after ketcher-react, so its generated
+  // declaration is outside this package's rootDir during this build.
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   () => import('ketcher-macromolecules'),
 ) as unknown as React.LazyExoticComponent<
   React.ComponentType<MacromoleculesEditorProps>

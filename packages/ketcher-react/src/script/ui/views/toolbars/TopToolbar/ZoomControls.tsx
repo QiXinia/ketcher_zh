@@ -116,6 +116,7 @@ interface ZoomProps {
   currentZoom: number;
   onZoom: (arg: number) => void;
   onZoomIn: VoidFunction;
+  onZoomFit: VoidFunction;
   onZoomOut: VoidFunction;
   disabledButtons: string[];
   hiddenButtons: string[];
@@ -126,6 +127,7 @@ export const ZoomControls = ({
   currentZoom,
   onZoom,
   onZoomIn,
+  onZoomFit,
   onZoomOut,
   disabledButtons,
   hiddenButtons,
@@ -227,6 +229,16 @@ export const ZoomControls = ({
             <span>{i18n.t('topToolbar.zoom100')}</span>
             <ShortcutLabel>{shortcuts.zoom}</ShortcutLabel>
           </ZoomControlButton>
+          {!hiddenButtons.includes('zoom-fit') && (
+            <ZoomControlButton
+              data-testid="zoom-fit"
+              title={i18n.t('topToolbar.zoomFit')}
+              onClick={onZoomFit}
+              disabled={disabledButtons.includes('zoom-fit')}
+            >
+              <span>{i18n.t('topToolbar.zoomFit')}</span>
+            </ZoomControlButton>
+          )}
         </DropDownContent>
       </Dropdown>
     </ElementAndDropdown>

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    https://www.apache.org/licenses/LICENSE-2.0
+ *    http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,33 +14,73 @@
  * limitations under the License.
  ***************************************************************************/
 
-import { KetcherLogger, KetSerializer, MolSerializer } from 'ketcher-core';
-import i18n from '../../../i18n/i18n';
-import type { CurrentAppState } from '../state/store.types';
+import {
+  FormatterFactory,
+  KetcherLogger,
+  KetSerializer,
+  MolSerializer,
+  SupportedFormat,
+  massToChargeFromKet,
+} from 'ketcher-core';
+import i18n from '../../../i18n';
+import type { CurrentAppState, StoreState } from '../state/store.types';
 import type { SerializationType, StructSerializer } from '../../../types';
 
-/**
- * Copies the selected structure to clipboard in the specified format (MOL or KET).
- * Simple objects and text objects are not supported in MOL format.
- *
- * @param type - The serialization format: 'mol' for MOL format or 'ket' for KET format
- */
-export default function copyAs(type: SerializationType): void {
-  const { editor } = (
-    globalThis as typeof globalThis & { currentState: CurrentAppState }
+export default async function copyAs(type: SerializationType): Promise<void> {
+  const state = (
+    globalThis as typeof globalThis & {
+      currentState: CurrentAppState & Pick<StoreState, 'server'>;
+    }
   ).currentState;
-
+  const editor = state.editor;
   if (!editor) {
     KetcherLogger.error('copyAs.ts::copyAs', 'Editor is not initialized');
     return;
   }
-
   const struct = editor.structSelected();
   const errorHandler = editor.errorHandler;
-
   let serializer: StructSerializer;
-
   try {
+    const formats: Partial<Record<SerializationType, SupportedFormat>> = {
+      smiles: SupportedFormat.smiles,
+      inchi: SupportedFormat.inChI,
+      inchikey: SupportedFormat.inChIKey,
+      cdxml: SupportedFormat.cdxml,
+    };
+    if (formats[type]) {
+      if (!state.server)
+        throw new Error(i18n.t('action.copyFormatUnavailable'));
+      if (
+        [struct.simpleObjects, struct.texts, struct.images].some(
+          (items) => items?.size,
+        )
+      ) {
+        throw new Error(i18n.t('action.copyFormatRequiresMolecule'));
+      }
+      // These formats cannot represent all KET query, reaction and graphic
+      // semantics. Restrict the shortcut to one concrete molecular graph.
+      const ket = new KetSerializer().serialize(struct);
+      const result = massToChargeFromKet(ket, 1);
+      if (!result.ok && result.reason !== 'neutral') {
+        throw new Error(i18n.t('action.copyFormatRequiresMolecule'));
+      }
+      const options = state.options?.getServerSettings?.() || {};
+      const formatter = new FormatterFactory(state.server).create(
+        formats[type]!,
+        options as unknown as Parameters<FormatterFactory['create']>[1],
+      );
+      const output = await formatter.getStringFromStructureAsync(struct);
+      if (typeof output !== 'string' || !output.trim()) {
+        throw new Error(i18n.t('action.copyFormatUnavailable'));
+      }
+      const { clipboardData } = globalThis as typeof globalThis & {
+        clipboardData?: DataTransfer;
+      };
+      if (clipboardData) clipboardData.setData('text', output);
+      else await navigator.clipboard.writeText(output);
+      return;
+    }
+
     switch (type) {
       case 'mol': {
         serializer = new MolSerializer();
@@ -51,22 +91,18 @@ export default function copyAs(type: SerializationType): void {
         break;
       }
       default: {
-        const exhaustiveCheck: never = type;
-        KetcherLogger.error(
-          'copyAs.ts::copyAs',
-          `Unknown serialization type: ${exhaustiveCheck}`,
-        );
-        return;
+        throw new Error(i18n.t('action.copyFormatUnavailable'));
       }
     }
 
-    const hasSimpleObjectsOrTexts = Boolean(
+    const simpleObjectOrText = Boolean(
       struct.simpleObjects.size || struct.texts.size,
     );
 
-    // MOL format doesn't support simple objects and text objects
-    if (hasSimpleObjectsOrTexts && serializer instanceof MolSerializer) {
-      errorHandler?.(i18n.t('toolbar:copy.notAvailableForSimpleObjects'));
+    if (simpleObjectOrText && serializer instanceof MolSerializer) {
+      errorHandler?.(
+        'This feature is not available for Simple objects and Text objects',
+      );
       return;
     }
 
@@ -78,10 +114,10 @@ export default function copyAs(type: SerializationType): void {
     if (clipboardData) {
       clipboardData.setData('text', structData);
     } else {
-      navigator.clipboard.writeText(structData);
+      await navigator.clipboard.writeText(structData);
     }
-  } catch (error) {
-    KetcherLogger.error('copyAs.ts::copyAs', error);
-    errorHandler?.(i18n.t('common:errors.featureNotAvailableInBrowser'));
+  } catch (e) {
+    KetcherLogger.error('copyAs.ts::copyAs', e);
+    errorHandler?.(e instanceof Error ? e.message : String(e));
   }
 }

@@ -20,5 +20,22 @@ import type { KetFileRootContent } from 'domain/serializers/serializers.types';
 
 export function validate(ket: KetFileRootContent): boolean {
   const result = compiledSchema(ket);
-  return result ? validateMultitailArrows(ket) : result;
+  return result ? validateMultitailArrows(ket) && validateBezierPointCounts(ket) : result;
+}
+
+function validateBezierPointCounts(value: unknown, seen = new Set<object>()): boolean {
+  if (!value || typeof value !== 'object' || seen.has(value)) return true;
+  seen.add(value);
+  if (Array.isArray(value)) {
+    return value.every((entry) => validateBezierPointCounts(entry, seen));
+  }
+  const object = value as Record<string, unknown>;
+  if (object.type === 'simpleObject' && object.data && typeof object.data === 'object') {
+    const data = object.data as Record<string, unknown>;
+    const pos = data.mode === 'bezier' ? data.pos : undefined;
+    if (pos !== undefined && (!Array.isArray(pos) || pos.length < 4 || (pos.length - 1) % 3 !== 0)) {
+      return false;
+    }
+  }
+  return Object.values(object).every((entry) => validateBezierPointCounts(entry, seen));
 }

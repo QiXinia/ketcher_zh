@@ -7,15 +7,14 @@ import {
   selectErrorModalText,
   selectErrorModalTitle,
 } from 'state/modal';
-import { translateErrorMessage } from 'ketcher-react';
+import { translateErrorMessage, translateErrorTitle } from 'ketcher-react';
 import { ErrorTextWrapper } from './Error.styles';
 
 export const ErrorModal = () => {
   const { t } = useTranslation('macromoleculesDialogs');
   const dispatch = useAppDispatch();
   const errorMessage = useAppSelector(selectErrorModalText);
-  const errorTitle =
-    useAppSelector(selectErrorModalTitle) || t('error.defaultTitle');
+  const errorTitle = translateErrorTitle(useAppSelector(selectErrorModalTitle) || t('error.defaultTitle'));
   const isModalOpen = errorMessage !== '';
   const onClose = () => {
     dispatch(closeErrorModal());

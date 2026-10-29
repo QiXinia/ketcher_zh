@@ -16,9 +16,12 @@
 
 import { connect } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { error } from './constants';
 import { Dialog } from '../../../components';
 import { PasteErrorModalBody } from './PasteErrorModalBody';
+import {
+  translateErrorMessage,
+  translateErrorTitle,
+} from '../../../../../../i18n/helpers';
 
 import styles from './InfoModal.module.less';
 
@@ -34,7 +37,11 @@ function ErrorInfoModal(props) {
     command: props.message,
   });
 
-  const headerContent = <div>{props.title ?? error.message}</div>;
+  const headerContent = <div>{translateErrorTitle(props.title)}</div>;
+  const customText =
+    typeof props.customText === 'string'
+      ? translateErrorMessage(props.customText)
+      : props.customText;
 
   return (
     <Dialog
@@ -53,7 +60,7 @@ function ErrorInfoModal(props) {
       headerContent={headerContent}
     >
       <div>
-        {props.customText ||
+        {customText ||
           (isPasteError ? <PasteErrorModalBody /> : defaultCutCopyMessage)}
       </div>
     </Dialog>

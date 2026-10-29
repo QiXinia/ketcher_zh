@@ -29,7 +29,13 @@ import { TopToolbarIconButton } from './TopToolbarIconButton';
 import { CustomButtons } from './CustomButtons';
 import { ketcherProvider } from 'ketcher-core';
 import i18n from '../../../../../i18n';
-import { cloneElement, useCallback, useMemo, useRef, type RefObject } from 'react';
+import {
+  cloneElement,
+  useCallback,
+  useMemo,
+  useRef,
+  type RefObject,
+} from 'react';
 import type { CustomButton } from '../../../../builders/ketcher/CustomButtons';
 import { useInView } from 'react-intersection-observer';
 import { ArrowScroll } from '../ArrowScroll';
@@ -50,12 +56,17 @@ export interface PanelProps {
   onCopy: VoidFunction;
   onCopyMol: VoidFunction;
   onCopyKet: VoidFunction;
+  onCopySmiles: VoidFunction;
+  onCopyInchi: VoidFunction;
+  onCopyInchiKey: VoidFunction;
+  onCopyCdxml: VoidFunction;
   onCopyImage: VoidFunction;
   onCut: VoidFunction;
   onPaste: VoidFunction;
   currentZoom: number | undefined;
   onZoom: (zoom: number) => void;
   onZoomIn: VoidFunction;
+  onZoomFit: VoidFunction;
   onZoomOut: VoidFunction;
   onSettingsOpen: VoidFunction;
   onLayout: VoidFunction;
@@ -152,12 +163,17 @@ export const TopToolbar = ({
   onCopy,
   onCopyMol,
   onCopyKet,
+  onCopySmiles,
+  onCopyInchi,
+  onCopyInchiKey,
+  onCopyCdxml,
   onCopyImage,
   onCut,
   onPaste,
   currentZoom,
   onZoom,
   onZoomIn,
+  onZoomFit,
   onZoomOut,
   onSettingsOpen,
   onLayout,
@@ -258,6 +274,10 @@ export const TopToolbar = ({
           onCopy={onCopy}
           onCopyMol={onCopyMol}
           onCopyKet={onCopyKet}
+          onCopySmiles={onCopySmiles}
+          onCopyInchi={onCopyInchi}
+          onCopyInchiKey={onCopyInchiKey}
+          onCopyCdxml={onCopyCdxml}
           onCopyImage={onCopyImage}
           onPaste={onPaste}
           onCut={onCut}
@@ -309,6 +329,7 @@ export const TopToolbar = ({
           <ZoomControls
             currentZoom={currentZoom ?? 1}
             onZoomIn={onZoomIn}
+            onZoomFit={onZoomFit}
             onZoomOut={onZoomOut}
             onZoom={onZoom}
             shortcuts={shortcuts}

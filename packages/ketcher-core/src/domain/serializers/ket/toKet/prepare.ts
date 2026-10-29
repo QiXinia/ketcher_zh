@@ -87,6 +87,12 @@ export function prepareStructForKet(struct: Struct) {
         ...(item.closed ? { closed: true } : {}),
         ...(item.fill && item.fill !== 'none' ? { fill: item.fill } : {}),
         ...(item.faded ? { faded: true } : {}),
+        ...(item.lineWidth != null && item.lineWidth !== 1
+          ? { lineWidth: item.lineWidth }
+          : {}),
+        ...(item.doubleLineSpacing != null && item.doubleLineSpacing !== 1
+          ? { doubleLineSpacing: item.doubleLineSpacing }
+          : {}),
         ...(item.color ? { color: item.color } : {}),
         ...(item.mode === 'bracket' && item.bracketType ? { bracketType: item.bracketType } : {}),
         ...(item.mode === 'bracket' && item.bracketUsage !== 'unspecified' ? { bracketUsage: item.bracketUsage } : {}),

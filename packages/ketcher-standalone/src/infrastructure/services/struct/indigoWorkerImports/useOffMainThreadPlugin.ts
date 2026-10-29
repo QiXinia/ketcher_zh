@@ -4,6 +4,8 @@
 
 let _indigoWorker: Worker | null = null;
 
+let users = 0;
+
 export function getIndigoWorker(): Worker {
   _indigoWorker ??= new Worker(
     new URL('./../indigoWorker.ts', import.meta.url),
@@ -11,5 +13,15 @@ export function getIndigoWorker(): Worker {
       type: 'module',
     },
   );
+  users += 1;
   return _indigoWorker;
+}
+
+export function releaseIndigoWorker(worker: Worker): void {
+  if (_indigoWorker !== worker || users === 0) return;
+  users -= 1;
+  if (users === 0) {
+    _indigoWorker.terminate();
+    _indigoWorker = null;
+  }
 }

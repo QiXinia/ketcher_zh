@@ -48,11 +48,9 @@ Excluded, and must stay physical: anything computed from real screen/canvas coor
 
 `resolveTranslatableText`/`getSelectOptionsFromSchema` (`packages/ketcher-react/src/script/ui/utils/index.ts`) require a `t` function and always call `t(value)` — there is no pre-check that skips translation for strings that don't look like a `namespace:key` path. Every `title`/`enumNames` value passed through these helpers must be an explicit, registered translation key; a call site that passes a literal string will render whatever i18next's missing-key fallback produces instead of the literal (see `i18n.ts`'s `returnEmptyString: false`). There are no automated key-parity or hardcoded-string regression tests in this package — verify new call sites by hand against `en`/`zh-CN`.
 
-## Single-language build is the default
+## Language builds
 
-English-only is the default build — the common case ships the smallest bundle, and there's no Settings language switcher since there's nothing to switch to. Setting `KETCHER_MULTI_LANGUAGE_BUILD=true` opts into every other locale instead (verified via bundle-content grep + size diff, not just code review — see design.md Section 9) and makes the Settings language switcher appear. Wired via each package's `rollup.config.mjs` (`@rollup/plugin-replace`, same mechanism as `NODE_ENV`) into `i18n.ts` and `ketcher-macromolecules/src/i18n/registerNamespaces.ts`: the non-English imports stay as plain ES imports (imports can't be conditional) but are referenced only inside a `MULTI_LANGUAGE_BUILD` branch, so Rollup's tree-shaking drops the whole branch — imports and JSON included — once the flag is replaced with a literal. Leave the env var unset (or `false`) for the default single-language build.
-
-Set the flag either by exporting it before running either package's `npm run build`, or by copying the repo-root `.env.example` to `.env` and setting `KETCHER_MULTI_LANGUAGE_BUILD=true` there — both `rollup.config.mjs` files load the repo-root `.env` (via `dotenv`) before reading `process.env`, so a value already exported in the shell always wins over the `.env` file. `.env` is gitignored; commit changes to `.env.example` instead.
+The Chinese fork includes all supported languages by default and starts in Simplified Chinese unless a supported language was previously saved. Missing translations fall back to English. Set `KETCHER_MULTI_LANGUAGE_BUILD=false` for an English-only bundle without a language switcher; apply the same value when building both React and macromolecules. The flag can be exported in the shell or placed in the repo-root `.env` file; shell values take precedence.
 
 ## Adding a language
 

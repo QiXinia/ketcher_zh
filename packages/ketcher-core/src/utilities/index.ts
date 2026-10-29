@@ -30,6 +30,8 @@ export * from './ensureString';
 export * from './normalizeError';
 export * from './monomers';
 export * from './dom';
+export * from './massToCharge';
+export * from './ketcherRasterExport';
 export * from './getOrThrow';
 export * from './errorMessages';
 export * from './assert';

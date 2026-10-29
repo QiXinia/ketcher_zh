@@ -1,4 +1,5 @@
 import { provideEditorInstance } from 'application/editor/editorSingleton';
+import { ketcherProvider } from 'application/ketcherProvider';
 import { BaseRenderer } from 'application/render/renderers/BaseRenderer';
 import type { Atom } from 'domain/entities/CoreAtom';
 import { Coordinates } from 'application/editor/shared/coordinates';
@@ -760,7 +761,16 @@ export class BondRenderer extends BaseRenderer {
   }
 
   private appendTopologyMark(bondFromStruct: StructBond) {
-    if (!this.rootElement) {
+    this.rootElement?.select(`#${this.topologyElementId}`).remove();
+    const editor = provideEditorInstance();
+    const settings = ketcherProvider
+      .getKetcher(editor.ketcherId)
+      .settingsService?.getSettings();
+    if (
+      !this.rootElement ||
+      bondFromStruct.showQueryIndicator === false ||
+      settings?.showQueryIndicators === false
+    ) {
       return;
     }
 
@@ -851,7 +861,8 @@ export class BondRenderer extends BaseRenderer {
   }
 
   private appendReactingCenterMark(bondFromStruct: StructBond) {
-    if (!this.rootElement) {
+    this.rootElement?.select(`#${this.reactingCenterElementId}`).remove();
+    if (!this.rootElement || bondFromStruct.showReactionIndicator === false) {
       return;
     }
 

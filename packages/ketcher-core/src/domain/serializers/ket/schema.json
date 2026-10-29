@@ -350,6 +350,8 @@
           "type": "integer",
           "enum": [0, 1]
         },
+        "showQueryIndicator": { "type": "boolean" },
+        "showReactionIndicator": { "type": "boolean" },
         "cip": {
           "type": "string",
           "enum": ["Z", "E"]
@@ -549,6 +551,19 @@
                 "type": "string",
                 "minLength": 1
               }
+            },
+            "additionalProperties": false
+          }
+        },
+        "ringFills": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["atoms", "bonds", "color"],
+            "properties": {
+              "atoms": { "type": "array", "uniqueItems": true, "items": { "type": "integer", "minimum": 0 } },
+              "bonds": { "type": "array", "uniqueItems": true, "items": { "type": "integer", "minimum": 0 } },
+              "color": { "type": "string", "minLength": 1 }
             },
             "additionalProperties": false
           }
@@ -876,6 +891,16 @@
             "faded": {
               "type": "boolean"
             },
+            "lineWidth": {
+              "type": "number",
+              "minimum": 0.25,
+              "maximum": 8
+            },
+            "doubleLineSpacing": {
+              "type": "number",
+              "minimum": 0.25,
+              "maximum": 8
+            },
             "color": {
               "type": "string",
               "pattern": "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$"
@@ -946,7 +971,6 @@
                 "pos": {
                   "type": "array",
                   "minItems": 4,
-                  "maxItems": 4,
                   "items": {
                     "type": "object",
                     "required": ["x", "y"],

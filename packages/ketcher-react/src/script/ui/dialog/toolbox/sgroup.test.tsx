@@ -173,13 +173,13 @@ describe('Windowed S-Group form state', () => {
       <SGroup type="SUP" formState={windowForm} />,
       { modal: null },
     );
-    expect(screen.getByLabelText('Name')).toHaveValue('EtOH');
+    expect(screen.getByLabelText('名称')).toHaveValue('EtOH');
   });
 
   it('prefers the window form over an unrelated modal form', () => {
     renderWithMockStore(<SGroup type="SUP" formState={windowForm} />);
-    expect(screen.getByLabelText('Name')).toHaveValue('EtOH');
-    expect(screen.queryByLabelText('Repeat count')).not.toBeInTheDocument();
+    expect(screen.getByLabelText('名称')).toHaveValue('EtOH');
+    expect(screen.queryByLabelText('重复次数')).not.toBeInTheDocument();
   });
 
   it('uses a valid schema while a window form is initializing', () => {

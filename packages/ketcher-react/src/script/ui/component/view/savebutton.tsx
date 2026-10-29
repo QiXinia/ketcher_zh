@@ -15,6 +15,9 @@
  ***************************************************************************/
 import {
   type GenerateImageOptions,
+  type KetcherRasterFormat,
+  KETCHER_RASTER_FORMATS,
+  convertKetcherImageToRaster,
   type StructService,
   KetcherLogger,
   ketcherProvider,
@@ -34,6 +37,7 @@ type Props = {
   type?: string;
   mode?: string;
   options?: GenerateImageOptions;
+  rasterFormat?: KetcherRasterFormat;
   onSave?: () => void;
   onError?: (err: unknown) => void;
   className?: string;
@@ -54,6 +58,7 @@ const SaveButton = (props: SaveButtonProps) => {
     type,
     mode = 'saveFile',
     options,
+    rasterFormat,
     onSave = noop,
     onError = noop,
     className,
@@ -82,8 +87,17 @@ const SaveButton = (props: SaveButtonProps) => {
     if (options?.outputFormat && typeof data === 'string') {
       ketcherInstance
         .generateImage(data, options)
-        .then((blob) => {
-          saveAs(blob, `${filename}.${options.outputFormat}`);
+        .then(async (blob) => {
+          const result = rasterFormat
+            ? await convertKetcherImageToRaster(blob, rasterFormat)
+            : blob;
+          const extension = rasterFormat
+            ? KETCHER_RASTER_FORMATS.find(
+                (item) => item.format === rasterFormat,
+              )?.extension
+            : options.outputFormat;
+          if (!extension) throw new Error('Unsupported image format');
+          saveAs(result, `${filename}.${extension}`);
           onSave();
         })
         .catch((error) => {

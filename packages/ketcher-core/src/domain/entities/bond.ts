@@ -38,6 +38,9 @@ export interface BondAttributes {
   display?: BondDisplay;
   /** Explicit double-bond line placement used by publication drawings. */
   doubleBondPosition?: DoubleBondPosition;
+  /** Object display overrides; chemistry and query predicates remain intact. */
+  showQueryIndicator?: boolean;
+  showReactionIndicator?: boolean;
   xxx?: string;
   type: number;
   end: number;
@@ -118,6 +121,8 @@ export class Bond extends BaseMicromoleculeEntity {
     stereo: Bond.PATTERN.STEREO.NONE,
     display: 'plain' as BondDisplay,
     doubleBondPosition: 'auto' as DoubleBondPosition,
+    showQueryIndicator: true,
+    showReactionIndicator: true,
     topology: Bond.PATTERN.TOPOLOGY.EITHER,
     reactingCenterStatus: Bond.PATTERN.REACTING_CENTER.UNMARKED,
     cip: null,
@@ -131,6 +136,8 @@ export class Bond extends BaseMicromoleculeEntity {
   stereo: number;
   display: BondDisplay;
   doubleBondPosition: DoubleBondPosition;
+  showQueryIndicator: boolean;
+  showReactionIndicator: boolean;
   readonly topology: number | null;
   readonly reactingCenterStatus: number | null;
   customQuery: string | null;
@@ -157,6 +164,8 @@ export class Bond extends BaseMicromoleculeEntity {
     this.stereo = Bond.PATTERN.STEREO.NONE;
     this.display = attributes.display ?? 'plain';
     this.doubleBondPosition = attributes.doubleBondPosition ?? 'auto';
+    this.showQueryIndicator = attributes.showQueryIndicator ?? true;
+    this.showReactionIndicator = attributes.showReactionIndicator ?? true;
     this.topology = Bond.PATTERN.TOPOLOGY.EITHER;
     this.customQuery = null;
     this.reactingCenterStatus = 0;
@@ -201,7 +210,7 @@ export class Bond extends BaseMicromoleculeEntity {
         if (bond.doubleBondPosition !== 'auto') attrs[key] = bond[key] as never;
         continue;
       }
-      if (bond[key] || key === 'stereo') {
+      if (bond[key] || key === 'stereo' || key === 'showQueryIndicator' || key === 'showReactionIndicator') {
         attrs[key] = bond[key] as never;
       }
     }

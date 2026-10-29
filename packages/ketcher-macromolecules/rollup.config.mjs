@@ -23,7 +23,7 @@ const pkg = require('./package.json');
 
 // Loads a repo-root .env file, if present, without overriding variables
 // already set in the shell (dotenv's default: existing process.env values
-// win). This lets a consumer set KETCHER_MULTI_LANGUAGE_BUILD=true in a
+// win). This lets a consumer set KETCHER_MULTI_LANGUAGE_BUILD=false in a
 // local .env instead of exporting it before every build invocation — see
 // packages/ketcher-react/src/locales/README.md for the full flag docs.
 loadEnv({
@@ -64,7 +64,7 @@ export const valuesToReplace = {
     process.env.INDIGO_MACHINE || '',
   ),
   'process.env.KETCHER_MULTI_LANGUAGE_BUILD': JSON.stringify(
-    process.env.KETCHER_MULTI_LANGUAGE_BUILD === 'true' ? 'true' : 'false',
+    process.env.KETCHER_MULTI_LANGUAGE_BUILD === 'false' ? 'false' : 'true',
   ),
 };
 
@@ -103,6 +103,9 @@ const config = {
     asPlugin(tsconfigPaths()),
     json(),
     typescript({
+      // Core declarations are rebuilt separately; stale diagnostics can retain
+      // their old alias paths even when a standalone tsc check passes.
+      clean: isProduction,
       tsconfigOverride: {
         exclude: ['*.test.ts'],
       },

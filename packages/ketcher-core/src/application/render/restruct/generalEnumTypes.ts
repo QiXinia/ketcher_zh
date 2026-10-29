@@ -21,6 +21,7 @@
 export enum LayerMap {
   background = 'background',
   images = 'images',
+  ringFill = 'ringFill',
   selectionPlate = 'selectionPlate',
   selectionPoints = 'selectionPoints',
   hovering = 'hovering',
