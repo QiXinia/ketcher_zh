@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *    https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -37,18 +37,41 @@ import {
   hotkeysShortcuts,
   updateInputString,
 } from 'components/ZoomControls/helpers';
+import { useAppSelector } from 'hooks';
+import { selectEditor } from 'state/common';
 
 export const ZoomControls = () => {
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [currentZoom, setCurrentZoom] = useState<number>(100);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const [containerElement, setContainerElement] =
+    useState<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const editor = useAppSelector(selectEditor);
+  const zoomTool = editor?.zoomTool;
+
   useEffect(() => {
-    ZoomTool?.instance?.subscribeOnZoomEvent(() => {
-      setCurrentZoom(Math.round(ZoomTool?.instance?.getZoomLevel() * 100));
-    });
-  }, [ZoomTool?.instance]);
+    if (!zoomTool) {
+      return;
+    }
+
+    const handler = () => {
+      const newZoom = Math.round(zoomTool.getZoomLevel() * 100);
+      setCurrentZoom(newZoom);
+
+      const inputEl = inputRef.current;
+      updateInputString(newZoom, inputEl);
+      if (document.activeElement === inputEl) {
+        inputEl?.select();
+      }
+    };
+
+    zoomTool.subscribeOnZoomEvent(handler);
+
+    return () => {
+      zoomTool.unsubscribeOnZoomEvent(handler);
+    };
+  }, [zoomTool]);
 
   const onZoomSubmit = useCallback(() => {
     const inputEl = inputRef.current;
@@ -88,7 +111,7 @@ export const ZoomControls = () => {
   };
 
   return (
-    <ElementAndDropdown ref={containerRef}>
+    <ElementAndDropdown ref={setContainerElement}>
       <DropDownButton onClick={onExpand} data-testid="zoom-selector">
         <ZoomLabel data-testid="zoom-input">{currentZoom}%</ZoomLabel>
         <Icon name="chevron" />
@@ -97,7 +120,7 @@ export const ZoomControls = () => {
       <Dropdown
         open={isExpanded}
         onClose={onClose}
-        anchorEl={containerRef.current}
+        anchorEl={containerElement}
         container={document.querySelector(
           KETCHER_MACROMOLECULES_ROOT_NODE_SELECTOR,
         )}

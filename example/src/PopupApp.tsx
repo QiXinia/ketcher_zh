@@ -53,14 +53,14 @@ const PopupApp = () => {
           staticResourcesUrl={process.env.PUBLIC_URL}
           structServiceProvider={structServiceProvider}
           onInit={(ketcher: Ketcher) => {
-            window.ketcher = ketcher;
+            globalThis.window.ketcher = ketcher;
             safePostMessage({
               eventType: 'init',
               data: {
                 theme: getCurrentKetcherTheme(),
               },
             });
-            window.scrollTo(0, 0);
+            globalThis.scrollTo(0, 0);
           }}
         />
         {hasError && (

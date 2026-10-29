@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *    https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,7 +18,10 @@ import type { Root } from 'react-dom/client';
 import type { ReactElement } from 'react';
 import { type ButtonsConfig, KetcherBuilder } from './builders';
 
-import type { StructServiceProvider } from 'ketcher-core';
+import type {
+  StructServiceProvider,
+  DisabledFunctionalityConfig,
+} from 'ketcher-core';
 import type { CustomButton } from './builders/ketcher/CustomButtons';
 
 interface Config {
@@ -31,9 +34,16 @@ interface Config {
   errorHandler: (message: string) => void;
   togglerComponent?: ReactElement;
   ketcherId: string;
+  /**
+   * List of Ketcher functionality to disable across all of their UI entry
+   * points (context menu items, toolbar buttons, etc). See
+   * `KetcherFunctionality` for the available values.
+   */
+  disabledFunctionality?: DisabledFunctionalityConfig;
 }
 
-export type { Config, ButtonsConfig };
+export type { Config };
+export type { ButtonsConfig } from './builders';
 export * from './providers';
 
 async function buildKetcherAsync({
@@ -45,12 +55,14 @@ async function buildKetcherAsync({
   errorHandler,
   togglerComponent,
   customButtons,
+  disabledFunctionality,
   ketcherId: prevKetcherId,
 }: Config) {
   const builder = new KetcherBuilder();
 
   const structService = builder.appendApiAsync(structServiceProvider);
   builder.appendServiceMode(structServiceProvider.mode);
+  builder.withDisabledFunctionality(disabledFunctionality ?? []);
   const ketcher = await builder.build();
   structService.addKetcherId(ketcher.id);
 

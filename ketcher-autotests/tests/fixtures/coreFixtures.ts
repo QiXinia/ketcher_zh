@@ -1,10 +1,5 @@
-/* eslint-disable @typescript-eslint/ban-types */
-import {
-  test as base,
-  BrowserContext,
-  Page,
-  TestInfoError,
-} from '@playwright/test';
+/* eslint-disable no-empty-pattern */
+import { test as base, BrowserContext, Page, TestInfoError } from '@playwright/test';
 import { waitForPageInit } from '@utils';
 
 type CoreTestFixtures = {

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *    https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,7 +23,10 @@ import Form, {
 import { Dialog } from '../../../../components';
 import Select from '../../../../../component/form/Select';
 import { getSelectOptionsFromSchema } from '../../../../../utils';
-import { bond as bondSchema } from '../../../../../data/schema/struct-schema';
+import {
+  bond as bondSchema,
+  CUSTOM_QUERY_MAX_LENGTH,
+} from '../../../../../data/schema/struct-schema';
 import classes from './Bond.module.less';
 import { useMemo, useRef, useState } from 'react';
 import { Bond as CoreBond, SettingsManager } from 'ketcher-core';
@@ -80,9 +83,9 @@ const Bond = (props: Props) => {
   );
   const handleCustomQueryCheckBoxChange = (
     value: boolean,
-    formState: BondSettings,
-    _,
-    updateFormState: (settings: BondSettings) => void,
+    formState: Record<string, unknown>,
+    _: (value: unknown) => void,
+    updateFormState: (settings: Record<string, unknown>) => void,
   ) => {
     if (isMonomerCreationWizardActive) {
       return;
@@ -90,6 +93,7 @@ const Bond = (props: Props) => {
 
     setIsCustomQuery(value);
     if (value) {
+      const bondFormState = formState as unknown as BondSettings;
       const {
         type,
         display,
@@ -99,7 +103,7 @@ const Bond = (props: Props) => {
         topology,
         center,
         customQuery,
-      } = formState;
+      } = bondFormState;
       previousSettings.current = {
         type,
         display,
@@ -121,10 +125,10 @@ const Bond = (props: Props) => {
               showReactionIndicator: formState.showReactionIndicator,
               topology: null,
               center: null,
-              customQuery: getBondCustomQuery(formState),
+              customQuery: getBondCustomQuery(formState as unknown as BondSettings),
           }
         : {
-            ...previousSettings.current,
+            ...(previousSettings.current as unknown as Record<string, unknown>),
             showQueryIndicator: formState.showQueryIndicator,
             showReactionIndicator: formState.showReactionIndicator,
           },
@@ -200,6 +204,7 @@ const Bond = (props: Props) => {
               disabled={!isCustomQuery || isMonomerCreationWizardActive}
               checkboxValue={isCustomQuery}
               onCheckboxChange={handleCustomQueryCheckBoxChange}
+              maxLength={CUSTOM_QUERY_MAX_LENGTH}
               data-testid="bond-custom-query"
             />
           </div>
@@ -212,6 +217,9 @@ const Bond = (props: Props) => {
 function customQueryValid(customQuery: string, isCustomQuery: boolean) {
   if (!isCustomQuery) {
     return true;
+  }
+  if (customQuery.length > CUSTOM_QUERY_MAX_LENGTH) {
+    return false;
   }
   const regex = new RegExp(bondSchema.properties.customQuery.pattern as string);
   const isValid = regex.test(customQuery);

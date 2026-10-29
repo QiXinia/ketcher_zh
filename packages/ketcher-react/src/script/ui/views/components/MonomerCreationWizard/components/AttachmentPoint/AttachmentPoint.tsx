@@ -5,8 +5,8 @@ import { useAttachmentPointSelectsData } from '../../hooks/useAttachmentPointSel
 import AttachmentPointControls from '../AttachmentPointControls/AttachmentPointControls';
 import type Editor from '../../../../../../editor';
 import { Icon } from '../../../../../../../components';
-import i18n from '../../../../../../../i18n';
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 type Props = {
   name: AttachmentPointName;
@@ -29,6 +29,7 @@ const AttachmentPoint = ({
   onLeavingAtomChange,
   onRemove,
 }: Props) => {
+  const { t } = useTranslation('components');
   const attachmentPointsContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -70,21 +71,21 @@ const AttachmentPoint = ({
       }
     };
 
-    window.addEventListener(
+    globalThis.addEventListener(
       'highlightAttachmentPointControls',
       handleAttachmentPointHighlight,
     );
-    window.addEventListener(
+    globalThis.addEventListener(
       'resetHighlightAttachmentPointControls',
       handleResetAttachmentPointHighlight,
     );
 
     return () => {
-      window.removeEventListener(
+      globalThis.removeEventListener(
         'highlightAttachmentPointControls',
         handleAttachmentPointHighlight,
       );
-      window.removeEventListener(
+      globalThis.removeEventListener(
         'resetHighlightAttachmentPointControls',
         handleResetAttachmentPointHighlight,
       );
@@ -122,7 +123,7 @@ const AttachmentPoint = ({
         <button
           className={styles.removeButton}
           onClick={handleRemove}
-          aria-label={i18n.t('monomerWizard.removeAttachmentPoint')}
+          aria-label={t('monomerCreationWizard.removeAttachmentPoint')}
           data-testid={`attachment-point-delete-button-${name}`}
         >
           <Icon name="deleteMenu" />

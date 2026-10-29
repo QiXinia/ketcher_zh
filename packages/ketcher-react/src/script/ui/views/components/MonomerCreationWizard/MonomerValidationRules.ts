@@ -1,4 +1,5 @@
 import { KetMonomerClass, AttachmentPointName, AtomLabel } from 'ketcher-core';
+import i18n from 'src/i18n/i18n';
 
 export type LeavingGroupRequirement = {
   attachmentPoint: AttachmentPointName;
@@ -24,7 +25,9 @@ export const MONOMER_VALIDATION_RULES: MonomerValidationRule[] = [
         expectedLeavingGroup: AtomLabel.O,
       },
     ],
-    warningMessage: 'monomerWizard.validation.aminoAcid',
+    warningMessage: i18n.t(
+      'components:monomerCreationWizard.notifications.aminoAcidLeavingGroupWarning',
+    ),
   },
   {
     monomerType: KetMonomerClass.Sugar,
@@ -42,7 +45,9 @@ export const MONOMER_VALIDATION_RULES: MonomerValidationRule[] = [
         expectedLeavingGroup: AtomLabel.O,
       },
     ],
-    warningMessage: 'monomerWizard.validation.sugar',
+    warningMessage: i18n.t(
+      'components:monomerCreationWizard.notifications.sugarLeavingGroupWarning',
+    ),
   },
   {
     monomerType: KetMonomerClass.Base,
@@ -52,7 +57,9 @@ export const MONOMER_VALIDATION_RULES: MonomerValidationRule[] = [
         expectedLeavingGroup: AtomLabel.H,
       },
     ],
-    warningMessage: 'monomerWizard.validation.base',
+    warningMessage: i18n.t(
+      'components:monomerCreationWizard.notifications.baseLeavingGroupWarning',
+    ),
   },
   {
     monomerType: KetMonomerClass.Phosphate,
@@ -66,7 +73,9 @@ export const MONOMER_VALIDATION_RULES: MonomerValidationRule[] = [
         expectedLeavingGroup: AtomLabel.O,
       },
     ],
-    warningMessage: 'monomerWizard.validation.phosphate',
+    warningMessage: i18n.t(
+      'components:monomerCreationWizard.notifications.phosphateLeavingGroupWarning',
+    ),
   },
   {
     monomerType: KetMonomerClass.RNA,
@@ -80,7 +89,9 @@ export const MONOMER_VALIDATION_RULES: MonomerValidationRule[] = [
         expectedLeavingGroup: AtomLabel.O,
       },
     ],
-    warningMessage: 'monomerWizard.validation.nucleotide',
+    warningMessage: i18n.t(
+      'components:monomerCreationWizard.notifications.nucleotideLeavingGroupWarning',
+    ),
   },
 ];
 

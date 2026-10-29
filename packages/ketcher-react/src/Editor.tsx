@@ -1,4 +1,6 @@
 import { lazy, Suspense, useEffect, useState, type ReactElement } from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable react-you-might-not-need-an-effect/no-event-handler */
 import {
   type EditorProps,
   MicromoleculesEditor as MicromoleculesEditorComponent,
@@ -6,10 +8,11 @@ import {
 import { ModeControl } from './script/ui/views/toolbars/ModeControl';
 import { LoadingCircles } from './script/ui/views/components';
 import styles from './Editor.module.less';
-import type {
-  Ketcher,
-  Editor as MoleculesEditor,
-  CoreEditor,
+import {
+  type Ketcher,
+  type Editor as MoleculesEditor,
+  type CoreEditor,
+  ketcherProvider,
 } from 'ketcher-core';
 
 type Props = Omit<EditorProps, 'ketcherId'> & {
@@ -37,6 +40,8 @@ interface MacromoleculesEditorProps {
  *  traverse this dynamic import. If this import is ever changed to a static one, the flag must be removed
  *  and the resulting cross-package cycle (ketcher-macromolecules -> ketcher-react) must be resolved first.
  */
+
+// @ts-ignore ketcher-macromolecules is not available during ketcher-react build (dynamic import)
 const MacromoleculesEditorComponent = lazy(
   // ketcher-macromolecules is built after ketcher-react, so its generated
   // declaration is outside this package's rootDir during this build.
@@ -120,7 +125,9 @@ export const Editor = (props: Props) => {
       moleculesEditor &&
       (macromoleculesEditor || props.disableMacromoleculesEditor)
     ) {
-      props.onInit?.(ketcher);
+      if (ketcherProvider.getIndexById(ketcher.id) !== -1) {
+        props.onInit?.(ketcher);
+      }
     }
   }, [moleculesEditor, macromoleculesEditor]);
 

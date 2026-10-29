@@ -152,7 +152,7 @@ describe('built-in ring click preference', () => {
     expect(shouldSproutRing(f.editor, { ringTool: true }, 'fg', event(true))).toBe(false);
     const g = fixture(true, false);
     // The old template-attachment path remains available without the flag.
-    const tmpl = { molecule: createFusionRing(5), aid: 0, angle0: 0, ringTool: false };
+    const tmpl = { molecule: createFusionRing(5), aid: 0, bid: 0, angle0: 0, ringTool: false };
     fromTemplateOnAtom(g.restruct, tmpl, 0, 0, false);
     expect(g.struct.atoms.size).toBe(10);
     expect(g.struct.bonds.size).toBe(11);

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *    https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -32,12 +32,12 @@ describe('OpenOptions component', () => {
   it('should render correctly with passed props', () => {
     render(withThemeProvider(<OpenOptions {...mockProps} />));
 
-    expect(screen.getByText('从剪贴板粘贴')).toBeInTheDocument();
-    expect(screen.getByText('从文件打开')).toBeInTheDocument();
+    expect(screen.getByText('Paste from clipboard')).toBeInTheDocument();
+    expect(screen.getByText('Open from file')).toBeInTheDocument();
   });
   it('callback for Paste from clipboard button should be called after click', () => {
     render(withThemeProvider(<OpenOptions {...mockProps} />));
-    const button = screen.getByText('从剪贴板粘贴');
+    const button = screen.getByText('Paste from clipboard');
 
     fireEvent.click(button);
 

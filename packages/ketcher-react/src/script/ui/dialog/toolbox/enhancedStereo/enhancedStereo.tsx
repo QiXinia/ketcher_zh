@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *    https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -28,6 +28,7 @@ interface EnhancedStereoResult {
   andNumber: number;
   orNumber: number;
   type: StereoLabel;
+  [key: string]: unknown;
 }
 
 type EnhancedStereoFormState = FormState<EnhancedStereoResult>;
@@ -50,10 +51,9 @@ const EnhancedStereo: FC<Props> = (props) => {
   const { struct, formState, init, ...rest } = props;
   const { result, valid } = formState;
 
-  const stereoLabels: Array<string> = findStereLabels(
-    struct,
-    Array.from(struct.atoms.keys()),
-  );
+  const stereoLabels: Array<string> = findStereLabels(struct, [
+    ...struct.atoms.keys(),
+  ]);
 
   const maxAnd: number = maxOfAnds(stereoLabels);
   const maxOr: number = maxOfOrs(stereoLabels);
@@ -87,9 +87,9 @@ const EnhancedStereo: FC<Props> = (props) => {
     >
       <Form schema={enhancedStereoSchema} init={init} {...formState}>
         <fieldset>
-          {/* eslint-disable jsx-a11y/label-has-associated-control */}
+          {}
           <label>
-            {/* eslint-enable jsx-a11y/label-has-associated-control */}
+            {}
             <Field
               name="type"
               labelPos={false}
@@ -102,7 +102,7 @@ const EnhancedStereo: FC<Props> = (props) => {
           </label>
           {maxAnd !== 0 && (
             <label>
-              {/* eslint-disable jsx-a11y/label-has-associated-control */}
+              {}
               <Field
                 name="type"
                 labelPos={false}
@@ -124,7 +124,7 @@ const EnhancedStereo: FC<Props> = (props) => {
           )}
           {maxOr !== 0 && (
             <label>
-              {/* eslint-disable jsx-a11y/label-has-associated-control */}
+              {}
               <Field
                 name="type"
                 labelPos={false}
@@ -145,7 +145,7 @@ const EnhancedStereo: FC<Props> = (props) => {
             </label>
           )}
           <label>
-            {/* eslint-disable jsx-a11y/label-has-associated-control */}
+            {}
             <Field
               name="type"
               labelPos={false}
@@ -157,7 +157,7 @@ const EnhancedStereo: FC<Props> = (props) => {
             {i18n.t('enhancedStereo.createNewANDGroup')}
           </label>
           <label>
-            {/* eslint-disable jsx-a11y/label-has-associated-control */}
+            {}
             <Field
               name="type"
               labelPos={false}

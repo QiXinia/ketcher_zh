@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *    https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,11 +14,12 @@
  * limitations under the License.
  ***************************************************************************/
 
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { Field } from '../../component/form/form/form';
 import { getSelectOptionsFromSchema } from '../../utils';
 import Select from '../../component/form/Select';
 import { sdataCustomSchema } from '../../data/schema/sdata-schema';
-import i18n from '../../../../i18n';
 
 interface SdataFormResult {
   context: string;
@@ -44,6 +45,7 @@ const content = (
   _fieldValue: string,
   checked: boolean,
   isContextEmpty: boolean,
+  t: TFunction,
 ) =>
   Object.keys(schema.properties)
     .filter(
@@ -66,7 +68,7 @@ const content = (
           <Field
             name={prop}
             key={`${context}-${fieldName}-${prop}-select`}
-            placeholder={i18n.t('sdata.enterValuePlaceholder')}
+            placeholder={t('dialogs:toolbox.sdata.fieldValuePlaceholder')}
             disabled={isContextEmpty}
           />
         );
@@ -84,6 +86,7 @@ const content = (
 
 function SDataFieldset({ formState }: Readonly<SDataFieldsetProps>) {
   const { result } = formState;
+  const { t } = useTranslation();
   const formSchema = sdataCustomSchema;
   const validContextValues = formSchema.properties.context.enum;
   const isContextEmpty =
@@ -93,13 +96,13 @@ function SDataFieldset({ formState }: Readonly<SDataFieldsetProps>) {
     <fieldset className="sdata">
       <Field
         name="context"
-        options={getSelectOptionsFromSchema(formSchema.properties.context)}
+        options={getSelectOptionsFromSchema(formSchema.properties.context, t)}
         component={Select}
         data-testid="context"
       />
       <Field
         name="fieldName"
-        placeholder={i18n.t('sdata.enterNamePlaceholder')}
+        placeholder={t('dialogs:toolbox.sdata.fieldNamePlaceholder')}
         disabled={isContextEmpty}
       />
       {content(
@@ -109,6 +112,7 @@ function SDataFieldset({ formState }: Readonly<SDataFieldsetProps>) {
         result.fieldValue,
         result.radiobuttons,
         isContextEmpty,
+        t,
       )}
     </fieldset>
   );

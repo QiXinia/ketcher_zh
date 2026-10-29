@@ -12,6 +12,7 @@ import {
   fromSimpleObjectAddition,
 } from 'ketcher-core';
 import type Editor from '../Editor';
+import type { Selection } from '../Editor';
 import type { Tool } from './Tool';
 
 const MIN_SAMPLE_DISTANCE_PX = 3;
@@ -146,9 +147,9 @@ class FreehandCurveTool implements Tool {
         false,
       );
       this.editor.update(action);
-      const id = action.operations[0]?.data?.id;
+      const id = (action.operations[0]?.data as { id?: unknown } | undefined)?.id;
       this.editor.selection(
-        Number.isInteger(id) ? { simpleObjects: [id] } : null,
+        Number.isInteger(id) ? ({ simpleObjects: [id] } as Selection) : null,
       );
     }
 

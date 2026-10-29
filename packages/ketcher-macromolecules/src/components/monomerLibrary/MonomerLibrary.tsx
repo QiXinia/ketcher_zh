@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *    https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,7 +14,7 @@
  * limitations under the License.
  ***************************************************************************/
 
-import { ChangeEvent, useCallback, useEffect, useMemo, useRef } from 'react';
+import { ChangeEvent, useCallback, useEffect, useMemo } from 'react';
 import { Tabs } from 'components/shared/Tabs';
 import { tabsContent } from 'components/monomerLibrary/tabsContent';
 import { useAppDispatch, useAppSelector } from 'hooks';
@@ -40,6 +40,7 @@ import {
   MonomerLibraryToggle,
 } from './styles';
 import { Icon, i18n } from 'ketcher-react';
+import { useTranslation } from 'react-i18next';
 
 const COPY = '_Copy';
 
@@ -48,18 +49,14 @@ type Props = {
 };
 
 const MonomerLibrary = ({ toggleLibraryVisibility }: Props) => {
-  const presetsRef = useRef<IRnaPreset[]>([]);
+  const { t } = useTranslation('macromoleculesDialogs');
   const dispatch = useAppDispatch();
   const selectedTabIndex = useAppSelector(selectCurrentTabIndex);
+  const presets = useAppSelector(selectAllPresets);
 
   useEffect(() => {
     dispatch(setSearchFilter(''));
   }, [dispatch]);
-
-  useAppSelector(selectAllPresets, (presets) => {
-    presetsRef.current = presets;
-    return true;
-  });
 
   const filterResults = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
@@ -74,9 +71,7 @@ const MonomerLibrary = ({ toggleLibraryVisibility }: Props) => {
       let presetWithSameName: IRnaPreset | undefined;
 
       do {
-        presetWithSameName = presetsRef.current.find(
-          (preset) => preset.name === name,
-        );
+        presetWithSameName = presets.find((preset) => preset.name === name);
         if (presetWithSameName) name += COPY;
       } while (presetWithSameName);
 
@@ -97,7 +92,7 @@ const MonomerLibrary = ({ toggleLibraryVisibility }: Props) => {
       dispatch(setIsEditMode(true));
       scrollToSelectedPreset(preset?.name);
     },
-    [dispatch],
+    [dispatch, presets],
   );
 
   const editPreset = useCallback(
@@ -109,8 +104,8 @@ const MonomerLibrary = ({ toggleLibraryVisibility }: Props) => {
   );
 
   const tabs = useMemo(
-    () => tabsContent(duplicatePreset, editPreset),
-    [duplicatePreset, editPreset],
+    () => tabsContent(t, duplicatePreset, editPreset),
+    [t, duplicatePreset, editPreset],
   );
 
   const handleTabChange = useCallback(

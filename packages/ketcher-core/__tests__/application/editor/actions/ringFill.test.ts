@@ -127,8 +127,8 @@ describe('ring fill topology, history and KET', () => {
     const target = new Struct();
     for(let index=0;index<10;index++) { target.atoms.newId(); target.bonds.newId(); }
     struct.mergeInto(target);
-    expect(moleculeToKet(target).ringFills[0].atoms.slice().sort()).toEqual([0,1,2,3,4,5]);
-    expect(moleculeToKet(target).ringFills[0].bonds.slice().sort()).toEqual([0,1,2,3,4,5]);
+    expect(moleculeToKet(target).ringFills![0].atoms.slice().sort()).toEqual([0,1,2,3,4,5]);
+    expect(moleculeToKet(target).ringFills![0].bonds.slice().sort()).toEqual([0,1,2,3,4,5]);
   });
 
   it('does not render or retain a fill after deleting a ring bond; restoration matches again', () => {

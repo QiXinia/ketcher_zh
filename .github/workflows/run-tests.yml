@@ -23,12 +23,12 @@ env:
 jobs:
   build_ketcher:
     runs-on: ubuntu-latest
-    container: node:24.14.1-bookworm-slim
+    container: node:24-trixie-slim
     steps:
       - name: Install dependencies
         run: apt-get update -y && apt-get install -y git
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 1
       - name: Git safe
@@ -38,7 +38,7 @@ jobs:
       - name: Build all packages
         run: npm run build:packages && npm run build:example:standalone
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ketcher-dist-micro
           path: example/dist
@@ -50,15 +50,15 @@ jobs:
     # private runner and stayed queued.
     runs-on: ubuntu-latest
     needs: build_ketcher
-    container: mcr.microsoft.com/playwright:v1.59.1-jammy
+    container: mcr.microsoft.com/playwright:v1.62.1-jammy
     strategy:
       fail-fast: false
       matrix:
-        shardIndex: [1, 2, 3, 4, 5, 6]
-        shardTotal: [6]
+        shardIndex: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        shardTotal: [10]
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 1
       - name: Install dependencies
@@ -66,7 +66,7 @@ jobs:
       - name: Create folder for dist
         run: mkdir -p example/dist
       - name: Download compiled ketcher
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: ketcher-dist-micro
           path: example/dist/
@@ -86,7 +86,7 @@ jobs:
           cd ketcher-autotests/
           npx playwright install chromium
           npx playwright test --project=chromium --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         # run even if previous steps fails
         if: always()
         with:
@@ -97,14 +97,14 @@ jobs:
     if: ${{ !cancelled() }}
     needs: [part]
     runs-on: ubuntu-latest
-    container: node:24.14.1-bookworm-slim
+    container: node:24-trixie-slim
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
       - name: Install dependencies
         run: npm ci
       - name: Download Playwright blob reports
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           path: ketcher-autotests/playwright-report/
           pattern: pw-report-*
@@ -112,7 +112,7 @@ jobs:
       - name: Merge into HTML Report
         run: npx playwright merge-reports --reporter html ./ketcher-autotests/playwright-report/blob
       - name: Upload HTML report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: html-report
           path: playwright-report/

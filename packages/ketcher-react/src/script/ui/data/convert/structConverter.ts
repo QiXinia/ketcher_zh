@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *    https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,12 +16,14 @@
 
 import {
   type Atom,
+  type RxnArrow,
   type Struct,
   type SupportedFormat,
   Bond,
   IsotopicAbundance,
   RxnArrowMode,
   StereoFlag,
+  exceedsMolfileV2000Limit,
   getPropertiesByFormat,
 } from 'ketcher-core';
 import i18n from '../../../../i18n';
@@ -130,8 +132,8 @@ export function couldBeSaved(
   const hasRxnArrow = struct.hasRxnArrow();
 
   if (format === 'smarts') {
-    const arrayOfAtoms: Array<Atom> = Array.from(struct.atoms.values());
-    const arrayOfBonds: Array<Bond> = Array.from(struct.bonds.values());
+    const arrayOfAtoms: Array<Atom> = [...struct.atoms.values()];
+    const arrayOfBonds: Array<Bond> = [...struct.bonds.values()];
 
     const atomsHaveUnsupportedProperties = arrayOfAtoms.some(
       (atom) =>
@@ -167,7 +169,7 @@ export function couldBeSaved(
   }
 
   if (format === 'smiles') {
-    const arrayOfAtoms: Array<any> = Array.from(struct.atoms.values());
+    const arrayOfAtoms: Array<Atom> = [...struct.atoms.values()];
     const hasGenerics = arrayOfAtoms.some((atom) => atom.pseudo);
     if (hasGenerics) {
       warnings.push(i18n.t('saveWarnings.smilesGenericAtoms'));
@@ -176,7 +178,7 @@ export function couldBeSaved(
 
   if (format !== 'ket') {
     if (hasRxnArrow) {
-      const arrayOfArrows: Array<any> = Array.from(struct.rxnArrows.values());
+      const arrayOfArrows: Array<RxnArrow> = [...struct.rxnArrows.values()];
       const rxnArrowMode: RxnArrowMode = arrayOfArrows[0].mode;
       if (
         ![RxnArrowMode.OpenAngle, RxnArrowMode.Retrosynthetic].includes(
@@ -250,8 +252,17 @@ export function couldBeSaved(
   }
 
   if (
+    (['mol'] as SupportedFormat[]).includes(format) &&
+    exceedsMolfileV2000Limit(struct)
+  ) {
+    warnings.push(
+      'The structure exceeds the MDL Molfile V2000 limit (999 atoms/bonds) and will be saved in V3000 format.',
+    );
+  }
+
+  if (
     (['mol', 'rxn'] as SupportedFormat[]).includes(format) &&
-    Array.from(struct.frags.values()).some((fr) => {
+    [...struct.frags.values()].some((fr) => {
       if (fr?.enhancedStereoFlag) {
         return fr.enhancedStereoFlag !== StereoFlag.Abs;
       }

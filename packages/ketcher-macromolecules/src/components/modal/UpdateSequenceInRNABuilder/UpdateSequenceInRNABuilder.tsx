@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *    https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,14 +15,17 @@
  ***************************************************************************/
 import { Modal } from 'components/shared/modal';
 import { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from 'hooks';
 import { selectSequenceSelection } from 'state/rna-builder';
 import { ActionButton } from 'components/shared/actionButton';
 import styled from '@emotion/styled';
 import { selectEditor } from 'state/common';
-import { getCountOfNucleoelements } from 'helpers/countNucleoelents';
+import {
+  getCountOfMirroredNucleoelements,
+  getCountOfNucleoelements,
+} from 'helpers/countNucleoelents';
 import { resetRnaBuilderAfterSequenceUpdate } from 'components/monomerLibrary/RnaBuilder/RnaEditor/RnaEditorExpanded/helpers';
-import { i18n } from 'ketcher-react';
 
 export interface Props {
   onClose: () => void;
@@ -34,10 +37,15 @@ const TextWrapper = styled.div`
 `;
 
 const UpdateSequenceInRNABuilder = ({ isModalOpen, onClose }: Props) => {
+  const { t } = useTranslation('macromoleculesDialogs');
   const dispatch = useAppDispatch();
   const sequenceSelection = useAppSelector(selectSequenceSelection);
   const editor = useAppSelector(selectEditor);
   const countOfNucleoelements = getCountOfNucleoelements(sequenceSelection);
+  const countOfMirroredNucleoelements = getCountOfMirroredNucleoelements(
+    editor,
+    sequenceSelection,
+  );
   const onCloseCallback = useCallback(() => {
     onClose();
   }, [onClose]);
@@ -59,22 +67,25 @@ const UpdateSequenceInRNABuilder = ({ isModalOpen, onClose }: Props) => {
   return (
     <Modal
       isOpen={isModalOpen}
-      title={String(i18n.t('rnaBuilder.updateSequence'))}
+      title={t('updateSequence.title')}
       onClose={onCloseCallback}
-      data-testid="update-sequence-modal"
+      testId="update-sequence-modal"
     >
       <Modal.Content data-testid="update-sequence-modal-body">
         <TextWrapper>
-          {String(i18n.t('rnaBuilder.updateSequenceConfirmPrefix'))}
-          {countOfNucleoelements}
-          {String(i18n.t('rnaBuilder.updateSequenceConfirmSuffix'))}
+          {countOfMirroredNucleoelements > 0
+            ? t('updateSequence.duplexConfirmText', {
+                count: countOfNucleoelements,
+                mirroredCount: countOfMirroredNucleoelements,
+              })
+            : t('updateSequence.confirmText', { count: countOfNucleoelements })}
         </TextWrapper>
       </Modal.Content>
       <Modal.Footer>
         <ActionButton
           key="cancel"
           clickHandler={cancelHandler}
-          label={String(i18n.t('dialog.cancel'))}
+          label={t('common:button.cancel')}
           styleType="secondary"
           title=""
           data-testid="update-sequence-cancel-button"
@@ -82,7 +93,7 @@ const UpdateSequenceInRNABuilder = ({ isModalOpen, onClose }: Props) => {
         <ActionButton
           key="update"
           clickHandler={updateHandler}
-          label={String(i18n.t('dialog.yes'))}
+          label={t('common:button.yes')}
           title=""
           data-testid="update-sequence-yes-button"
         />

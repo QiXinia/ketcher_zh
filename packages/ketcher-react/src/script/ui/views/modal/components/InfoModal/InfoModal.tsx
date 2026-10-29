@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *    https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,30 +15,24 @@
  ***************************************************************************/
 
 import { connect } from 'react-redux';
+import { useTranslation } from 'react-i18next';
+import { error } from './constants';
 import { Dialog } from '../../../components';
 import { PasteErrorModalBody } from './PasteErrorModalBody';
-import i18n from '../../../../../../i18n';
-import {
-  translateErrorMessage,
-  translateErrorTitle,
-} from '../../../../../../i18n/helpers';
+import { translateErrorMessage, translateErrorTitle } from '../../../../../../i18n/helpers';
 
 import styles from './InfoModal.module.less';
 
 function ErrorInfoModal(props) {
-  // The paste-failure modal is dispatched with the stable id 'Paste'
-  // (see openInfoModal('Paste')). It must not be compared against the
-  // localized action title, otherwise the check breaks under non-English
-  // locales.
-  const paste = 'Paste';
-  const isPasteError = props.message === paste;
+  const { t } = useTranslation(['common', 'dialogs']);
+  // props.message is one of the fixed command identifiers dispatched by
+  // openInfoModal('Paste' | 'Copy' | 'Cut') in state/shared.ts — not
+  // display text, so compare against the literal identifier, not a
+  // translatable title (see action/index.ts's `paste` action title key).
+  const isPasteError = props.message === 'Paste';
 
-  const actionKey = String(props.message || '').toLowerCase();
-  const action = i18n.exists(`action.${actionKey}`)
-    ? i18n.t(`action.${actionKey}`)
-    : props.message;
-  const defaultCutCopyMessage = i18n.t('infoModal.unavailableViaMenu', {
-    action,
+  const defaultCutCopyMessage = t('dialogs:infoModal.defaultCutCopyMessage', {
+    command: props.message,
   });
 
   const headerContent = <div>{translateErrorTitle(props.title)}</div>;
@@ -58,7 +52,7 @@ function ErrorInfoModal(props) {
           key="ok"
           data-testid={props.testId || 'info-modal-close'}
         >
-          {props.button || i18n.t('infoModal.close')}
+          {props.button || t('common:button.close')}
         </button>,
       ]}
       headerContent={headerContent}

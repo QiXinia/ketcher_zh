@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *    https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -74,9 +74,9 @@ import {
   STRUCT_SERVICE_INITIALIZED_EVENT,
   STRUCT_SERVICE_NO_RENDER_INITIALIZED_EVENT,
 } from './constants';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import { getIndigoWorker } from '_indigo-worker-import-alias_';
+import { getIndigoWorker, releaseIndigoWorker } from '_indigo-worker-import-alias_';
+
+let nextSharedRequestId = 0;
 
 interface KeyValuePair {
   [key: string]: number | string | boolean | object;
@@ -234,7 +234,8 @@ class IndigoService implements StructService {
   // of the same input to different output formats.
   readonly supportsRequestIds = true;
   readonly supportsCrippenLogP = true;
-  private nextRequestId = 0;
+  private destroyed = false;
+  private readonly failureHandler: (event: ErrorEvent | MessageEvent) => void;
   private workerFailure: Error | null = null;
   private readonly pending = new Map<
     number,
@@ -245,23 +246,24 @@ class IndigoService implements StructService {
   >();
 
   private ketcherId: string | null = null;
+  private readonly messageHandler: (
+    e: MessageEvent<OutputMessage<string>>,
+  ) => void;
 
   constructor(defaultOptions: StructServiceOptions) {
     this.defaultOptions = defaultOptions;
     this.worker = getIndigoWorker();
-    this.worker.onmessage = (e: MessageEvent<OutputMessage<unknown>>) => {
-      if (e.data.type === Command.Info && !e.data.hasError) {
-        const callbackMethod = process.env.SEPARATE_INDIGO_RENDER
-          ? this.callIndigoNoRenderLoadedCallback
-          : this.callIndigoLoadedCallback;
-
-        callbackMethod();
-      }
-
+    this.messageHandler = (e: MessageEvent<OutputMessage<string>>) => {
       const message = e.data;
       if (message.requestId === undefined) return;
       const request = this.pending.get(message.requestId);
       if (!request) return;
+      if (message.type === Command.Info && !message.hasError) {
+        const callbackMethod = process.env.SEPARATE_INDIGO_RENDER
+          ? this.callIndigoNoRenderLoadedCallback
+          : this.callIndigoLoadedCallback;
+        callbackMethod();
+      }
       this.pending.delete(message.requestId);
       try {
         request.action({ data: message });
@@ -269,7 +271,7 @@ class IndigoService implements StructService {
         request.reject(error);
       }
     };
-    const failWorker = (event: ErrorEvent | MessageEvent) => {
+    this.failureHandler = (event: ErrorEvent | MessageEvent) => {
       this.workerFailure = new Error(
         'message' in event && event.message
           ? event.message
@@ -279,8 +281,9 @@ class IndigoService implements StructService {
         request.reject(this.workerFailure);
       this.pending.clear();
     };
-    this.worker.onerror = failWorker;
-    this.worker.onmessageerror = failWorker;
+    this.worker.addEventListener('error', this.failureHandler);
+    this.worker.addEventListener('messageerror', this.failureHandler);
+    this.worker.addEventListener('message', this.messageHandler);
   }
 
   private sendRequest<T, R>(
@@ -292,7 +295,11 @@ class IndigoService implements StructService {
       reject(this.workerFailure);
       return;
     }
-    const requestId = ++this.nextRequestId;
+    if (nextSharedRequestId >= Number.MAX_SAFE_INTEGER) {
+      reject(new Error('Indigo request identifier space exhausted'));
+      return;
+    }
+    const requestId = ++nextSharedRequestId;
     this.pending.set(requestId, {
       action: (response) => action(response as OutputMessageWrapper<R>),
       reject,
@@ -321,11 +328,13 @@ class IndigoService implements StructService {
   }
 
   private callIndigoNoRenderLoadedCallback() {
-    window.dispatchEvent(new Event(STRUCT_SERVICE_NO_RENDER_INITIALIZED_EVENT));
+    globalThis.dispatchEvent(
+      new Event(STRUCT_SERVICE_NO_RENDER_INITIALIZED_EVENT),
+    );
   }
 
   private callIndigoLoadedCallback() {
-    window.dispatchEvent(new Event(STRUCT_SERVICE_INITIALIZED_EVENT));
+    globalThis.dispatchEvent(new Event(STRUCT_SERVICE_INITIALIZED_EVENT));
   }
 
   async getInChIKey(struct: string): Promise<string> {
@@ -879,14 +888,16 @@ class IndigoService implements StructService {
   }
 
   public destroy() {
+    if (this.destroyed) return;
+    this.destroyed = true;
     this.workerFailure = new Error('Indigo service was destroyed');
-    for (const request of this.pending.values())
-      request.reject(this.workerFailure);
+    for (const request of this.pending.values()) request.reject(this.workerFailure);
     this.pending.clear();
-    this.worker.terminate();
-    this.worker.onmessage = null;
-    this.worker.onerror = null;
-    this.worker.onmessageerror = null;
+    this.worker.removeEventListener('message', this.messageHandler);
+    this.worker.removeEventListener('error', this.failureHandler);
+    this.worker.removeEventListener('messageerror', this.failureHandler);
+    releaseIndigoWorker(this.worker);
+
   }
 }
 

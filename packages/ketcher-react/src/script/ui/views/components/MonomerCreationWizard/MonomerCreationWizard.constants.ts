@@ -1,101 +1,108 @@
-import { KetMonomerClass } from 'ketcher-core';
+import {
+  BILN_ALIAS_FORMAT_ERROR_MESSAGE,
+  HELM_ALIAS_FORMAT_ERROR_MESSAGE,
+  KetMonomerClass,
+} from 'ketcher-core';
 
 import type {
   MonomerTypeSelectItem,
   WizardNotificationMessageMap,
   WizardNotificationTypeMap,
 } from './MonomerCreationWizard.types';
+import i18n from 'src/i18n/i18n';
 
 export const MonomerTypeSelectConfig: MonomerTypeSelectItem[] = [
   {
     value: KetMonomerClass.AminoAcid,
-    label: 'monomerWizard.typeLabels.aminoAcid',
+    label: i18n.t('components:monomerCreationWizard.types.aminoAcid'),
     iconName: 'peptide',
   },
   {
     value: KetMonomerClass.Sugar,
-    label: 'monomerWizard.typeLabels.sugar',
+    label: i18n.t('common:monomerType.sugar'),
     iconName: 'sugar',
   },
   {
     value: KetMonomerClass.Base,
-    label: 'monomerWizard.typeLabels.base',
+    label: i18n.t('common:monomerType.base'),
     iconName: 'base',
   },
   {
     value: KetMonomerClass.Phosphate,
-    label: 'monomerWizard.typeLabels.phosphate',
+    label: i18n.t('common:monomerType.phosphate'),
     iconName: 'phosphate',
   },
   {
     value: KetMonomerClass.RNA,
-    label: 'monomerWizard.typeLabels.nucleotideMonomer',
+    label: i18n.t('components:monomerCreationWizard.types.nucleotideMonomer'),
     iconName: 'nucleotide',
   },
   {
     value: 'rnaPreset',
-    label: 'monomerWizard.typeLabels.nucleotidePreset',
+    label: i18n.t('components:monomerCreationWizard.types.nucleotidePreset'),
     iconName: 'preset',
   },
   {
     value: KetMonomerClass.CHEM,
-    label: 'monomerWizard.typeLabels.chem',
+    label: i18n.t('components:monomerCreationWizard.types.chem'),
     iconName: 'chem',
   },
 ];
 
 export const MAX_MODIFICATION_TYPES = 5;
 
+const n = 'components:monomerCreationWizard.notifications.';
+
 export const NotificationMessages: WizardNotificationMessageMap = {
-  defaultAttachmentPoints:
-    'monomerWizard.notifications.defaultAttachmentPoints',
-  emptyMandatoryFields: 'monomerWizard.notifications.emptyMandatoryFields',
-  invalidSymbol: 'monomerWizard.notifications.invalidSymbol',
-  symbolExists: 'monomerWizard.notifications.symbolExists',
-  editingIsNotAllowed: 'monomerWizard.notifications.editingIsNotAllowed',
-  noAttachmentPoints: 'monomerWizard.notifications.noAttachmentPoints',
-  incorrectAttachmentPointsOrder:
-    'monomerWizard.notifications.incorrectAttachmentPointsOrder',
-  attachmentPointsNotUnique:
-    'monomerWizard.notifications.attachmentPointsNotUnique',
-  creationSuccessful: 'monomerWizard.notifications.creationSuccessful',
-  creationRNASuccessful: 'monomerWizard.notifications.creationRNASuccessful',
-  incontinuousStructure: 'monomerWizard.notifications.incontinuousStructure',
-  notUniqueModificationTypes:
-    'monomerWizard.notifications.notUniqueModificationTypes',
-  modificationTypeExists: 'monomerWizard.notifications.modificationTypeExists',
-  notMinimalViableStructure:
-    'monomerWizard.notifications.notMinimalViableStructure',
-  impureStructure: 'monomerWizard.notifications.impureStructure',
-  invalidHELMAlias: 'monomerWizard.notifications.invalidHELMAlias',
-  notUniqueHELMAlias: 'monomerWizard.notifications.notUniqueHELMAlias',
-  invalidBILNAlias: 'monomerWizard.notifications.invalidBILNAlias',
-  notUniqueBILNAlias: 'monomerWizard.notifications.notUniqueBILNAlias',
-  invalidRnaPresetStructure:
-    'monomerWizard.notifications.invalidRnaPresetStructure',
-  rnaPresetAtomsOutsideComponents:
-    'monomerWizard.notifications.rnaPresetAtomsOutsideComponents',
-  rnaPresetAtomsInMultipleComponents:
-    'monomerWizard.notifications.rnaPresetAtomsInMultipleComponents',
-  rnaPresetMissingComponents:
-    'monomerWizard.notifications.rnaPresetMissingComponents',
-  rnaPresetInvalidSugarConnectionBonds:
-    'monomerWizard.notifications.rnaPresetInvalidSugarConnectionBonds',
-  rnaPresetUnexpectedBasePhosphateBond:
-    'monomerWizard.notifications.rnaPresetUnexpectedBasePhosphateBond',
-  rnaPresetInvalidSugarBaseConnectionAttachmentPoints:
-    'monomerWizard.notifications.rnaPresetInvalidSugarBaseConnectionAttachmentPoints',
-  rnaPresetInvalidSugarPhosphateConnectionAttachmentPoints:
-    'monomerWizard.notifications.rnaPresetInvalidSugarPhosphateConnectionAttachmentPoints',
-  notUniquePresetCode: 'monomerWizard.notifications.notUniquePresetCode',
-  invalidPresetCode: 'monomerWizard.notifications.invalidPresetCode',
-  invalidName: 'monomerWizard.notifications.invalidName',
-  invalidPhosphatePositionAttachmentPoints:
-    'monomerWizard.notifications.invalidPhosphatePositionAttachmentPoints',
-  phosphatePositionNotSelected:
-    'monomerWizard.notifications.phosphatePositionNotSelected',
-  editAllPresetWarning: 'monomerWizard.notifications.editAllPresetWarning',
-  editAllPresetError: 'monomerWizard.notifications.editAllPresetError',
+  defaultAttachmentPoints: i18n.t(`${n}defaultAttachmentPoints`),
+  emptyMandatoryFields: i18n.t(`${n}emptyMandatoryFields`),
+  invalidSymbol: i18n.t(`${n}invalidSymbol`),
+  symbolExists: i18n.t(`${n}symbolExists`),
+  editingIsNotAllowed: i18n.t(`${n}editingIsNotAllowed`),
+  noAttachmentPoints: i18n.t(`${n}noAttachmentPoints`),
+  incorrectAttachmentPointsOrder: i18n.t(`${n}incorrectAttachmentPointsOrder`),
+  attachmentPointsNotUnique: i18n.t(`${n}attachmentPointsNotUnique`),
+  creationSuccessful: i18n.t(`${n}creationSuccessful`),
+  creationRNASuccessful: i18n.t(`${n}creationRNASuccessful`),
+  incontinuousStructure: i18n.t(`${n}incontinuousStructure`),
+  notUniqueModificationTypes: i18n.t(`${n}notUniqueModificationTypes`),
+  modificationTypeExists: i18n.t(`${n}modificationTypeExists`),
+  notMinimalViableStructure: i18n.t(`${n}notMinimalViableStructure`),
+  impureStructure: i18n.t(`${n}impureStructure`),
+  invalidHELMAlias: HELM_ALIAS_FORMAT_ERROR_MESSAGE,
+  notUniqueHELMAlias: i18n.t(`${n}notUniqueHELMAlias`),
+  invalidBILNAlias: BILN_ALIAS_FORMAT_ERROR_MESSAGE,
+  notUniqueBILNAlias: i18n.t(`${n}notUniqueBILNAlias`),
+  invalidRnaPresetStructure: i18n.t(`${n}invalidRnaPresetStructure`),
+  rnaPresetAtomsOutsideComponents: i18n.t(
+    `${n}rnaPresetAtomsOutsideComponents`,
+  ),
+  rnaPresetAtomsInMultipleComponents: i18n.t(
+    `${n}rnaPresetAtomsInMultipleComponents`,
+  ),
+  rnaPresetMissingComponents: i18n.t(`${n}rnaPresetMissingComponents`),
+  rnaPresetInvalidSugarConnectionBonds: i18n.t(
+    `${n}rnaPresetInvalidSugarConnectionBonds`,
+  ),
+  rnaPresetUnexpectedBasePhosphateBond: i18n.t(
+    `${n}rnaPresetUnexpectedBasePhosphateBond`,
+  ),
+  rnaPresetInvalidSugarBaseConnectionAttachmentPoints: i18n.t(
+    `${n}rnaPresetInvalidSugarBaseConnectionAttachmentPoints`,
+  ),
+  rnaPresetInvalidSugarPhosphateConnectionAttachmentPoints: i18n.t(
+    `${n}rnaPresetInvalidSugarPhosphateConnectionAttachmentPoints`,
+  ),
+  notUniquePresetCode: i18n.t(`${n}notUniquePresetCode`),
+  invalidPresetCode: i18n.t(`${n}invalidPresetCode`),
+  invalidName: i18n.t(`${n}invalidName`),
+  invalidPhosphatePositionAttachmentPoints: i18n.t(
+    `${n}invalidPhosphatePositionAttachmentPoints`,
+  ),
+  phosphatePositionNotSelected: i18n.t(`${n}phosphatePositionNotSelected`),
+  editAllPresetWarning: '',
+  editAllPresetError: '',
+  usedAttachmentPointsWarning: '',
 };
 
 export const NotificationTypes: WizardNotificationTypeMap = {
@@ -133,6 +140,7 @@ export const NotificationTypes: WizardNotificationTypeMap = {
   phosphatePositionNotSelected: 'error',
   editAllPresetWarning: 'warning',
   editAllPresetError: 'error',
+  usedAttachmentPointsWarning: 'info',
 };
 
 export const MonomerCreationExternalNotificationAction =

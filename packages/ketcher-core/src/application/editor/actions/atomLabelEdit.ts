@@ -78,7 +78,7 @@ export function fromSelectedAtomLabelEdit(
   // All checks above are read-only. The native replacement keeps external
   // bonds, their IDs/direction/stereo and the original anchor's coordinates.
   const [inverseAction, added] = fromTemplateOnAtom(
-    restruct, { molecule: fragment, aid, angle0 }, sourceId, angle, false,
+    restruct, { molecule: fragment, aid, bid: 0, angle0 }, sourceId, angle, false,
   );
   return { inverseAction, atoms: added.atoms, bonds: added.bonds, targetAtomId: sourceId };
 }

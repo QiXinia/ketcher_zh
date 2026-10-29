@@ -1,7 +1,7 @@
 import { ChangeEvent, KeyboardEvent, memo, useRef, useState } from 'react';
 import clsx from 'clsx';
+import { useTranslation } from 'react-i18next';
 import { LayoutMode } from 'ketcher-core';
-import { i18n } from 'ketcher-react';
 
 import useTranslateAlongXAxis from './useTranslateAlongXAxis';
 
@@ -22,11 +22,9 @@ const RulerInput = ({
   layoutMode,
   onCommitValue,
 }: Props) => {
+  const { t } = useTranslation('macromolecules');
   const ref = useRef<HTMLInputElement>(null);
 
-  // TODO suppressed after upgrade to react 19. Need to fix
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
   useTranslateAlongXAxis(ref, offsetX);
 
   const stringifiedLineLengthValue = lineLengthValue.toString();
@@ -73,7 +71,7 @@ const RulerInput = ({
         styles.rulerInput,
         isDragging && styles.rulerInputDragging,
       )}
-      title={String(i18n.t('ruler.monomersInLine'))}
+      title={t('ruler.monomersInLine')}
       type="text"
       inputMode="numeric"
       pattern="[0-9]*"

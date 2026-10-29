@@ -96,6 +96,9 @@ export const DEFAULT_SETTINGS: Settings = {
   },
   disableCustomQuery: false,
   monomerLibraryUpdates: [],
+
+  // Color picker
+  colorPickerCustomColors: [],
 };
 
 /**
@@ -231,5 +234,8 @@ export const SCHEMA = {
     editorLineLength: { type: 'object' },
     disableCustomQuery: { type: 'boolean' },
     monomerLibraryUpdates: { type: 'array', items: { type: 'string' } },
+
+    // Color picker
+    colorPickerCustomColors: { type: 'array', items: { type: 'string' } },
   },
 };

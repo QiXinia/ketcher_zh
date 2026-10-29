@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *    https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,7 +14,7 @@
  * limitations under the License.
  ***************************************************************************/
 
-import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { MonomerGroup } from '../monomerLibraryGroup';
 import { useAppSelector } from 'hooks';
 import { MonomerListContainer } from './styles';
@@ -33,14 +33,12 @@ import {
   MonomerGroups,
 } from '../../../constants';
 import { MonomerItemType } from 'ketcher-core';
-import { selectEditorActiveTool } from 'state/common';
 import {
   selectFilteredPresets,
   selectPresetsInFavorites,
 } from 'state/rna-builder';
 import { RnaPresetGroup } from '../RnaPresetGroup/RnaPresetGroup';
 import { IRnaPreset } from '../RnaBuilder/types';
-import { i18n } from 'ketcher-react';
 
 export type Group = {
   groupItems: Array<MonomerItemType>;
@@ -58,9 +56,9 @@ const MonomerList = ({
   duplicatePreset,
   editPreset,
 }: IMonomerListProps) => {
+  const { t } = useTranslation('macromoleculesDialogs');
   const monomers = useAppSelector(selectFilteredMonomers);
   const presets = useAppSelector(selectFilteredPresets);
-  const activeTool = useAppSelector(selectEditorActiveTool);
   const isFavoriteTab = libraryName === MONOMER_LIBRARY_FAVORITES;
 
   const items = !isFavoriteTab
@@ -78,18 +76,10 @@ const MonomerList = ({
   const ambiguousMonomers = isFavoriteTab
     ? selectAmbiguousMonomersInFavorites(monomers)
     : selectAmbiguousMonomersInCategory(monomers, MonomerGroups.PEPTIDES);
-  const [selectedMonomers, setSelectedMonomers] = useState('');
-
-  useEffect(() => {
-    if (activeTool !== 'monomer') {
-      setSelectedMonomers('');
-    }
-  }, [activeTool]);
-
   return (
     <MonomerListContainer>
       {isFavoriteTab && monomerGroups.length > 0 && (
-        <div>{String(i18n.t('monomerLibrary.favoritesMonomers'))}</div>
+        <div>{t('monomerLibrary.monomersSectionHeader')}</div>
       )}
       {monomerGroups.map(({ groupItems, groupTitle }, _index, groups) => {
         return (
@@ -99,13 +89,12 @@ const MonomerList = ({
             items={groupItems}
             libraryName={libraryName}
             onItemClick={onItemClick}
-            selectedMonomerUniqueKey={selectedMonomers}
           />
         );
       })}
       {isFavoriteTab && (items as Favorites).presets.length > 0 && (
         <>
-          <div>{String(i18n.t('monomerLibrary.favoritesPresets'))}</div>
+          <div>{t('monomerLibrary.presetsSectionHeader')}</div>
           <RnaPresetGroup
             duplicatePreset={duplicatePreset}
             editPreset={editPreset}
@@ -123,7 +112,6 @@ const MonomerList = ({
                 items={group.groupItems}
                 libraryName={libraryName}
                 onItemClick={onItemClick}
-                selectedMonomerUniqueKey={selectedMonomers}
               />
             );
           })}

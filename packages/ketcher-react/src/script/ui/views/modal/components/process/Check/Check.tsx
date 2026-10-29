@@ -28,6 +28,10 @@ import ErrorsCheck from './components';
 import { check } from '../../../../../state/server';
 import type { MoleculeErrorLocations } from '../../../../../state/server/checkLocations';
 import { checkOpts } from '../../../../../state/options';
+import type {
+  CheckOption,
+  OptionsCheckState,
+} from '../../../../../state/options/types';
 import style from './Check.module.less';
 import { LoadingCircles } from 'src/script/ui/views/components/Spinner';
 import i18n from '../../../../../../../i18n';
@@ -35,19 +39,6 @@ import i18n from '../../../../../../../i18n';
 interface MoleculeErrors {
   [key: string]: string;
 }
-
-type CheckOption =
-  | 'valence'
-  | 'radicals'
-  | 'pseudoatoms'
-  | 'stereo'
-  | 'query'
-  | 'overlapping_atoms'
-  | 'overlapping_bonds'
-  | 'rgroups'
-  | 'chiral'
-  | '3d'
-  | 'chiral_flag';
 
 interface CheckSchema {
   title: string;
@@ -65,9 +56,7 @@ interface CheckSchema {
   };
 }
 
-interface CheckState {
-  checkOptions: CheckOption[];
-}
+type CheckState = OptionsCheckState;
 
 interface CheckFormState extends FormState<CheckState> {
   moleculeErrors: MoleculeErrors;
@@ -120,28 +109,29 @@ const checkSchema: CheckSchema = {
         enum: [
           'valence',
           'radicals',
+          'isotopes',
           'pseudoatoms',
           'stereo',
+          'chiral',
+          'chiral_flag',
           'query',
           'overlapping_atoms',
           'overlapping_bonds',
           'rgroups',
-          'chiral',
           '3d',
-          'chiral_flag',
         ],
         enumNames: [
           i18n.t('check.valence'),
           i18n.t('check.radical'),
           i18n.t('check.pseudoatom'),
           i18n.t('check.stereochemistry'),
+          i18n.t('check.chirality'),
+          i18n.t('check.chiralFlag'),
           i18n.t('check.query'),
           i18n.t('check.overlappingAtoms'),
           i18n.t('check.overlappingBonds'),
           i18n.t('check.rgroups'),
-          i18n.t('check.chirality'),
           i18n.t('check.structure3D'),
-          i18n.t('check.chiralFlag'),
         ],
       },
     },
@@ -264,6 +254,8 @@ const CheckDialog: FC<CheckDialogProps> = (props) => {
   };
 
   useEffect(() => {
+    // Decided to suppress because this is intended behaviour for this component
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     handleCheck();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -289,8 +281,6 @@ const CheckDialog: FC<CheckDialogProps> = (props) => {
         schema={checkSchema}
         init={checkState}
         {...formState}
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore - result prop is not in FormProps type definition but is accepted by the component
         result={result}
       >
         <div className={style.wrapper}>
@@ -304,8 +294,6 @@ const CheckDialog: FC<CheckDialogProps> = (props) => {
               <Field
                 name="checkOptions"
                 labelPos={false}
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore - multiple and onChange props are not in FieldProps type definition but are accepted by the component
                 multiple
                 type="checkbox"
                 disabled={!isStructureChecking}
@@ -347,6 +335,15 @@ const CheckDialog: FC<CheckDialogProps> = (props) => {
             </div>
           </div>
         </div>
+        <p
+          className={style.idsExplanation}
+          data-testid="check-structure-id-explanation"
+        >
+          Some checks will return atom or bond IDs for the elements causing the
+          error. To visualize them toggle on the &apos;Show Atom IDs&apos; and
+          &apos;Show Bond IDs&apos; in the &apos;Debugging&apos; section of
+          Settings.
+        </p>
       </Form>
     </Dialog>
   );
@@ -373,12 +370,9 @@ const mapDispatchToProps = (
   },
 });
 
-// Workaround: @types/react version conflict with connect()
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const CheckDialogAny = CheckDialog as any;
-const Check = connect(
+const ConnectedCheckDialog = connect(
   mapStateToProps,
   mapDispatchToProps,
-)(CheckDialogAny) as ComponentType<CheckDialogOwnProps>;
+)(CheckDialog);
 
-export default Check;
+export default ConnectedCheckDialog as ComponentType<CheckDialogOwnProps>;

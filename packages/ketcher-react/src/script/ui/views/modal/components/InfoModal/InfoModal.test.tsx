@@ -7,9 +7,10 @@ import i18n from '../../../../../../i18n';
 describe('InfoModal should be rendered correctly', () => {
   it('should render default error message for Cut and Copy actions', () => {
     const props = 'Cut';
-    const defaultErrorText = i18n.t('infoModal.unavailableViaMenu', {
-      action: i18n.t('action.cut'),
-    });
+    const defaultErrorText = i18n.t(
+      'dialogs:infoModal.defaultCutCopyMessage',
+      { command: props },
+    );
     const view = renderWithMockStore(<InfoModal message={props} />);
 
     expect(view).toMatchSnapshot();

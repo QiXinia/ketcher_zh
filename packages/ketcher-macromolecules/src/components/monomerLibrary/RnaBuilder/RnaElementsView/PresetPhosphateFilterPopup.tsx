@@ -5,10 +5,11 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *    https://www.apache.org/licenses/LICENSE-2.0
  ***************************************************************************/
 
 import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { useAppSelector } from 'hooks';
 import {
@@ -26,7 +27,6 @@ import {
   FilterPopupTitle,
   StyledCheckboxInput,
 } from './styles';
-import { i18n } from 'ketcher-react';
 
 type Props = {
   onClose: () => void;
@@ -42,6 +42,7 @@ const DEFAULT_FILTER: PresetPhosphateFilter = {
 };
 
 export const PresetPhosphateFilterPopup: React.FC<Props> = ({ onClose }) => {
+  const { t } = useTranslation('macromoleculesDialogs');
   const dispatch = useDispatch();
   const currentFilter = useAppSelector(selectPresetPhosphateFilter);
   const [draftFilter, setDraftFilter] =
@@ -104,7 +105,7 @@ export const PresetPhosphateFilterPopup: React.FC<Props> = ({ onClose }) => {
       data-testid="preset-phosphate-filter-popup"
       onClick={(event) => event.stopPropagation()}
     >
-      <FilterPopupTitle>{String(i18n.t('rnaBuilder.filter'))}</FilterPopupTitle>
+      <FilterPopupTitle>{t('monomerLibrary.filterTitle')}</FilterPopupTitle>
       <FilterPopupOption>
         <StyledCheckboxInput
           type="checkbox"
@@ -112,7 +113,7 @@ export const PresetPhosphateFilterPopup: React.FC<Props> = ({ onClose }) => {
           onChange={toggle('fivePrime')}
           data-testid="preset-filter-5-phosphate"
         />
-        <span /> {String(i18n.t('rnaBuilder.phosphate5'))}
+        <span /> {t('monomerLibrary.fivePrimePhosphate')}
       </FilterPopupOption>
       <FilterPopupOption>
         <StyledCheckboxInput
@@ -121,7 +122,7 @@ export const PresetPhosphateFilterPopup: React.FC<Props> = ({ onClose }) => {
           onChange={toggle('threePrime')}
           data-testid="preset-filter-3-phosphate"
         />
-        <span /> {String(i18n.t('rnaBuilder.phosphate3'))}
+        <span /> {t('monomerLibrary.threePrimePhosphate')}
       </FilterPopupOption>
       <FilterPopupOption>
         <StyledCheckboxInput
@@ -130,18 +131,18 @@ export const PresetPhosphateFilterPopup: React.FC<Props> = ({ onClose }) => {
           onChange={toggle('noPhosphate')}
           data-testid="preset-filter-no-phosphate"
         />
-        <span /> {String(i18n.t('rnaBuilder.noPhosphateGroup'))}
+        <span /> {t('monomerLibrary.noPhosphateGroup')}
       </FilterPopupOption>
       <FilterPopupSeparator />
       <FilterPopupActions>
         <FilterPopupResetButton
           styleType="secondary"
-          label={String(i18n.t('rnaBuilder.resetAll'))}
+          label={t('monomerLibrary.resetAll')}
           clickHandler={handleResetAll}
           data-testid="preset-filter-reset"
         />
         <FilterPopupActionButton
-          label="Set"
+          label={t('monomerLibrary.setFilter')}
           clickHandler={handleSet}
           data-testid="preset-filter-set"
         />

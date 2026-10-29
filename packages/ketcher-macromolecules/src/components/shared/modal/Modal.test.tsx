@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *    https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -46,7 +46,7 @@ describe('Modal component', () => {
   it('should call close handler when close icon clicked', () => {
     render(withThemeProvider(mockModal()));
 
-    const closeIcon = screen.getByTitle('关闭窗口');
+    const closeIcon = screen.getByTitle('Close window');
     fireEvent.click(closeIcon);
 
     expect(mockOnCloseHandler).toHaveBeenCalledTimes(1);
@@ -66,7 +66,7 @@ describe('Modal component', () => {
       ),
     );
 
-    expect(screen.queryByTitle('关闭窗口')).not.toBeInTheDocument();
+    expect(screen.queryByTitle('Close window')).not.toBeInTheDocument();
   });
 
   it('should show "Expand window" tooltip when not expanded', () => {
@@ -86,7 +86,7 @@ describe('Modal component', () => {
       ),
     );
 
-    expect(screen.getByTitle('展开窗口')).toBeInTheDocument();
+    expect(screen.getByTitle('Expand window')).toBeInTheDocument();
   });
 
   it('should show "Minimize window" tooltip when expanded', () => {
@@ -106,7 +106,7 @@ describe('Modal component', () => {
       ),
     );
 
-    expect(screen.getByTitle('最小化窗口')).toBeInTheDocument();
+    expect(screen.getByTitle('Minimize window')).toBeInTheDocument();
   });
 
   it('should toggle tooltip when expand button is clicked', () => {
@@ -130,7 +130,7 @@ describe('Modal component', () => {
       ),
     );
 
-    const expandButton = screen.getByTitle('展开窗口');
+    const expandButton = screen.getByTitle('Expand window');
     fireEvent.click(expandButton);
 
     expect(mockSetExpanded).toHaveBeenCalledWith(true);
@@ -151,6 +151,6 @@ describe('Modal component', () => {
       ),
     );
 
-    expect(screen.getByTitle('最小化窗口')).toBeInTheDocument();
+    expect(screen.getByTitle('Minimize window')).toBeInTheDocument();
   });
 });

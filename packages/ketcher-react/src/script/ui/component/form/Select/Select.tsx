@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /****************************************************************************
  * Copyright 2021 EPAM Systems
  *
@@ -6,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *    https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,7 +21,7 @@ import type { ReactNode } from 'react';
 import clsx from 'clsx';
 import styles from './Select.module.less';
 import { Icon } from 'components';
-import i18n from '../../../../../i18n';
+import { useTranslation } from 'react-i18next';
 
 export interface Option {
   value: string;
@@ -65,6 +64,7 @@ const Select = ({
   error,
   title,
 }: Props) => {
+  const { t } = useTranslation('common');
   const currentValue = options?.find((option) => option.value === value);
   const isFullscreen = !!document.fullscreenElement;
   const portalContainer = isFullscreen
@@ -82,11 +82,7 @@ const Select = ({
       title={title}
       onChange={handleChange}
       renderValue={(selected: string) =>
-        (currentValue?.children ??
-          currentValue?.label ??
-          placeholder ??
-          selected ??
-          '') as any
+        currentValue?.children ?? currentValue?.label ?? placeholder ?? selected
       }
       displayEmpty
       multiple={multiple}
@@ -114,9 +110,7 @@ const Select = ({
             key={option.value}
             disableRipple={true}
             disabled={option.disabled}
-            title={
-              option.markedAsUsed ? i18n.t('common.alreadyInUse') : undefined
-            }
+            title={option.markedAsUsed ? t('alreadyInUse') : undefined}
             className={clsx({
               [`dropdown-${formName}_${name}`]: formName,
               [styles.usedOption]: option.markedAsUsed,

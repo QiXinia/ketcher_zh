@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *    https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,6 +16,14 @@
 
 import { KetcherLogger } from 'utilities';
 import { SupportedFormat } from './structFormatter.types';
+
+function isIdtString(s: string): boolean {
+  // Phosphorothioate nucleotide sequence: A, C, G, T, U joined by *
+  const idtBaseSeq = /^[ACGTUacgtu](\*[ACGTUacgtu])+$/;
+  // IDT modification token: /3Name/, /5Name/, /iName/, /rName/
+  const idtModToken = /\/[35ir][A-Za-z0-9][A-Za-z0-9-]*\/?/;
+  return idtBaseSeq.test(s) || idtModToken.test(s);
+}
 
 export function identifyStructFormat(
   stringifiedStruct: string,
@@ -28,9 +36,9 @@ export function identifyStructFormat(
     if (JSON.parse(sanitizedString)) {
       return SupportedFormat.ket;
     }
-  } catch (e) {
-    KetcherLogger.error('identifyStructFormat.ts::identifyStructFromat', e);
-  } // eslint-disable-line
+  } catch (error) {
+    KetcherLogger.error('identifyStructFormat.ts::identifyStructFromat', error);
+  }
 
   const isRXN = sanitizedString.includes('$RXN');
   const isSDF = sanitizedString.includes('\n$$$$');
@@ -89,7 +97,7 @@ export function identifyStructFormat(
   if (
     clearStr.length % 4 === 0 &&
     isBase64String.test(clearStr) &&
-    window.atob(clearStr).startsWith(cdxHeader)
+    globalThis.atob(clearStr).startsWith(cdxHeader)
   ) {
     return SupportedFormat.cdx;
   }
@@ -107,6 +115,14 @@ export function identifyStructFormat(
     return SupportedFormat.fasta;
   }
 
+  if (sanitizedString.indexOf('<CDXML') !== -1) {
+    return SupportedFormat.cdxml;
+  }
+
+  if (isIdtString(sanitizedString)) {
+    return SupportedFormat.idt;
+  }
+
   if (sanitizedString.indexOf('\n') === -1 && !isMacromolecules) {
     // TODO: smiles regexp
     return SupportedFormat.smiles;
@@ -114,11 +130,8 @@ export function identifyStructFormat(
 
   const isSequence = /^[a-zA-Z\s]*$/.test(sanitizedString);
   const isThreeLetter = /^(?:(?:[A-Z][a-z]{2})\s?)+$/.test(sanitizedString);
-  const isIdt = /([a-zA-Z0-9]+)\/*([a-zA-Z0-9*-]+)/.test(sanitizedString);
 
-  if (!isThreeLetter && isIdt) {
-    return SupportedFormat.idt;
-  } else if (isSequence) {
+  if (!isThreeLetter && isSequence) {
     return SupportedFormat.sequence;
   }
 

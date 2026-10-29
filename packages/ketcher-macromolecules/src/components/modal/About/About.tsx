@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *    https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,18 +15,18 @@
  ***************************************************************************/
 
 import Logo from './logo.svg';
+import { useTranslation } from 'react-i18next';
 import { Modal } from '../../shared/modal/Modal';
 import { About as AboutStyled } from './About.styles';
-import { useIndigoVersionToRedux } from 'src/hooks/useIndigoVersionToRedux';
 import { selectAppMeta } from 'state/common/editorSlice';
 import { useAppDispatch, useAppSelector } from 'src/hooks/stateHooks';
-import { i18n } from 'ketcher-react';
 
-const FEEDBACK_URL = 'http://lifescience.opensource.epam.com/ketcher/#feedback';
+const FEEDBACK_URL =
+  'https://lifescience.opensource.epam.com/ketcher/#feedback';
 const OVERVIEW_URL =
   'https://lifescience.opensource.epam.com/ketcher/index.html';
-const LIFE_SCIENCES_URL = 'http://lifescience.opensource.epam.com/';
-const INDIGO_URL = 'http://lifescience.opensource.epam.com/indigo/';
+const LIFE_SCIENCES_URL = 'https://lifescience.opensource.epam.com/';
+const INDIGO_URL = 'https://lifescience.opensource.epam.com/indigo/';
 
 function formatDate(isoDate = ''): string {
   if (!isoDate.includes('T')) return isoDate;
@@ -41,8 +41,8 @@ export function About({
   isOpen: boolean;
   onClose: () => void;
 }>) {
+  const { t } = useTranslation('dialogs');
   const dispatch = useAppDispatch();
-  useIndigoVersionToRedux();
   const { buildDate, indigoVersion, version } = useAppSelector(selectAppMeta);
   const formattedDate = formatDate(buildDate);
 
@@ -69,11 +69,11 @@ export function About({
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  {i18n.t('about.version')} {version}
+                  {t('meta.about.version', { value: version })}
                 </a>
               </dt>
               <dd data-testid="build-time">
-                {i18n.t('about.buildAt')} <time>{formattedDate}</time>
+                {t('meta.about.buildAt')} <time>{formattedDate}</time>
               </dd>
               <div className="infoLinks">
                 <dt>
@@ -82,7 +82,7 @@ export function About({
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    {i18n.t('about.feedback')}
+                    {t('meta.about.feedback')}
                   </a>
                 </dt>
                 <dt>
@@ -91,22 +91,20 @@ export function About({
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    EPAM Life Sciences
+                    {t('meta.about.epamLifeSciences')}
                   </a>
                 </dt>
               </div>
               <div className="indigoVersion">
                 <a href={INDIGO_URL} target="_blank" rel="noopener noreferrer">
-                  Indigo Toolkit
+                  {t('meta.about.indigoToolkit')}
                 </a>
               </div>
               <div data-testid="build-indigo-version">
                 {indigoVersion ? (
-                  <dd>
-                    {i18n.t('about.version')} {indigoVersion}
-                  </dd>
+                  <dd>{t('meta.about.version', { value: indigoVersion })}</dd>
                 ) : (
-                  <p>{i18n.t('about.standalone')}</p>
+                  <p>{t('meta.about.standalone')}</p>
                 )}
               </div>
             </dl>
@@ -117,7 +115,7 @@ export function About({
               className="okButton"
               data-testid="ok-button"
             >
-              {i18n.t('about.ok')}
+              {t('meta.about.ok')}
             </button>
           </div>
         </AboutStyled>

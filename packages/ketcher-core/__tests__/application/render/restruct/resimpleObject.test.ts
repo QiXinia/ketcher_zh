@@ -1,7 +1,7 @@
 import { ReStruct, Render } from 'application/render';
 import type { RenderOptions } from 'application/render/render.types';
 import ReSimpleObject from 'application/render/restruct/resimpleObject';
-import { SimpleObjectBracketType, SimpleObjectMode, Struct, Vec2 } from 'domain/entities';
+import { SimpleObjectArrow, SimpleObjectBracketType, SimpleObjectMode, Struct, Vec2 } from 'domain/entities';
 
 it('scales curve stroke and doubled spacing while preserving solid arrowheads', () => {
   const option = { microModeScale: 20, width: 100, height: 100 } as RenderOptions;
@@ -11,7 +11,7 @@ it('scales curve stroke and doubled spacing while preserving solid arrowheads', 
   new ReSimpleObject({
     mode: SimpleObjectMode.line, pos: [new Vec2(0, 0), new Vec2(4, 0)],
     style: 'bold', lineWidth: 2.5, doubled: true, doubleLineSpacing: 0.5,
-    endArrow: 'full',
+    endArrow: SimpleObjectArrow.full,
   }).show(restruct, render.options);
   expect(paths).toHaveLength(3);
   expect(paths[0].attr('stroke-width')).toBe(5);

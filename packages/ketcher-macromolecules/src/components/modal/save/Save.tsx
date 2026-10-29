@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *    https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,7 +14,8 @@
  * limitations under the License.
  ***************************************************************************/
 
-import { useEffect, useState } from 'react';
+import { useState, type MouseEvent } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Modal } from 'components/shared/modal';
 import { Option } from 'components/shared/dropDown/dropDown';
@@ -22,7 +23,7 @@ import { TextArea } from 'components/shared/TextArea';
 import { TextInputField } from 'components/shared/textInputField';
 import { getPropertiesByFormat, SupportedFormats } from 'helpers/formats';
 import { ActionButton } from 'components/shared/actionButton';
-import { IconButton, IndigoProvider, i18n } from 'ketcher-react';
+import { IconButton, IndigoProvider } from 'ketcher-react';
 import {
   ChemicalMimeType,
   KetSerializer,
@@ -30,7 +31,6 @@ import {
   KetcherLogger,
   getSvgFromDrawnStructures,
   isClipboardAPIAvailable,
-  legacyCopy,
   isHelmCompatible,
   provideEditorInstance,
   KETCHER_RASTER_FORMATS,
@@ -53,8 +53,7 @@ import {
 import styled from '@emotion/styled';
 import { useAppDispatch } from 'hooks';
 import { openErrorModal } from 'state/modal';
-// TODO: Make it type safe by using `SupportedFormats` as id
-const options: Array<Option> = [
+const options: Array<Option & { id: SupportedFormats }> = [
   { id: 'ket', label: 'Ket Format' },
   { id: 'mol', label: 'MDL Molfile V3000' },
   { id: 'sequence', label: 'Sequence (1-letter code)' },
@@ -100,18 +99,25 @@ export const Save = ({
   onClose,
   isModalOpen,
 }: RequiredModalProps): JSX.Element => {
+  const { t } = useTranslation('macromoleculesDialogs');
   const dispatch = useAppDispatch();
+  const indigo = IndigoProvider.getIndigo() as StructService;
+  const editor = provideEditorInstance();
   const [currentFileFormat, setCurrentFileFormat] = useState<
     SupportedFormats | KetcherRasterFormat | 'png'
   >('ket');
   const [currentFileName, setCurrentFileName] = useState('ketcher');
-  const [struct, setStruct] = useState('');
+  const [struct, setStruct] = useState(() => {
+    const ketSerializer = new KetSerializer();
+    return ketSerializer.serialize(
+      editor.drawingEntitiesManager.micromoleculesHiddenEntities.clone(),
+      editor.drawingEntitiesManager,
+    );
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [svgData, setSvgData] = useState<string | undefined>();
-  const indigo = IndigoProvider.getIndigo() as StructService;
-  const editor = provideEditorInstance();
 
-  const handleSelectChange = async (fileFormat) => {
+  const handleSelectChange = async (fileFormat: SupportedFormats) => {
     setCurrentFileFormat(fileFormat);
     const ketSerializer = new KetSerializer();
     const serializedKet = ketSerializer.serialize(
@@ -123,34 +129,22 @@ export const Save = ({
       setStruct(serializedKet);
       return;
     }
-    if (
-      fileFormat === 'svg' ||
-      fileFormat === 'png' ||
-      isKetcherRasterFormat(fileFormat)
-    ) {
-      // Get Ketcher root element offset for SVG positioning
-      const ketcherRootRect = editor.ketcherRootElementBoundingClientRect;
-      const ketcherRootOffsetX = ketcherRootRect?.x || 0;
-      const ketcherRootOffsetY = ketcherRootRect?.y || 0;
-
-      const svgData = getSvgFromDrawnStructures(editor.canvas, 'preview', {
-        horizontal: ketcherRootOffsetX,
-        vertical: ketcherRootOffsetY,
-      });
+    if (fileFormat === 'svg' || fileFormat === 'png' || isKetcherRasterFormat(fileFormat)) {
+      const svgData = getSvgFromDrawnStructures(editor.canvas, 'preview');
       setSvgData(svgData);
       return;
     }
     if (fileFormat === 'helm') {
       if (editor.drawingEntitiesManager.molecules.length > 0) {
-        editor.events.error.dispatch(i18n.t('save.inlineSmilesWarning'));
+        editor.events.error.dispatch(t('save.helmSmilesExportNotice'));
       }
       if (
         !isHelmCompatible(
-          Array.from(editor.drawingEntitiesManager.monomers.values()),
+          [...editor.drawingEntitiesManager.monomers.values()],
           editor.monomersLibrary,
         )
       ) {
-        editor.events.error.dispatch(i18n.t('save.helmAliasWarning'));
+        editor.events.error.dispatch(t('save.helmAliasExportNotice'));
       }
     }
 
@@ -164,15 +158,27 @@ export const Save = ({
         const isValid =
           editor.drawingEntitiesManager.validateIfApplicableForFasta();
         if (!isValid) {
-          throw new Error(
-            'Error during sequence type recognition(RNA, DNA or Peptide)',
-          );
+          throw new Error(t('save.sequenceTypeRecognitionError'));
         }
       }
-      const result = await indigo.convert({
-        struct: serializedKet,
-        output_format: formatDetector[fileFormat],
-      });
+      // FASTA cannot represent a mix of RNA and DNA (both collapse to the same
+      // letter codes). IDT can, so this check is intentionally FASTA-only.
+      if (
+        fileFormat === 'fasta' &&
+        editor.drawingEntitiesManager.hasRnaAndDnaMix()
+      ) {
+        throw new Error(t('save.sequenceTypeRecognitionError'));
+      }
+      const formatProperties = getPropertiesByFormat(fileFormat);
+      // Pass format-specific options (e.g., 'molfile-saving-mode': '3000' for MOL V3000)
+      // to ensure correct format version is used during conversion
+      const result = await indigo.convert(
+        {
+          struct: serializedKet,
+          output_format: formatDetector[fileFormat],
+        },
+        formatProperties.options,
+      );
       setStruct(result.struct);
     } catch (error) {
       let stringError;
@@ -181,7 +187,7 @@ export const Save = ({
       } else {
         stringError = typeof error === 'string' ? error : JSON.stringify(error);
       }
-      const errorMessage = i18n.t('save.convertError', { error: stringError });
+      const errorMessage = t('save.convertError', { error: stringError });
       dispatch(openErrorModal(errorMessage));
       KetcherLogger.error(errorMessage);
       setCurrentFileFormat('ket');
@@ -190,26 +196,14 @@ export const Save = ({
     }
   };
 
-  const handleInputChange = (value) => {
+  const handleInputChange = (value: string) => {
     setCurrentFileName(value);
   };
 
   const handleSave = async () => {
     let blobPart;
-    if (
-      currentFileFormat === 'svg' ||
-      currentFileFormat === 'png' ||
-      isKetcherRasterFormat(currentFileFormat)
-    ) {
-      // Get Ketcher root element offset for SVG positioning
-      const ketcherRootRect = editor.ketcherRootElementBoundingClientRect;
-      const ketcherRootOffsetX = ketcherRootRect?.x || 0;
-      const ketcherRootOffsetY = ketcherRootRect?.y || 0;
-
-      const svgData = getSvgFromDrawnStructures(editor.canvas, 'file', {
-        horizontal: ketcherRootOffsetX,
-        vertical: ketcherRootOffsetY,
-      });
+    if (currentFileFormat === 'svg' || currentFileFormat === 'png' || isKetcherRasterFormat(currentFileFormat)) {
+      const svgData = getSvgFromDrawnStructures(editor.canvas, 'file');
       if (!svgData) {
         dispatch(openErrorModal('无法生成画布图像'));
         return;
@@ -255,37 +249,23 @@ export const Save = ({
     onClose();
   };
 
-  const handleCopy = (event) => {
+  const handleCopy = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
 
-    try {
-      if (isClipboardAPIAvailable()) {
-        navigator.clipboard.writeText(struct);
-      } else {
-        legacyCopy(event.clipboardData, {
-          'text/plain': struct,
-        });
-      }
-    } catch (e) {
-      KetcherLogger.error('copyAs.js::copyAs', e);
-      dispatch(openErrorModal(i18n.t('save.featureNotAvailable')));
+    if (!isClipboardAPIAvailable()) {
+      dispatch(openErrorModal(t('common:errors.featureNotAvailableInBrowser')));
+      return;
     }
-  };
 
-  useEffect(() => {
-    if (currentFileFormat === 'ket') {
-      const ketSerializer = new KetSerializer();
-      const serializedKet = ketSerializer.serialize(
-        editor.drawingEntitiesManager.micromoleculesHiddenEntities.clone(),
-        editor.drawingEntitiesManager,
-      );
-      setStruct(serializedKet);
-    }
-  }, [currentFileFormat]);
+    navigator.clipboard.writeText(struct).catch((error) => {
+      KetcherLogger.error('copyAs.js::copyAs', error);
+      dispatch(openErrorModal(t('common:errors.featureNotAvailableInBrowser')));
+    });
+  };
 
   return (
     <StyledModal
-      title={i18n.t('save.title')}
+      title={t('save.title')}
       isOpen={isModalOpen}
       onClose={onClose}
       testId="save-structure-dialog"
@@ -298,15 +278,17 @@ export const Save = ({
                 value={currentFileName}
                 id="filename"
                 onChange={handleInputChange}
-                label="File name:"
+                label={t('save.fileName')}
                 data-testid="filename-input"
               />
             </div>
             <StyledDropdown
-              label="File format:"
+              label={t('save.fileFormat')}
               options={options}
               currentSelection={currentFileFormat}
-              selectionHandler={handleSelectChange}
+              selectionHandler={(value) =>
+                handleSelectChange(value as SupportedFormats)
+              }
               customStylesForExpanded={stylesForExpanded}
               testId="file-format-list"
             />
@@ -322,7 +304,7 @@ export const Save = ({
               <IconButton
                 onClick={handleCopy}
                 iconName="copy"
-                title={i18n.t('save.copyToClipboard')}
+                title={t('save.copyToClipboard')}
                 testId="copy-to-clipboard"
               />
               {isLoading && (
@@ -337,14 +319,14 @@ export const Save = ({
 
       <Modal.Footer>
         <ActionButton
-          label={i18n.t('dialog.cancel')}
+          label={t('common:button.cancel')}
           styleType="secondary"
           clickHandler={onClose}
           data-testid="cancel-button"
         />
 
         <ActionButton
-          label={i18n.t('dialog.save')}
+          label={t('common:button.save')}
           clickHandler={handleSave}
           disabled={!currentFileName || isLoading}
           data-testid="save-button"

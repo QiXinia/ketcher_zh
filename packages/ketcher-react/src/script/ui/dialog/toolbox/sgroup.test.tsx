@@ -1,6 +1,12 @@
-import { screen, fireEvent, render as rtlRender } from '@testing-library/react';
+import {
+  screen,
+  fireEvent,
+  within,
+  render as rtlRender,
+} from '@testing-library/react';
 import { combineReducers, createStore } from 'redux';
 import { Provider } from 'react-redux';
+import { type ReactElement } from 'react';
 import modalReducer from '../../state/modal';
 import SGroup from './sgroup';
 
@@ -8,7 +14,7 @@ describe('Multiple repeating S-groups limitations should be in [1, 200]', () => 
   const setup = () => {
     const props = { type: 'MUL' };
     const utils = renderWithMockStore(<SGroup {...props} />);
-    const input = screen.getByLabelText('重复次数');
+    const input = screen.getByLabelText('Repeat count');
     return {
       input,
       ...utils,
@@ -47,24 +53,39 @@ describe('Copolymer S-Group type availability', () => {
     renderWithMockStore(
       <SGroup type="MUL" selectedSruCount={selectedSruCount} />,
     );
-    const typeSelect = screen.getAllByRole('combobox')[0];
+    const typeSelect = within(
+      screen.getByTestId('s-group-type-input-span'),
+    ).getByRole('combobox');
     fireEvent.mouseDown(typeSelect);
   };
 
-  it('should hide Copolymer option when fewer than two SRUs are selected', () => {
+  it('should show Copolymer option when fewer than two SRUs are selected', () => {
     renderAndOpenTypeSelect(1);
-    expect(screen.queryByTestId('共聚物-option')).not.toBeInTheDocument();
+    expect(screen.getByTestId('Copolymer-option')).toBeInTheDocument();
   });
 
   it('should show Copolymer option when at least two SRUs are selected', () => {
     renderAndOpenTypeSelect(2);
-    expect(screen.getByTestId('共聚物-option')).toBeInTheDocument();
+    expect(screen.getByTestId('Copolymer-option')).toBeInTheDocument();
+  });
+
+  it('should show Copolymer option when selected SRU count is not provided', () => {
+    renderWithMockStore(<SGroup type="MUL" />);
+    const typeSelect = within(
+      screen.getByTestId('s-group-type-input-span'),
+    ).getByRole('combobox');
+    fireEvent.mouseDown(typeSelect);
+    expect(screen.getByTestId('Copolymer-option')).toBeInTheDocument();
   });
 
   it('should show Copolymer option when editing existing Copolymer S-Group', () => {
     renderWithMockStore(<SGroup type="COP" selectedSruCount={2} />, {
       modal: {
+        name: '',
+        prop: null,
+        parentModal: null,
         form: {
+          errors: {},
           result: {
             type: 'COP',
           },
@@ -73,7 +94,48 @@ describe('Copolymer S-Group type availability', () => {
     });
     const typeSelect = screen.getAllByRole('combobox')[0];
     fireEvent.mouseDown(typeSelect);
-    expect(screen.getByTestId('共聚物-option')).toBeInTheDocument();
+    expect(screen.getByTestId('Copolymer-option')).toBeInTheDocument();
+  });
+});
+
+describe('Copolymer S-Group Subtype dropdown', () => {
+  const openSubtypeSelect = () => {
+    const { store } = renderWithMockStore(
+      <SGroup type="COP" selectedSruCount={2} />,
+      {
+        modal: {
+          name: 'SGroup',
+          form: {
+            errors: {},
+            result: {
+              type: 'COP',
+              subtype: 'ran',
+            },
+          },
+          prop: null,
+          parentModal: null,
+        },
+      },
+    );
+    const subtypeSelect = within(
+      screen.getByTestId('subtype-input-span'),
+    ).getByRole('combobox');
+    fireEvent.mouseDown(subtypeSelect);
+    return { store };
+  };
+
+  it('should include a blank option alongside Random, Block and Alternating', () => {
+    openSubtypeSelect();
+    expect(screen.getByTestId('<Blank>-option')).toBeInTheDocument();
+    expect(screen.getByTestId('Random-option')).toBeInTheDocument();
+    expect(screen.getByTestId('Block-option')).toBeInTheDocument();
+    expect(screen.getByTestId('Alternating-option')).toBeInTheDocument();
+  });
+
+  it('should clear a previously selected subtype when the blank option is chosen', () => {
+    const { store } = openSubtypeSelect();
+    fireEvent.click(screen.getByTestId('<Blank>-option'));
+    expect(store.getState().modal?.form?.result?.subtype).toBeUndefined();
   });
 });
 
@@ -81,7 +143,11 @@ describe('S-Group DAT type rendering', () => {
   it('should render SDataFieldset when type is DAT', () => {
     renderWithMockStore(<SGroup type="DAT" />, {
       modal: {
+        name: '',
+        prop: null,
+        parentModal: null,
         form: {
+          errors: {},
           result: {
             type: 'DAT',
             context: 'Fragment',
@@ -91,7 +157,7 @@ describe('S-Group DAT type rendering', () => {
         },
       },
     });
-    expect(screen.getByText('S-基团属性')).toBeInTheDocument();
+    expect(screen.getAllByTestId('context').length).toBeGreaterThan(0);
   });
 });
 
@@ -118,7 +184,7 @@ describe('Windowed S-Group form state', () => {
 
   it('uses a valid schema while a window form is initializing', () => {
     renderWithMockStore(<SGroup type="DAT" />, { modal: null });
-    expect(screen.getByText('字段名')).toBeInTheDocument();
+    expect(screen.getAllByTestId('context').length).toBeGreaterThan(0);
   });
 });
 
@@ -139,26 +205,44 @@ describe('S-Group bracket style controls', () => {
   });
 });
 
+describe('SRU S-Group defaults', () => {
+  it('should prefill the Polymer label field with n when SRU is selected', () => {
+    renderWithMockStore(<SGroup type="MUL" />);
+
+    const typeSelect = within(
+      screen.getByTestId('s-group-type-input-span'),
+    ).getByRole('combobox');
+    fireEvent.mouseDown(typeSelect);
+    fireEvent.click(screen.getByRole('option', { name: 'SRU polymer' }));
+
+    expect(screen.getByLabelText('Polymer label')).toHaveValue('n');
+  });
+});
+
+const reducer = combineReducers({
+  modal: modalReducer,
+});
+
 function renderWithMockStore(
-  component,
-  initialState: Record<string, unknown> = {
-    modal: {
-      form: {
-        result: {
-          type: 'MUL',
+  component: ReactElement,
+  initialState?: Partial<ReturnType<typeof reducer>>,
+) {
+  const store = createStore(
+    reducer,
+    initialState ?? {
+      modal: {
+        name: '',
+        prop: null,
+        parentModal: null,
+        form: {
+          errors: {},
+          result: {
+            type: 'MUL',
+          },
         },
       },
     },
-  },
-) {
-  const reducer = combineReducers({
-    modal: modalReducer,
-  });
-
-  // TODO suppressed after upgrade to react 19. Need to fix
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  const store = createStore(reducer, initialState);
+  );
   return {
     ...rtlRender(<Provider store={store}>{component}</Provider>),
     store,

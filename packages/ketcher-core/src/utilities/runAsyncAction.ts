@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *    https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,7 +23,7 @@ export enum KetcherAsyncEvents {
   FAILURE = 'FAILURE',
 }
 
-export const runAsyncAction = async <T = any>(
+export const runAsyncAction = async <T = unknown>(
   action: () => Promise<T>,
   eventEmitter: EventEmitter,
   rejectOnFailure = false,
@@ -33,12 +33,12 @@ export const runAsyncAction = async <T = any>(
     const res = await action();
     eventEmitter.emit(KetcherAsyncEvents.SUCCESS);
     return res;
-  } catch (e) {
-    KetcherLogger.error('runAsyncAction.ts::runAsyncAction', e);
+  } catch (error) {
+    KetcherLogger.error('runAsyncAction.ts::runAsyncAction', error);
     eventEmitter.emit(KetcherAsyncEvents.FAILURE);
     // Public mutation APIs must allow callers to distinguish failure from a
     // successful void result. Legacy UI actions retain event-only handling.
-    if (rejectOnFailure) throw e;
+    if (rejectOnFailure) throw error;
     return undefined;
   }
 };

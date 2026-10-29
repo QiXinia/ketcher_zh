@@ -57,7 +57,7 @@ export function fromSelectedAtomLabelSprout(
   if (angle === undefined) throw new Error('标签片段位置与既有原子重叠，请先调整布局');
   const bondsBefore = new Set(struct.bonds.keys());
   const [inverseAction, added] = fromTemplateOnAtom(
-    restruct, { molecule: fragment, aid, angle0 }, sourceId, angle, true,
+    restruct, { molecule: fragment, aid, bid: 0, angle0 }, sourceId, angle, true,
   );
   return {
     inverseAction, atoms: added.atoms,

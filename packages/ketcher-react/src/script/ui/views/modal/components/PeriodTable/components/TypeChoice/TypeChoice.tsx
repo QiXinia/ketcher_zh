@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *    https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -54,7 +54,6 @@ function TypeChoice({ value, onChange, disabled }: Readonly<TypeChoiceProps>) {
     <fieldset className={classes.fieldset} disabled={disabled}>
       {typeSchema.map((type) => (
         <label key={type.title}>
-          {/* eslint-disable jsx-a11y/label-has-associated-control */}
           <GenericInput
             type="radio"
             value={type.value}
@@ -67,7 +66,6 @@ function TypeChoice({ value, onChange, disabled }: Readonly<TypeChoiceProps>) {
             schema={undefined}
             innerRef={undefined}
           />
-          {/* eslint-enable jsx-a11y/label-has-associated-control */}
           {type.title}
         </label>
       ))}

@@ -7,7 +7,10 @@ import styles from './NaturalAnaloguePicker.module.less';
 import NaturalAnalogueChip from '../NaturalAnalogueChip/NaturalAnalogueChip';
 import { Icon } from 'components';
 import { KetMonomerClass } from 'ketcher-core';
-import i18n from '../../../../../../../i18n';
+import { useTranslation } from 'react-i18next';
+import { isNaturalAnalogueRequired } from '../../MonomerCreationWizardFields.utils';
+
+export { isNaturalAnalogueRequired };
 
 interface ChipGridSelectProps {
   monomerType: KetMonomerClass | 'rnaPreset' | undefined;
@@ -56,16 +59,6 @@ const rnaOptions = [
   { value: 'X', label: 'X', color: '#CCCBD6' },
 ];
 
-export const isNaturalAnalogueRequired = (
-  monomerType: KetMonomerClass | 'rnaPreset' | undefined,
-) => {
-  return (
-    monomerType === KetMonomerClass.AminoAcid ||
-    monomerType === KetMonomerClass.Base ||
-    monomerType === KetMonomerClass.RNA
-  );
-};
-
 const NaturalAnaloguePicker: FC<ChipGridSelectProps> = ({
   monomerType,
   value,
@@ -73,6 +66,7 @@ const NaturalAnaloguePicker: FC<ChipGridSelectProps> = ({
   className,
   error,
 }) => {
+  const { t } = useTranslation('components');
   const disabled = !isNaturalAnalogueRequired(monomerType);
 
   const options =
@@ -84,7 +78,7 @@ const NaturalAnaloguePicker: FC<ChipGridSelectProps> = ({
       if (!selectedOption) {
         return (
           <span className={styles.placeholder}>
-            {i18n.t('monomerWizard.selectAnalogue')}
+            {t('monomerCreationWizard.selectAnalogue')}
           </span>
         );
       }
@@ -94,11 +88,11 @@ const NaturalAnaloguePicker: FC<ChipGridSelectProps> = ({
           label={selectedOption.label}
           color={selectedOption.color}
           className={styles.selectedChip}
-          data-testid={`natural-analogue-picker-selected-${selectedOption.value}`}
+          testId={`natural-analogue-picker-selected-${selectedOption.value}`}
         />
       );
     },
-    [options],
+    [options, t],
   );
 
   const menuProps: Partial<MenuProps> = useMemo(

@@ -36,7 +36,7 @@ import accordionClasses from '../../../../../components/Accordion/Accordion.modu
 import ModificationTypeDropdown from './components/ModificationTypeDropdown/ModificationTypeDropdown';
 import { Autocomplete, TextField } from '@mui/material';
 import { getMonomerPropertyVisibility } from './MonomerCreationWizardFields.utils';
-import i18n from '../../../../../i18n';
+import { useTranslation } from 'react-i18next';
 
 interface IMonomerCreationWizardFieldsProps {
   wizardState: WizardState;
@@ -46,6 +46,7 @@ interface IMonomerCreationWizardFieldsProps {
     leavingAtomLabel: AtomLabel;
   }>;
   onChangeModificationTypes?: (modificationTypes: string[]) => void;
+  initialModificationTypes?: string[];
   onFieldChange: (fieldId: StringWizardFormFieldId, value: string) => void;
   onReadonlyLeavingAtomChange?: (
     apName: AttachmentPointName,
@@ -63,6 +64,7 @@ interface ModificationTypeItem {
 const MonomerCreationWizardFields = (
   props: IMonomerCreationWizardFieldsProps,
 ) => {
+  const { t } = useTranslation('components');
   const { ketcherId } = useAppContext();
   const ketcher = ketcherProvider.getKetcher(ketcherId);
   const editor = ketcher.editor as Editor;
@@ -71,6 +73,7 @@ const MonomerCreationWizardFields = (
     assignedAttachmentPoints,
     readonlyAttachmentPoints = [],
     onChangeModificationTypes,
+    initialModificationTypes = [],
     onFieldChange,
     onReadonlyLeavingAtomChange,
     attachmentPointsExtra,
@@ -79,8 +82,8 @@ const MonomerCreationWizardFields = (
   const { type, symbol, name, naturalAnalogue, aliasHELM, aliasBILN } = values;
   const [modificationTypes, setModificationTypes] = useState<
     ModificationTypeItem[]
-  >([]);
-  const modificationTypeIdRef = useRef(0);
+  >(() => initialModificationTypes.map((value, id) => ({ id, value })));
+  const modificationTypeIdRef = useRef(initialModificationTypes.length);
 
   useEffect(() => {
     editor?.setMonomerCreationSelectedType?.(values.type);
@@ -155,12 +158,14 @@ const MonomerCreationWizardFields = (
         className={clsx(styles.attributesFields, selectStyles.selectContainer)}
       >
         <AttributeField
-          title={i18n.t('monomerWizard.code')}
+          title={t('components:monomerCreationWizard.codeFieldLabel')}
           control={
             <input
               type="text"
               className={clsx(styles.input, errors.symbol && styles.inputError)}
-              placeholder={i18n.t('monomerWizard.examplePeg2')}
+              placeholder={t(
+                'components:monomerCreationWizard.codeFieldPlaceholder',
+              )}
               data-testid="symbol-input"
               value={symbol}
               onChange={(event: ChangeEvent<HTMLInputElement>) =>
@@ -173,12 +178,14 @@ const MonomerCreationWizardFields = (
           disabled={!type}
         />
         <AttributeField
-          title={i18n.t('monomerWizard.name')}
+          title={t('components:monomerCreationWizard.nameFieldLabel')}
           control={
             <input
               type="text"
               className={clsx(styles.input, errors.name && styles.inputError)}
-              placeholder={i18n.t('monomerWizard.exampleDiethyleneGlycol')}
+              placeholder={t(
+                'components:monomerCreationWizard.nameFieldPlaceholder',
+              )}
               value={name}
               data-testid="name-input"
               onChange={(event: ChangeEvent<HTMLInputElement>) =>
@@ -191,7 +198,9 @@ const MonomerCreationWizardFields = (
         />
         {props.showNaturalAnalogue !== false && displayNaturalAnalogue && (
           <AttributeField
-            title={i18n.t('monomerWizard.naturalAnalogue')}
+            title={t(
+              'components:monomerCreationWizard.naturalAnalogueFieldLabel',
+            )}
             control={
               <NaturalAnaloguePicker
                 monomerType={type}
@@ -220,11 +229,13 @@ const MonomerCreationWizardFields = (
         )}
         <div className={styles.attachmentPointsHeader}>
           <p className={styles.attachmentPointsTitle}>
-            {i18n.t('monomerWizard.attachmentPoints')}
+            {t('components:monomerCreationWizard.attachmentPointsTitle')}
           </p>
           <span
             className={styles.attachmentPointInfoIcon}
-            title={i18n.t('monomerWizard.addAttachmentPoints')}
+            title={t(
+              'components:monomerCreationWizard.attachmentPointInfoText',
+            )}
             data-testid="attachment-point-info-icon"
           >
             <Icon name="about" />
@@ -233,18 +244,16 @@ const MonomerCreationWizardFields = (
         {(assignedAttachmentPoints.size > 0 ||
           readonlyAttachmentPoints.length > 0) && (
           <div className={styles.attachmentPoints}>
-            {Array.from(assignedAttachmentPoints.entries()).map(
-              ([name, atomPair]) => (
-                <AttachmentPoint
-                  name={name}
-                  editor={editor}
-                  onNameChange={handleAttachmentPointNameChange}
-                  onLeavingAtomChange={handleLeavingAtomChange}
-                  onRemove={handleAttachmentPointRemove}
-                  key={`${name}-${atomPair[0]}-${atomPair[1]}`}
-                />
-              ),
-            )}
+            {[...assignedAttachmentPoints.entries()].map(([name, atomPair]) => (
+              <AttachmentPoint
+                name={name}
+                editor={editor}
+                onNameChange={handleAttachmentPointNameChange}
+                onLeavingAtomChange={handleLeavingAtomChange}
+                onRemove={handleAttachmentPointRemove}
+                key={`${name}-${atomPair[0]}-${atomPair[1]}`}
+              />
+            ))}
             {readonlyAttachmentPoints.map(
               ({ name: attachmentPointName, leavingAtomLabel }) => (
                 <ReadonlyAttachmentPoint
@@ -279,7 +288,9 @@ const MonomerCreationWizardFields = (
                 }
                 data-testid="modification-types-accordion"
               >
-                Modification
+                {t(
+                  'components:monomerCreationWizard.modificationAccordionTitle',
+                )}
               </AccordionSummary>
               <AccordionDetails>
                 {modificationTypes.map((modificationType, idx) => (
@@ -304,7 +315,9 @@ const MonomerCreationWizardFields = (
                     <IconButton
                       iconName="delete"
                       className={styles.deleteModificationTypeButton}
-                      title={i18n.t('monomerWizard.deleteModificationType')}
+                      title={t(
+                        'components:monomerCreationWizard.deleteModificationTypeTitle',
+                      )}
                       onClick={() =>
                         deleteModificationType(modificationType.id)
                       }
@@ -319,7 +332,9 @@ const MonomerCreationWizardFields = (
                   disabled={modificationTypes.length >= MAX_MODIFICATION_TYPES}
                   data-testid="add-modification-type-button"
                 >
-                  Add modification type
+                  {t(
+                    'components:monomerCreationWizard.addModificationTypeButton',
+                  )}
                 </button>
               </AccordionDetails>
             </Accordion>
@@ -346,12 +361,14 @@ const MonomerCreationWizardFields = (
                 }
                 data-testid="aliases-accordion"
               >
-                Aliases
+                {t('components:monomerCreationWizard.aliasesAccordionTitle')}
               </AccordionSummary>
               <AccordionDetails>
                 {displayHelmAlias && (
                   <div className={styles.aliasField}>
-                    <p className={styles.inputLabel}>HELM</p>
+                    <p className={styles.inputLabel}>
+                      {t('components:monomerCreationWizard.helmLabel')}
+                    </p>
                     <Autocomplete
                       freeSolo
                       options={[]}
@@ -376,7 +393,9 @@ const MonomerCreationWizardFields = (
                 )}
                 {displayBilnAlias && (
                   <div className={styles.aliasField}>
-                    <p className={styles.inputLabel}>BILN</p>
+                    <p className={styles.inputLabel}>
+                      {t('components:monomerCreationWizard.bilnLabel')}
+                    </p>
                     <Autocomplete
                       freeSolo
                       options={[]}

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *    https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,46 +14,74 @@
  * limitations under the License.
  ***************************************************************************/
 
-import { Settings } from 'ketcher-core';
+import type { SettingsFormValue } from 'ketcher-core';
+
+export type SettingFieldValue = boolean | number | string;
+export type SettingFieldName = {
+  [Key in keyof SettingsFormValue]-?: Exclude<
+    SettingsFormValue[Key],
+    undefined
+  > extends SettingFieldValue
+    ? Key
+    : never;
+}[keyof SettingsFormValue];
 
 export interface FieldGroup {
   id: string;
+  /**
+   * Frozen English literal, NOT a translation key - Playwright's
+   * settingsDialog/Constants.ts hardcodes `${title}-accordion` test ids
+   * (e.g. 'General-accordion'), so this value must never change. Use
+   * `titleKey` for the translated, user-visible group label.
+   */
   title: string;
-  fields: Array<keyof Settings>;
+  titleKey: string;
+  fields: Array<SettingFieldName>;
 }
 
 export interface FieldDefinition {
-  label: string;
+  labelKey: string;
   type: 'checkbox' | 'number' | 'text' | 'select' | 'color';
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  options?: Array<{ value: any; label: string }>;
+  options?: Array<{ value: SettingFieldValue; labelKey: string }>;
   min?: number;
   max?: number;
   step?: number;
+  tooltipKey?: string;
 }
 
 export const FIELD_GROUPS: FieldGroup[] = [
   {
-    id: 'general',
-    title: 'settings.general',
+    id: 'atoms',
+    title: 'Atoms',
+    titleKey: 'settings.groups.atoms',
     fields: [
-      'resetToSelect',
-      'rotationStep',
-      'showValenceWarnings',
+      'carbonExplicitly',
+      'showCharge',
+      'showValence',
+      'showHydrogenLabels',
       'atomColoring',
-      'font',
-      'fontsz',
-      'fontszUnit',
-      'fontszsub',
-      'fontszsubUnit',
-      'reactionComponentMarginSize',
-      'reactionComponentMarginSizeUnit',
-      'imageResolution',
+    ],
+  },
+  {
+    id: 'bonds',
+    title: 'Bonds',
+    titleKey: 'settings.groups.bonds',
+    // bondLength is not tracked by the macromolecules settings form; omitted.
+    fields: [
+      'aromaticCircle',
+      'bondSpacing',
+      'bondThickness',
+      'bondThicknessUnit',
+      'stereoBondWidth',
+      'stereoBondWidthUnit',
+      'hashSpacing',
+      'hashSpacingUnit',
     ],
   },
   {
     id: 'stereochemistry',
-    title: 'settings.stereochemistry',
+    title: 'Stereochemistry',
+    titleKey: 'settings.groups.stereochemistry',
     fields: [
       'showStereoFlags',
       'stereoLabelStyle',
@@ -70,389 +98,436 @@ export const FIELD_GROUPS: FieldGroup[] = [
     ],
   },
   {
-    id: 'atoms',
-    title: 'settings.atoms',
+    id: 'reactions',
+    title: 'Reactions & Components',
+    titleKey: 'settings.groups.reactions',
     fields: [
-      'carbonExplicitly',
-      'showCharge',
-      'showValence',
-      'showHydrogenLabels',
-    ],
-  },
-  {
-    id: 'bonds',
-    title: 'settings.bonds',
-    fields: [
-      'aromaticCircle',
-      'bondSpacing',
-      'bondThickness',
-      'bondThicknessUnit',
-      'stereoBondWidth',
-      'stereoBondWidthUnit',
-      'hashSpacing',
-      'hashSpacingUnit',
-    ],
-  },
-  {
-    id: 'server',
-    title: 'settings.server',
-    fields: [
-      'smart-layout',
-      'ignore-stereochemistry-errors',
-      'mass-skip-error-on-pseudoatoms',
+      'reactionComponentMarginSize',
+      'reactionComponentMarginSizeUnit',
       'gross-formula-add-rsites',
       'gross-formula-add-isotopes',
     ],
   },
   {
+    id: 'general',
+    title: 'General Editing & Display',
+    titleKey: 'settings.groups.general',
+    fields: [
+      'resetToSelect',
+      'rotationStep',
+      'font',
+      'fontsz',
+      'fontszUnit',
+      'fontszsub',
+      'fontszsubUnit',
+      'imageResolution',
+    ],
+  },
+  {
     id: 'viewer3d',
-    title: 'settings.viewer3D',
+    title: '3D Viewer',
+    titleKey: 'settings.groups.viewer3d',
     fields: ['miewMode', 'miewTheme', 'miewAtomLabel'],
   },
   {
-    id: 'debug',
-    title: 'settings.optionsForDebugging',
-    fields: ['showAtomIds', 'showBondIds', 'showHalfBondIds', 'showLoopIds'],
+    id: 'validation',
+    title: 'Validation & Calculation',
+    titleKey: 'settings.groups.validation',
+    // valence-mode is not tracked by the macromolecules settings form; omitted.
+    fields: [
+      'showValenceWarnings',
+      'ignore-stereochemistry-errors',
+      'mass-skip-error-on-pseudoatoms',
+      'aromatize-skip-superatoms',
+      'dearomatize-on-load',
+    ],
   },
+  {
+    id: 'debug',
+    title: 'Debugging',
+    titleKey: 'settings.groups.debug',
+    fields: [
+      'smart-layout',
+      'showAtomIds',
+      'showBondIds',
+      'showHalfBondIds',
+      'showLoopIds',
+    ],
+  },
+];
+
+// Plain literal English (not translation keys): px/pt/cm/inch are unit
+// abbreviations, not language content - same convention as ketcher-react's
+// own Settings dialog (see .memory-bank/modules/i18n.md).
+const UNIT_OPTIONS = [
+  { value: 'px', labelKey: 'px' },
+  { value: 'pt', labelKey: 'pt' },
+  { value: 'cm', labelKey: 'cm' },
+  { value: 'inch', labelKey: 'inch' },
 ];
 
 export const FIELD_DEFINITIONS: Record<string, FieldDefinition> = {
   // General
   resetToSelect: {
-    label: 'settings.resetToSelectTool',
+    labelKey: 'settings.fields.resetToSelect',
     type: 'select',
     options: [
-      { value: true, label: 'settings.enabled' },
-      { value: false, label: 'settings.disabled' },
-      { value: 'paste', label: 'settings.afterPaste' },
+      { value: true, labelKey: 'settings.fields.resetToSelectOn' },
+      { value: 'paste', labelKey: 'settings.fields.resetToSelectAfterPaste' },
+      { value: false, labelKey: 'settings.fields.resetToSelectManual' },
     ],
   },
   rotationStep: {
-    label: 'settings.rotationStep',
+    labelKey: 'settings.fields.rotationStep',
     type: 'number',
     min: 1,
     max: 90,
     step: 1,
+    tooltipKey: 'settings.fields.rotationStepTooltip',
   },
   showValenceWarnings: {
-    label: 'settings.showValenceWarnings',
+    labelKey: 'settings.fields.showValenceWarnings',
     type: 'checkbox',
+    tooltipKey: 'settings.fields.showValenceWarningsTooltip',
   },
   atomColoring: {
-    label: 'settings.atomColoring',
+    labelKey: 'settings.fields.atomColoring',
     type: 'checkbox',
   },
   font: {
-    label: 'settings.font',
+    labelKey: 'settings.fields.font',
     type: 'select',
     // TODO: Replace with dynamic font detection (see ketcher-react/systemfonts.jsx)
     // This hardcoded list should be replaced with runtime font detection using FontFaceObserver
     // to only show fonts actually available on the user's system
+    // Font family names are proper nouns, not translation keys.
     options: [
-      { value: '30px Arial', label: 'Arial' },
-      { value: '30px Arial Black', label: 'Arial Black' },
-      { value: '30px Comic Sans MS', label: 'Comic Sans MS' },
-      { value: '30px Courier New', label: 'Courier New' },
-      { value: '30px Georgia', label: 'Georgia' },
-      { value: '30px Impact', label: 'Impact' },
-      { value: '30px Charcoal', label: 'Charcoal' },
-      { value: '30px Lucida Console', label: 'Lucida Console' },
-      { value: '30px Monaco', label: 'Monaco' },
-      { value: '30px Palatino Linotype', label: 'Palatino Linotype' },
-      { value: '30px Book Antiqua', label: 'Book Antiqua' },
-      { value: '30px Palatino', label: 'Palatino' },
-      { value: '30px Tahoma', label: 'Tahoma' },
-      { value: '30px Geneva', label: 'Geneva' },
-      { value: '30px Times New Roman', label: 'Times New Roman' },
-      { value: '30px Times', label: 'Times' },
-      { value: '30px Verdana', label: 'Verdana' },
-      { value: '30px Symbol', label: 'Symbol' },
-      { value: '30px MS Serif', label: 'MS Serif' },
-      { value: '30px MS Sans Serif', label: 'MS Sans Serif' },
-      { value: '30px New York', label: 'New York' },
-      { value: '30px Droid Sans', label: 'Droid Sans' },
-      { value: '30px Droid Serif', label: 'Droid Serif' },
-      { value: '30px Droid Sans Mono', label: 'Droid Sans Mono' },
-      { value: '30px Roboto', label: 'Roboto' },
+      { value: '30px Arial', labelKey: 'Arial' },
+      { value: '30px Arial Black', labelKey: 'Arial Black' },
+      { value: '30px Comic Sans MS', labelKey: 'Comic Sans MS' },
+      { value: '30px Courier New', labelKey: 'Courier New' },
+      { value: '30px Georgia', labelKey: 'Georgia' },
+      { value: '30px Impact', labelKey: 'Impact' },
+      { value: '30px Charcoal', labelKey: 'Charcoal' },
+      { value: '30px Lucida Console', labelKey: 'Lucida Console' },
+      { value: '30px Monaco', labelKey: 'Monaco' },
+      { value: '30px Palatino Linotype', labelKey: 'Palatino Linotype' },
+      { value: '30px Book Antiqua', labelKey: 'Book Antiqua' },
+      { value: '30px Palatino', labelKey: 'Palatino' },
+      { value: '30px Tahoma', labelKey: 'Tahoma' },
+      { value: '30px Geneva', labelKey: 'Geneva' },
+      { value: '30px Times New Roman', labelKey: 'Times New Roman' },
+      { value: '30px Times', labelKey: 'Times' },
+      { value: '30px Verdana', labelKey: 'Verdana' },
+      { value: '30px Symbol', labelKey: 'Symbol' },
+      { value: '30px MS Serif', labelKey: 'MS Serif' },
+      { value: '30px MS Sans Serif', labelKey: 'MS Sans Serif' },
+      { value: '30px New York', labelKey: 'New York' },
+      { value: '30px Droid Sans', labelKey: 'Droid Sans' },
+      { value: '30px Droid Serif', labelKey: 'Droid Serif' },
+      { value: '30px Droid Sans Mono', labelKey: 'Droid Sans Mono' },
+      { value: '30px Roboto', labelKey: 'Roboto' },
     ],
   },
   fontsz: {
-    label: 'settings.fontSize',
+    labelKey: 'settings.fields.fontsz',
     type: 'number',
     min: 1,
     max: 96,
     step: 1,
   },
   fontszUnit: {
-    label: 'settings.fontSizeUnit',
+    labelKey: 'settings.fields.fontszUnit',
     type: 'select',
-    options: [
-      { value: 'px', label: 'px' },
-      { value: 'pt', label: 'pt' },
-      { value: 'cm', label: 'cm' },
-      { value: 'inch', label: 'inch' },
-    ],
+    options: UNIT_OPTIONS,
   },
   fontszsub: {
-    label: 'settings.subFontSize',
+    labelKey: 'settings.fields.fontszsub',
     type: 'number',
     min: 1,
     max: 96,
     step: 1,
   },
   fontszsubUnit: {
-    label: 'settings.subFontSizeUnit',
+    labelKey: 'settings.fields.fontszsubUnit',
     type: 'select',
-    options: [
-      { value: 'px', label: 'px' },
-      { value: 'pt', label: 'pt' },
-      { value: 'cm', label: 'cm' },
-      { value: 'inch', label: 'inch' },
-    ],
+    options: UNIT_OPTIONS,
   },
   reactionComponentMarginSize: {
-    label: 'settings.reactionComponentMargin',
+    labelKey: 'settings.fields.reactionComponentMarginSize',
     type: 'number',
     min: 0.1,
     max: 1000,
     step: 0.1,
+    tooltipKey: 'settings.fields.reactionComponentMarginSizeTooltip',
   },
   reactionComponentMarginSizeUnit: {
-    label: 'settings.reactionComponentMarginUnit',
+    labelKey: 'settings.fields.reactionComponentMarginSizeUnit',
     type: 'select',
-    options: [
-      { value: 'px', label: 'px' },
-      { value: 'pt', label: 'pt' },
-      { value: 'cm', label: 'cm' },
-      { value: 'inch', label: 'inch' },
-    ],
+    options: UNIT_OPTIONS,
   },
   imageResolution: {
-    label: 'settings.imageResolution',
+    labelKey: 'settings.fields.imageResolution',
     type: 'select',
+    tooltipKey: 'settings.fields.imageResolutionTooltip',
     options: [
-      { value: '72', label: 'settings.imageResLow' },
-      { value: '600', label: 'settings.imageResHigh' },
+      { value: '72', labelKey: 'settings.fields.imageResolutionLow' },
+      { value: '600', labelKey: 'settings.fields.imageResolutionHigh' },
     ],
   },
 
   // Stereochemistry
   showStereoFlags: {
-    label: 'settings.showStereoFlags',
+    labelKey: 'settings.fields.showStereoFlags',
     type: 'checkbox',
+    tooltipKey: 'settings.fields.showStereoFlagsTooltip',
   },
   stereoLabelStyle: {
-    label: 'settings.labelDisplayStereogenicCenters',
+    labelKey: 'settings.fields.stereoLabelStyle',
     type: 'select',
+    tooltipKey: 'settings.fields.stereoLabelStyleTooltip',
     options: [
-      { value: 'Iupac', label: 'settings.iupacStyle' },
-      { value: 'Classic', label: 'settings.classic' },
-      { value: 'On', label: 'settings.on' },
-      { value: 'Off', label: 'settings.off' },
+      { value: 'Iupac', labelKey: 'settings.fields.stereoLabelStyleIupac' },
+      {
+        value: 'Classic',
+        labelKey: 'settings.fields.stereoLabelStyleClassic',
+      },
+      { value: 'On', labelKey: 'settings.fields.stereoLabelStyleOn' },
+      { value: 'Off', labelKey: 'settings.fields.stereoLabelStyleOff' },
     ],
   },
   colorOfAbsoluteCenters: {
-    label: 'settings.absoluteCenterColor',
+    labelKey: 'settings.fields.colorOfAbsoluteCenters',
     type: 'color',
+    tooltipKey: 'settings.fields.colorOfAbsoluteCentersTooltip',
   },
   colorOfAndCenters: {
-    label: 'settings.andCentersColor',
+    labelKey: 'settings.fields.colorOfAndCenters',
     type: 'color',
+    tooltipKey: 'settings.fields.colorOfAndCentersTooltip',
   },
   colorOfOrCenters: {
-    label: 'settings.orCentersColor',
+    labelKey: 'settings.fields.colorOfOrCenters',
     type: 'color',
+    tooltipKey: 'settings.fields.colorOfOrCentersTooltip',
   },
   colorStereogenicCenters: {
-    label: 'settings.colorStereogenicCenters',
+    labelKey: 'settings.fields.colorStereogenicCenters',
     type: 'select',
     options: [
-      { value: 'LabelsOnly', label: 'settings.labelsOnly' },
-      { value: 'BondsOnly', label: 'settings.bondsOnly' },
-      { value: 'LabelsAndBonds', label: 'settings.labelsAndBonds' },
-      { value: 'Off', label: 'settings.off' },
+      {
+        value: 'LabelsOnly',
+        labelKey: 'settings.fields.colorStereogenicCentersLabelsOnly',
+      },
+      {
+        value: 'BondsOnly',
+        labelKey: 'settings.fields.colorStereogenicCentersBondsOnly',
+      },
+      {
+        value: 'LabelsAndBonds',
+        labelKey: 'settings.fields.colorStereogenicCentersLabelsAndBonds',
+      },
+      {
+        value: 'Off',
+        labelKey: 'settings.fields.colorStereogenicCentersOff',
+      },
     ],
   },
   autoFadeOfStereoLabels: {
-    label: 'settings.autoFadeStereoLabels',
+    labelKey: 'settings.fields.autoFadeOfStereoLabels',
     type: 'checkbox',
+    tooltipKey: 'settings.fields.autoFadeOfStereoLabelsTooltip',
   },
   absFlagLabel: {
-    label: 'settings.textOfAbsoluteFlag',
+    labelKey: 'settings.fields.absFlagLabel',
     type: 'text',
   },
   andFlagLabel: {
-    label: 'settings.textOfAndFlag',
+    labelKey: 'settings.fields.andFlagLabel',
     type: 'text',
   },
   orFlagLabel: {
-    label: 'settings.textOfOrFlag',
+    labelKey: 'settings.fields.orFlagLabel',
     type: 'text',
   },
   mixedFlagLabel: {
-    label: 'settings.textOfMixedFlag',
+    labelKey: 'settings.fields.mixedFlagLabel',
     type: 'text',
   },
   ignoreChiralFlag: {
-    label: 'settings.ignoreChiralFlag',
+    labelKey: 'settings.fields.ignoreChiralFlag',
     type: 'checkbox',
+    tooltipKey: 'settings.fields.ignoreChiralFlagTooltip',
   },
 
   // Atoms
   carbonExplicitly: {
-    label: 'settings.displayCarbonExplicitly',
+    labelKey: 'settings.fields.carbonExplicitly',
     type: 'checkbox',
   },
   showCharge: {
-    label: 'settings.displayCharge',
+    labelKey: 'settings.fields.showCharge',
     type: 'checkbox',
   },
   showValence: {
-    label: 'settings.displayValence',
+    labelKey: 'settings.fields.showValence',
     type: 'checkbox',
   },
   showHydrogenLabels: {
-    label: 'settings.showHydrogenLabels',
+    labelKey: 'settings.fields.showHydrogenLabels',
     type: 'select',
     options: [
-      { value: 'off', label: 'settings.off' },
-      { value: 'Hetero', label: 'settings.hetero' },
-      { value: 'Terminal', label: 'settings.terminal' },
-      { value: 'Terminal and Hetero', label: 'settings.terminalAndHetero' },
-      { value: 'On', label: 'settings.on' },
+      { value: 'off', labelKey: 'settings.fields.showHydrogenLabelsOff' },
+      {
+        value: 'Hetero',
+        labelKey: 'settings.fields.showHydrogenLabelsHetero',
+      },
+      {
+        value: 'Terminal',
+        labelKey: 'settings.fields.showHydrogenLabelsTerminal',
+      },
+      {
+        value: 'Terminal and Hetero',
+        labelKey: 'settings.fields.showHydrogenLabelsTerminalAndHetero',
+      },
+      { value: 'On', labelKey: 'settings.fields.showHydrogenLabelsOn' },
     ],
   },
 
   // Bonds
   aromaticCircle: {
-    label: 'settings.aromaticBondsAsCircle',
+    labelKey: 'settings.fields.aromaticCircle',
     type: 'checkbox',
   },
   bondSpacing: {
-    label: 'settings.bondSpacing',
+    labelKey: 'settings.fields.bondSpacing',
     type: 'number',
     min: 0.1,
     max: 10,
     step: 0.1,
   },
   bondThickness: {
-    label: 'settings.bondThickness',
+    labelKey: 'settings.fields.bondThickness',
     type: 'number',
     min: 0.1,
     max: 96,
     step: 0.1,
   },
   bondThicknessUnit: {
-    label: 'settings.bondThicknessUnit',
+    labelKey: 'settings.fields.bondThicknessUnit',
     type: 'select',
-    options: [
-      { value: 'px', label: 'px' },
-      { value: 'pt', label: 'pt' },
-      { value: 'cm', label: 'cm' },
-      { value: 'inch', label: 'inch' },
-    ],
+    options: UNIT_OPTIONS,
   },
   stereoBondWidth: {
-    label: 'settings.stereoBondWidth',
+    labelKey: 'settings.fields.stereoBondWidth',
     type: 'number',
     min: 0.1,
     max: 96,
     step: 0.1,
   },
   stereoBondWidthUnit: {
-    label: 'settings.stereoBondWidthUnit',
+    labelKey: 'settings.fields.stereoBondWidthUnit',
     type: 'select',
-    options: [
-      { value: 'px', label: 'px' },
-      { value: 'pt', label: 'pt' },
-      { value: 'cm', label: 'cm' },
-      { value: 'inch', label: 'inch' },
-    ],
+    options: UNIT_OPTIONS,
   },
   hashSpacing: {
-    label: 'settings.hashSpacing',
+    labelKey: 'settings.fields.hashSpacing',
     type: 'number',
     min: 0.1,
     max: 1000,
     step: 0.1,
+    tooltipKey: 'settings.fields.hashSpacingTooltip',
   },
   hashSpacingUnit: {
-    label: 'settings.hashSpacingUnit',
+    labelKey: 'settings.fields.hashSpacingUnit',
     type: 'select',
-    options: [
-      { value: 'px', label: 'px' },
-      { value: 'pt', label: 'pt' },
-      { value: 'cm', label: 'cm' },
-      { value: 'inch', label: 'inch' },
-    ],
+    options: UNIT_OPTIONS,
   },
 
-  // Server
+  // Reactions & Components / Validation & Calculation / Debugging
   'smart-layout': {
-    label: 'settings.smartLayout',
+    labelKey: 'settings.fields.smartLayout',
     type: 'checkbox',
+    tooltipKey: 'settings.fields.smartLayoutTooltip',
   },
   'ignore-stereochemistry-errors': {
-    label: 'settings.ignoreStereochemistryErrors',
+    labelKey: 'settings.fields.ignoreStereochemistryErrors',
     type: 'checkbox',
+    tooltipKey: 'settings.fields.ignoreStereochemistryErrorsTooltip',
   },
   'mass-skip-error-on-pseudoatoms': {
-    label: 'settings.ignorePseudoatomsAtMass',
+    labelKey: 'settings.fields.massSkipErrorOnPseudoatoms',
     type: 'checkbox',
   },
   'gross-formula-add-rsites': {
-    label: 'settings.addRsitesAtMassCalculation',
+    labelKey: 'settings.fields.grossFormulaAddRsites',
     type: 'checkbox',
   },
   'gross-formula-add-isotopes': {
-    label: 'settings.addIsotopesAtMassCalculation',
+    labelKey: 'settings.fields.grossFormulaAddIsotopes',
     type: 'checkbox',
+  },
+  'aromatize-skip-superatoms': {
+    labelKey: 'settings.fields.aromatizeSkipSuperatoms',
+    type: 'checkbox',
+  },
+  'dearomatize-on-load': {
+    labelKey: 'settings.fields.dearomatizeOnLoad',
+    type: 'checkbox',
+    tooltipKey: 'settings.fields.dearomatizeOnLoadTooltip',
   },
 
   // 3D Viewer
   miewMode: {
-    label: 'settings.miewMode',
+    labelKey: 'settings.fields.miewMode',
     type: 'select',
     options: [
-      { value: 'LN', label: 'settings.lines' },
-      { value: 'BS', label: 'settings.ballsAndSticks' },
-      { value: 'LC', label: 'settings.licorice' },
+      { value: 'LN', labelKey: 'settings.fields.miewModeLines' },
+      { value: 'BS', labelKey: 'settings.fields.miewModeBallAndStick' },
+      { value: 'LC', labelKey: 'settings.fields.miewModeLicorice' },
     ],
   },
   miewTheme: {
-    label: 'settings.miewTheme',
+    labelKey: 'settings.fields.miewTheme',
     type: 'select',
     options: [
-      { value: 'light', label: 'settings.light' },
-      { value: 'dark', label: 'settings.dark' },
+      { value: 'light', labelKey: 'settings.fields.miewThemeLight' },
+      { value: 'dark', labelKey: 'settings.fields.miewThemeDark' },
     ],
   },
   miewAtomLabel: {
-    label: 'settings.miewAtomLabel',
+    labelKey: 'settings.fields.miewAtomLabel',
     type: 'select',
     options: [
-      { value: 'no', label: 'settings.none' },
-      { value: 'bright', label: 'settings.bright' },
-      { value: 'blackAndWhite', label: 'settings.blackAndWhite' },
-      { value: 'black', label: 'settings.black' },
+      { value: 'no', labelKey: 'settings.fields.miewAtomLabelNone' },
+      { value: 'bright', labelKey: 'settings.fields.miewAtomLabelBright' },
+      {
+        value: 'blackAndWhite',
+        labelKey: 'settings.fields.miewAtomLabelBlackAndWhite',
+      },
+      { value: 'black', labelKey: 'settings.fields.miewAtomLabelBlack' },
     ],
   },
 
   // Debug
   showAtomIds: {
-    label: 'settings.showAtomIds',
+    labelKey: 'settings.fields.showAtomIds',
     type: 'checkbox',
+    tooltipKey: 'settings.fields.showAtomIdsTooltip',
   },
   showBondIds: {
-    label: 'settings.showBondIds',
+    labelKey: 'settings.fields.showBondIds',
     type: 'checkbox',
+    tooltipKey: 'settings.fields.showBondIdsTooltip',
   },
   showHalfBondIds: {
-    label: 'settings.showHalfBondIds',
+    labelKey: 'settings.fields.showHalfBondIds',
     type: 'checkbox',
+    tooltipKey: 'settings.fields.showHalfBondIdsTooltip',
   },
   showLoopIds: {
-    label: 'settings.showLoopIds',
+    labelKey: 'settings.fields.showLoopIds',
     type: 'checkbox',
+    tooltipKey: 'settings.fields.showLoopIdsTooltip',
   },
 };

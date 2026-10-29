@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *    https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -88,8 +88,8 @@ const ShortcutLabel = styled('span')`
 `;
 
 const getIntegerFromString = (zoomInput: string | undefined): number => {
-  const zoomNumber = parseInt(zoomInput ?? '');
-  if (isNaN(zoomNumber)) {
+  const zoomNumber = Number.parseInt(zoomInput ?? '');
+  if (Number.isNaN(zoomNumber)) {
     return 0;
   }
   return zoomNumber;
@@ -134,6 +134,7 @@ export const ZoomControls = ({
   shortcuts,
 }: ZoomProps) => {
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -157,9 +158,11 @@ export const ZoomControls = ({
       onZoomSubmit();
     }
     setIsExpanded(false);
+    setAnchorEl(null);
   };
 
   const onExpand = () => {
+    setAnchorEl(containerRef.current);
     setIsExpanded(true);
   };
 
@@ -179,7 +182,7 @@ export const ZoomControls = ({
       <Dropdown
         open={isExpanded}
         onClose={onClose}
-        anchorEl={containerRef.current}
+        anchorEl={anchorEl}
         container={
           document.querySelector(KETCHER_ROOT_NODE_CSS_SELECTOR) ||
           document.querySelector(KETCHER_MACROMOLECULES_ROOT_NODE_SELECTOR)

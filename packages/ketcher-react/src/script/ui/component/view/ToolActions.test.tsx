@@ -1,16 +1,15 @@
 import toolActions from '../../action/tools';
 
-const toolsWithoutTitles = [
+const toolsWithoutTitles = new Set([
   'bonds',
   'arrows',
   'reaction-mapping-tools',
   'rgroup',
   'shapes',
-  // Empty bond type ('') is a placeholder in the bond-properties schema, not a
-  // selectable toolbar tool, and intentionally has no title
+  // Empty bond type is a schema placeholder, not a selectable tool.
   'bond-',
-];
-const isToolWithTitle = (tool) => !toolsWithoutTitles.includes(tool);
+]);
+const isToolWithTitle = (tool) => !toolsWithoutTitles.has(tool);
 const toolsWithTitles = Object.keys(toolActions).filter(isToolWithTitle);
 
 describe('ToolActions', () => {

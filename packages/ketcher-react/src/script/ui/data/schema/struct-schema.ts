@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *    https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,6 +17,7 @@
 import { mapOf } from './schema-helper';
 import { range } from 'lodash/fp';
 import { sdataCustomSchema } from './sdata-schema';
+export { CUSTOM_QUERY_MAX_LENGTH } from 'ketcher-core';
 import {
   localizedEnumNames,
   localizedInvalidMessage,
@@ -901,7 +902,7 @@ const sgroup: Omit<StructSchema, 'properties'> & {
           type: 'string',
           default: 'n',
           // any string, except empty and including double quotes
-          pattern: '^(?!\\s*$)[^"]+$',
+          pattern: String.raw`^(?!\s*$)[^"]+$`,
           invalidMessage:
             'SRU subscript should not be empty and contain double quotes',
         },
@@ -943,11 +944,9 @@ const sgroup: Omit<StructSchema, 'properties'> & {
       properties: {
         type: { enum: ['COP'] },
         subtype: {
-          get title() {
-            return i18n.t('sgroup.subtype');
-          },
-          enum: ['ran', 'blo', 'alt'],
-          enumNames: ['Random', 'Block', 'Alternating'],
+          title: 'Subtype',
+          enum: ['', 'ran', 'blo', 'alt'],
+          enumNames: ['<Blank>', 'Random', 'Block', 'Alternating'],
         },
         connectivity: {
           get title() {

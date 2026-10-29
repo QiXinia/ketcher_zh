@@ -16,14 +16,7 @@
 
 import * as structFormat from '../../../../../data/convert/structConverter';
 
-import {
-  type ClipboardEvent,
-  type ContextType,
-  type MouseEvent,
-  type RefObject,
-  Component,
-  createRef,
-} from 'react';
+import { type ContextType, type RefObject, Component, createRef } from 'react';
 import { createSelector } from 'reselect';
 import Form, { Field } from '../../../../../component/form/form/form';
 import {
@@ -43,7 +36,6 @@ import {
   KetcherLogger,
   Atom,
   isClipboardAPIAvailable,
-  legacyCopy,
   SupportedFormat,
   isKetcherRasterFormat,
 } from 'ketcher-core';
@@ -75,11 +67,11 @@ const saveSchema = {
       title: i18n.t('save.fileName'),
       type: 'string',
       maxLength: 128,
-      pattern: '^[^.<>:?"*\\\\|\\/][^<>:?"*\\\\|\\/]*$',
+      pattern: String.raw`^[^.<>:?"*\\|\/][^<>:?"*\\|\/]*$`,
       invalidMessage: (res) => {
-        if (!res) return i18n.t('save.filenameEmpty');
-        if (res.length > 128) return i18n.t('save.filenameTooLong');
-        return i18n.t('save.filenameInvalidChars');
+        if (!res) return 'Filename should contain at least one character';
+        if (res.length > 128) return 'Filename is too long';
+        return String.raw`A filename cannot contain characters: \ / : * ? " < > | and cannot start with '.'`;
       },
     },
     format: {
@@ -113,7 +105,7 @@ interface PreviewContentProps {
   classes: typeof classes;
   structStr: string;
   textAreaRef: RefObject<HTMLTextAreaElement | null>;
-  handleCopy: (event: MouseEvent | ClipboardEvent) => void;
+  handleCopy: () => void;
 }
 
 interface FormState {
@@ -147,7 +139,6 @@ interface SaveDialogProps {
   formState: FormState;
   moleculeErrors?: Record<string, string>;
   checkState: CheckState;
-  bondThickness?: number;
   ignoreChiralFlag: boolean;
   editor: Editor;
   onCheck: (checkOptions: unknown) => void;
@@ -173,9 +164,6 @@ interface AppState {
     };
     getServerSettings: () => StructServiceOptions;
     check: CheckState;
-    settings: {
-      bondThickness?: number;
-    };
   };
   server: StructService;
   editor: Editor;
@@ -387,7 +375,7 @@ class SaveDialog extends Component<SaveDialogProps, SaveDialogState> {
       // temporary check if query properties are used
       const queryPropertiesAreUsed = !!(
         type === SupportedFormat.mol &&
-        Array.from(struct.atoms).find(
+        Array.from(struct.atoms).some(
           ([_, atom]) =>
             atom.queryProperties.aromaticity ||
             atom.queryProperties.connectivity ||
@@ -401,6 +389,7 @@ class SaveDialog extends Component<SaveDialogProps, SaveDialogState> {
         type,
         { ...options, ignoreChiralFlag },
         queryPropertiesAreUsed,
+        struct,
       );
       const getStructFromStringByType = () => {
         if (type === SupportedFormat.ket) {
@@ -549,7 +538,6 @@ class SaveDialog extends Component<SaveDialogProps, SaveDialogState> {
         </Form>
         <Tabs
           className={classes.tabs}
-          captions={tabs}
           tabIndex={this.state.tabIndex}
           changeTab={this.changeTab}
           tabs={tabs}
@@ -558,22 +546,22 @@ class SaveDialog extends Component<SaveDialogProps, SaveDialogState> {
     );
   };
 
-  handleCopy = (event: MouseEvent | ClipboardEvent): void => {
+  handleCopy = (): void => {
     const { structStr } = this.state;
 
-    try {
-      if (isClipboardAPIAvailable()) {
-        navigator.clipboard.writeText(structStr || '');
-      } else if ('clipboardData' in event) {
-        legacyCopy(event.clipboardData, {
-          'text/plain': structStr,
-        });
-        event.preventDefault();
-      }
-    } catch (e) {
-      KetcherLogger.error('copyAs.js::copyAs', e);
-      this.props.editor.errorHandler(i18n.t('save.featureNotAvailable'));
+    if (!isClipboardAPIAvailable()) {
+      this.props.editor.errorHandler(
+        'This feature is not available in your browser',
+      );
+      return;
     }
+
+    navigator.clipboard.writeText(structStr || '').catch((e) => {
+      KetcherLogger.error('copyAs.js::copyAs', e);
+      this.props.editor.errorHandler(
+        'This feature is not available in your browser',
+      );
+    });
   };
 
   renderSaveFile = (): JSX.Element | null => {
@@ -729,7 +717,6 @@ class SaveDialog extends Component<SaveDialogProps, SaveDialogState> {
     const DialogComponent = Dialog;
     return (
       <DialogComponent
-        testId="save-structure-dialog"
         className={classes.dialog}
         title={i18n.t('save.title')}
         params={this.props}
@@ -762,7 +749,6 @@ const mapStateToProps = (
   formState: ownProps.formState ?? state.modal?.form,
   moleculeErrors: (ownProps.formState ?? state.modal?.form)?.moleculeErrors,
   checkState: state.options.check,
-  bondThickness: state.options.settings.bondThickness,
   ignoreChiralFlag: state.editor.render.options.ignoreChiralFlag,
   editor: state.editor,
 });

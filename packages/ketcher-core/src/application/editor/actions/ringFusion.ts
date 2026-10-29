@@ -86,10 +86,12 @@ export function fromSelectedRingFusion(
   const candidates = [false, true].map((flip) => {
     const templateBond = ring.bonds.get(0)!;
     const templateBegin = ring.atoms.get(flip ? templateBond.end : templateBond.begin)!;
-    const { angle, scale } = utils.mergeBondsParams(struct, bond, ring, {
+    const mergeParams = utils.mergeBondsParams(struct, bond, ring, {
       begin: flip ? templateBond.end : templateBond.begin,
       end: flip ? templateBond.begin : templateBond.end,
     });
+    if (!mergeParams) throw new Error("无法确定稠合环的放置位置");
+    const { angle, scale } = mergeParams;
     let score = 0;
     let overlaps = false;
     ring.atoms.forEach((atom, id) => {
@@ -109,6 +111,8 @@ export function fromSelectedRingFusion(
   return fromTemplateOnBondAction(restruct, {
     molecule: ring,
     bid: 0,
+    aid: 0,
+    angle0: 0,
     preserveTargetAtomAttributes: true,
     preserveExistingBondAttributes: true,
     mergeNearbyAtoms: false,
